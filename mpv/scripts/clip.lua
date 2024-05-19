@@ -25,9 +25,17 @@ end
 -- mp.register_event("file-loaded", on_loaded)
 mp.register_event("eof-reached", on_eof)
 
+-- FIXED: show progressbar on startup
+-- ALT:(mpv.conf): script-opts-add=osc-visibility=always
+-- mp.register_event("file-loaded", function()
+--     mp.commandv("script-message", "osc-visibility", "always", "no-osd")
+--     -- local hasvid = mp.get_property_osd("video") ~= "no"
+--     -- mp.commandv("script-message", "osc-visibility", (hasvid and "auto" or "always"), "no-osd")
+--     -- mp.commandv("set", "options/osd-bar", (hasvid and "yes" or "no"))
+-- end)
+
 
 -- Helpers
-local function nm(m) return 'clip_'..m end
 local function show_status(t, msg)
   mp.msg.log(t, msg)
   mp.osd_message(t .. ": " .. msg, 2)
@@ -39,41 +47,42 @@ end
 -- mp.set_property("ab-loop-a", g.A)
 -- mp.set_property("loop", 999)
 function mark_update(m)
-  show_status("info", string.format("[%s] % 4.3f  (%s - %s)",
+  show_status("info", string.format("[%s] dt=%4.3f  (%s - %s)",
     m, g.B - g.A, os.date("%M:%S", g.A), os.date("%M:%S", g.B)))
 end
 function h_mark_beg()
   g.A = mp.get_property_number("playback-time")
   -- print(g.A)
   g.B = math.max(g.A, g.B)
-  mark_update('A')
+  mark_update('<')
 end
 function h_mark_end()
   g.B = mp.get_property_number("playback-time")
   -- print(g.B)
   g.A = math.min(g.A, g.B)
-  mark_update('B')
+  mark_update('>')
 end
 
 
 -- function h_seek(pos) return loadstring([[return function()
 --     mp.commandv("seek", ]] .. pos .. [[, "absolute", "exact")
 -- end ]])(pos) end
-function h_seek_beg()
+function h_seek(begend,kfrxct)
   mp.set_property("pause", "yes")
-  mp.commandv("seek", g.A, "absolute", "exact")
-end
-function h_seek_end()
-  mp.set_property("pause", "yes")
-  mp.commandv("seek", g.B, "absolute", "exact")
+  local ats, flg, m
+  if (begend == 1) then ats,m=g.B,'>' else ats,m=g.A,'<' end
+  if (kfrxct == 1) then flg="exact" else flg="keyframes" end
+  mp.commandv("seek", ats, "absolute", flg)
+  show_status("info", string.format("seek %s%4.3f (%s) -> got %4.3f",
+    m, ats, flg, mp.get_property_number("playback-time")))
 end
 
-function h_write()
+function h_write(mode)
   if g.B - g.A == 0 then
     show_status("error", "can't encode empty clip at=" .. g.A)
     return
   end
-  show_status("info", "sent to encoding")
+  show_status("info", string.format("encoding '%s' dt=%4.3f", mode, g.B - g.A))
   -- [_] BET: create hidden tmux session to allow parallel enconding
 
   local r = mp.command_native({
@@ -83,7 +92,7 @@ function h_write()
       capture_stderr = true,
       args = { "r.ffmpeg",
         tostring(mp.get_property_native("path")),
-        tostring(g.A), tostring(g.B), 'fast'
+        tostring(g.A), tostring(g.B), mode
   }})
   if r.status == 0 then
     -- TODO: show how much time passed
@@ -108,12 +117,16 @@ function h_move()
   end
 end
 
-mp.add_key_binding("y", nm("write"),    h_write)
-mp.add_key_binding("m", nm("moving"),   h_move)
-mp.add_key_binding("[", nm("mark_beg"), h_mark_beg)
-mp.add_key_binding("]", nm("mark_end"), h_mark_end)
-mp.add_key_binding("{", nm("seek_beg"), h_seek_beg)
-mp.add_key_binding("}", nm("seek_end"), h_seek_end)
+mp.add_key_binding("", "clip_write_fast", (function() return h_write('fast') end))  -- y
+mp.add_key_binding("", "clip_write_copy", (function() return h_write('copy') end))  -- Y
+mp.add_key_binding("", "clip_moving",   h_move)       -- m
+mp.add_key_binding("", "clip_mark_beg", h_mark_beg)   -- [
+mp.add_key_binding("", "clip_mark_end", h_mark_end)   -- ]
+-- ALT: jump and mark to keyframe
+mp.add_key_binding("", "clip_seek_beg", (function() return h_seek(0,1) end))  -- {
+mp.add_key_binding("", "clip_seek_end", (function() return h_seek(1,1) end))  -- }
+mp.add_key_binding("", "clip_seek_kfb", (function() return h_seek(0,0) end))  -- <
+mp.add_key_binding("", "clip_seek_kfe", (function() return h_seek(1,0) end))  -- >
 
 
 -- mp.osd_message("loaded", 3)
