@@ -17,8 +17,8 @@ function M.register()
   local matchadd = vim.fn.matchadd
   -- local rpfx = '\\v%(^|.*!|\\A@1<=)'
   -- local rsfx = '%(!.*|[:?*.=~]+|\\A@=|$)'
-  local rpfx = '\\v<%('
-  local rsfx = ')%(!\\..+|[.:=?!]{1,2}|>|\\ze\\s|$)'
+  local rpfx = '\\v%(<|[<]{1,2}|\\s@1<=[-=<:.]{1,2})%('
+  local rsfx = ')%(!\\..+|[.:=?!>-]{1,2}|>|\\ze\\s|$)'
 
   -- DEBUG: :echo getmatches()
   vim.fn.clearmatches()
