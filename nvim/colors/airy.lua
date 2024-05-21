@@ -71,6 +71,11 @@ local highlights = {
   DiffDelete = { fg = '#dc322f', bg = '#1a0000', bold = true },
   DiffText   = { fg = '#268bd2', bg = bg, sp = '#268bd2' },
 
+  GitSignsAddNr = { link = "DiffAdd" },
+  GitSignsChangeNr = { link = "DiffChange" },
+  GitSignsDeleteNr = { link = "DiffDelete" },
+  GitSignsChangedeleteNr = { link = "DiffDelete" },
+
   -- GitGutterChange = { fg = '#b58900', bg = '#000000', sp = '#b58900', underline = true },
   -- GitGutterChange = { fg = '#b58900', bg = '#140c00', sp = '#b58900' },
 
@@ -173,6 +178,8 @@ local highlights = {
   -- semshiSelected xxx ctermfg=231 ctermbg=161 guifg=#ffffff guibg=#d7005f
   -- semshiErrorSign xxx ctermfg=231 ctermbg=160 guifg=#ffffff guibg=#d70000
   -- semshiErrorChar xxx ctermfg=231 ctermbg=160 guifg=#ffffff guibg=#d70000
+
+  ["@variable"] = { link = "Normal" },
 }
 
 local nvim_set_hl = vim.api.nvim_set_hl
