@@ -132,6 +132,10 @@ bindkey -M viins "^ " glob-alias
 # NOTE: remove "/" from default set to prevent deleting whole path at once
 WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
 
+## DISABLED: long running
+# TIMEFMT='e=%*E u=%U s=%S memsh=%XkB memun=%DkB memmax=%MkB nswap=%W nmajflt=%F nmnrflt=%R nrecv=%r nsent=%s nctxyield=%w nctxforce=%c nm=%J'
+TIMEFMT='%mE %P(%mU+%mS) | ram=%D+%XkB,%MkB fault=%F/%R ios=%I/%O/%k ctx=%w/%c'
+
 # SRC: https://unix.stackexchange.com/questions/76227/how-to-make-cd-dir-filename-take-me-to-dir
 autoload -Uz select-word-style
 zle -N select-word-style
