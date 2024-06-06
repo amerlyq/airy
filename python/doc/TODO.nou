@@ -20,3 +20,12 @@ FAQ
     # ERR: Build problems on Ubuntu 14.04
     pip_inst -a readline  # BUG: no adequate condition
     pip_inst -y pyreadline{,}
+
+
+2024-05-28-Tue-W22
+  [+] AGAIN:FIX: jupyter_console unreadable yellow color in exception highlight ⌇⡦⡕⢈⢃
+    //core/ultratb.py:845
+      /usr/lib/python3.12/site-packages/IPython/core/ultratb.py:830:
+      _tb_highlight = "bg:ansiblack"
+        ::: CHG: -> "bg:ansiblack"
+        # style = stack_data.style_with_executing_node(style, _tb_highlight)

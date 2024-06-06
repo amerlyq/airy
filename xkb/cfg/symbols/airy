@@ -191,7 +191,8 @@ xkb_symbols "lvl3_latch_ralt" {
         // FAIL:
         // type= "AMER_SHIFT_SUPER",
         // [ ISO_Level3_Latch, ISO_Level3_Latch, ISO_Last_Group, ISO_First_Group ],
-        overlay1=<KATA>   // -> RU
+        // overlay1=<KATA>   // -> RU
+        overlay1=<DOWN>   // -> RU
     };
 };
 
@@ -310,4 +311,5 @@ xkb_symbols "overlay_vim" {
     // HACK: remap Kinesis arrows and brackets
     key <AD11> { overlay1=<UP>   };
     key <AD12> { overlay1=<DOWN> };
+    // key <RALT> { overlay1=<DOWN> };
 };

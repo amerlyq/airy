@@ -5,7 +5,7 @@
 --% * Convert by 'r.ffmpeg <path> <beg> <end>' on 'y'
 --%
 
-local g = { A = 0.0, B = mp.get_property_number("length") or 0.0 }
+local g = { A = 0.0, B = 0.0 }
 
 -- Options
 -- mp.set_property("hr-seek-framedrop", "no")
@@ -16,13 +16,16 @@ local g = { A = 0.0, B = mp.get_property_number("length") or 0.0 }
 
 -- Behaviour
 -- Pause on open and eof
-function on_loaded() mp.set_property("pause", "yes") end
+function on_loaded()
+  -- mp.set_property("pause", "yes")
+  g.B = mp.get_property_number("duration/full")
+end
 function on_eof()
     mp.msg.log("info", "playback reached end of file")
     mp.set_property("pause", "yes")
     mp.commandv("seek", 100, "absolute-percent", "exact")
 end
--- mp.register_event("file-loaded", on_loaded)
+mp.register_event("file-loaded", on_loaded)
 mp.register_event("eof-reached", on_eof)
 
 -- FIXED: show progressbar on startup
