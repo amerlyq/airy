@@ -9,7 +9,7 @@ autocmd('FileType', {
 
 
 -- Highlight on yank
-vim.api.nvim_create_autocmd('TextYankPost', {
+autocmd('TextYankPost', {
   callback = function() vim.highlight.on_yank { higroup = "TextYank", timeout = 130 } end,
   group = vim.api.nvim_create_augroup('YankHighlight', { clear = true }),
 })
@@ -47,6 +47,21 @@ autocmd("BufWritePre", {
     --ALSO: let &fixeol=g:strip_lines
     vim.fn.winrestview(save)
   end
+})
+
+
+autocmd('CursorMoved', {
+  desc = "(Nou) cvt ts -> date",
+  callback = function()
+    local word = vim.fn.expand('<cword>')
+    if string.match(word, "^1%d%d%d%d%d%d%d%d%d$") then
+      local ts = tonumber(word)
+      local dts = os.date("%Y%m%d_%H%M%S", ts)
+      vim.api.nvim_echo({{dts, 'None'}}, false, {})
+    end
+  end
+  -- command = "if expand('<cword>')=~'^1[0-9]{9}$'| "
+  -- group = vim.api.nvim_create_augroup('YankHighlight', { clear = true }),
 })
 
 

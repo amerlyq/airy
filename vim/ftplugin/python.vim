@@ -1,6 +1,6 @@
 " Indent settings.
 " make Python follow PEP8 ( http://www.python.org/dev/peps/pep-0008/ )
-setlocal textwidth=88
+setlocal textwidth=112
 setlocal nowrap
 setlocal smarttab
 setlocal expandtab

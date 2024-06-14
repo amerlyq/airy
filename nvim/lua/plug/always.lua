@@ -35,10 +35,11 @@ require('nvim_comment').setup {
 require('leap').set_default_keymaps()
 -- vim.cmd [[ autocmd ColorScheme * lua require('leap').init_highlight(true) ]]
 
-require('spellsitter').setup {
-  -- Whether enabled, can be a list of filetypes, e.g. {'python', 'lua'}
-  enable = true,
-}
+-- DISABLED:(errors-out): no updates from 2022
+-- require('spellsitter').setup {
+--   -- Whether enabled, can be a list of filetypes, e.g. {'python', 'lua'}
+--   enable = true,
+-- }
 
 
 require('legendary').setup()

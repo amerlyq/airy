@@ -59,7 +59,9 @@ cmp.setup {
     -- { name = 'snippy' }, -- For snippy users.
     -- { name = 'vsnip' },  -- For vsnip users.
   }, {
-    { name = 'buffer' }, -- https://github.com/hrsh7th/cmp-buffer
+    -- DISABLED: too much noise when trying to DEV .py
+    --   [_] FIXME: only activate for non .py/.c files
+    -- { name = 'buffer' }, -- https://github.com/hrsh7th/cmp-buffer
     { name = 'calc' }, -- https://github.com/hrsh7th/cmp-calc
     -- { name = 'fuzzy_buffer' }, -- CFG: https://github.com/tzachar/cmp-fuzzy-buffer
   }, {

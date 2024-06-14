@@ -18,6 +18,7 @@ nnoremap <unique> [Toggle]H :setl hlsearch! hls?<CR>
 
 " Amazing custom search command. Thansk to Ingo: http://stackoverflow.com/a/24818933/1147859
 command! -nargs=+ Se execute 'vimgrep /' . [<f-args>][0] . '/ **/*.' . [<f-args>][1]
+" ALT: .!tr ' ' '\n'|sort|paste -sd' '
 command! -nargs=0 -range  SortInLine
       \ <line1>,<line2>call setline('.',join(sort(split(getline('.'),' ')),' '))
 " Visual block sorting. Restore text _outside_ block:  gvyugvp
