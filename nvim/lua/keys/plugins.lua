@@ -99,3 +99,7 @@ g.table_mode_corner = '┼'
 -- g.table_mode_separator = '│'
 g.table_mode_fillchar = '─'
 g.table_mode_header_fillchar = '─'
+
+
+-- DEBUG: lazy keymap
+-- vim.keymap.set("x", "X", function() require('substitute.exchange').visual() end, { noremap = true })

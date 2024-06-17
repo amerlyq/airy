@@ -110,3 +110,17 @@ require("cybu").setup {
     },
   }
 }
+
+
+-- SRC: https://github.com/gbprod/substitute.nvim
+-- LIOR Exchange text: cx{motion} on first, then cx{motion} on other.
+-- OLD: https://github.com/tommcdo/vim-exchange
+--   ALT: https://github.com/osyo-manga/vim-operator-swap
+-- WARN: keymap overshadows "leap"
+require('substitute').setup {}
+local xcg = require('substitute.exchange')
+local K = require('keys.bind').K
+K("x", "X", xcg.visual)
+K("n", "cx", xcg.operator)
+K("n", "cxc", xcg.line)
+K("n", "cxx", xcg.cancel)
