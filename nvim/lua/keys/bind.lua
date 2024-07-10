@@ -7,6 +7,7 @@ local KG = vim.api.nvim_set_keymap  -- OR: local KS = vim.keymap.set
 local KB = vim.api.nvim_buf_set_keymap
 
 local function map(modes, lhs, rhs, desc, fn, opts)
+  opts.desc = desc
   if type(rhs) == "function" then
     opts.callback = rhs
     rhs = ''

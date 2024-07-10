@@ -18,8 +18,36 @@ require('mini.move').setup({  --- ALT※⡤⣪⡒⡮
   }
 })
 
+-- OLD:ALT:
+--   https://github.com/kana/vim-operator-replace
+--   https://github.com/thinca/vim-quickrun
+require('mini.operators').setup({
+  evaluate = { -- Evaluate text and replace with output
+    prefix = 'g<BS>',  -- DFL='g='
+    func = nil,  -- Function which does the evaluation
+  },
+  exchange = { -- Exchange text regions
+    prefix = '', -- DFL='gx'  -- OBSOL: https://github.com/gbprod/substitute.nvim
+    reindent_linewise = true,  -- Whether to reindent new text to match previous indent
+  },
+  multiply = { -- Multiply (duplicate) text
+    prefix = 'gC',  -- DFL='gm'
+    func = nil,  -- Function which can modify text before multiplying
+  },
+  replace = { -- Replace text with register
+    prefix = 'gr',  -- OR: 'cr'
+    reindent_linewise = true,
+  },
+  sort = {
+    prefix = ',S',
+    func = nil
+  }
+})
+
+
 --Enable Comment.nvim
 -- https://github.com/numToStr/Comment.nvim
+--   ALT: mini.comment
 -- require('Comment').setup()
 require('nvim_comment').setup {
   -- HACK: pull "commentstring" based on HEREDOC language
@@ -30,10 +58,6 @@ require('nvim_comment').setup {
   -- end
 }
 
---OFF:TUT: https://github.com/ggandor/leap.nvim
---LIOR: s|S char1 char2 <space>? (<space>|<tab>)* label?
-require('leap').set_default_keymaps()
--- vim.cmd [[ autocmd ColorScheme * lua require('leap').init_highlight(true) ]]
 
 -- DISABLED:(errors-out): no updates from 2022
 -- require('spellsitter').setup {
@@ -115,7 +139,8 @@ require("cybu").setup {
 -- SRC: https://github.com/gbprod/substitute.nvim
 -- LIOR Exchange text: cx{motion} on first, then cx{motion} on other.
 -- OLD: https://github.com/tommcdo/vim-exchange
---   ALT: https://github.com/osyo-manga/vim-operator-swap
+--   OLD:ALT: https://github.com/osyo-manga/vim-operator-swap
+--   ALT:(reuse): mini.operators.exchange
 -- WARN: keymap overshadows "leap"
 require('substitute').setup {}
 local xcg = require('substitute.exchange')
@@ -124,3 +149,7 @@ K("x", "X", xcg.visual)
 K("n", "cx", xcg.operator)
 K("n", "cxc", xcg.line)
 K("n", "cxx", xcg.cancel)
+
+
+-- SRC: https://github.com/RaafatTurki/hex.nvim
+-- require('hex').setup()

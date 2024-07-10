@@ -1,3 +1,7 @@
+-- ALT:(TODO compare code): https://github.com/machakann/vim-sandwich
+--   TALK: https://www.reddit.com/r/vim/comments/esrfno/why_vimsandwich_and_not_surroundvim/
+--   CMP: https://joereynoldsaudio.com/2020/01/22/vim-sandwich-is-better-than-surround.html
+-- DEPR: (bloated) tpope/vim-surround
 require("nvim-surround").setup {
   keymaps = {
     -- ALSO:TODO: use <C-q> for insert mappings
@@ -11,9 +15,9 @@ require("nvim-surround").setup {
     normal = "ys",
     normal_cur = "yss",
     normal_line = "yS",
-    normal_cur_line = "ySS",
-    visual = "S",
-    visual_line = "gS",
+    normal_cur_line = "ysS",
+    visual = "q",  -- DFL=S
+    visual_line = "Q",  -- DFL=gS
     delete = "ds",
     change = "cs",
   },
@@ -124,3 +128,7 @@ require("nvim-surround").setup {
   --   duration = 0,
   -- }
 }
+
+local KG = vim.api.nvim_set_keymap
+-- local K = require('keys.bind').K
+KG("n", "q2", 'ysiw"', {})

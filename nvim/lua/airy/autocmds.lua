@@ -58,6 +58,13 @@ autocmd('CursorMoved', {
       local ts = tonumber(word)
       local dts = os.date("%Y%m%d_%H%M%S", ts)
       vim.api.nvim_echo({{dts, 'None'}}, false, {})
+    elseif vim.fn.match(word, '^\\v[\\u2800-\\u28FF]{4}$') == 0 then
+      -- http://lua-users.org/wiki/LuaUnicode
+      -- val = bit32.bor(bit32.lshift(val, 6), bit32.band(c, 0x3F))
+      local vxfm = '\\=printf("%02x",and(char2nr(submatch(0)),0xff))'
+      local hexts = vim.fn.substitute(word, '.', vxfm, 'g')
+      local dts = os.date("%Y%m%d_%H%M%S", tonumber(hexts, 16))
+      vim.api.nvim_echo({{dts, 'None'}}, false, {})
     end
   end
   -- command = "if expand('<cword>')=~'^1[0-9]{9}$'| "

@@ -7,7 +7,7 @@ K('', '<C-l>', '<Cmd>setl hlsearch! hls?<CR>')
 
 K('n', ',c', ':%s;;;g<Left><Left>', "Replace all matches by")
 K('x', ',c', ':s;;;g<Left><Left>', "Replace matches in selected region by")
--- '<Leader>c' : 's;;<C-r>=SubsCount()<CR>;g',
+-- '<Leader>c' : 's;;<C-r>=(v:count ? substitute(string(v:count), '.', '\\&', 'g') : '')<CR>;g',
 -- '<Leader>C' : 'g//'
 -- '<Leader>R' : 'v//'
 

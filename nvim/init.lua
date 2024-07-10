@@ -8,6 +8,12 @@ package.path = './?.lua'
 package.cpath = './?.so'
 
 
+-- OLD:ALT: https://github.com/lewis6991/impatient.nvim
+-- (native): adds the Lua loader using the byte-compilation cache
+-- BAD: Error executing vim.schedule lua callback: /@/airy/nvim/lua/plug/cmp.lua:4: module 'cmp' not found:
+-- vim.loader.enable()
+
+
 -- USAGE: vim.env.MYLUA
 -- vim.cmd [[ let $MYLUA = fnamemodify($MYVIMRC, ':h') . '/lua/' ]]
 MYCONF = '/@/airy/nvim'

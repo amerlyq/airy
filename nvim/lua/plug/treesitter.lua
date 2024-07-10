@@ -38,13 +38,14 @@ require('nvim-treesitter.configs').setup {
   --     cpp = '// %s'
   --   }
   -- },
+  -- DONE: inof 'terryma/vim-expand-region'
   incremental_selection = {
     enable = true,
     keymaps = {
-      init_selection = 'gnn',
-      node_incremental = 'grn',
-      scope_incremental = 'grc',
-      node_decremental = 'grm',
+      init_selection = '+',
+      node_incremental = '+',
+      node_decremental = '-',
+      scope_incremental = '_',
     },
   },
   indent = {
@@ -55,6 +56,8 @@ require('nvim-treesitter.configs').setup {
   textobjects = {
     swap = {
       enable = true,
+      -- OR: https://github.com/AndrewRadev/sideways.vim
+      -- OR: https://github.com/machakann/vim-swap
       swap_previous = { ["ga"] = "@parameter.inner" },
       swap_next = { ["gA"] = "@parameter.inner" },
     },
@@ -62,8 +65,8 @@ require('nvim-treesitter.configs').setup {
       enable = true,
       border = "none",
       peek_definition_code = {
-        ["<Bslash>df"] = "@function.outer",
-        ["<Bslash>dF"] = "@class.outer",
+        ["g<Bslash>d"] = "@function.outer",
+        ["g<Bslash>D"] = "@class.outer",
       },
     },
     select = {
@@ -81,20 +84,20 @@ require('nvim-treesitter.configs').setup {
       enable = true,
       set_jumps = true, -- whether to set jumps in the jumplist
       goto_next_start = {
-        [']m'] = '@function.outer',
-        [']]'] = '@class.outer',
+        [']]'] = '@function.outer',
+        [']}'] = '@class.outer',
       },
       goto_next_end = {
-        [']M'] = '@function.outer',
-        [']['] = '@class.outer',
+        [']['] = '@function.outer',
+        [']{'] = '@class.outer',
       },
       goto_previous_start = {
-        ['[m'] = '@function.outer',
-        ['[['] = '@class.outer',
+        ['[['] = '@function.outer',
+        ['[{'] = '@class.outer',
       },
       goto_previous_end = {
-        ['[M'] = '@function.outer',
-        ['[]'] = '@class.outer',
+        ['[]'] = '@function.outer',
+        ['[}'] = '@class.outer',
       },
     },
   },
