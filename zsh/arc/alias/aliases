@@ -44,6 +44,7 @@ alias -g LP="X zsh -c 'command ln -svT --backup=numbered -- "'"$1:A" "$0/${1//\/
 # Line trim W/H to term size (w/o two prompts and errcode)
 alias -g CW='| expand | cut -c-"$(tput cols)"'
 alias -g CH='| head -$(($(tput lines)-5)) | expand | cut -c-"$(tput cols)"'
+alias -g CL="| sed -rz 's/^(\\n|\\s)+//;s/(\\s|\\n)+$//;s/(\\n|\\s)+/ /g'"
 
 if (($+commands[$EDITOR])); then
   # alias -g V='| $EDITOR -R - '  # USE ':set noro' to edit
@@ -207,6 +208,8 @@ elif (($+commands[xsel])); then
   alias -g .Y='<(xsel -ob)'
   alias -g _Y='"$(xsel -ob)"'
 fi
+
+alias -g YL='CL Y'
 
 if (($+commands[fzf])); then
   # ALT:(fzf) https://github.com/garybernhardt/selecta

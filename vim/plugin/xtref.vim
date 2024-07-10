@@ -200,7 +200,7 @@ fun! xtref#cvt(fmt, xts)
   "" ALT:PERF:(native)
   " let hexts = substitute(x, '.', '\=printf("%02x",and(char2nr(submatch(0)),0xff))', 'g')
   " return strftime('%Y-%m-%d=%H:%M:%S%z', str2nr(hexts, 16))
-  return systemlist('r.vim-xtref -nf '.a:fmt.' -- '.shellescape(a:xts))[0]
+  return systemlist('/d/airy/vim/ctl/xtref -nf '.a:fmt.' -- '.shellescape(a:xts))[0]
 endf
 
 "" NICE: use "r.vim-xtref" as SPOT
@@ -296,6 +296,7 @@ fun! xtref#ctags(root, ...)
   end
 
   " FIXME: use async job
+  " echoe cmd  " DEBUG
   let _ = join(xtref#call_at(a:root, 'systemlist', cmd), '\n')
   echom 'DONE:('. a:root .') -> '. dst
 endf

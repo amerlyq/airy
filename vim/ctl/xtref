@@ -95,8 +95,6 @@ EOT
   local r_addr=$r_braille
 
   args=( --options='NONE'
-    ${recursive+--recurse}
-    --links=no
 
     --input-encoding='UTF-8'
     --output-encoding='UTF-8'
@@ -123,15 +121,23 @@ EOT
 
     # FAIL:(does not work): --exclude='/home/amer/aura/items/*'
     #   FIXED:USE:(path relative to PWD): --exclude='items/*' OR --exclude='items'
-    --exclude='employment/luxoft/log'
+    # --exclude='employment/luxoft/log'
   )
   # DEBUG:(stats): $ <xtref.tags C2 |cut -d/ -f-6 SC H
-  for g in '.git' '_build*' 'tags' '*.tags' '&*' 'out' 'items' '#del'; do
+
+  if [[ " $* " =~ " --append " ]] && [[ ! " $* " =~ " --recurse " ]]; then
+    args+=( --links=yes )
+  else
+    args+=( --links=no ${recursive+--recurse} )
+    for f in .ignore .gitignore; do
+      [[ -f $f ]] && args+=( --exclude="@$f" )
+    done
+  fi
+
+  for g in '.git' '_build*' 'tags' '*.tags' 'out' '#del'; do  # '&*'
     args+=( --exclude="$g" )
   done
-  for f in .ignore .gitignore; do
-    [[ -f $f ]] && args+=( --exclude="@$f" )
-  done
+
   # DEBUG: echo exec ctags --quiet "${args[@]}" "$@"
   exec ctags --quiet "${args[@]}" "$@"
   exit

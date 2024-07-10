@@ -456,9 +456,9 @@ def audit_cb(name, selection) -> None:
     #     if any(x in owner_class for x in blacklist):
     #         return
 
+    nl = sel.count("\n") + 1
     sel = sel.rstrip().replace("\r", "").replace("\n", "\r")
     cnt = len(sel)
-    nl = sel.count("\n") + 1
     maxlen = 1024
     if cnt > maxlen:
         sel = sel[:maxlen] + "..."
