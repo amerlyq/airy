@@ -180,3 +180,10 @@ K('n',  's', '<Plug>(leap)')
 K('n',  'S', '<Plug>(leap-from-window)')
 K('xo', 's', '<Plug>(leap-forward)')
 K('xo', 'S', '<Plug>(leap-backward)')
+
+
+
+-- SRC: https://github.com/embear/vim-foldsearch
+-- g.foldsearch_highlight = 1
+g.foldsearch_disable_mappings = 1
+vim.cmd 'com! Fv let w:foldsearch_pattern = "\\V\\^\\%(\\%(".@/."\\)\\@!\\.\\)\\*\\$"|call foldsearch#foldsearch#FoldSearchDo()'

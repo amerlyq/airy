@@ -178,6 +178,9 @@ local function on_delayed_startup()
   --USAGE :LuaCacheProfile
   -- require('impatient').enable_profile()
 
+  --DEBUG: vim.cmd 'set pp'
+  -- print(vim.inspect(vim.opt.packpath))
+
   --HACK: add lazy plugins to &rtp
   --DISABLED:(MYCONF,...): prevent duplicates in &rtp
   --  NOTE: always treat MYCONF as preload-only and don't insert it here again

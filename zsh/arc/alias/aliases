@@ -45,11 +45,13 @@ alias -g LP="X zsh -c 'command ln -svT --backup=numbered -- "'"$1:A" "$0/${1//\/
 alias -g CW='| expand | cut -c-"$(tput cols)"'
 alias -g CH='| head -$(($(tput lines)-5)) | expand | cut -c-"$(tput cols)"'
 alias -g CL="| sed -rz 's/^(\\n|\\s)+//;s/(\\s|\\n)+$//;s/(\\n|\\s)+/ /g'"
+alias -g CD='|(){ local n=${1:--1}; ((n>=0)) && n=-n+$n; cdauto "$(tail "$n"|head -1)" }'
 
 if (($+commands[$EDITOR])); then
   # alias -g V='| $EDITOR -R - '  # USE ':set noro' to edit
   # ALSO: -c "fencs= fenc=utf8 nobinary nobomb"
   alias -g V='| $EDITOR - -c "setl noro ma bt=nofile nowrap"'
+  alias -g VL='| xargs $EDITOR'
   alias -g VN='V -c "setl ft=nou fdl=99"'
   alias -g VQ='V -c "cgetb|copen"'
     # ALT: ag --vimgrep ... |sort| nvim -q/dev/stdin

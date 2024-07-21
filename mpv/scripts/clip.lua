@@ -57,12 +57,17 @@ function h_mark_beg()
   g.A = mp.get_property_number("playback-time")
   -- print(g.A)
   g.B = math.max(g.A, g.B)
+  -- HACK: loop the snippet; clear it manually
+  mp.set_property("ab-loop-a", g.A)
+  mp.set_property("ab-loop-b", g.B)
   mark_update('<')
 end
 function h_mark_end()
   g.B = mp.get_property_number("playback-time")
   -- print(g.B)
   g.A = math.min(g.A, g.B)
+  mp.set_property("ab-loop-a", g.A)
+  mp.set_property("ab-loop-b", g.B)
   mark_update('>')
 end
 
@@ -78,6 +83,7 @@ function h_seek(begend,kfrxct)
   mp.commandv("seek", ats, "absolute", flg)
   show_status("info", string.format("seek %s%4.3f (%s) -> got %4.3f",
     m, ats, flg, mp.get_property_number("playback-time")))
+  if (begend == 1) then mp.set_property("ab-loop-b", "no") end
 end
 
 function h_write(mode)
@@ -88,6 +94,8 @@ function h_write(mode)
   show_status("info", string.format("encoding '%s' dt=%4.3f", mode, g.B - g.A))
   -- [_] BET: create hidden tmux session to allow parallel enconding
 
+  mp.set_property("ab-loop-a", "no")
+  mp.set_property("ab-loop-b", "no")
   local r = mp.command_native({
       name = "subprocess",
       playback_only = false,

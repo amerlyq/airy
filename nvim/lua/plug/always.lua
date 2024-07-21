@@ -1,5 +1,5 @@
 
-require 'plug.cmp' -- +luasnip
+require 'plug.cmp_' -- +luasnip
 require 'plug.gitsigns'
 
 require 'plug.surround'

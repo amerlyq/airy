@@ -1,23 +1,26 @@
 -- vim:ts=2:sts=2:sw=2:et
 -- REF: https://github.com/nvim-lua/kickstart.nvim/blob/master/init.lua
 
-
 -- OFF: https://github.com/neovim/neovim/wiki/FAQ#why-lua-51-instead-of-lua-53
 -- ONLY: /usr/share/luajit-2.1.0-beta3/?.lua -- plenary/profile
 package.path = './?.lua'
 package.cpath = './?.so'
 
 
--- OLD:ALT: https://github.com/lewis6991/impatient.nvim
--- (native): adds the Lua loader using the byte-compilation cache
--- BAD: Error executing vim.schedule lua callback: /@/airy/nvim/lua/plug/cmp.lua:4: module 'cmp' not found:
--- vim.loader.enable()
-
-
 -- USAGE: vim.env.MYLUA
 -- vim.cmd [[ let $MYLUA = fnamemodify($MYVIMRC, ':h') . '/lua/' ]]
-MYCONF = '/@/airy/nvim'
-MYPLUG = '/@/plugins/nvim'
+MYCONF = '/d/airy/nvim'
+MYPLUG = '/d/plugins/nvim'
+
+
+--DISABLED:BAD:PERF: with deferred plugins it becomes slower, not faster (48ms vs 61ms)
+-- SRC: https://github.com/neovim/neovim/pull/22668
+-- OLD:ALT: https://github.com/lewis6991/impatient.nvim
+-- (native): adds the Lua loader using the byte-compilation cache
+-- FIXED:ERR: Error executing vim.schedule lua callback: /@/airy/nvim/lua/plug/cmp.lua:4: module 'cmp' not found:
+-- vim.opt.packpath = { MYPLUG .. '/preload', MYPLUG .. '/lazy', MYCONF }
+-- vim.loader.enable()
+
 
 -- DEBUG: what files ':runtime' found
 -- vim.opt.verbose = 2
