@@ -47,8 +47,11 @@ K('nx', 'gY', '<Plug>(LiveEasyAlign)')
 -- OLD: https://github.com/t9md/vim-quickhl
 
 -- SRC: https://github.com/ghillb/cybu.nvim
-K("n", "<C-Tab>", "<Plug>(CybuPrev)")
-K("n", "<S-Tab>", "<Plug>(CybuNext)")
+K("n", "<S-Tab>", "<plug>(CybuLastusedPrev)")  -- "<c-s-tab>"
+-- K("n", "<c-tab>", "<plug>(CybuLastusedNext)")
+-- DISABLED: very irritating; always appears at the border of line of sight
+-- K("n", "gh", "<Plug>(CybuPrev)")  -- "<C-Tab>"
+-- K("n", "gl", "<Plug>(CybuNext)")  -- "<S-Tab>"
 
 -- https://github.com/preservim/tagbar
 -- ALSO:SEE: TagbarOpenAutoClose, TagbarTogglePause, TagbarShowTag

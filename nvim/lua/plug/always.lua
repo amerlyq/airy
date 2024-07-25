@@ -127,7 +127,7 @@ require("which-key").setup {
 -- TALK: https://www.reddit.com/r/neovim/comments/uu2rfn/cybunvim_v10_a_plugin_to_cycle_buffers_with/
 -- require("cybu").setup()
 require("cybu").setup {
-  display_time = 350,
+  display_time = 450,
   style = {
     devicons = {
       enabled = false,

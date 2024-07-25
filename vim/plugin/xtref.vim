@@ -355,27 +355,27 @@ augroup END
 iabbrev <expr> !xts! xtref#new()
 
 "" DISABLED: prevent overwriting long lazytagdir by short *.nou-only
-" nnoremap [Xtref]U :<C-u>XtrefNou<CR>
+" nnoremap <Leader>xU :<C-u>XtrefNou<CR>
 " command! -bar -range -nargs=0  XtrefNou  call xtref#ctags(g:xtref.aura, '.nou,.task')
 
-nnoremap [Xtref]u :<C-u>XtrefOpened<CR>
+nnoremap <Leader>xu :<C-u>XtrefOpened<CR>
 command! -bar -range -nargs=0  XtrefOpened
   \ call xtref#ctags(g:xtref.lazytagdir, 1)
 
 " DEPS: https://github.com/airblade/vim-rooter
-nnoremap [Xtref]<C-u> :<C-u>XtrefRepo<CR>
+nnoremap <Leader>x<C-u> :<C-u>XtrefRepo<CR>
 command! -bar -range -nargs=0  XtrefRepo
   \ call xtref#ctags(FindRootDirectory())
 
 " FIXME: prevent in /@ and many other system/network locations
-nnoremap [Xtref]<A-u> :<C-u>XtrefCwd<CR>
+nnoremap <Leader>x<A-u> :<C-u>XtrefCwd<CR>
 command! -bar -range -nargs=0  XtrefCwd
   \ if $HOME !~# '^'.getcwd()|call xtref#ctags('.')
   \ |else|echoerr "Prevented gen tags in $HOME or below"|en
 
 "" HACK: use same g:lazytagdir for initial @/aura and then for --append()
 " OBSOL: <LocalLeader><F2>
-nnoremap [Xtref]<A-S-u> :<C-u>XtrefAura<CR>
+nnoremap <Leader>x<A-S-u> :<C-u>XtrefAura<CR>
 command! -bar -range -nargs=0  XtrefAura
   \ call xtref#ctags(g:xtref.aura, [], g:xtref.lazytagdir)
 
@@ -506,30 +506,31 @@ xnoremap <Plug>(xtref-invert) :<C-u>call xtref#replace(1,xtref#invert(xtref#get(
 
 
 " OBSOL:  <LocalLeader>...
-map <silent> [Xtref]<Backspace> <Plug>(xtref-delete)
-map <silent> [Xtref]<Delete> <Plug>(xtref-delete)
+map <silent> <Leader>x<Backspace> <Plug>(xtref-delete)
+map <silent> <Leader>x<Delete> <Plug>(xtref-delete)
 
-map <silent> [Xtref]a <Plug>(xtref-new-append)
-map <silent> [Xtref]A <Plug>(xtref-new-postpone-day)
-map <silent> [Xtref]i <Plug>(xtref-new-insert)
-map <silent> [Xtref]I <Plug>(xtref-new-prepend)
-map <silent> [Xtref]> <Plug>(xtref-new-postpone)
-map <silent> [Xtref]d <Plug>(xtref-replace-datetime)
-map <silent> [Xtref]r <Plug>(xtref-invert)
-map <silent> [Xtref]R <Plug>(xtref-refresh)
-map <silent> [Xtref]t <Plug>(xtref-replace-datetime)
-map <silent> [Xtref]y  <Plug>(xtref-yank-refer)
-map <silent> [Xtref]Y 1<Plug>(xtref-yank-refer)
-map <silent> [Xtref]gy <Plug>(xtref-yank-anchor)
+map <silent> <Leader>xa <Plug>(xtref-new-append)
+map <silent> <Leader>xA <Plug>(xtref-new-postpone-day)
+map <silent> <Leader>xi <Plug>(xtref-new-insert)
+map <silent> <Leader>xI <Plug>(xtref-new-prepend)
+map <silent> <Leader>x> <Plug>(xtref-new-postpone)
+map <silent> <Leader>xd <Plug>(xtref-replace-datetime)
+map <silent> <Leader>xr <Plug>(xtref-invert)
+map <silent> <Leader>xR <Plug>(xtref-refresh)
+map <silent> <Leader>xt <Plug>(xtref-replace-datetime)
+map <silent> <Leader>xy  <Plug>(xtref-yank-refer)
+map <silent> <Leader>xY 1<Plug>(xtref-yank-refer)
+map <silent> <Leader>xgy <Plug>(xtref-yank-anchor)
 
 " BAD: better use unified keybindings for tasks in nou.vim and xtref
 "   i.e. always confusing <,.> and <\x>
-map <silent> [Xtref]<Space> <Plug>(xtref-task-new)
-map <silent> [Xtref]_ <Plug>(xtref-task-insert)
-map <silent> [Xtref]x <Plug>(xtref-task-convert)
-map <silent> [Xtref]X <Plug>(xtref-task-done)
+map <silent> <Leader>x<Space> <Plug>(xtref-task-new)
+map <silent> <Leader>x_ <Plug>(xtref-task-insert)
+map <silent> <Leader>xx <Plug>(xtref-task-convert)
+map <silent> <Leader>xX <Plug>(xtref-task-done)
 
 
+"" DISABLED: no preview for this group of keybinds
 " HACK: new leader
-map <silent>  \x  [Xtref]
-noremap <silent>  [Xtref] <Nop>
+" map <silent>  \x  [Xtref]
+" noremap <silent>  [Xtref] <Nop>

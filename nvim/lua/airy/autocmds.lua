@@ -65,6 +65,15 @@ autocmd('CursorMoved', {
       local hexts = vim.fn.substitute(word, '.', vxfm, 'g')
       local dts = os.date("%Y%m%d_%H%M%S", tonumber(hexts, 16))
       vim.api.nvim_echo({{dts, 'None'}}, false, {})
+    elseif vim.fn.match(word, '^\\v[a-t][1-9abc][1-9a-v][MTWRFSU]?$') == 0 then
+      -- ALT:(foreach): https://stackoverflow.com/questions/829063/how-to-iterate-individual-characters-in-lua-string
+      local fcvt = function(v) if v <= 57 then return v - 48 else return v - 87 end end
+      local y = fcvt(string.byte(word:sub(1,1))) + 2010
+      local m = fcvt(string.byte(word:sub(2,2)))
+      local d = fcvt(string.byte(word:sub(3,3)))
+      -- TEMP: only decode 'ymd', FUT: also decode 'ymdhms'
+      local dts = os.date("%Y-%m-%d", os.time({year=y, month=m, day=d, hour=0, min=0, sec=1}))
+      vim.api.nvim_echo({{dts, 'None'}}, false, {})
     end
   end
   -- command = "if expand('<cword>')=~'^1[0-9]{9}$'| "
