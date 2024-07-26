@@ -233,3 +233,118 @@
           https://github.com/intel/S0ixSelftestTool
       215367 – S0ix: not able to enter S0ix, low_power_idle_system_residency_us 0 - XPS 13 7390 ICL ⌇⡣⠦⠡⣰
         https://bugzilla.kernel.org/show_bug.cgi?id=215367
+
+
+2024-07-24-Wed-W30
+  e7n [X] 02:30 50m #hpx CFG poweroff button -> hibernate ⌇⡦⢡⢮⡏
+    &why случайное нажатие Poweroff вместо <BS>|<Del> закрывает все окна
+    WKLOG
+      * ADD "resume" to /etc/mkinitcpio.conf and re-gen $ sudo mkinitcpio -p linux
+      * ADD cmdline resume=/dev/mapper/swap to /boot/loader/entries/arch.conf
+      * use only manually when needed $ systemctl hibernate
+        [≫] ALSO: when closing LID on battery (but suspend on AC cord)
+        [>] CHECK: hibernate works
+          &why #indy:AC надо часто тушить ноут для сохранения батареи
+        [+] ALT is OK: $ systemctl suspend
+          ::: 11h = 58% -> 38%  # =2‥3% per hour
+      * override /etc/systemd/logind.conf to HandlePowerKey=suspend
+         &why faster resume time if clicked accidentally
+        [✓] CHECK: $ systemd-analyze cat-config systemd/logind.conf
+      * actually my default state is suspend-to-idle
+        Linux – Suspend to Idle or to RAM? – WirelessMoves ⌇⡦⢡⢗⢓
+          https://blog.wirelessmoves.com/2021/11/linux-suspend-to-idle-or-to-ram.html
+          $ cat /sys/power/mem_sleep
+          # s2idle [deep]
+          ::: BUT: I only have [s2idle], nothing to chose
+            linux - How do I disable "suspend to RAM", and enable "suspend to idle"? - Super User ⌇⡦⢡⢗⢺
+              https://superuser.com/questions/1792252/how-do-i-disable-suspend-to-ram-and-enable-suspend-to-idle
+      ! WARN: don't use IdleAction=suspend, or Citrix will lose connection and you will need to re-login
+        [>] CHECK: is it true or not
+    [≫] FUT:PERF: optimize mkinitcpio hooks
+      [?] MAYBE: [SOLVED] Systemd based initramfs with luks / System Administration / Arch Linux Forums ⌇⡦⢡⢑⠛
+        https://bbs.archlinux.org/viewtopic.php?id=289861
+        PERF: Why is systemd based initramfs resulting in so much faster boot than udev based initramfs? : r/archlinux ⌇⡦⢡⢑⠋
+          https://www.reddit.com/r/archlinux/comments/6a8ixk/why_is_systemd_based_initramfs_resulting_in_so/
+          [!] Optimizing Bootup With mkinitcpio [Dave Reisner] ⌇⡦⢡⢐⣩
+            http://blog.falconindy.com/articles/optmizing-bootup-with-mkinitcpio.html
+
+
+2024-07-25-Thu-W30
+  [X] 14:20 3h30m <W:env> #hpx CFG poweroff button -> suspend/hibernate ※⡦⢡⢮⡏ ⌇⡦⢢⡓⠀
+    [✗] 14:20 10m WTF:ERR: uuid not found
+    [X] 15:15 10m MAYBE "resume" needs some cmdline
+    [✗] 15:30 5m <env> CHECK: Citrix keeps connection on =suspend (or reconnects)
+      ::: FAIL: no, it treats session as lost
+        Session reliability suspended the connection for user domain\user, session 5. source rpm - XenDesktop 7.x - Citrix Community ⌇⡦⢢⡒⢷
+          https://community.citrix.com/forums/topic/238240-session-reliability-suspended-the-connection-for-user-domainuser-session-5-source-rpm/#_=_
+        Users getting disconnected while working in the published applications ⌇⡦⢢⡒⢼
+          https://support.citrix.com/s/article/CTX286701-users-getting-disconnected-while-working-in-the-published-applications?language=en_US
+      [>] CHECK: will IdleAction=suspend activates with Citrix in bkgr
+    [✗] 16:20 5m <env> CHECK: #hpx =hibernate works
+      ::: FAIL: /dev/mapper/swap not found
+        [>] SEE: encrypted swap
+    [X] 01:25 1h SEE: encrypted swap ::: /d/erian/hibernate
+      INFO: dm-crypt/Swap encryption - ArchWiki ⌇⡦⢢⣕⠘
+        https://wiki.archlinux.org/title/Dm-crypt/Swap_encryption#mkinitcpio_hook
+        [_] BET: transition to use !sd-encrypt inof !udev
+      * disable previous randomly encrypted swap
+        $ v /etc/crypttab
+          ## @me DISABLED:(COS=hibernation): inof use /etc/initcpio/hooks/openswap
+          # swap      LABEL=cryptswap      /dev/urandom   swap,offset=2048,cipher=aes-xts-plain64,size=512
+        $ sudo swapoff /dev/mapper/swap
+        $ sudo cryptsetup -v close swap
+      * encrypt swap only once (inof each boot -- but always re-encrypt it on shutdown)
+        $ sudo cryptsetup luksFormat /dev/nvme0n1
+        $ sudo cryptsetup open /dev/nvme0n1 encswap
+        $ sudo mkswap /dev/mapper/encswap
+        $ sudo v /etc/fstab
+          # /dev/mapper/encswap swap swap defaults 0 0
+        $ sudo v /boot/loader/entries/arch.conf
+          # kernel /vmlinuz-linux ... resume=/dev/mapper/encswap
+      * get UUID for /dev/nvme0n1 and ensure it actually matches back
+        $ sudo blkid /dev/nvme0n1
+        $ readlink /dev/disk/by-uuid/a16e61cd-5251-4e2b-9c3e-0242ba7b74a5
+      * make a hook to open swap by password (yes, double-password entry to return from hibernation)
+        /etc/initcpio/hooks/openswap
+          run_hook() { cryptsetup open /dev/disk/by-uuid/a16e61cd-5251-4e2b-9c3e-0242ba7b74a5 encswap; }
+        /etc/initcpio/install/openswap
+          build() { add_runscript; }
+          help() { echo "This opens the swap encrypted partition /dev/device in /dev/mapper/encswap"; }
+      * register the hook
+        /etc/mkinitcpio.conf
+        HOOKS=(... encrypt openswap resume filesystems ...)
+        $ sudo mkinitcpio -p linux
+    [X] 02:25 50m "suspend" button doesn't work
+      ::: WARN:USAGE: you should hold "poweroff" button for 0.5 sec, otherwise short presses will be ignored
+      [X] 15:25 5m .
+        Jun 20 11:50:17 hpx systemd-logind[874]: Watching system buttons on /dev/input/event2 (Power Button)
+        Jun 20 11:50:17 hpx systemd-logind[874]: Watching system buttons on /dev/input/event1 (Power Button)
+        Jun 20 11:50:17 hpx systemd-logind[874]: Watching system buttons on /dev/input/event0 (Lid Switch)
+      [X] 02:25 45m .
+        linux - /etc/systemd/logind.conf is being ignored - Super User ⌇⡦⢢⣠⢞
+          https://superuser.com/questions/1605504/etc-systemd-logind-conf-is-being-ignored
+        inhibit ⌇⡦⢢⣤⠅
+          https://www.freedesktop.org/wiki/Software/systemd/inhibit/
+        gnome - How to kill listed inhibitors for proper working of suspend on Laptop lid close - Ask Ubuntu ⌇⡦⢢⣤⠏
+          https://askubuntu.com/questions/1114095/how-to-kill-listed-inhibitors-for-proper-working-of-suspend-on-laptop-lid-close
+          $ systemd-inhibit --list --mode=block
+        HandleLidSwitch in /etc/systemd/logind.conf is ignored · Issue #11638 · systemd/systemd ⌇⡦⢢⣧⡲
+          https://github.com/systemd/systemd/issues/11638
+          $ busctl get-property org.freedesktop.login1 /org/freedesktop/login1 org.freedesktop.login1.Manager HandlePowerKey
+    [✗] 03:10 1h10m make key inof passwd and reboot AGAIN
+      WARN!. Mounting the file system is dangerous and destructive.
+         ¦ The keyfile should not be read from a file system that was mounted when the system was suspended.
+      $ sudo dd if=/dev/random bs=32 count=1 of=/root/encswap.key
+      $ sudo chmod 600 /root/encswap.key
+      $ sudo cryptsetup luksAddKey /dev/nvme0n1 /root/encswap.key
+      /etc/initcpio/hooks/openswap
+        run_hook() {
+            x=0; while [ ! -b /dev/mapper/ws-root ] && [ $x -le 10 ]; do x=$((x+1)); sleep .2; done
+            mkdir myrootfs
+            mount -o ro /dev/mapper/ws-root myrootfs
+            cryptsetup open --key-file myrootfs/root/encswap.key /dev/disk/by-uuid/a16e61cd-5251-4e2b-9c3e-0242ba7b74a5 encswap
+            umount myrootfs
+        }
+      ::: FAIL: doesn't work, can't read /dev/ws/root ERR: /dev/mapper/encswap not found
+        NEED: separatate partition with a key FAIL: it also should be encrypted
+        >> TEMP: use 2nd long passwd to not compromise primary one in swap -- OR give up on hibernation
