@@ -1,4 +1,17 @@
 
+2024-03-29-Fri-W13
+  [!] #nvim CFG:SEIZE PSA: Configuring LSP w/o nvim-lspconfig is Simple! : r/neovim ⌇⡦⠆⢋⡬
+    https://www.reddit.com/r/neovim/comments/12itdmx/psa_configuring_lsp_wo_nvimlspconfig_is_simple/
+    if vim.fn.executable('pyright-langserver') == 1 then
+        vim.lsp.start({
+            name = 'Pyright',
+            cmd = { 'pyright-langserver', '--stdio' },
+            root_dir = vim.fs.dirname(vim.fs.find({'requirements.txt', '.git'}, { upward = true })[1]),
+            settings = { python = {} }
+        })
+    end
+
+
 2024-05-20-Mon-W21
   [•] ◑ #nvim restore my old vim plugins I miss for ⌇⡦⢐⡗⠓
     [%] ◕ @me SEE all old plugins I used in .vim

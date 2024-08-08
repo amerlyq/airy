@@ -90,6 +90,7 @@
 .cS  /usr/share
 .ct  /t
 # .cu  ${TMPDIR:-/tmp/$USER}/
+.cv  /cache/vd
 .cw  /d/chat/weechat
 # .cx  ~/.cache/airy/tags/xorg
 .cx  /run/user/1000
@@ -328,7 +329,7 @@
 .vz  /d/airy/nvim/lua/lazy.lua
 
 .w. -l /d/wklog/!pj
-.w, -l /work/!now
+.w, -l /d/todo/work/!now
 .w! -l /work/!now
 .wb -l /work/bug/!now   # symlink -> ./bug/$date-$jira-$desc>/
 .wB  /work/bug
@@ -340,8 +341,9 @@
 .wi  /d/seize/kirie/wiw
 # .wj  /work/tenjo
 .wk  /d/wklog
-.wl  /d/todo/work/log
+.wl  /d/todo/work/wklog
 # .wm  /work/repo/_mirror
+.wn -l /d/todo/work/!now
 .wo  /work
 # .wp  /work/cache/_prefix
 # .wr  /work/repo/_root
