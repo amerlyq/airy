@@ -179,6 +179,11 @@ local highlights = {
   -- semshiErrorSign xxx ctermfg=231 ctermbg=160 guifg=#ffffff guibg=#d70000
   -- semshiErrorChar xxx ctermfg=231 ctermbg=160 guifg=#ffffff guibg=#d70000
 
+  -- FIXED: set defaults for plugins
+  LeapLabel = { link = "IncSearch" },
+  LeapBackdrop = { link = "Comment" },
+  LeapMatch = { fg = 'white', bold = true, nocombine = true },
+
   ["@variable"] = { link = "Normal" },
 }
 
