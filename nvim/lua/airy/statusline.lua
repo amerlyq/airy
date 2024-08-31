@@ -151,7 +151,13 @@ local function buffers()
       local mod = bufgetopt(b, 'modified')
       -- FIXME: don't shorten current buffer
       local hl = (b == cur) and "%#TabLineSel#" or "%#TabLine#"
-      local nm = fnm and vim.fn.fnamemodify(fnm, ':t') or "[No Name]"
+      local nm = "[No Name]"
+      if fnm then
+        -- MAYBE: only prefix parent dir if name matches ~typical~ names
+        --   like docs "\u+.nou" or keys 20\d\d-.*
+        -- ALT:BET: only add prefix if there are same bufnames (or similar for e.g. keys/dates)
+        nm = vim.fn.fnamemodify(fnm, ':p:h:t') .. "/" .. vim.fn.fnamemodify(fnm, ':t')
+      end
       -- NEED: modify previous entry -- insert !hi=underline group at beg/end pos of reuse
       local snm = delcommonpfxsfx(nm, prevnm)
       local sfx = (mod and '+' or '') -- '●'
