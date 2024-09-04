@@ -1172,6 +1172,7 @@ c.content.register_protocol_handler = False  # @me: "ask" is infuriating on Gmai
 ##   - block: Automatically block loading on certificate errors.
 ##   - load-insecurely: Force loading pages despite certificate errors. This is *insecure* and should be avoided. Instead of using this, consider fixing the underlying issue or importing a self-signed certificate via `certutil` (or Chromium) instead.
 # c.content.tls.certificate_errors = 'ask'
+c.content.tls.certificate_errors = 'ask-block-thirdparty'
 
 ## How navigation requests to URLs with unknown schemes are handled.
 ## Type: String
@@ -2621,10 +2622,18 @@ config.bind("pp", "nop")  #  'open -- {clipboard}')
 # config.bind('wo', 'cmd-set-text -s :open -w')
 # config.bind('wp', 'open -w -- {clipboard}')
 # config.bind('xO', 'cmd-set-text :open -b -r {url:pretty}')
-# config.bind('xb', 'config-cycle statusbar.hide')  # WTF
 # config.bind('xo', 'cmd-set-text -s :open -b')
-# config.bind('xt', 'config-cycle tabs.show always switching')  # WTF
-# config.bind('xx', 'config-cycle statusbar.hide ;; config-cycle tabs.show always switching')  # WTF
+
+## INFO: @me: bind AGAIN to switch bars visibility for more screen estate
+# https://www.reddit.com/r/qutebrowser/comments/7kh49o/hide_tabs_and_navigation_bar/
+# https://www.reddit.com/r/qutebrowser/comments/kaxfdz/comment/gfdjp68/?context=3
+#   :bind xb config-cycle statusbar.show always never
+#   :bind xt config-cycle tabs.show always never
+#   :bind xx config-cycle tabs.show always never ;; config-cycle statusbar.show always never
+config.bind('xb', 'config-cycle statusbar.show always never')
+config.bind('xt', 'config-cycle tabs.show always never')
+config.bind('xx', 'config-cycle tabs.show always never ;; config-cycle statusbar.show always never')
+
 # config.bind('yD', 'yank domain -s')
 # config.bind('yM', 'yank inline [{title}]({url}) -s')
 # config.bind('yP', 'yank pretty-url -s')

@@ -66,3 +66,26 @@ ALT: palemoon
   rm -f "$pmsi"
   wget_it "http://sourceforge.net/projects/pm4linux/files/latest/download?source=files" "$pm"
   cd "$CURR_DIR_PKG" && tar xvfj "$pmsi" && bash "${pmsi%.tar.*}.sh"
+
+
+2024-08-22-Thu-W34
+  [X] 01:50 40m #hpx TODO !ff tabs to bottom ⌇⡦⣇⣘⡻
+    Tabs on bottom in 113 : r/FirefoxCSS ⌇⡦⣇⣃⡷
+      https://www.reddit.com/r/FirefoxCSS/comments/122uai9/tabs_on_bottom_in_113/
+      firefox-csshacks/chrome/tabs_on_bottom.css at master · MrOtherGuy/firefox-csshacks ⌇⡦⣇⣃⢼
+        https://github.com/MrOtherGuy/firefox-csshacks/blob/master/chrome/tabs_on_bottom.css
+        * about:config :: toolkit.legacyUserProfileCustomizations.stylesheet = true
+        $ cd ~/.mozilla/firefox/XXX-YYY/chromeuser/
+        $ wget ...
+        $ echo '@import url("tabs_on_bottom.css");' >> Chrome.css
+        $ firefox
+      firefox-csshacks/chrome/tabs_on_bottom_menubar_on_top_patch.css at master · MrOtherGuy/firefox-csshacks ⌇⡦⣇⣃⣀
+        https://github.com/MrOtherGuy/firefox-csshacks/blob/master/chrome/tabs_on_bottom_menubar_on_top_patch.css
+        * combine into one 'userChrome.css' file
+          << The second hacks the first to put menubar at top, while still
+          putting tabs where they belong, below all the window top-located bars.
+    Please, please allow us to place the tabs at the b... - Page 3 - Mozilla Connect ⌇⡦⣇⣈⡉
+      https://connect.mozilla.org/t5/ideas/please-please-allow-us-to-place-the-tabs-at-the-bottom/idi-p/216/page/3#comments
+    Re: The more you push for updates, the least I wil... - Mozilla Connect ⌇⡦⣇⣉⠘
+      https://connect.mozilla.org/t5/discussions/the-more-you-push-for-updates-the-least-i-will-comply/m-p/47919/highlight/true#M17107
+        ~~ doesn't seem to work anymore, as userChrome.css is unsupported

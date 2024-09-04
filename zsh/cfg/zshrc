@@ -2,9 +2,15 @@
 [[ ~/.zshrc.zwc -nt ~/.zshrc ]] || zcompile ~/.zshrc
 
 
-# TEMP: for WSL2
+# # TEMP: for WSL2 and NUC
 # export EDITOR=nvim
-: "${XDG_RUNTIME_DIR:=/tmp}"
+# # : "${XDG_RUNTIME_DIR:=/tmp}"
+# ## BAD:OBSOL:USE: $ sudo systemd-run --system --scope -- su -l myuser
+# # export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+# ## TEMP: override for "su - myuser"
+# [[ -n ${DISPLAY:+x} ]] || export DISPLAY=":10.0"
+# ## TEMP: override for "clipboard"
+# [[ -n $SSH_CONNECTION && $PATH != *libexec/xc:* ]] && export PATH=/usr/local/libexec/xc:$PATH
 
 
 export SSH_AUTH_SOCK=${XDG_RUNTIME_DIR:?}/gnupg/S.gpg-agent.ssh
@@ -204,7 +210,7 @@ _set_prompt() {
   PROMPT="%(?..%F{1}%?↵%f
 )%F{$color}┌${nest:-─}─%f %B%F{220}%d %F{238}%~%f%b
 %F{$color}└%(!.#.╼)%f "
-  ## OR:(WSL2): append {"$'\e[2 q'"%} to 2nd line ::
+  ## OR:(disable blinking cursor on WSL2/NUC): append {"$'\e[2 q'"%} to 2nd line ::
   #   )%F{$color}┌${nest:-─}─%f %B%F{220}%d %F{238}%~%f%b%{"$'\e[2 q'"%}
 }; _set_prompt
 

@@ -71,3 +71,6 @@ BASH_AIRY=$(readlink -e "$BASH_SOURCE")
 BASH_AIRY=${BASH_AIRY%/*}
 source "$BASH_AIRY/prompt"
 # source ~/.shell/common
+
+# [⡣⢴⢄⡭] FIXED:BUG disable blinking cursor after exiting !nvim
+# export PROMPT_COMMAND='echo -en "\e[2 q"'
