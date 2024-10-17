@@ -49,9 +49,13 @@ end
 -- at some later time, setting a/b markers might be used to visualize begin/end
 -- mp.set_property("ab-loop-a", g.A)
 -- mp.set_property("loop", 999)
+function to_ffmpeg_sfx(t)
+  -- ALT: os.date("%M:%S", g.A)
+  return string.format("%02d:%02d.%d", math.floor(t/60), math.floor(t%60), math.floor((t-math.floor(t))*10))
+end
 function mark_update(m)
   show_status("info", string.format("[%s] dt=%4.3f  (%s - %s)",
-    m, g.B - g.A, os.date("%M:%S", g.A), os.date("%M:%S", g.B)))
+    m, g.B - g.A, to_ffmpeg_sfx(g.A), to_ffmpeg_sfx(g.A)))
 end
 function h_mark_beg()
   g.A = mp.get_property_number("playback-time")

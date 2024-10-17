@@ -56,6 +56,14 @@ setopt histsavenodups
 setopt incappendhistorytime
 
 
+## FIXED: trim trailing newline from confl-triple-click
+# SRC: https://unix.stackexchange.com/questions/693118/trim-trailing-newline-from-pasted-text-in-zsh
+bracketed-paste() {
+  zle .$WIDGET && LBUFFER=${LBUFFER%$'\n'}
+}
+zle -N bracketed-paste
+
+
 ## NOTE: store audit events from zsh history by days ⌇⡟⢏⠰⣔
 # [_] CHECK:FAIL? shells local sessions don't sync immediately anymore -- only after shell was closed
 # SEE: INC_APPEND_HISTORY or SHARE_HISTORY

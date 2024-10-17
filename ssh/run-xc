@@ -15,12 +15,13 @@ loc=$XDG_RUNTIME_DIR/xc-server.$host
 
 ## THINK: how chaining hops will work with clipboard
 # OLD: 1000
-rmt="/run/user/1001/xc-client.${HOSTNAME:?}"
+# FIXME: don't hardcode uid=1000..1002; query or symlink on remote
+rmt="/run/user/1000/xc-client.${HOSTNAME:?}"
 
 ## HACK: forward-propagate hostname-indexed clipboard socket name,
 ##   and back-propagate connection details
 rconn=$(ssh -TR "$rmt:$loc" -o ControlMaster=auto -o StreamLocalBindUnlink=yes -- "$host" '
-  dst=$XDG_RUNTIME_DIR/xc/${SSH_CONNECTION%% *}
+  dst=${XDG_RUNTIME_DIR:?}/xc/${SSH_CONNECTION%% *}
   mkdir -p -- "${dst%/*}"
   printf "%s\n" "'"$rmt"'" > "$dst"
   printf "%s\n" "$SSH_CONNECTION"

@@ -1172,7 +1172,7 @@ c.content.register_protocol_handler = False  # @me: "ask" is infuriating on Gmai
 ##   - block: Automatically block loading on certificate errors.
 ##   - load-insecurely: Force loading pages despite certificate errors. This is *insecure* and should be avoided. Instead of using this, consider fixing the underlying issue or importing a self-signed certificate via `certutil` (or Chromium) instead.
 # c.content.tls.certificate_errors = 'ask'
-c.content.tls.certificate_errors = 'ask-block-thirdparty'
+c.content.tls.certificate_errors = "ask-block-thirdparty"
 
 ## How navigation requests to URLs with unknown schemes are handled.
 ## Type: String
@@ -2329,31 +2329,8 @@ c.url.start_pages = ["qute://history/"]  # @me
 ## Type: List of Perc
 # c.zoom.levels = ['25%', '33%', '50%', '67%', '75%', '90%', '100%', '110%', '125%', '150%', '175%', '200%', '250%', '300%', '400%', '500%']
 ## @me
-c.zoom.levels = [
-    "40%",
-    "45%",
-    "50%",
-    "60%",
-    "67%",
-    "75%",
-    "85%",
-    "90%",
-    "95%",
-    "100%",
-    "105%",
-    "110%",
-    "115%",
-    "120%",
-    "125%",
-    "130%",
-    "140%",
-    "150%",
-    "175%",
-    "200%",
-    "300%",
-    "400%",
-    "500%",
-]
+lvls = "30 40 50 60 70 75 80 85 90 95 100 105 110 115 120 130 140 150 200 300"
+c.zoom.levels = [f"{v}%" for v in lvls.split()]
 
 ## Number of zoom increments to divide the mouse wheel movements to.
 ## Type: Int
@@ -2630,9 +2607,9 @@ config.bind("pp", "nop")  #  'open -- {clipboard}')
 #   :bind xb config-cycle statusbar.show always never
 #   :bind xt config-cycle tabs.show always never
 #   :bind xx config-cycle tabs.show always never ;; config-cycle statusbar.show always never
-config.bind('xb', 'config-cycle statusbar.show always never')
-config.bind('xt', 'config-cycle tabs.show always never')
-config.bind('xx', 'config-cycle tabs.show always never ;; config-cycle statusbar.show always never')
+config.bind("xb", "config-cycle statusbar.show always never")
+config.bind("xt", "config-cycle tabs.show always never")
+config.bind("xx", "config-cycle tabs.show always never ;; config-cycle statusbar.show always never")
 
 # config.bind('yD', 'yank domain -s')
 # config.bind('yM', 'yank inline [{title}]({url}) -s')
