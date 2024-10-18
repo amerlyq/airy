@@ -1,10 +1,10 @@
 # SEE: /usr/lib/python3.10/site-packages/libqtile/backend/x11/xkeysyms.py
 # %DEBUG: $ tail -F ~/.local/share/qtile/qtile.log
-import importlib
+# import importlib
 import os
-import sys
+# import sys
 import time
-from typing import cast
+from typing import Any, cast
 
 from just.ext.datetime.cvt import ts_ymd3aw
 from just.ext.datetime.local import ltoday
@@ -18,6 +18,9 @@ from psutil import Process
 
 # pylint:disable=invalid-name
 
+# from typing import TYPE_CHECKING
+# if TYPE_CHECKING:
+#     reveal_type(qtile)
 
 ## DEV:DEBUG: propagate changes on <M-C-r> reload of !qtile
 # importlib.reload(sys.modules["just.ext.datetime.cvt"])
@@ -31,7 +34,7 @@ def K(keydef: str, *cmds: str, desc: str = None) -> EzKey:
 prev_layout = 0  # lazy.current_group.current_layout
 
 
-def toggle_maxlayout(wm, laymax: int = 2) -> None:
+def toggle_maxlayout(wm: Any, laymax: int = 2) -> None:
     global prev_layout
     l = wm.current_group.current_layout
     if l == laymax:
@@ -40,6 +43,18 @@ def toggle_maxlayout(wm, laymax: int = 2) -> None:
         prev_layout = l
         l = laymax
     wm.current_group.use_layout(l)
+
+
+def toggle_to_screen(wm: Any, screen_idx: int) -> None:
+    # global prev_screen
+    prev_screen = 0
+    now = wm.screens.index(wm.current_screen)
+    if now == screen_idx:
+        idx = prev_screen
+    else:
+        # prev_screen = (now + 1) % len(wm.screens)
+        idx = screen_idx
+    wm.to_screen(idx)
 
 
 mod = "mod4"
@@ -116,8 +131,18 @@ keys = [
     KeyChord([mod], "o", mod_open),  # , mode="Launch"
     KeyChord([mod], "i", mod_info),
     K("M-u", lazy.spawn(["qutebrowser"]), desc="Launch browser"),
-    K("M-<bracketleft>", lazy.next_screen(), desc="Toggle between screens"),
-    K("M-<bracketright>", lazy.next_screen(), desc="Toggle between screens"),
+    # K("M-<bracketleft>", lazy.prev_screen(), desc="Toggle between screens"),
+    # K("M-<bracketright>", lazy.next_screen(), desc="Toggle between screens"),
+    K(
+        "M-<bracketleft>",
+        lazy.function(toggle_to_screen, 1),
+        desc="Toggle to primary ext-monitor",
+    ),
+    K(
+        "M-<bracketright>",
+        lazy.function(toggle_to_screen, 2),
+        desc="Toggle to scondary ext-monitor",
+    ),
     # Toggle between different layouts as defined below
     K("M-<slash>", lazy.next_layout(), desc="Toggle between layouts"),
     # K("M-slash", lazy.next_layout(), desc="Toggle between layouts"),
@@ -190,7 +215,23 @@ def toscreen_noswap(wm, nm) -> None:
         cs.set_group(grp)
 
 
-groups = [Group(i) for i in "123456789"]
+# SRC: https://docs.qtile.org/en/stable/manual/faq.html#how-can-i-get-my-groups-to-stick-to-screens
+# OR: https://www.reddit.com/r/qtile/comments/qxi6zi/keeping_workspacesgroups_on_a_specific_monitor/
+# groups = [Group(i) for i in "123456789"]
+groups = [
+    # Screen affinity here is used to make
+    # sure the groups startup on the right screens
+    Group(name="1", screen_affinity=0),
+    Group(name="2", screen_affinity=0),
+    Group(name="3", screen_affinity=0),
+    Group(name="4", screen_affinity=1),
+    Group(name="5", screen_affinity=0),
+    Group(name="6", screen_affinity=0),
+    Group(name="7", screen_affinity=2),
+    Group(name="8", screen_affinity=1),
+    Group(name="9", screen_affinity=1),
+    Group(name="0", screen_affinity=0),
+]
 
 for i in groups:
     keys.extend(
