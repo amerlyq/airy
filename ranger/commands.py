@@ -8,6 +8,7 @@ from ranger.ext.shell_escape import shell_quote
 # HACK:FIXME: wide icons (OR: narrow font)
 # os.environ["RANGER_DEVICONS_SEPARATOR"]="  "
 
+
 # NOTE: jump to next day only at 7:00AM
 def today_date(delta=7):
     import datetime
@@ -330,7 +331,11 @@ class cda(Command):
         # Strip :lnum:lpos:
         path = re.sub(r"(?::\d+){1,2}:?$", "", path)
 
-        if fs.islink(path):
+        if "m" in flags:
+            from stat import S_ISREG as isfile
+            files = __import__("glob").glob(path + "/**", recursive=True)
+            path = max((st.st_mtime, x) for x in files if isfile((st := os.stat(x)).st_mode))[1]
+        elif fs.islink(path):
             if "l" in flags:
                 lpath = os.readlink(path)
                 # NOTE: resolve only basename (relative to its dir)
@@ -466,7 +471,7 @@ class actualee(Command):
     def execute(self):
         cur = self.fm.thisfile
         if cur.is_file:
-            if 'x' in cur.get_permission_string():
+            if "x" in cur.get_permission_string():
                 self.fm.execute_command(cur.path)
                 return
 
