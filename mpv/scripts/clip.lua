@@ -55,7 +55,7 @@ function to_ffmpeg_sfx(t)
 end
 function mark_update(m)
   show_status("info", string.format("[%s] dt=%4.3f  (%s - %s)",
-    m, g.B - g.A, to_ffmpeg_sfx(g.A), to_ffmpeg_sfx(g.A)))
+    m, g.B - g.A, to_ffmpeg_sfx(g.A), to_ffmpeg_sfx(g.B)))
 end
 function h_mark_beg()
   g.A = mp.get_property_number("playback-time")
