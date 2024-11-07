@@ -30,3 +30,93 @@ Extract audio
 DVD-player
   Video: XviD, 704x396, ~1500+ Kbps, 23.976 fps
   Audio: RUS, mp3, 192kb, 48000
+
+
+2024-10-13-Sun-W41
+  [+] 13:15 20m #vd:cvt ⌇⡧⠒⢍⢞
+    Concatenate – FFmpeg ⌇⡧⠋⢖⡗
+      https://trac.ffmpeg.org/wiki/Concatenate#samecodec
+      $ ffmpeg -f concat -safe 0 -i <(printf "file '$PWD/%s'\n" ./*.wav) -c copy output.wav
+    Кодирование с кодеком HEVC простым языком — гайд на FFmpeg. Высокое качество, но низкий вес / Хабр ⌇⡧⠋⢘⢵
+      https://habr.com/ru/companies/ruvds/articles/845202/
+      $ ffmpeg -i input.mp4 -c:v libx265 -preset fast -crf 25 output.mp4
+        # -tune animation
+      $ ffmpeg -i input.mp4 -c:v hevc_qsv -rc cqp -qp_i 12 -qp_p 13 output.mp4
+        * nvidia=hevc_nvenc, amd=hevc_amf или intel=hevc_qsv
+      $ ffmpeg -decoders -hide_banner | grep qsv
+        https://bbs.archlinux.org/viewtopic.php?id=279799
+        https://www.reddit.com/r/archlinux/comments/4g9fmv/trying_to_make_a_pkgbuild_for_ffmpeg_compiled/
+    linux - Constructing encoding statements using ffmpeg QSV and Intel ARC card - Super User ⌇⡧⠋⢟⡻
+      https://superuser.com/questions/1830920/constructing-encoding-statements-using-ffmpeg-qsv-and-intel-arc-card
+      $ ffmpeg -y -v verbose -hwaccel qsv -hwaccel_output_format qsv -c:v h264_qsv -i input.mkv -vf "scale_qsv=w=1920:h=1080" -c:v h265_qsv -preset veryslow -global_quality 18 output.mkv
+    Hardware/QuickSync – FFmpeg ⌇⡧⠋⢠⡫
+      https://trac.ffmpeg.org/wiki/Hardware/QuickSync
+      $ ffmpeg -hide_banner -hwaccel qsv -c:v h264_qsv -i input.mp4 -c:v hevc_qsv -global_quality 25 output.mp4
+      $ ffmpeg -hide_banner -hwaccel vaapi -hwaccel_output_format vaapi -i input.mp4 -c:v hevc_qsv -global_quality 25 output.mp4
+
+
+2024-10-18-Fri-W42
+  [≈⡧⠒⢎⠆] 12:25 1h+15m ffmpeg video hw-cvt ⌇⡧⠒⢍⡄
+    [>] TRY: upgrade the system and re-try qsv
+    frigate/frigate/ffmpeg_presets.py at b6b10e753fa69dd5983761b0063c1227b7bcf997 · blakeblackshear/frigate ⌇⡧⠒⠵⢠
+      https://github.com/blakeblackshear/frigate/blob/b6b10e753fa69dd5983761b0063c1227b7bcf997/frigate/ffmpeg_presets.py#L33-L34
+      $ ffmpeg -y -hide_banner -hwaccel vaapi -hwaccel_output_format vaapi -i input.mp4 -c:v hevc output.mp4
+      $ ffmpeg -hide_banner -hwaccel qsv -qsv_device /dev/dri/renderD128 -hwaccel_output_format qsv -c:v h264_qsv -i input.mp4 -y output.mp4
+      $ ffmpeg -hide_banner -load_plugin hevc_hw  -hwaccel qsv -qsv_device /dev/dri/renderD128 -hwaccel_output_format qsv -c:v hevc_qsv -i input.mp4 -y output.mp4
+    intel/vpl-gpu-rt ⌇⡧⠒⠶⡐
+      https://github.com/intel/vpl-gpu-rt
+      $ paci vpl-gpu-rt
+    FFmpeg and oneVPL-intel-gpu (or quicksync) / Newbie Corner / Arch Linux Forums ⌇⡧⠒⠷⢫
+      https://bbs.archlinux.org/viewtopic.php?id=279799
+    NICE: #10377 (Intel QSV is broken in FFmpeg 6.0) – FFmpeg ⌇⡧⠒⠷⣰
+      https://trac.ffmpeg.org/ticket/10377
+    Videos: Improve Intel QSV Hardware Support and Performance · Issue #4030 · photoprism/photoprism ⌇⡧⠒⠸⠉
+      https://github.com/photoprism/photoprism/issues/4030
+    Решено: Hardware encoding to H264 with ffmpeg using Intel Atom® Processor E3845 - Intel Community ⌇⡧⠒⠸⡇
+      https://community.intel.com/t5/Embedded-Intel-Atom-Processors/Hardware-encoding-to-H264-with-ffmpeg-using-Intel-Atom-Processor/td-p/1478292
+    No device available for decoder: device type qsv needed for codec h264_qsv. · Issue #1523 · mdhiggins/sickbeard_mp4_automator ⌇⡧⠒⠸⡒
+      https://github.com/mdhiggins/sickbeard_mp4_automator/issues/1523
+    QSV and Linux: No available device for decoder : r/Tdarr ⌇⡧⠒⠸⡗
+      https://www.reddit.com/r/Tdarr/comments/slgaw7/qsv_and_linux_no_available_device_for_decoder/
+    +++
+    Transcoding with Intel Quick Sync : r/ffmpeg ⌇⡧⠒⠸⡢
+      https://www.reddit.com/r/ffmpeg/comments/18dgpda/transcoding_with_intel_quick_sync/
+      ffmpeg -loglevel verbose -y -hwaccel vaapi -hwaccel_device /dev/dri/renderD128 -hwaccel_output_format vaapi -i test.mp4 -c:v h264_vaapi tmp.mp4
+      ✓ $ vcvt(){ ffmpeg -y -hide_banner -hwaccel vaapi -hwaccel_output_format vaapi -i "$1" -c:v hevc_vaapi -global_quality "${2:-25}" "${1%.*}_c.${1##*.}"; }
+        800ms vs 3600ms
+    Vaapi vs QSync - performance difference? : r/jellyfin ⌇⡧⠒⢋⠐
+      https://www.reddit.com/r/jellyfin/comments/y7k70s/vaapi_vs_qsync_performance_difference/
+    Difference between VA-API and QuickSync? - Linux - Emby Community ⌇⡧⠒⢋⠭
+      https://emby.media/community/index.php?/topic/98196-difference-between-va-api-and-quicksync/
+    On Intel CPUs - vaapi vs intel-qsv-h265 / h264 - only intel-qsv-h265 not working · blakeblackshear/frigate · Discussion #6405 ⌇⡧⠒⢋⠰
+      https://github.com/blakeblackshear/frigate/discussions/6405
+    Hevc_vaapi vs. hevc_qsv - Help/How To - Shotcut Forum ⌇⡧⠒⢋⡄
+      https://forum.shotcut.org/t/hevc-vaapi-vs-hevc-qsv/38382
+    NICE: Hardware/VAAPI – FFmpeg ⌇⡧⠒⢌⠆
+      https://trac.ffmpeg.org/wiki/Hardware/VAAPI#SurfaceFormats
+
+
+2024-10-22-Tue-W43
+  eai [✓] 15:00 35m TRY:AGAIN: ffmpeg qsv ※⡧⠒⢍⡄ ⌇⡧⠗⢴⣜
+    linux - Constructing encoding statements using ffmpeg QSV and Intel ARC card - Super User ⌇⡧⠗⢖⡘
+      https://superuser.com/questions/1830920/constructing-encoding-statements-using-ffmpeg-qsv-and-intel-arc-card
+      $ ffmpeg -v verbose -hide_banner -hwaccel qsv -hwaccel_output_format qsv -c:v h264 -i input.mp4 -c:v hevc_qsv -y output.mp4
+        speed=x5.5
+      ✓ $ ffmpeg -v verbose -hide_banner -hwaccel qsv -hwaccel_output_format qsv -c:v h264_qsv -i input.mp4 -vf 'hwdownload' -c:v hevc_qsv -preset slow -y output.mp4
+        # -vf "scale_qsv=w=1920:h=1080"
+    video - How to use Intel QSV record screen based on ffmpeg - Stack Overflow ⌇⡧⠗⢘⠱
+      https://stackoverflow.com/questions/51392585/how-to-use-intel-qsv-record-screen-based-on-ffmpeg
+      ~ $ ffmpeg -f gdigrab -framerate 30 -draw_mouse 1 -i desktop -c:v h264 -r 30 -preset ultrafast -tune zerolatency -pix_fmt yuv420p "record.mp4"
+      ~ $ ffmpeg -f gdigrab -framerate 30 -i desktop -an -c:v h264_qsv -video_size 640x480 output.mp4
+      ~ $ ffmpeg -init_hw_device qsv=hw -filter_hw_device hw -f gdigrab -i desktop -vf hwupload=extra_hw_frames=64 -c:v h264_qsv record.mp4
+      Capture/Desktop – FFmpeg ⌇⡧⠗⢘⡓
+        https://trac.ffmpeg.org/wiki/Capture/Desktop
+        $ ffmpeg -video_size 1024x768 -framerate 30 -f x11grab -i :0.0+100,200 -f pulse -ac 2 -i default -c:v hevc_qsv output.mkv
+    [Tutorial] Removing the frozen frames from a video using only the terminal, no editor required. This can actually save you HOURS of work. : r/VideoEditing ⌇⡧⠗⢚⢷
+      https://www.reddit.com/r/VideoEditing/comments/g9o4i4/tutorial_removing_the_frozen_frames_from_a_video/
+      $ ffmpeg -i input.mp4 -vf mpdecimate,setpts=N/FRAME_RATE/TB -an output.mp4
+  [+] 23:50 30m FIND: ffmpeg qa
+    FFmpeg Codecs Documentation ⌇⡧⠘⠖⣤
+      https://www.ffmpeg.org/ffmpeg-codecs.html#Ratecontrol-Method
+    VIZ
+      $ ffmpeg -h encoder=hevc_qsv

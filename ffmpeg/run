@@ -40,7 +40,7 @@ sfx=$(awk -vt="$beg" 'BEGIN{t=strtonum(t);printf"%02dm%02ds%d",t/60,t%60,(t-int(
 path="${path%.*}_${sfx}.${path##*.}"
 
 if [[ -e $path ]]; then
-    mv -vfT --backup=t "$path" "${path%.*}_${RANDOM}.${path##*.}"
+    mv -vfT --backup=t "$path" "${path%.*}_prev${RANDOM}.${path##*.}"
 fi
 
 # BAD:PERF: webm=57s .vs. mp4=9s
@@ -71,19 +71,42 @@ elif [[ $fmt == copy ]]; then
 
   # BAD: inexact position
   # -loglevel info
-  ffmpeg -hide_banner -nostats -nostdin -i "$fname" \
+  # -avoid_negative_ts make_zero \
+  ffmpeg -hide_banner -nostats -nostdin \
     -ss "${beg:-00:00}" -to "${end:--00:00}" \
+    -i "$fname" \
     -codec:v copy -codec:a copy -codec:d copy \
-    -avoid_negative_ts make_zero \
     "$path"
 
 elif [[ $fmt == fast ]]; then
 
-  ffmpeg -hide_banner -nostats -nostdin -i "$fname" \
+  ## -crf 24 -codec:v libx264
+  # ffmpeg -hide_banner -nostats -nostdin \
+  #   -hwaccel vaapi -hwaccel_output_format vaapi \
+  #   -ss "${beg:-00:00}" -to "${end:--00:00}" \
+  #   -i "$fname" \
+  #   -c:v hevc_vaapi -global_quality 25 \
+  #   -codec:a copy -codec:d copy \
+  #   -avoid_negative_ts make_zero \
+  #   "$path"
+
+  # -vf "scale_qsv=w=1920:h=1080"
+  ffmpeg -hide_banner -nostats -nostdin \
+    -hwaccel qsv -hwaccel_output_format qsv \
     -ss "${beg:-00:00}" -to "${end:--00:00}" \
-    -crf 23 -codec:v libx264 -codec:a copy -codec:d copy \
-    -avoid_negative_ts make_zero \
+    -c:v h264_qsv -i "$fname" -vf 'hwdownload' \
+    -c:v hevc_qsv -preset slow -global_quality 23 \
+    -codec:a copy -codec:d copy \
     "$path"
+
+
+  # x4.5: ffmpeg -y -hide_banner -hwaccel vaapi -hwaccel_output_format vaapi -i input.mp4 -c:v hevc_vaapi -global_quality 25 output.mp4
+
+  # HW ※⡧⠋⢠⡫
+  # $ ffmpeg -hide_banner -hwaccel qsv -c:v h264_qsv -i input.mp4 -c:v hevc_qsv -global_quality 25 output.mp4
+  # $ ffmpeg -i input.mp4 -c:v hevc_qsv -rc cqp -qp_i 12 -qp_p 13 output.mp4
+  # Merge ※⡧⠋⢖⡗
+  # $ ffmpeg -f concat -safe 0 -i <(printf "file '$PWD/%s'\n" ./*.wav) -c copy output.wav
 
 else
   # SRC: https://superuser.com/questions/459313/how-to-cut-at-exact-frames-using-ffmpeg

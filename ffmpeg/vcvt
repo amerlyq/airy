@@ -1,0 +1,33 @@
+#!/bin/bash
+# DEBUG: $ ffprobe input.mp4
+set -euo pipefail
+
+if [[ ${2-} == -a ]]; then
+  # REF: https://www.ffmpeg.org/ffmpeg-codecs.html#Ratecontrol-Method
+  #   For the ICQ modes, global quality range is 1 to 51, with 1 being the best quality.
+  qa=${3:-25}
+  ifx=a
+  cvargs=( -preset slow -tune animation -global_quality "$qa" )
+else
+  qa=${2:-23}
+  ifx=c
+  cvargs=( -preset slow -global_quality "$qa" )
+fi
+
+# h264_qsv av1_qsv
+# -vf 'scale_qsv=w=1920:h=1080,format=yuv420p'
+# -vf 'scale=w=1920:h=1080' \
+ffmpeg -v verbose -hide_banner \
+  -hwaccel qsv -hwaccel_output_format qsv \
+  -c:v h264_qsv -i "$1" -vf 'hwdownload' \
+  -c:v hevc_qsv "${cvargs[@]}" \
+  -y "${1%.*}_${ifx}${qa}.${1##*.}"
+
+## ALT: vaapi
+# ffmpeg -hide_banner -hwaccel vaapi -hwaccel_output_format vaapi \
+#   -i "$1" -c:v hevc -global_quality "${2:-25}" -y "${1%.*}_c.${1##*.}"
+
+## ALT:(sw): when vaapi doesn't work e.g: fps>30/re-scale
+# ffmpeg -y -hide_banner -i "$1" -vf 'fps=60,scale=w=1920:h=1080' \
+# ffmpeg -y -hide_banner -i "$1" \
+#   -c:v hevc -global_quality "${2:-25}" "${1%.*}_c.${1##*.}"
