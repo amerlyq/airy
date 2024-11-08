@@ -4,13 +4,18 @@
 
 # # TEMP: for WSL2 and NUC
 # export EDITOR=nvim
-# # : "${XDG_RUNTIME_DIR:=/tmp}"
-# ## BAD:OBSOL:USE: $ sudo systemd-run --system --scope -- su -l myuser
-# # export XDG_RUNTIME_DIR="/run/user/$(id -u)"
-# ## TEMP: override for "su - myuser"
-# [[ -n ${DISPLAY:+x} ]] || export DISPLAY=":10.0"
+#
+# # FIXED: override PATH to more sane and controllable value
+# export PATH=/b:$HOME/.local/bin:/usr/bin
+#
 # ## TEMP: override for "clipboard"
-# [[ -n $SSH_CONNECTION && $PATH != *libexec/xc:* ]] && export PATH=/usr/local/libexec/xc:$PATH
+# # OBSOL(due !su whitelist=DISPLAY): [[ -z ${DISPLAY-} && ... ]]
+# [[ -n ${SSH_CONNECTION+x} && $PATH != *bin/xc-ssh:* && -d $HOME/me/bin/xc-ssh ]] && PATH=$HOME/me/bin/xc-ssh:$PATH
+#
+# # BET:USAGE: $ sudo systemd-run --system --scope -- su -l myuser -w DISPLAY
+# #   ALSO;BAD:OBSOL: export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+# # TEMP: for SSH connections to be immediately functional
+# [[ -n ${DISPLAY:+x} ]] || export DISPLAY=":10.0"
 
 
 export SSH_AUTH_SOCK=${XDG_RUNTIME_DIR:?}/gnupg/S.gpg-agent.ssh

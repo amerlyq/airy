@@ -21,6 +21,16 @@ xinput --set-prop --type=int "Wacom Intuos Pro S Finger" "libinput Tapping Drag 
 xinput --set-prop --type=float "Wacom Intuos Pro S (WL) Finger" "libinput Accel Speed" 0.88
 xinput --set-prop --type=int "Wacom Intuos Pro S (WL) Finger" "libinput Tapping Drag Lock Enabled" 1
 
+# mon=$(xrandr -q --current | awk '$2" "$3=="connected primary"{print$1}')
+# xid=$(xinput list --id-only 'Network Tablet')
+# xid=$(xinput list | grep -oP 'Wacom.*Pen Pen.*id=\K\d+')
+# xinput map-to-output "$xid" "$mon"
+## COS:(eDP-1): has almost A4 proportions
+xinput --map-to-output "$(xinput list | grep -oP 'Wacom.*Pen Pen.*id=\K\d+')" "eDP-1"
+xinput --map-to-output "$(xinput list | grep -oP 'Wacom.*Pen Eraser.*id=\K\d+')" "eDP-1"
+# ALT: xinput list-props 32 G Matrix
+# REF: https://github.com/linuxwacom/xf86-input-wacom/wiki/Dual-and-Multi-Monitor-Set-Up#coordinate-transformation-matrix
+
 
 xset b off s off dpms 900 1500 1800 r rate 250 40
 
@@ -39,15 +49,15 @@ if xrandr --listmonitors | grep -wo "DP-1~[0-9]"; then
   if delargs=$(xrandr --listmonitors | grep -wo "DP-1~[0-9]" | sed 's/^/--delmonitor /' | paste -sd' ') \
     && [[ $delargs ]]; then xrandr ${delargs:?}; fi
   # xrandr --delmonitor DP-1~1 --delmonitor DP-1~2
-  # sleep 1
+  sleep 1
   refresh=1
 fi
 
 ## NOTE: split the ext screen in my usual ratio
 if xrandr -q | grep -q '^DP-1 connected'; then
   # OR:(reverse): xrandr --setmonitor DP-1~2 914/208x1600/366+0+0 DP-1 --setmonitor DP-1~1 2926/666x1600/366+914+0 none
-  xrandr --setmonitor DP-1~1 2926/666x1600/366+914+0 DP-1 --setmonitor DP-1~2 914/208x1600/366+0+0 none
-  # sleep 1
+  xrandr --setmonitor DP-1~1 2926/666x1600/366+914+0 DP-1 --setmonitor DP-1~2 914/208x1600/366+0+0 DP-1
+  sleep 1
   refresh=1
 fi
 

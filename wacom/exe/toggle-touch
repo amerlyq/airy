@@ -18,8 +18,8 @@ fi
 # ALT: xinput set-prop "$id" "Device Enabled" 0
 if [[ $state == off ]]; then
   xinput disable "$id"
-  r.n -Ut20 'Wacom: Touch' "$state"
+  # r.n -Ut20 'Wacom: Touch' "$state"
 else
   xinput enable "$id"
-  r.n 'Wacom: Touch' "$state"
+  # r.n 'Wacom: Touch' "$state"
 fi

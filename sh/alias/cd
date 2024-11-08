@@ -15,6 +15,15 @@ alias .....='cd ../../../../'
 cdauto() { ((!$#)) || local p=${*: -1} d l
   if [[ -z ${1-} || $p == - ]]; then
     builtin cd "$@" || return
+  elif [[ ${1-} == -m ]]; then
+    builtin cd "$p" || return
+    p=$(find . -type f -printf '%T@\t%p\n' | awk '$1>a{a=$1;n=substr($0,length(a)+2)}END{print""n}')
+    builtin cd "${p%/*}" || return
+    if [[ -d $p ]]; then
+      builtin cd "${p##*/}" || return
+    else
+      $EDITOR -- "${p##*/}"
+    fi
   elif [[ ${1-} == -l ]]; then
     builtin cd "${p%/*}" || return
     l=$(readlink "$p")
