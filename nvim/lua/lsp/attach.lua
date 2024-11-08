@@ -12,7 +12,8 @@ local on_attach = function(client, bufnr)
   -- WTF: it's registered for all .py buffers BUT formatting works only for first buffer
   -- vim.cmd [[autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()]]
 
-  local group = vim.api.nvim_create_augroup('MyLsp', { clear = true })
+  -- FIXED:(clear=false): allow duplicates for multiple buffers
+  local group = vim.api.nvim_create_augroup('MyLsp', { clear = false })
 
   local function autocmd(evs, cb, s)
     vim.api.nvim_create_autocmd(evs, {
@@ -24,7 +25,7 @@ local on_attach = function(client, bufnr)
   end
 
   local B = vim.lsp.buf
-  autocmd('BufWritePre', B.format, "Auto Format")
+  autocmd('BufWritePre', function() B.format { async = false } end, "Auto Format")
   -- ALT: vim-illuminate
   autocmd({ 'CursorHold', 'CursorHoldI' }, B.document_highlight, "hi! show under cursor")
   autocmd('CursorMoved', B.clear_references, "hi! clear under cursor")
