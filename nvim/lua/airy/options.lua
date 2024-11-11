@@ -47,7 +47,7 @@ o.mouse = 'a'
 o.breakindent = true
 
 --Save undo history
-vim.opt.undofile = true
+o.undofile = true
 
 --Case insensitive searching UNLESS /C or capital in search
 o.ignorecase = true
@@ -60,7 +60,8 @@ vim.wo.signcolumn = 'auto'
 
 o.cursorline = true
 o.list = true
-vim.opt.listchars = { tab = '▸ ', trail = '·', extends = '»', precedes = '«', nbsp = '␣' }
+o.listchars = { tab = '▸ ', trail = '·', extends = '»', precedes = '«', nbsp = '␣' }
+o.showbreak = ' '  -- ALT: '‥ .. ↪  ⮓ '
 
 -- Set completeopt to have a better completion experience
 o.completeopt = 'menuone,noselect' -- menu,

@@ -517,8 +517,8 @@ class console(Command):
                 pass
 
         command = self.rest(1)
-        if pos is None or int(pos) > len(command):
-            command += " "
+        # if pos is None or int(pos) > len(command):
+        #     command += " "
         self.fm.open_console(command, position=pos)
         if not command and self.quantifier is not None:
             self.fm.ui.console.history_move(-self.quantifier)
