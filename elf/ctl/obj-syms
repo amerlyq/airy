@@ -19,7 +19,7 @@ dump_once(){ local mark=$1; shift
 
 # -o | to search obj files
 find_artifacts(){ printf '* (find) %s\n' "$*" >&2
-  r.find-elf "$@" \
+  /d/airy/find/ctl/elf "$@" \
   || { printf '!!! (warning) %s binaries not found\n' "$1" >&2; }
 }
 
@@ -204,11 +204,11 @@ cycle_relpath(){ local sym=$1; shift
 # TODO: replace by "parallel --keep-order"
 topo_cycle_relpath(){ local grp=$1; shift
   dump_once "$grp/topo.cycles.relpath" \
-    <"$grp/topo.cycles" xargs -rn1 -d\\n -I{} -- \
+    <"$grp/topo.cycles" xargs -r -d\\n -I{} -- \
     bash -c 'cycle_relpath "$0" "$@"' '{}' "$grp/files" "$@"
 }
 
-annotate_cycle(){ local fcycle=$1; shift; r.elf-obj-syms-annotate-cycles "$@" < "$fcycle" | c++filt; }
+annotate_cycle(){ local fcycle=$1; shift; /d/airy/elf/ctl/obj-syms-annotate-cycles "$@" < "$fcycle" | c++filt; }
 annotate_cycle_group(){ local grp=$1; shift 1
   dump_once "$grp/topo.cycles.annotated" \
     annotate_cycle "$grp/topo.cycles.relpath" "$grp/need"

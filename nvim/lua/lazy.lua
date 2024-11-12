@@ -119,6 +119,32 @@ local function ft_lisp()
   end
 end
 
+local function ft_qf()
+  if vim.bo.filetype == 'qf' then
+    local bufnr = seen_filetypes['qf'].buf
+    local KB = vim.api.nvim_buf_set_keymap
+    local KBn = function(lhs, fn, s) KB(bufnr, 'n', lhs, '', { callback = fn, noremap = true, desc = s }) end
+
+    -- OLD: https://github.com/stefandtw/quickfix-reflector.vim
+    --   autocmd! FileType qf packadd quickfix-reflector.vim
+    -- vim.cmd [[ packadd quickfix-reflector.vim ]]
+    KB(bufnr, 'n', '<Bslash>e', '<Cmd>exe "BqfAutoToggle" | packadd quickfix-reflector.vim | copen<CR>'
+      , { noremap = true, silent = true, desc = 'edit [QF] by reflector / disable Bqf' })
+
+    -- SRC: https://github.com/gabrielpoca/replacer.nvim
+    -- BAD: line numbers and lnum:col: disappers
+    -- KBn('<Bslash>h', function() require("replacer").run {rename_files = false} end, "enable editing [QF]")
+    ---- ERR: can't save QF by replacer.vim
+    --   Error detected while processing BufWriteCmd Autocommands for "<buffer=31>":
+    --   Error executing lua callback: Vim:E5300: Expected a Number or a String
+    --   stack traceback:
+    --           [C]: in function 'writefile'
+    --           ...m/lazy/pack/ui/start/replacer.nvim/lua/replacer/init.lua:81: in function 'save'
+    --           ...m/lazy/pack/ui/start/replacer.nvim/lua/replacer/init.lua:200: in function <...m/lazy/pack/ui/start/replacer.nvim/lua/replacer/init.lua:200>
+    -- KBn('<Bslash>H', function() require("replacer").save {rename_files = false} end, "save edited [QF]")
+  end
+end
+
 
 --BAD: called each time you open buffers of the same type
 --  WKRND: should wrap everything behind "require" singletons
@@ -126,7 +152,9 @@ end
 local function load_ondemand()
   -- DEBUG: print(vim.inspect(g.lazy_filetypes))
   -- FIXED:(vim.bo.filetype): if ANY buffer had python
-  if seen_filetypes['python'] then
+  if seen_filetypes['qf'] then
+    ft_qf()
+  elseif seen_filetypes['python'] then
     ft_python()
   elseif seen_filetypes['lisp'] then
     ft_lisp()
