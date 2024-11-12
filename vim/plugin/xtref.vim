@@ -4,6 +4,7 @@
 " SPDX-PackageName: vim-xtref
 " SPDX-PackageSummary: timestamp-based cross-refs manipulation and tagging
 "   = xtref = cross(X)-time(T)-references
+" [_] TODO: merge into nou.vim to be used as an overlay for anything not .nou
 if &cp||exists('g:loaded_xtref')|finish|else|let g:loaded_xtref=1|endif
 
 let g:xtref = {}
@@ -472,8 +473,25 @@ import just.flower.xts.cvt as C
 vim.current.line += " <" + C.date_to_xts2() + ">"
 EOF
 endf
-
 nnoremap <Plug>(xtref-new-postpone-day) :<C-u>call xtref#py_postpone()<CR>
+
+
+fun! xtref#py_insert_day(...)
+py3 << EOF
+import just.flower.xts.cvt as C
+EOF
+  return py3eval('C.date_to_xts2()')
+endf
+nnoremap <Plug>(xtref-new-insert-day) i<C-r>=xtref#py_insert_day()<CR><Esc>
+
+
+fun! xtref#py_insert_ymd(...)
+py3 << EOF
+import just.flower.xts.cvt as C
+EOF
+  return py3eval('C.ts_ymd3(C.ltoday())')
+endf
+nnoremap <Plug>(xtref-new-insert-ymd) i<C-r>=xtref#py_insert_ymd()<CR><Esc>
 
 
 fun! xtref#pytest_cvt()
@@ -511,10 +529,12 @@ map <silent> <Leader>x<Delete> <Plug>(xtref-delete)
 
 map <silent> <Leader>xa <Plug>(xtref-new-append)
 map <silent> <Leader>xA <Plug>(xtref-new-postpone-day)
+map <silent> <Leader>xb <Plug>(xtref-new-insert)
+map <silent> <Leader>xB <Plug>(xtref-new-insert-day)
 map <silent> <Leader>xi <Plug>(xtref-new-insert)
 map <silent> <Leader>xI <Plug>(xtref-new-prepend)
 map <silent> <Leader>x> <Plug>(xtref-new-postpone)
-map <silent> <Leader>xd <Plug>(xtref-replace-datetime)
+map <silent> <Leader>xd <Plug>(xtref-new-insert-ymd)
 map <silent> <Leader>xr <Plug>(xtref-invert)
 map <silent> <Leader>xR <Plug>(xtref-refresh)
 map <silent> <Leader>xt <Plug>(xtref-replace-datetime)

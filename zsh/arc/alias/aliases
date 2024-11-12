@@ -53,10 +53,10 @@ if (($+commands[$EDITOR])); then
   alias -g V='| $EDITOR - -c "setl noro ma bt=nofile nowrap"'
   alias -g VL='| xargs $EDITOR'
   alias -g VN='V -c "setl ft=nou fdl=99"'
-  alias -g VQ='V -c "cgetb|copen"'
+  alias -g VQ='V -c "au User LazyPluginsLoaded cgetb|copen"'
     # ALT: ag --vimgrep ... |sort| nvim -q/dev/stdin
   # DEV: highlight: call ag#syntax#himatch_pcre("${@: -1}")
-  alias -g VG='V -c "set cole=0 fdl=1|setf ag_grp"'
+  alias -g VG='V -c "au User LazyPluginsLoaded set cole=0 fdl=1|setf ag_grp"'
   alias -g V@='|vipe| '
   # ALT:(vipe): V :w!tee
   # SEE: http://stackoverflow.com/questions/3219479/how-to-write-buffer-content-to-stdout
