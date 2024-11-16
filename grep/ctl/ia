@@ -14,10 +14,11 @@ export FZF_DEFAULT_COMMAND="$cmd '--files'"
 # --bind 'ctrl-v:preview:bat --line-range {2}:+10 --highlight-line {2} -- {1}' \
 # --preview 'bat --line-range {2}:+10 --highlight-line {2} -- {1}' \
 
-exec fzf --ansi --disabled --multi \
+exec fzf --extended --ansi --multi \
+  --disabled --wrap \
   --bind "change:reload:$cmd {q} || true" \
   --bind='ctrl-s:toggle-sort' \
-  --history=/@/xdg_share/skim_history \
+  --history=${HOME}/.local/share/skim_history \
   | ifne vq
 
 # exec sk --ansi --interactive --multi \
