@@ -43,7 +43,7 @@ o.packpath = { MYPLUG .. '/preload', MYCONF }
 --  MAYBE: use "au BufWipeout :wshada" to store them
 --PERF: reduce .shada file size to ~115kB (5ms) .vs. DFL=660kB (~36ms)
 --  HACK:(edit): source $VIMRUNTIME/plugin/shada.vim | edit /@/xdg_share/nvim/shada/main.shada
-o.shada = { "'30", "<0", "s1", "h", "rterm://" }
+o.shada = { "'50", "<0", "s1", "h", "rterm://" }
 o.history = 999
 
 

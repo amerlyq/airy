@@ -74,6 +74,22 @@ autocmd('CursorMoved', {
       -- TEMP: only decode 'ymd', FUT: also decode 'ymdhms'
       local dts = os.date("%Y-%m-%d", os.time({year=y, month=m, day=d, hour=0, min=0, sec=1}))
       vim.api.nvim_echo({{dts, 'None'}}, false, {})
+    else
+      local word = vim.fn.expand('<cWORD>')
+      if vim.fn.match(word, '^\\v(%(19|20)\\d\\d)-(0\\d|1[012])-([012]\\d|3[01])>') == 0 then
+        local _base31 = function(i)
+          if i <= 9 then
+            return string.char(string.byte("0") + i)
+          else
+            return string.char(string.byte("a") + (i - 10))
+          end
+        end
+        local y = _base31((tonumber(word:sub(1,4)) - 2011) % 30 + 1)
+        local m = _base31(tonumber(word:sub(6,7)))
+        local d = _base31(tonumber(word:sub(9,10)))
+        local dts = y .. m .. d
+        vim.api.nvim_echo({{dts, 'None'}}, false, {})
+      end
     end
   end
   -- command = "if expand('<cword>')=~'^1[0-9]{9}$'| "

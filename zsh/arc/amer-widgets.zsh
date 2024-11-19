@@ -73,8 +73,8 @@ function complete-files() { compadd - $PREFIX*; }
 zle -N set-fast-exec-cmd set_fast_exec_cmd
 function set_fast_exec_cmd {
     local cmd="${*:-${BUFFER:-$(fc -ln -1)}}"
-    bindkey  -s ',m' "^U$cmd\n"
-    bindkey -as ',m' "S$cmd\n"
+    bindkey  -s ',m' "^U $cmd\n"
+    bindkey -as ',m' "S $cmd\n"
     (($#)) || printf "\nSaved: '%s'\n" "$cmd"
     # WARNING: don't output -- for key-mix setting? or eval "$cmd?"
 }

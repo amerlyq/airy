@@ -164,7 +164,7 @@ if [[ -r /usr/share/zsh/site-functions/abyss.zsh ]]; then
   source /usr/share/zsh/site-functions/abyss.zsh
 else
   # make -- save and re-run last cmd by [,m]
-  set_fast_exec_cmd 'abyss'
+  set_fast_exec_cmd 'miur'  # 'abyss'
   bindkey    '\C-x\C-m' set-fast-exec-cmd
   bindkey -a '\C-x\C-m' set-fast-exec-cmd
 fi

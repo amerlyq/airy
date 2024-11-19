@@ -2,12 +2,12 @@
 [[ ~/.zshrc.zwc -nt ~/.zshrc ]] || zcompile ~/.zshrc
 
 
-# # TEMP: for WSL2 and NUC
+## TEMP: for WSL2 and NUC
 # export EDITOR=nvim
-#
-# # FIXED: override PATH to more sane and controllable value
-# export PATH=/b:$HOME/.local/bin:/usr/bin
-#
+
+# FIXED: override PATH to more sane and controllable value
+export PATH=/b:$HOME/.local/bin:/usr/bin
+
 # ## TEMP: override for "clipboard"
 # # OBSOL(due !su whitelist=DISPLAY): [[ -z ${DISPLAY-} && ... ]]
 # [[ -n ${SSH_CONNECTION+x} && $PATH != *bin/xc-ssh:* && -d $HOME/me/bin/xc-ssh ]] && PATH=$HOME/me/bin/xc-ssh:$PATH
@@ -92,7 +92,10 @@ zshaddhistory() { local f
 ############################################################
 ### TEMP
 
-source /usr/share/doc/pkgfile/command-not-found.zsh
+## DISABLED: takes too much time when I mistype command
+##   ~~ suggested pkgs are interesting, but I almost never use them,
+##     as I have pkgfile and other pac*/aur* cmds
+# source /usr/share/doc/pkgfile/command-not-found.zsh
 
 source() {
   [[ $1.zwc -nt $1 ]] || zcompile $1
@@ -205,26 +208,38 @@ _set_prompt() {
     elif [[ $HOST =~ vbox ]]; then color=3
     fi
   elif [[ -z $TMUX ]]; then color=7
-  elif [[ $RANGER_LEVEL ]]; then color=34
-  elif [[ $MIUR_LEVEL ]]; then color=62
+  elif [[ $RANGER_LEVEL ]]; then color=22
+  elif [[ $MIUR_LEVEL ]]; then color=34  # 62
   fi
 
   local nest=
-  [[ $debian_chroot ]] && nest+=C
-  [[ $RANGER_LEVEL ]] && nest+=R
-  [[ $MIUR_LEVEL ]] && nest+=M
-  [[ $VIM ]] && nest+=V
-  [[ $nest ]] && nest="%F{60}%B$nest%b%F{$color}"
+  [[ ${debian_chroot:+x} ]] && nest+=C
+  [[ ${MIUR_LEVEL:+x} ]] && nest+=M
+  [[ ${RANGER_LEVEL:+x} ]] && nest+=R
+  [[ ${VIM:+x} ]] && nest+=V
+  [[ ${NVIM:+x} ]] && nest+=V
+  [[ ${VIRTUAL_ENV:+x} ]] && nest+=E
+  [[ -n $nest ]] && nest="%F{60}%B$nest%b%F{$color}"
 
   # local parts
   # [[ $UID -eq 0 ]] && parts="╔═╚╣╼┇" || parts="┌─└╢╼┇"
   # OR: ╭ ╰
 
-  PROMPT="%(?..%F{1}%?↵%f
+  if [[ $TERM =~ "^(st|tmux)\\b" ]]; then
+    PROMPT="%(?..%F{1}%?↵%f
 )%F{$color}┌${nest:-─}─%f %B%F{220}%d %F{238}%~%f%b
 %F{$color}└%(!.#.╼)%f "
-  ## OR:(disable blinking cursor on WSL2/NUC): append {"$'\e[2 q'"%} to 2nd line ::
-  #   )%F{$color}┌${nest:-─}─%f %B%F{220}%d %F{238}%~%f%b%{"$'\e[2 q'"%}
+  else
+    ## FIXED: disable prompt prefix from <any>/.venv/bin/activate
+    VIRTUAL_ENV_DISABLE_PROMPT=1
+    set -o promptsubst  # COS: to expand .venv path in prompt
+
+    ## NOTE:(disable blinking cursor on WSL2/NUC): append {"$'\e[2 q'"%} to 2nd line ::
+    PROMPT="%(?..%F{1}%?↵%f
+)%F{$color}┌${nest:-─}─%f %B%F{220}%d %F{238}\${VIRTUAL_ENV+(\$VIRTUAL_ENV)}%f%b%{"$'\e[2 q'"%}
+%F{$color}└%(!.#.╼)%f "
+  fi
+
 }; _set_prompt
 
 
@@ -266,4 +281,15 @@ zstyle ':completion:*' completer _expand _complete _files _correct _approximate
 
 # HACK: #miur※⡢⣯⢁⢏ pre-fill prompt (inof running) by specified cmdline on ZSH startup
 #   BET: print help notice  above shell-out to use $F / $S vars in cmdline
-# if [[ -n ${ZSH_BUFFER-} ]]; then print -z "$ZSH_BUFFER" && unset ZSH_BUFFER; fi
+if [[ -n ${ZSH_BUFFER-} ]]; then print -z "$ZSH_BUFFER" && unset ZSH_BUFFER; fi
+
+# TRY: inject this code directly from !miur when doing shell_out()
+# TODO: replace "fm()" above, as I can launch !ranger from inside !miur too
+#   NEED: first make !miur slightly more stable for daily use
+miur(){ local d f=${XDG_RUNTIME_DIR:?}/ranger/cwd
+  [[ $(alias m) == "m=miur" ]] || source =miur  # source all aliases on first run
+  [[ -n ${MIUR_LEVEL-} ]] && exit  # NOTE: exit miur-nested shell
+  command miur --choosedir="$f" "$@"
+  [[ -s $f ]] && d=$(<"$f")  # sync last PWD (TEMP: reuse !ranger)
+  if [[ -d ${d-} && $d != $PWD ]]; then builtin cd -- "$d" || return; fi
+}

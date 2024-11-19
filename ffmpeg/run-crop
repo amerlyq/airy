@@ -18,9 +18,15 @@ if [[ -z $force ]]; then
   ffplay -hide_banner -loglevel warning -i "$path" \
    -vf "crop=$crop,setpts=0.1*N/FRAME_RATE/TB"
 else
-  ffmpeg -hide_banner -nostdin -i "$path" \
-    -crf 23 -codec:v libx264 -c:a copy \
-    -vf "crop=$crop" \
-    "${path%.*}v.${path##*.}"
+  # ffmpeg -hide_banner -nostdin -i "$path" \
+  #   -crf 23 -codec:v libx264 -c:a copy \
+  #   -vf "crop=$crop" \
+  #   "${path%.*}v.${path##*.}"
+
+  ffmpeg -v verbose -hide_banner \
+    -hwaccel qsv -hwaccel_output_format qsv \
+    -c:v hevc_qsv -i "$path" -vf "hwdownload,crop=$crop" \
+    -c:v hevc_qsv -preset slow -global_quality 23 \
+    -y "${path%.*}v.${path##*.}"
 
 fi
