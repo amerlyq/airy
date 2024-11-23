@@ -4,27 +4,39 @@
 
 cmd="re --color=always $*"
 export FZF_DEFAULT_COMMAND="$cmd '--files'"
+# export FZF_DEFAULT_COMMAND="$cmd '--files-with-matches'"
 
-# --bind ctrl-a:select-all
-# --bind '?:preview:cat {}'
+# https://habr.com/ru/companies/vk/articles/858284/
+# https://github.com/eth-p/bat-extras/blob/master/doc/batgrep.md
+#   https://github.com/eth-p/bat-extras/blob/master/README.md#installation
+#   https://github.com/eth-p/bat-extras/blob/master/src/batgrep.sh
+export BAT_THEME="Solarized (light)"
+# export BAT_THEME="Monokai Extended"
+# export BAT_THEME="ansi"
+# --preview="[[ ! -z {} ]] && rg --pretty --context 5 {q} {}" \
+# --preview="if [[ -n {} ]]; then if [[ -n {q} ]]; then ~/bin/bat-extras/src/batgrep.sh --color=always --terminal-width=105 --context=3 {q} {}; else bat --color=always {}; fi; fi" \
+# preview='if [[ -n {q} ]]; then /d/plugins/bat-extras/src/batgrep.sh --color=always --terminal-width=105 --context=3 {q} {}; else bat --color=always {}; fi'
+# --preview="if [[ -n {} ]]; then ${preview}; fi" \
+
+# TBD? --query "$1" for args after "--"
 # --query '' \
 # --tiebreak=begin,end,length \
+# --tiebreak=-index,begin,end,score \
+# --preview-window hidden \
 
-# --delimiter=':' --preview-window hidden \
-# --bind 'ctrl-v:preview:bat --line-range {2}:+10 --highlight-line {2} -- {1}' \
-# --preview 'bat --line-range {2}:+10 --highlight-line {2} -- {1}' \
 
-exec fzf --extended --ansi --multi \
-  --disabled --wrap \
-  --bind "change:reload:$cmd {q} || true" \
-  --bind='ctrl-s:toggle-sort' \
+# fzf --preview 'cat {}' --preview-window 'right,border-left,<30(up,30%,border-bottom)'
+
+exec fzf --extended --ansi --multi --disabled --wrap \
   --history=${HOME}/.local/share/skim_history \
+  --delimiter=':' \
+  --preview="bat --style=full --color=always --highlight-line {2} -- {1}" \
+  --preview-window 'up,50%:wrap,~3,+{2}+3/2' \
+  --bind "change:reload:sleep 0.1; $cmd {q} || true" \
+  --bind='ctrl-s:toggle-sort' \
+  --bind='ctrl-a:select-all' \
+  --bind='?:preview:cat {1}' \
+  --bind 'ctrl-v:preview:bat --line-range {2}:+10 --highlight-line {2} -- {1}' \
+  --bind "f3:execute(bat --paging=always --pager=\"less -j4 -R -F +/{q}\" --color=always {1} < /dev/tty > /dev/tty)" \
+  --bind "f4:execute(v {1..3})" \
   | ifne vq
-
-# exec sk --ansi --interactive --multi \
-#   --bind='ctrl-s:toggle-sort' \
-#   --tiebreak=-index,begin,end,score \
-#   --cmd-history=/@/xdg_share/skim_history \
-#   \
-#   --cmd 're --color=always '"$*"' "{}"' \
-#   | ifne vq

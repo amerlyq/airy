@@ -23,9 +23,10 @@ else
   #   -vf "crop=$crop" \
   #   "${path%.*}v.${path##*.}"
 
+  # -c:v hevc_qsv
   ffmpeg -v verbose -hide_banner \
     -hwaccel qsv -hwaccel_output_format qsv \
-    -c:v hevc_qsv -i "$path" -vf "hwdownload,crop=$crop" \
+    -i "$path" -vf "hwdownload,crop=$crop" \
     -c:v hevc_qsv -preset slow -global_quality 23 \
     -y "${path%.*}v.${path##*.}"
 
