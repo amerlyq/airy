@@ -1,9 +1,16 @@
-#!/bin/sh -eu
+#!/bin/bash -e
 # FAIL: can't pipe directly to nvim due to stdin blocking
 #   ::: FIXED:USE: !ifne OR !sponge to drain stdin before passing to !nvim
 
-cmd="re --color=always $*"
-export FZF_DEFAULT_COMMAND="$cmd '--files'"
+for((i=1;i<=$#;++i)); do [[ ${!i} == -- ]] && break; done
+if ((i <= $#)); then ((++i)); else for((i=1;i<=$#;++i)); do [[ ${!i} != -* ]] && break; done; fi
+flags=( "${@:1:i-1}" )
+patt=${!i}
+files=( "${@:i+1}" )
+
+cmd="re --color=always ${flags[*]}"
+
+export FZF_DEFAULT_COMMAND="$cmd ${*:---files}"
 # export FZF_DEFAULT_COMMAND="$cmd '--files-with-matches'"
 
 # https://habr.com/ru/companies/vk/articles/858284/
@@ -18,21 +25,19 @@ export BAT_THEME="Solarized (light)"
 # preview='if [[ -n {q} ]]; then /d/plugins/bat-extras/src/batgrep.sh --color=always --terminal-width=105 --context=3 {q} {}; else bat --color=always {}; fi'
 # --preview="if [[ -n {} ]]; then ${preview}; fi" \
 
-# TBD? --query "$1" for args after "--"
-# --query '' \
 # --tiebreak=begin,end,length \
 # --tiebreak=-index,begin,end,score \
 # --preview-window hidden \
 
-
 # fzf --preview 'cat {}' --preview-window 'right,border-left,<30(up,30%,border-bottom)'
 
 exec fzf --extended --ansi --multi --disabled --wrap \
+  ${patt:+--query "$patt"} \
   --history=${HOME}/.local/share/skim_history \
   --delimiter=':' \
   --preview="bat --style=full --color=always --highlight-line {2} -- {1}" \
   --preview-window 'up,50%:wrap,~3,+{2}+3/2' \
-  --bind "change:reload:sleep 0.1; $cmd {q} || true" \
+  --bind "change:reload:sleep 0.1; $cmd {q} ${files[*]} || true" \
   --bind='ctrl-s:toggle-sort' \
   --bind='ctrl-a:select-all' \
   --bind='?:preview:cat {1}' \
