@@ -30,6 +30,19 @@ if vim.fn.has("wsl") == 1 then
       vim.fn.system('clip.exe', vim.fn.getreg('"'))
     end,
   })
+elseif vim.env.SSH_CONNECTION then
+  g.clipboard = {
+    name = 'SSH xcio',
+    copy = {
+      ['+'] = 'xci',
+      ['*'] = 'xci',
+    },
+    paste = {
+      ['+'] = 'xco',
+      ['*'] = 'xco',
+    },
+    cache_enabled = 0,
+  }
 end
 
 -- DISABLED: inherits "r.sh" from ranger which accesses too much files

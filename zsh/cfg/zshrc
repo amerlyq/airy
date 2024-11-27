@@ -2,21 +2,22 @@
 [[ ~/.zshrc.zwc -nt ~/.zshrc ]] || zcompile ~/.zshrc
 
 
-## TEMP: for WSL2 and NUC
-# export EDITOR=nvim
+if [[ $HOST == *-* ]]; then
+  # TEMP: for WSL2 and NUC
+  export EDITOR=nvim
 
-# FIXED: override PATH to more sane and controllable value
-export PATH=/b:$HOME/.local/bin:/usr/bin
+  # FIXED: override PATH to more sane and controllable value
+  export PATH=/b:$HOME/.local/bin:/usr/bin
 
-# ## TEMP: override for "clipboard"
-# # OBSOL(due !su whitelist=DISPLAY): [[ -z ${DISPLAY-} && ... ]]
-# [[ -n ${SSH_CONNECTION+x} && $PATH != *bin/xc-ssh:* && -d $HOME/me/bin/xc-ssh ]] && PATH=$HOME/me/bin/xc-ssh:$PATH
-#
-# # BET:USAGE: $ sudo systemd-run --system --scope -- su -l myuser -w DISPLAY
-# #   ALSO;BAD:OBSOL: export XDG_RUNTIME_DIR="/run/user/$(id -u)"
-# # TEMP: for SSH connections to be immediately functional
-# [[ -n ${DISPLAY:+x} ]] || export DISPLAY=":10.0"
+  ## TEMP: override for "clipboard"
+  # OBSOL(due !su whitelist=DISPLAY): [[ -z ${DISPLAY-} && ... ]]
+  [[ -n ${SSH_CONNECTION+x} && $PATH != *bin/xc-ssh:* && -d $HOME/me/bin/xc-ssh ]] && PATH=$HOME/me/bin/xc-ssh:$PATH
 
+  # BET:USAGE: $ sudo systemd-run --system --scope -- su -l myuser -w DISPLAY
+  #   ALSO;BAD:OBSOL: export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+  # TEMP: for SSH connections to be immediately functional
+  [[ -n ${DISPLAY:+x} ]] || export DISPLAY=":10.0"
+fi
 
 export SSH_AUTH_SOCK=${XDG_RUNTIME_DIR:?}/gnupg/S.gpg-agent.ssh
 [[ -n $SSH_CONNECTION ]] && export PINENTRY_USER_DATA='USE_CURSES=1'
@@ -130,7 +131,7 @@ fm(){ local d f=${XDG_RUNTIME_DIR:?}/ranger/cwd
 zshexit(){  # _ranger_cwd
   local tmp=${XDG_RUNTIME_DIR:?}/ranger
   [[ -d $tmp && $RANGER_LEVEL ]] || return 0
-  # [[ -d $tmp ]] || command mkdir -p "$tmp"
+  [[ -d $tmp ]] || command mkdir -p "$tmp"
   (set +C && print -n -- "$PWD" > "$tmp/cwd")  # Disable clobbering
 }
 
