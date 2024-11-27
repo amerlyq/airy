@@ -1,0 +1,100 @@
+# vim:ft=zsh
+
+_prompt_color=
+
+function prompt_pwd {
+  local w=$1 p=${PWD/#$HOME/\~}
+  ## Keep first char '/' or '~' in path
+  if [[ $p != (#m)[/~] ]]; then
+    # CHECK: '/' already filtered by outer match
+    [[ $p == / ]] || p=${${p%/}//\%/%%}
+    (($w && $#p >= $w )) && p=${${(@j:/:M)${(@s:/:)p}##.#?}:h}/${p:t}
+    (($w && $#p >= $w )) && p="%$w>…>…/${p:t}%<<"
+  fi
+  unset MATCH
+  print -P $p  # NEED: to collapse path segments
+}
+
+function prompt_elapsed { local var=$1
+  local dt=$(( SECONDS - _prompt_elapsed_start ))
+  (( dt < 10 )) && return  # && print -v 'psvar[2]' ''
+
+  local ss=$(( dt % 60 ))
+  local mm=$(( (dt /= 60) % 60 ))
+  local hh=$(( (dt /= 60) % 24 ))
+  local dd=$(( dt / 24 ))
+
+  local color=3 t=${ss}s bell=''
+  ((mm > 0)) && { color=1;  t=${mm}m$t; }
+  ((hh > 0)) && { color=13; t=${hh}h$t; }
+  ((dd > 0)) && { color=9;  t=${dd}d$t; }
+  ((dt > 60)) && t+=$'%{\a%}'  # <:attention / urgent bell
+  ((dt > 120)) && t+=' %F{235}(%F{4}%*%F{235}…)'  # start of cmd
+
+  print "%B%F{240}>>> elapsed time: %F{$color}${t}%f%b"
+}
+
+function prompt_precmd {
+  # BAD: any statement before prompt will override "%?"
+  #   ALT: local err=$(print -P '%?')
+  # BAD: perscent-expansion isn't recursive in PROMPT (and it keeps ANSI as-is)
+  #   ALT:WKRND: print immediately inof expanding by %(1V.%F{$color}╸%f%1v.)
+  print -v 'psvar[1]' -nrP '%(1j.%F{9}⚙%j%f.)%(?.. %F{1}%?↵%f)$(prompt_elapsed)'
+  [[ ${psvar[1]:+x} ]] && print -P "%F{$_prompt_color}╸%f${psvar[1]}"
+
+  # HACK: don't append timer on empty <CR>
+  _prompt_elapsed_start=$SECONDS
+}
+
+function prompt_preexec {
+  _prompt_elapsed_start=$SECONDS
+}
+
+function prompt_setup {
+  autoload -Uz add-zsh-hook
+  add-zsh-hook preexec prompt_preexec
+  add-zsh-hook precmd  prompt_precmd
+
+  local color=1
+  if [[ $debian_chroot ]]; then color=4
+  elif [[ $SSH_CONNECTION ]]; then color=2
+    if [[ $TMUX ]]; then color=4
+    elif [[ $HOST =~ vbox ]]; then color=3
+    fi
+  elif [[ -z $TMUX ]]; then color=7
+  elif [[ $RANGER_LEVEL ]]; then color=22
+  elif [[ $MIUR_LEVEL ]]; then color=34  # 62
+  fi
+  _prompt_color=$color
+
+  local nest=
+  [[ ${debian_chroot:+x} ]] && nest+=C
+  [[ ${MIUR_LEVEL:+x} ]] && nest+=M
+  [[ ${RANGER_LEVEL:+x} ]] && nest+=R
+  [[ ${VIM:+x} ]] && nest+=V
+  [[ ${NVIM:+x} ]] && nest+=V
+  [[ ${VIRTUAL_ENV:+x} ]] && nest+=E
+  [[ -n $nest ]] && nest="%F{60}%B$nest%b%F{$color}"
+
+  # local parts
+  # [[ $UID -eq 0 ]] && parts="╔═╚╣╼┇" || parts="┌─└╢╼┇"
+  # OR: ╭ ╰
+
+  # COS: to expand .venv path in prompt
+  #   ALSO:WKRND: for $(prompt_elapsed) to not interfere with '%?'
+  set -o promptsubst
+
+  local info=' %F{238}%~%f%b'
+  if [[ ! $TERM =~ "^(st|tmux)\\b" ]]; then
+    ## FIXED: disable prompt prefix from <any>/.venv/bin/activate
+    VIRTUAL_ENV_DISABLE_PROMPT=1
+
+    ## NOTE:(disable blinking cursor on WSL2/NUC): append {"$'\e[2 q'"%} to 2nd line ::
+    info="%B%F{238}\${VIRTUAL_ENV+(\$VIRTUAL_ENV)}%f%b%{"$'\e[2 q'"%}"
+  fi
+
+  # FAIL: "%(1V.%F{$color}╸%f%1v.)" prints ANSI escape-sequences literally
+  #   ALT:WTF: "${psvar[1]:+%F{$color}╸%f${psvar[1]}}" prints only "}"
+  PROMPT="%F{$color}┌${nest:-─}─%f %B%F{220}%d%f${info}
+%F{$color}└%(!.#.╼)%f "
+}

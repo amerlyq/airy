@@ -198,50 +198,11 @@ bindkey "\e," insert-first-word
 ############################################################
 ### Prompt
 
-# source /d/airy/zsh/arc/prompt.d/path
-
-_set_prompt() {
-  local color=1
-  if [[ $debian_chroot ]]; then color=4
-  elif [[ $SSH_CONNECTION ]]; then color=2
-    if [[ $TMUX ]]; then color=4
-    elif [[ $HOST =~ vbox ]]; then color=3
-    fi
-  elif [[ -z $TMUX ]]; then color=7
-  elif [[ $RANGER_LEVEL ]]; then color=22
-  elif [[ $MIUR_LEVEL ]]; then color=34  # 62
-  fi
-
-  local nest=
-  [[ ${debian_chroot:+x} ]] && nest+=C
-  [[ ${MIUR_LEVEL:+x} ]] && nest+=M
-  [[ ${RANGER_LEVEL:+x} ]] && nest+=R
-  [[ ${VIM:+x} ]] && nest+=V
-  [[ ${NVIM:+x} ]] && nest+=V
-  [[ ${VIRTUAL_ENV:+x} ]] && nest+=E
-  [[ -n $nest ]] && nest="%F{60}%B$nest%b%F{$color}"
-
-  # local parts
-  # [[ $UID -eq 0 ]] && parts="╔═╚╣╼┇" || parts="┌─└╢╼┇"
-  # OR: ╭ ╰
-
-  if [[ $TERM =~ "^(st|tmux)\\b" ]]; then
-    PROMPT="%(?..%F{1}%?↵%f
-)%F{$color}┌${nest:-─}─%f %B%F{220}%d %F{238}%~%f%b
-%F{$color}└%(!.#.╼)%f "
-  else
-    ## FIXED: disable prompt prefix from <any>/.venv/bin/activate
-    VIRTUAL_ENV_DISABLE_PROMPT=1
-    set -o promptsubst  # COS: to expand .venv path in prompt
-
-    ## NOTE:(disable blinking cursor on WSL2/NUC): append {"$'\e[2 q'"%} to 2nd line ::
-    PROMPT="%(?..%F{1}%?↵%f
-)%F{$color}┌${nest:-─}─%f %B%F{220}%d %F{238}\${VIRTUAL_ENV+(\$VIRTUAL_ENV)}%f%b%{"$'\e[2 q'"%}
-%F{$color}└%(!.#.╼)%f "
-  fi
-
-}; _set_prompt
-
+(){ local dcfg=${${(%):-%x}:A:h}
+  # source /d/airy/zsh/arc/prompt.d/path
+  source $dcfg/prompt
+  prompt_setup
+}
 
 ############################################################
 ### Plugins
