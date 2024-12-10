@@ -39,8 +39,8 @@ exec fzf --extended --ansi --multi --disabled --wrap \
   --preview-window 'up,50%:wrap,~3,+{2}+3/2' \
   --bind "change:reload:sleep 0.1; $cmd {q} ${files[*]} || true" \
   --bind='ctrl-s:toggle-sort' \
-  --bind='ctrl-a:select-all' \
-  --bind='?:preview:cat {1}' \
+  --bind='ctrl-q:select-all' \
+  --bind='ctrl-/:preview:cat {1}' \
   --bind 'ctrl-v:preview:bat --line-range {2}:+10 --highlight-line {2} -- {1}' \
   --bind "f3:execute(bat --paging=always --pager=\"less -j4 -R -F +/{q}\" --color=always {1} < /dev/tty > /dev/tty)" \
   --bind "f4:execute(v {1..3})" \

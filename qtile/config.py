@@ -34,7 +34,7 @@ def K(keydef: str, *cmds: str, desc: str = None) -> EzKey:
 prev_layout = 0  # lazy.current_group.current_layout
 
 
-def toggle_maxlayout(wm: Any, laymax: int = 2) -> None:
+def toggle_maxlayout(wm: Any, laymax: int = 3) -> None:
     global prev_layout
     l = wm.current_group.current_layout
     if l == laymax:
@@ -62,27 +62,27 @@ terminal = ["env", "--chdir=/t", cast(str, guess_terminal())]
 ranger = ["st", "-e", "ranger", "--choosedir=/run/user/1000/ranger/cwd", "--"]
 
 mod_open = [
-    Key([], "f", lazy.spawn(["/@/airy/firefox/run"]), desc="Launch firefox"),
+    Key([], "f", lazy.spawn(["/d/airy/firefox/run"]), desc="Launch firefox"),
     Key([], "c", lazy.spawn(["st", "-e", "calc"]), desc="Launch calculator"),
     Key([], "h", lazy.spawn(["st", "-e", "htop"]), desc="Launch htop"),
     Key([], "i", lazy.spawn(["st", "-e", "ipython"]), desc="Launch ipython"),
     Key([], "n", lazy.spawn(["st", "-e", "ncmpcpp"]), desc="Launch ncmpcpp"),
     Key([], "t", lazy.spawn(terminal + ["-M"]), desc="Launch terminal w/o tmux"),
     Key([], "v", lazy.spawn(["st", "-e", "v"]), desc="Launch vim"),
-    Key([], "x", lazy.spawn(["/@/airy/xournalpp/run"]), desc="Launch xournal"),
+    Key([], "x", lazy.spawn(["/d/airy/xournalpp/run"]), desc="Launch xournal"),
 ] + [
     Key(
         [],
         str(i),
-        lazy.spawn(f"/@/airy/backlight/run-mon-sys -n {i or 10}0%"),
+        lazy.spawn(f"/d/airy/backlight/run-mon-sys -n {i or 10}0%"),
         desc=f"Brightness-{i or 10}0%",
     )
     for i in range(0, 10)
 ]
 
 mod_info = [
-    Key([], "e", lazy.spawn(["/@/airy/dict/run", "--en", "--dmenu"]), desc="Tr En"),
-    Key([], "r", lazy.spawn(["/@/airy/dict/run", "--ru", "--dmenu"]), desc="Tr Ru"),
+    Key([], "e", lazy.spawn(["/d/airy/dict/run", "--en", "--dmenu"]), desc="Tr En"),
+    Key([], "r", lazy.spawn(["/d/airy/dict/run", "--ru", "--dmenu"]), desc="Tr Ru"),
 ]
 
 keys = [
@@ -126,8 +126,8 @@ keys = [
         # * Unsplit = 1 window displayed, like Max layout, but still with multiple stack panes
     ),
     K("M-<Return>", lazy.spawn(terminal), desc="Launch terminal"),
-    K("M-<space>", lazy.spawn(ranger + ["/@/airy"]), desc="Launch fm"),
-    K("M-S-<space>", lazy.spawn(ranger + ["/@/just"]), desc="Launch fm"),
+    K("M-<space>", lazy.spawn(ranger + ["/d/airy"]), desc="Launch fm"),
+    K("M-S-<space>", lazy.spawn(ranger + ["/d/just"]), desc="Launch fm"),
     KeyChord([mod], "o", mod_open),  # , mode="Launch"
     KeyChord([mod], "i", mod_info),
     K("M-u", lazy.spawn(["qutebrowser"]), desc="Launch browser"),
@@ -145,6 +145,7 @@ keys = [
     ),
     # Toggle between different layouts as defined below
     K("M-<slash>", lazy.next_layout(), desc="Toggle between layouts"),
+    K("M-S-<slash>", lazy.layout.flip(), desc="Mirror layouts"),
     # K("M-slash", lazy.next_layout(), desc="Toggle between layouts"),
     # K("M-question", lazy.previous_layout(), desc="Toggle between layouts"),
     # K("M-S-slash", lazy.prev_layout(), desc="Toggle between layouts"),
@@ -162,12 +163,12 @@ keys = [
     K("M-<minus>", lazy.spawn("xset dpms force off".split()), desc="Screen off"),
     K(
         "<XF86MonBrightnessDown>",
-        lazy.spawn("/@/airy/backlight/run-mon-sys -n -"),
+        lazy.spawn("/d/airy/backlight/run-mon-sys -n -"),
         desc="Brightness-",
     ),
     K(
         "<XF86MonBrightnessUp>",
-        lazy.spawn("/@/airy/backlight/run-mon-sys -n +"),
+        lazy.spawn("/d/airy/backlight/run-mon-sys -n +"),
         desc="Brightness+",
     ),
     # KeyChord(
@@ -177,7 +178,7 @@ keys = [
     #         Key(
     #             [],
     #             str(i),
-    #             lazy.spawn(f"/@/airy/backlight/run-mon-sys -n {i or 10}0%"),
+    #             lazy.spawn(f"/d/airy/backlight/run-mon-sys -n {i or 10}0%"),
     #             desc=f"Brightness-{i or 10}0%",
     #         )
     #         for i in range(0, 10)
@@ -270,6 +271,7 @@ layouts = [
     # layout.MonadTall(ratio=0.587, border_focus="#00af00"),
     # NOTE: emulate xrandr split-screen ratio for ultrawide ext monitor
     layout.MonadTall(ratio=0.238, border_focus="#00af00"),
+    layout.MonadWide(ratio=0.238, border_focus="#00af00"),
     # MAYBE: use maximized layout.Columns() inof this HACK
     layout.Max(),
     layout.MonadThreeCol(main_centered=True, ratio=0.333, border_focus="#00af00"),
