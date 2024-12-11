@@ -92,3 +92,17 @@
   [+] 17:00 2h30m <env> #nou FIND: sort/filter/edit QF
     list - How to automatically sort Quickfix entries by line text in Vim? - Stack Overflow ⌇⡧⠳⢡⠤
       https://stackoverflow.com/questions/15393301/how-to-automatically-sort-quickfix-entries-by-line-text-in-vim
+
+
+2024-11-27-Wed-W48
+  ebr [~] #nvim how to reorder/reindex buffers
+    multiple files - Renumbering buffer list - Vi and Vim Stack Exchange ⌇⡧⡆⣲⣙
+      https://vi.stackexchange.com/questions/464/renumbering-buffer-list
+        :argdel * (delete the existing argument list)
+        :bufdo argadd % (for each buffer, add the buffer's path to the list)
+        :1,1000bd (delete buffers 1 to 1000; probably there's a better way to do this)
+        :argdo e (for each argument, edit that argument)
+    How to change order for :bnext and :bprevious in vim? - Stack Overflow ⌇⡧⡆⣲⣥
+      https://stackoverflow.com/questions/8184527/how-to-change-order-for-bnext-and-bprevious-in-vim
+    Feature Request: change order of buffers in buffer list · Issue #7558 · neovim/neovim ⌇⡧⡆⣲⣫
+      https://github.com/neovim/neovim/issues/7558

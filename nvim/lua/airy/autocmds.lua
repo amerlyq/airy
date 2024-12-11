@@ -54,17 +54,32 @@ autocmd('CursorMoved', {
   desc = "(Nou) cvt ts -> date",
   callback = function()
     local word = vim.fn.expand('<cword>')
+    local vim_echo = function(x) vim.api.nvim_echo({{x ..": ".. word, 'None'}}, false, {}) end
     if string.match(word, "^1%d%d%d%d%d%d%d%d%d$") then
       local ts = tonumber(word)
-      local dts = os.date("%Y%m%d_%H%M%S", ts)
-      vim.api.nvim_echo({{dts ..": ".. word, 'None'}}, false, {})
-    elseif vim.fn.match(word, '^\\v[\\u2800-\\u28FF]{4}$') == 0 then
+      vim_echo(os.date("%Y%m%d_%H%M%S", ts))
+    elseif vim.fn.match(word, '^\\v[\\u2800-\\u28FF]{1,4}$') == 0 then
       -- http://lua-users.org/wiki/LuaUnicode
       -- val = bit32.bor(bit32.lshift(val, 6), bit32.band(c, 0x3F))
       local vxfm = '\\=printf("%02x",and(char2nr(submatch(0)),0xff))'
-      local hexts = vim.fn.substitute(word, '.', vxfm, 'g')
-      local dts = os.date("%Y%m%d_%H%M%S", tonumber(hexts, 16))
-      vim.api.nvim_echo({{dts ..": ".. word, 'None'}}, false, {})
+      local hexnum = vim.fn.substitute(word, '.', vxfm, 'g')
+      local xtslen = hexnum:len() / 2
+      local intnum = tonumber(hexnum, 16)
+      if xtslen == 1 then
+        local eng = " A1B'K2L@CIF/MSP\"E3H9O6R^DJG>NTQ,*5<-U8V.%[$+X!&;:4\\0Z7(_?W]#Y)="
+        local brl = "⠀⠁⠂⠃⠄⠅⠆⠇⠈⠉⠊⠋⠌⠍⠎⠏⠐⠑⠒⠓⠔⠕⠖⠗⠘⠙⠚⠛⠜⠝⠞⠟⠠⠡⠢⠣⠤⠥⠦⠧⠨⠩⠪⠫⠬⠭⠮⠯⠰⠱⠲⠳⠴⠵⠶⠷⠸⠹⠺⠻⠼⠽⠾⠿"
+        local idx = 1 + vim.fn.index(vim.fn.split(brl, "\\zs"), word)
+        local chr = idx > 0 and eng:sub(idx,idx) or "𑑛"
+        vim_echo(string.format("(0x%x %d) %s", intnum, intnum, chr))
+      elseif xtslen == 2 then
+        -- python: UNIX_EPOCH + TT(days=int.from_bytes(bytes(ord(c) - ord("\u2800") for c in xts), "big"))
+        local unixts = os.time({year=1970, month=1, day=1+intnum, hour=0, min=0, sec=1})
+        vim_echo(os.date("%Y-%m-%d/%a", unixts))
+      elseif xtslen == 4 then
+        vim_echo(os.date("%Y%m%d_%H%M%S", intnum))
+      else
+        vim.api.nvim_echo({{xtslen, 'Error'}}, false, {})
+      end
     elseif vim.fn.match(word, '^\\v\\C[a-t][1-9abc][1-9a-v][MTWRFSU]?$') == 0 then
       -- ALT:(foreach): https://stackoverflow.com/questions/829063/how-to-iterate-individual-characters-in-lua-string
       local fcvt = function(v) if v <= 57 then return v - 48 else return v - 87 end end
@@ -72,8 +87,7 @@ autocmd('CursorMoved', {
       local m = fcvt(string.byte(word:sub(2,2)))
       local d = fcvt(string.byte(word:sub(3,3)))
       -- TEMP: only decode 'ymd', FUT: also decode 'ymdhms'
-      local dts = os.date("%Y-%m-%d", os.time({year=y, month=m, day=d, hour=0, min=0, sec=1}))
-      vim.api.nvim_echo({{dts ..": ".. word, 'None'}}, false, {})
+      vim_echo(os.date("%Y-%m-%d/%a", os.time({year=y, month=m, day=d, hour=0, min=0, sec=1})))
     else
       local word = vim.fn.expand('<cWORD>')
       if vim.fn.match(word, '^\\v(%(19|20)\\d\\d)-(0\\d|1[012])-([012]\\d|3[01])>') == 0 then
@@ -84,11 +98,11 @@ autocmd('CursorMoved', {
             return string.char(string.byte("a") + (i - 10))
           end
         end
-        local y = _base31((tonumber(word:sub(1,4)) - 2011) % 30 + 1)
-        local m = _base31(tonumber(word:sub(6,7)))
-        local d = _base31(tonumber(word:sub(9,10)))
-        local dts = y .. m .. d
-        vim.api.nvim_echo({{dts ..": ".. word, 'None'}}, false, {})
+        local y = tonumber(word:sub(1,4))
+        local m = tonumber(word:sub(6,7))
+        local d = tonumber(word:sub(9,10))
+        local w = os.date("%u", os.time({year=y, month=m, day=d, hour=0, min=0, sec=1}))
+        vim_echo(_base31((y - 2011) % 30 + 1) .. _base31(m) .. _base31(d) .."/".. string.sub("MTWRFSU",w,w))
       else
         vim.api.nvim_echo({{"", 'None'}}, false, {})
       end
