@@ -388,10 +388,10 @@ exe 'set tags^='. './'.g:xtref.tagfile.';'
 
 
 fun! xtref#py_jump(...)
+" ALT:(charcol):BAD: bytecol = vim.current.window.cursor[1]
 py3 << EOF
 import just.flower.xts.parse as M
-ctx = vim.current
-if m := M.find_near(ctx.line, ctx.window.cursor[1]):
+if m := M.find_near(vim.current.line, int(vim.eval("charcol('.')"))):
   pfx = "※" if m.group(0)[0] == "⌇" else "⌇"
   vn = vim.eval("v:count")
   cmd = vn + "tag" if vn != "0" else "tjump"

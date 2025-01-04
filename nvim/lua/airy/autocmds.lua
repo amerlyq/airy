@@ -78,7 +78,8 @@ autocmd('CursorMoved', {
       elseif xtslen == 4 then
         vim_echo(os.date("%Y%m%d_%H%M%S", intnum))
       else
-        vim.api.nvim_echo({{xtslen, 'Error'}}, false, {})
+        local errmsg = string.format("Unsupported(xts%d): %s", xtslen, word)
+        vim.api.nvim_echo({{errmsg, 'Error'}}, false, {})
       end
     elseif vim.fn.match(word, '^\\v\\C[a-t][1-9abc][1-9a-v][MTWRFSU]?$') == 0 then
       -- ALT:(foreach): https://stackoverflow.com/questions/829063/how-to-iterate-individual-characters-in-lua-string

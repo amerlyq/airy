@@ -2,6 +2,7 @@
 # %DEBUG: $ tail -F ~/.local/share/qtile/qtile.log
 # import importlib
 import os
+import os.path as fs
 # import sys
 import time
 from typing import Any, cast
@@ -439,12 +440,17 @@ def fix_group(window):
 
 prev_focus = None
 prev_cbsel = None
+audit_dir = "/d/audit/"
+audit_host = os.uname().nodename
 
 
 def audit_log(text: str, grp: str) -> None:
     ts = time.time()
     sfx = time.strftime("%Y/%Y-%m-%d", time.localtime(ts))
-    dst = f"/d/audit/{os.uname().nodename}/{grp}/{sfx}"
+    dst = fs.join(audit_dir, audit_host, grp, sfx)
+    dst_dir = fs.dirname(dst)
+    if fs.exists(audit_dir) and not fs.exists(dst_dir):
+        os.makedirs(dst_dir, mode=0o755)
 
     # TODO:PERF: write in batch/second inof each ctxswitch
     #   ALSO:TODO: mkdir for "year"
