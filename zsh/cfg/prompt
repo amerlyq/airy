@@ -73,8 +73,9 @@ function prompt_setup {
   [[ ${RANGER_LEVEL:+x} ]] && nest+=R
   [[ ${VIM:+x} ]] && nest+=V
   [[ ${NVIM:+x} ]] && nest+=V
-  [[ ${VIRTUAL_ENV:+x} ]] && nest+=E
-  [[ -n $nest ]] && nest="%F{60}%B$nest%b%F{$color}"
+  ## FIXED: should affect prompt even after it was initially assigned
+  nest+="\${VIRTUAL_ENV:+E}"  # [[ ${VIRTUAL_ENV:+x} ]] && nest+=E
+  [[ -n $nest ]] && nest="%F{60}%B$nest%b"
 
   # local parts
   # [[ $UID -eq 0 ]] && parts="╔═╚╣╼┇" || parts="┌─└╢╼┇"
@@ -84,17 +85,17 @@ function prompt_setup {
   #   ALSO:WKRND: for $(prompt_elapsed) to not interfere with '%?'
   set -o promptsubst
 
-  local info=' %F{238}%~%f%b'
-  if [[ ! $TERM =~ "^(st|tmux)\\b" ]]; then
-    ## FIXED: disable prompt prefix from <any>/.venv/bin/activate
-    VIRTUAL_ENV_DISABLE_PROMPT=1
+  ## FIXED: disable prompt prefix from <any>/.venv/bin/activate
+  VIRTUAL_ENV_DISABLE_PROMPT=1
+  local info=" %F{238}\${\${VIRTUAL_ENV+%B(\$VIRTUAL_ENV)%b}:-%~}%f"
 
-    ## NOTE:(disable blinking cursor on WSL2/NUC): append {"$'\e[2 q'"%} to 2nd line ::
-    info="%B%F{238}\${VIRTUAL_ENV+(\$VIRTUAL_ENV)}%f%b%{"$'\e[2 q'"%}"
+  if [[ $HOST =~ MINIPC ]]; then
+    ## NOTE:(disable blinking cursor on WSL2/NUC):
+    info+="%{"$'\e[2 q'"%}"
   fi
 
   # FAIL: "%(1V.%F{$color}╸%f%1v.)" prints ANSI escape-sequences literally
   #   ALT:WTF: "${psvar[1]:+%F{$color}╸%f${psvar[1]}}" prints only "}"
-  PROMPT="%F{$color}┌${nest:-─}─%f %B%F{220}%d%f${info}
+  PROMPT="%F{$color}┌${nest:-─}%F{$color}─%f %B%F{220}%d%f%b${info}
 %F{$color}└%(!.#.╼)%f "
 }

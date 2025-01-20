@@ -2,7 +2,7 @@
 [[ ~/.zshrc.zwc -nt ~/.zshrc ]] || zcompile ~/.zshrc
 
 
-if [[ $HOST == *-* ]]; then
+if [[ $HOST =~ MINIPC ]]; then
   # TEMP: for WSL2 and NUC
   export EDITOR=nvim
 
@@ -256,7 +256,10 @@ if [[ -n ${ZSH_BUFFER-} ]]; then print -z "$ZSH_BUFFER" && unset ZSH_BUFFER; fi
 miur(){ local d f=${XDG_RUNTIME_DIR:?}/ranger/cwd
   [[ $(alias m) == "m=miur" ]] || source =miur  # source all aliases on first run
   [[ -n ${MIUR_LEVEL-} ]] && exit  # NOTE: exit miur-nested shell
+  # NOTE: load !miur back at whatever folder it was
+  [[ -s $f ]] && d=$(<"$f") && [[ $d != $PWD ]] && set -- "$d" "$@" && unset d
   command miur --choosedir="$f" "$@"
-  [[ -s $f ]] && d=$(<"$f")  # sync last PWD (TEMP: reuse !ranger)
+  # NOTE: sync last PWD (TEMP: reuse !ranger)
+  [[ -s $f ]] && d=$(<"$f") && while [[ ! -d $d ]]; do d=${d%/*}; done
   if [[ -d ${d-} && $d != $PWD ]]; then builtin cd -- "$d" || return; fi
 }

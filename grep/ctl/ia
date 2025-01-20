@@ -31,6 +31,8 @@ export BAT_THEME="Solarized (light)"
 
 # fzf --preview 'cat {}' --preview-window 'right,border-left,<30(up,30%,border-bottom)'
 
+# TEMP:OLD:(unknown): --wrap
+# exec fzf --extended --ansi --multi --disabled \
 exec fzf --extended --ansi --multi --disabled --wrap \
   ${patt:+--query "$patt"} \
   --history=${HOME}/.local/share/skim_history \

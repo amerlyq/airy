@@ -24,6 +24,10 @@ vrgx="THEO\
 # rg --pcre2 --no-filename -o '\b[A-Z]{3,}(?=:)|^\s*\K[A-Z]{2,}$'
 # rg --pcre2 --no-unicode --color=never -o "${rpfx}(${vrgx})${rsfx}"
 
-rg --pcre2 --no-unicode --color=never --no-filename --no-line-number \
-  -woe "${rpfx}(${vrgx})${rsfx}" \
-|sort|uniq -c|sort -srn -k1,1
+if [[ ${1-} == -s ]]; then
+  rg --pcre2 --no-unicode --color=never --no-filename --no-line-number \
+    -woe "${rpfx}(${vrgx})${rsfx}" \
+  |sort|uniq -c|sort -srn -k1,1
+else
+  rg --pcre2 --no-unicode -we "${rpfx}(${vrgx})${rsfx}"
+fi

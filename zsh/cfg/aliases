@@ -28,10 +28,11 @@ alias gdf.='gdf .'
 alias gdfa='gdf --diff-filter=A'
 alias gdfm='gdf --diff-filter=M -w'
 alias gdfr='gdf --diff-filter=R'
-alias gd='gdf --cached -w'
 alias gds='gdf --stat'
 alias gdsf='gdf --stat --diff-filter=mr'
 alias gdsm='gdf --stat --diff-filter=MR'
+alias gdw='gdf -w --ignore-blank-lines'
+alias gd='gdf --cached'
 
 # IDEA: "base .cmp. others(local)" and "merged .cmp. myown(remote)"
 alias gdm='git -c mergetool.vimdiff.cmd='\''nvim -d "$BASE" "$LOCAL" "$MERGED" "$REMOTE"'\'' mergetool --tool=vimdiff'
