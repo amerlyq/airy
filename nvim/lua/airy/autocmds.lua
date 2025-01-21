@@ -115,19 +115,27 @@ autocmd('CursorMoved', {
 
 
 --DISABLED: use "which-key" which overrules this
+--  XXX: which-key was fixed and doesn't overrule it anymore
+--    bug: Conflict Between which-key Operator Preset and Custom Mappings · Issue #904 · folke/which-key.nvim ⌇⡧⢏⡃⠜
+--      https://github.com/folke/which-key.nvim/issues/904
 --HACK: Infinite wait on mappings, but timeout on keycodes (like <\e..>)
 --WARN: you must eliminate clushing keymaps like ',x' and ',xy'
 -- local K = require'keys.bind'.K
 -- local o, g = vim.opt, vim.g
--- o.timeout =
--- set timeoutlen=1000 ttimeoutlen=32
--- set notimeout ttimeout
--- " Leave insert mode quickly
--- augroup FastEscape
---   autocmd!
---   au InsertEnter * set timeoutlen=0 ttimeoutlen=0
---   au InsertLeave * set timeoutlen=1000 ttimeoutlen=32
--- augroup END
+-- o.timeout = false
+-- o.timeoutlen = 1000
+-- o.ttimeout = true
+-- o.ttimeoutlen = 32
+-- -- Leave insert mode quickly
+-- local FastEscape = vim.api.nvim_create_augroup('FastEscape', { clear = true })
+-- autocmd('InsertEnter', {
+--   callback = function() o.timeoutlen = 0; o.ttimeoutlen = 0; end,
+--   group = FastEscape,
+-- })
+-- autocmd('InsertLeave', {
+--   callback = function() o.timeoutlen = 1000; o.ttimeoutlen = 32; end,
+--   group = FastEscape,
+-- })
 
 
 -- SRC: https://github.com/wfxr/minimap.vim/issues

@@ -2,6 +2,7 @@
 require 'plug.cmp_' -- +luasnip
 require 'plug.gitsigns'
 
+-- BAD: which-key preview has long delay due to nested <ys/ds> mappings
 require 'plug.surround'
 
 require('mini.move').setup({  --- ALT※⡤⣪⡒⡮
@@ -112,21 +113,32 @@ require 'plug.telescope'
 -- BUG:WTF: :verb map v -> "viÞ <Nop>" waiting pause
 -- SRC: https://github.com/folke/which-key.nvim
 -- ALT: telescope.actions.which_key()
-local presets = require("which-key.plugins.presets")
-presets.operators[">"] = nil
-presets.operators["<lt>"] = nil
-require("which-key").setup {
-  -- delay = 200,
-  spelling = {
-    enabled = true, -- enabling this will show WhichKey when pressing z= to select spelling suggestions
-    suggestions = 20, -- how many suggestions should be shown in the list?
-  },
+-- local presets = require("which-key.plugins.presets")
+-- presets.operators[">"] = nil
+-- presets.operators["<lt>"] = nil
+require("which-key").setup {}
+-- require("which-key").setup {
+--   -- delay = 200,
+--   spelling = {
+--     enabled = true, -- enabling this will show WhichKey when pressing z= to select spelling suggestions
+--     suggestions = 20, -- how many suggestions should be shown in the list?
+--   },
   -- triggers = {
   --   { "<auto>", mode = "nixsotc" },
-  --   { "<leader>", mode = { "n", "v" } },
-  --   { "<localleader>", mode = { "n", "v" } },
-  -- }
-}
+  --   -- { "<Leader>", mode = { "n", "v" } },
+  --   -- { "<LocalLeader>", mode = { "n", "v" } },
+  -- },
+  -- defer = function(ctx)
+  --   if vim.list_contains({ "d", "y" }, ctx.operator) then
+  --     return true
+  --   end
+  --   return vim.list_contains({ "<C-V>", "V" }, ctx.mode)
+  -- end,
+-- }
+-- local wk = require('which-key')
+-- wk.add({
+--   { '<space>', group = 'leader' },
+-- })
 
 
 -- SRC: https://github.com/ghillb/cybu.nvim

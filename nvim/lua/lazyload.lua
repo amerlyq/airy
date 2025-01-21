@@ -179,8 +179,8 @@ end
 local function source_plugins()
   -- OR: vim.fn.glob(MYCONF .. '/plugin/*.vim',1,1)
   vim.cmd [[
-    for f in glob('/@/airy/nvim/plugin/*.vim',1,1)| exe 'source' fnameescape(f) |endfor
-    for f in glob('/@/airy/nvim/plugin/*.lua',1,1)| exe 'luafile' fnameescape(f)|endfor
+    for f in glob('/d/airy/nvim/plugin/*.vim',1,1)| exe 'source' fnameescape(f) |endfor
+    for f in glob('/d/airy/nvim/plugin/*.lua',1,1)| exe 'luafile' fnameescape(f)|endfor
     source $VIMRUNTIME/plugin/rplugin.vim
   ]]
 end
@@ -208,6 +208,11 @@ local function on_delayed_startup()
 
   --DEBUG: vim.cmd 'set pp'
   -- print(vim.inspect(vim.opt.packpath))
+
+  --DEBUG
+  -- vim.opt.packpath = { MYPLUG .. '/test' }
+  -- require("which-key").setup {}
+  -- return
 
   --HACK: add lazy plugins to &rtp
   --DISABLED:(MYCONF,...): prevent duplicates in &rtp

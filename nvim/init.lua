@@ -48,7 +48,7 @@ require 'keys.yank'
 require 'airy.diagnostics'
 require 'keys.plugins'
 
-require 'lazy'
+require 'lazyload'
 require 'plug.rnvimr'
 
 require 'airy.statusline'

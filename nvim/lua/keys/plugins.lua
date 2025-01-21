@@ -191,3 +191,6 @@ K('nxo', 'gs', '<Plug>(leap-backward)')
 -- g.foldsearch_highlight = 1
 g.foldsearch_disable_mappings = 1
 vim.cmd 'com! Fv let w:foldsearch_pattern = "\\V\\^\\%(\\%(".@/."\\)\\@!\\.\\)\\*\\$"|call foldsearch#foldsearch#FoldSearchDo()'
+
+K('n', '<leader>?', function() require("which-key").show({ global = false }) end,
+  "Buffer Local Keymaps (which-key)")
