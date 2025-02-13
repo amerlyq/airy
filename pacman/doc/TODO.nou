@@ -31,6 +31,7 @@ TODO
     https://github.com/AladW/aurutils/issues/641#event-2839998079
     HACK: find all python-dependent packages in local "aur" db
     $ pactree -sur python | grep -f <(pacman -Slq aur)
+    $ pikaur --rebuild -S $(pacman -Qqem G python)
   [_] TRY:USE: pacman post-instal hooks
     https://www.reddit.com/r/archlinux/comments/dsnu81/hear_ye_archers_share_your_pacman_hooks/
   [_] MOVE: ~/.cache/aurutils to /var/cache/aurutils

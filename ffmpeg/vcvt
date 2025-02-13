@@ -19,7 +19,7 @@ fi
 # -vf 'scale=w=1920:h=1080' \
 ffmpeg -v verbose -hide_banner \
   -hwaccel qsv -hwaccel_output_format qsv \
-  -c:v h264_qsv -i "$1" -vf 'hwdownload' \
+  -c:v hevc_qsv -i "$1" -vf 'hwdownload' \
   -c:v hevc_qsv "${cvargs[@]}" \
   -y "${1%.*}_${ifx}${qa}.${1##*.}"
 

@@ -99,7 +99,8 @@ zshaddhistory() { local f
 # source /usr/share/doc/pkgfile/command-not-found.zsh
 
 source() {
-  [[ $1.zwc -nt $1 ]] || zcompile $1
+  # NOTE: don't compile anything inside /usr/*
+  [[ ! -w ${1:h} ]] || [[ $1.zwc -nt $1 ]] || zcompile $1
   builtin source $@
 }
 
@@ -119,6 +120,7 @@ while read -r k p; do
   alias "$k"="cdauto $p"
 done < <(sed -r 's/(^|\s+)#.*$//; /^\s*$/d' /d/airy/airy/pathes)
 
+# TODO: replace "fm()/zshexit()" by "source =miur/sync-cwd"
 fm(){ local d f=${XDG_RUNTIME_DIR:?}/ranger/cwd
   # NOTE: exit ranger-nested shell && sync last PWD (inof ZSHEXIT)
   [[ -n ${RANGER_LEVEL-} ]] && exit  # && (set +C && pwd > "$f")
@@ -245,21 +247,7 @@ zstyle ':completion:*:*:kill:*:processes' command 'ps xo pid,user:10,cmd |tac| g
 # DEP=mcfly NICE: fzf-like Ctrl-R history by frecency/timestamp
 # eval "$(mcfly init zsh)"
 # eval "$(thefuck --alias '!' --enable-experimental-instant-mode)"
-
-# HACK: #miur※⡢⣯⢁⢏ pre-fill prompt (inof running) by specified cmdline on ZSH startup
-#   BET: print help notice  above shell-out to use $F / $S vars in cmdline
-if [[ -n ${ZSH_BUFFER-} ]]; then print -z "$ZSH_BUFFER" && unset ZSH_BUFFER; fi
-
-# TRY: inject this code directly from !miur when doing shell_out()
-# TODO: replace "fm()" above, as I can launch !ranger from inside !miur too
-#   NEED: first make !miur slightly more stable for daily use
-miur(){ local d f=${XDG_RUNTIME_DIR:?}/ranger/cwd
-  [[ $(alias m) == "m=miur" ]] || source =miur  # source all aliases on first run
-  [[ -n ${MIUR_LEVEL-} ]] && exit  # NOTE: exit miur-nested shell
-  # NOTE: load !miur back at whatever folder it was
-  [[ -s $f ]] && d=$(<"$f") && [[ $d != $PWD ]] && set -- "$d" "$@" && unset d
-  command miur --choosedir="$f" "$@"
-  # NOTE: sync last PWD (TEMP: reuse !ranger)
-  [[ -s $f ]] && d=$(<"$f") && while [[ ! -d $d ]]; do d=${d%/*}; done
-  if [[ -d ${d-} && $d != $PWD ]]; then builtin cd -- "$d" || return; fi
-}
+_m=${${:-miur}:c:A:h:h}
+[[ $_m == /usr/* ]] && _m="$_m/share/miur"
+_m=$_m/integ/miur-shell-sync-cwd.zsh
+if [[ -f $_m ]]; then builtin source $_m; fi; unset _m

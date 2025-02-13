@@ -104,7 +104,8 @@ require('dressing').setup()
 -- })
 
 
-require('pretty-fold').setup()
+-- FAIL: errors-out with nvim=0.10.4
+-- require('pretty-fold').setup()
 require('fold-preview').setup()
 
 

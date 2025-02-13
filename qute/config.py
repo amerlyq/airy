@@ -936,6 +936,7 @@ c.content.geolocation = False  # @me
 ##   - access: Allow reading from and writing to the clipboard.
 ##   - access-paste: Allow accessing the clipboard and pasting clipboard content.
 # c.content.javascript.clipboard = 'none'
+c.content.javascript.clipboard = "ask"
 
 ## Enable JavaScript.
 ## Type: Bool
@@ -1269,7 +1270,16 @@ c.downloads.location.prompt = False  # @me
 # c.editor.command = ['gvim', '-f', '{file}', '-c', 'normal {line}G{column0}l']
 ## @me
 # c.editor.command = ['r.vim-new', '{file}', '-c', 'call cursor({line}, {column0})']
-c.editor.command = ["st", "-n", "Float", "-e", "nvim", "{file}", "-c", "normal {line}G{column0}|"]
+c.editor.command = [
+    "st",
+    "-n",
+    "Float",
+    "-e",
+    "nvim",
+    "{file}",
+    "-c",
+    "normal {line}G{column0}|",
+]
 
 ## Encoding to use for the editor.
 ## Type: Encoding
@@ -1716,7 +1726,6 @@ c.qt.args += [
     # "enable-vulkan",
     # --use-gl=desktop
     # --disable-gpu-driver-bug-workarounds
-
     "disable-accelerated-2d-canvas",  # COS:(!7489)※⡥⡛⢷⣏
     # "enable-accelerated-2d-canvas",
     # "enable-gpu-memory-buffer-video-frames",
@@ -2413,8 +2422,13 @@ config.bind(";I", "hint images tab-bg")
 # config.bind(';f', 'hint all tab-fg')
 # config.bind(';h', 'hint all hover')
 # config.bind(';i', 'hint images')
-config.bind(";m", 'hint links spawn -- mpv "{hint-url}" --ytdl-format="mp4[height<=720]/best[height<=?720]"')
-config.bind(";M", 'spawn -- mpv "{url}" --ytdl-format="mp4[height<=720]/best[height<=?720]"')
+config.bind(
+    ";m",
+    'hint links spawn -- mpv "{hint-url}" --ytdl-format="mp4[height<=720]/best[height<=?720]"',
+)
+config.bind(
+    ";M", 'spawn -- mpv "{url}" --ytdl-format="mp4[height<=720]/best[height<=?720]"'
+)
 # config.bind(';o', 'hint links fill :open {hint-url}')
 # config.bind(';r', 'hint --rapid links tab-bg')
 # config.bind(';t', 'hint inputs')
@@ -2609,7 +2623,10 @@ config.bind("pp", "nop")  #  'open -- {clipboard}')
 #   :bind xx config-cycle tabs.show always never ;; config-cycle statusbar.show always never
 config.bind("xb", "config-cycle statusbar.show always never")
 config.bind("xt", "config-cycle tabs.show always never")
-config.bind("xx", "config-cycle tabs.show always never ;; config-cycle statusbar.show always never")
+config.bind(
+    "xx",
+    "config-cycle tabs.show always never ;; config-cycle statusbar.show always never",
+)
 
 # config.bind('yD', 'yank domain -s')
 # config.bind('yM', 'yank inline [{title}]({url}) -s')

@@ -32,6 +32,9 @@ AUR
     $ sudo repo-remove /var/cache/pacman/aur/aur.db.tar gtk3-classic-noatk-64-3.24.30-1-x86_64.pkg.tar.zst
     $ sudo pacman --config /etc/pacman.d/aur.conf -Sy
     $ pikaur --sync --edit gtk3-classic-noatk-64
+  Delete unused/uninstalled pikaur pkgs (prevent their future upgrades)
+    clean old or uninstalled AUR packages in ~/.cache/pikaur/pkg · Issue #165 · actionless/pikaur ⌇⡧⢮⡍⢊
+      https://github.com/actionless/pikaur/issues/165
   TRY:HACK: remove old aurutils trash at once
     $ sudo mv /var/cache/pacman/aur/aur.db.tar{,_}
     $ sudo repo-add /var/cache/pacman/aur/aur.db.tar
