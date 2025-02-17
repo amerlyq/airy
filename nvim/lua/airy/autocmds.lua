@@ -2,9 +2,16 @@ local autocmd = vim.api.nvim_create_autocmd
 
 
 autocmd('FileType', {
-  desc = "(Aux) filetype settings",
+  desc = "(Aux) .lua filetype settings",
   pattern = 'lua',
   command = 'setlocal shiftwidth=2 tabstop=2 softtabstop=2 expandtab'
+})
+
+-- WHY: remove unnecessary modelines
+autocmd('FileType', {
+  desc = "(Aux) .dosini filetype settings",
+  pattern = 'dosini',
+  command = 'setlocal commentstring=#\\ %s'
 })
 
 
