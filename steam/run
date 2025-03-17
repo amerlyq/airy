@@ -1,5 +1,9 @@
 #!/bin/bash
+#%USAGE: $ sudo ln -svfT $PWD/run /usr/local/bin/steam
 set -euo pipefail -o errtrace
+
+exec /usr/bin/steam -forcedesktopscaling 1.5
+exit
 
 r.monitor -2
 # r.monitor-scale 2

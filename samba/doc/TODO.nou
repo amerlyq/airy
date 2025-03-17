@@ -51,3 +51,16 @@ WTF: IPC$ (2-Bay) in samba shares
   [_] shutdown/reboot
     https://community.wd.com/t/safe-shutdown/147307/42
     Utilities -> Maintenance -> Reboot
+
+
+2025-03-16-Sun-W10
+  [+] 20:00 35m <env> CFG mount #fra:win samba to #hpx ⌇⡧⣘⠋⡥
+    [+] NEED: Windows: create new local user=samba ++ share folder only for its (excluding "All")
+    $ sudo nvim /etc/fstab
+      //192.168.1.15/dwhelper  /net/winshare  cifs  ro,noauto,credentials=/root/samba.winfra,uid=1000,gid=users,forceuid,forcegid,iocharset=utf8,rsize=4194304,wsize=4194304 0 0
+    $ sudo systemctl daemon-reload
+    $ sudo mount /net/winshare
+    SMB folder sharing after going passwordless with the microsoft account - Microsoft Community ⌇⡧⣗⠡⡄
+      https://answers.microsoft.com/en-us/windows/forum/all/smb-folder-sharing-after-going-passwordless-with/7be9e665-1eb3-4ce7-a23d-6b709bd3d415
+    Manage User Accounts in Windows - Microsoft Support ⌇⡧⣗⠡⡍
+      https://support.microsoft.com/en-us/windows/manage-user-accounts-in-windows-104dc19f-6430-4b49-6a2b-e4dbd1dcdf32

@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from just.web.src.mangatx import summary
+from just.web.src.mangatx import summary_by_url_name
 
 
 def qute_send(cmdline: str) -> None:
@@ -21,7 +21,7 @@ def main() -> None:
     page.write_text(src.read_text(encoding="utf-8"))
 
     try:
-        progress = list(summary(src))
+        progress = list(summary_by_url_name(src))
     except Exception as exc:
         dst.write_text(__import__("traceback").format_exc(), encoding="utf-8")
         qute_send("message-error '{}'".format(f"Exception! See {dst}"))

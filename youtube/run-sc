@@ -49,7 +49,7 @@ fi
 # NEED:(--proxy): due to region $ --proxy='socks5://127.0.0.1:17321'
 ydl --xattrs --ignore-errors --embed-thumbnail \
   --format='bestaudio/best' \
-  --output='%(playlist_index)s - %(title)s.%(ext)s' \
+  --output='%(playlist_index)02d - %(title)s.%(ext)s' \
   --download-archive='.youtube-dl.txt' \
   --sleep-requests 5 \
   --sleep-interval 5 \

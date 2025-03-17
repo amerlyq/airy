@@ -90,11 +90,13 @@ elif [[ $fmt == fast ]]; then
   #   -avoid_negative_ts make_zero \
   #   "$path"
 
+  # av1_qsv h264_qsv hevc_qsv
+  # -c:v h264_qsv -i ...
   # -vf "scale_qsv=w=1920:h=1080"
   ffmpeg -hide_banner -nostats -nostdin \
     -hwaccel qsv -hwaccel_output_format qsv \
     -ss "${beg:-00:00}" -to "${end:--00:00}" \
-    -c:v h264_qsv -i "$fname" -vf 'hwdownload' \
+    -i "$fname" -vf 'hwdownload' \
     -c:v hevc_qsv -preset slow -global_quality 23 \
     -codec:a copy -codec:d copy \
     "$path"

@@ -334,6 +334,7 @@ class cda(Command):
         if "m" in flags:
             from stat import S_ISREG as isfile
             files = __import__("glob").glob(path + "/**", recursive=True)
+            files = [x for x in files if not x.endswith(".pyc")]
             path = max((st.st_mtime, x) for x in files if isfile((st := os.stat(x)).st_mode))[1]
         elif fs.islink(path):
             if "l" in flags:

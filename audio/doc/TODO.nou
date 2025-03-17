@@ -13,3 +13,41 @@ TODO
 
   2019-10-02 [X] READ: setup microphone for recording
     RU: https://glashkoff.com/kak-zapisat-zvyk/
+
+
+25m 2025-03-05-Wed-W09
+  [,] 23:50 25m CFG #hpx pipewire HDMI no audio after standby ⌇⡧⣉⡻⠉
+    [•] Sound output device is lost on suspend, requiring a reboot to reactivate - Ask Ubuntu ⌇⡧⣈⣄⣏
+      https://askubuntu.com/questions/1485148/sound-output-device-is-lost-on-suspend-requiring-a-reboot-to-reactivate
+    Pipewire: sound not working after update/HDMI monitor added - Support / Sound - Manjaro Linux Forum ⌇⡧⣈⣅⠮
+      https://forum.manjaro.org/t/pipewire-sound-not-working-after-update-hdmi-monitor-added/166110/3
+    [SOLVED] Pipewire-pulse no sound on HDMI / Newbie Corner / Arch Linux Forums ⌇⡧⣈⣈⡨
+      https://bbs.archlinux.org/viewtopic.php?id=281263
+    [•] No sound from the built-in speakers (pipewire) : r/archlinux ⌇⡧⣈⣉⡾
+      https://www.reddit.com/r/archlinux/comments/1e0tp14/no_sound_from_the_builtin_speakers_pipewire/
+      $ systemctl --user restart pipewire pipewire-pulse wireplumber
+      $ rm -rf ~/.local/state/wireplumber/
+    pipewire-debian | Upstream Version of pipewire, wireplumber, roc-toolkit & blueman for debian/ubuntu ⌇⡧⣈⣊⠖
+      https://pipewire-debian.github.io/pipewire-debian/#add-the-launchpad-ppa
+    PipeWire - ArchWiki ⌇⡧⣈⣊⠣
+      https://wiki.archlinux.org/title/PipeWire#Sound_does_not_automatically_switch_when_connecting_a_new_device
+    When power management turns HDMI display off and on, HDMI output reenables itself (#138) · Issues · PipeWire / wireplumber · GitLab ⌇⡧⣈⣊⡡
+      https://gitlab.freedesktop.org/pipewire/wireplumber/-/issues/138
+    When power management turns HDMI display off and on, HDMI output reenables itself (#138) · Issues · PipeWire / wireplumber · GitLab ⌇⡧⣈⣋⡄
+      https://gitlab.freedesktop.org/pipewire/wireplumber/-/issues/138
+    [SOLVED] Pipewire stops working after suspend/resume / Kernel & Hardware / Arch Linux Forums ⌇⡧⣈⣋⢗
+      https://bbs.archlinux.org/viewtopic.php?id=274296
+    [Pipewire] No audio after suspend : r/archlinux ⌇⡧⣈⣋⣤
+      https://www.reddit.com/r/archlinux/comments/sas6hw/pipewire_no_audio_after_suspend/
+      PipeWire - ArchWiki ⌇⡧⣈⣌⠩
+        https://wiki.archlinux.org/title/PipeWire#Audio_problems_after_standby
+
+
+25m 2025-03-06-Thu-W09
+  [✓] 20:10 25m CFG #hpx pipewire HDMI no audio after standby ※⡧⣉⡻⠉
+    ⁘ WKRND: off/on питание DP1 переходника (и всего удлинителя с монитором)
+      No sound over DisplayPort / Multimedia and Games / Arch Linux Forums ⌇⡧⣉⣩⡴
+        https://bbs.archlinux.org/viewtopic.php?id=300960
+        $ pactl list short sinks
+        $ pamixer --get-volume
+        $ pactl get-default-sink

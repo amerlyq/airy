@@ -5,3 +5,30 @@
     HYPO: it doesn't register "n  <Space>iÞ   *@<Nop>" in 2nd buffer
     ⁘ FIXED: !which-key=v3 conflicts with "lazy.lua" filename, RENAME → lazyload.lua
       [_] FUT: remove dupl keybinds on d/y operators to avoid o.timeoutlen delay
+
+
+50m 2025-03-16-Sun-W10
+  f3e [+] 00:15 ✓ 50m #nvim BUG: :SudaWrite deletes everything above cursor ⌇⡧⣘⠋⠭
+    ex~: if cursor is below uncommented en_US with trailing spaces on each line
+      $ cd /etc && sudo git checkout 4f929d5~ locale.gen
+    [✗] HYPO: my autocmd to strip trailing space
+      /d/airy/nvim/lua/airy/autocmds.lua
+      ⁘ FAIL: writing to /t/loc is OK
+    [✗] HYPO: some other autocmd
+    [✓] HYPO: it's BUG in !suda itself -- because my strip-trailing changes marks <'[>
+      ALG: ":SudaWrite" -> ":write suda://%f" -> BufWriteCmd -> suda#BufWriteCmd()
+        let echo_message = suda#write('<afile>', {
+            \ 'range': '''[,'']',
+            \})
+    [•] ALT:BET: don't use !suda at all
+      Unable to use `:w !sudo tee %` command in NeoVim · Issue #12103 · neovim/neovim ⌇⡧⣗⡔⣯
+        https://github.com/neovim/neovim/issues/12103
+      ## FAIL: no window, spends all attempts to enter passwd and locks for 5min
+      # :lua vim.env.XAUTHORITY=":0"
+      # :lua vim.env.DISPLAY=":0"
+      # :lua vim.env.SUDO_ASKPASS="/usr/bin/pinentry-qt"
+      # :w !sudo -A tee %
+      :w !pkexec tee %
+      :w !pkexec env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY tee %
+      [_] TRY? Lua solution to writing a file using sudo : r/neovim ⌇⡧⣗⡘⣘
+        https://www.reddit.com/r/neovim/comments/p3b20j/lua_solution_to_writing_a_file_using_sudo/
