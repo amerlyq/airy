@@ -638,7 +638,13 @@ c.completion.cmd_history_max_items = 1000  # @me
 ##   - history
 ##   - filesystem
 # c.completion.open_categories = ['searchengines', 'quickmarks', 'bookmarks', 'history', 'filesystem']
-# c.completion.open_categories = ['history', 'filesystem', 'searchengines', 'quickmarks', 'bookmarks']  # @me
+c.completion.open_categories = [
+    "history",
+    "filesystem",
+    "searchengines",
+    "quickmarks",
+    "bookmarks",
+]  # @me
 
 ## Move on to the next part when there's only one possible completion
 ## left.

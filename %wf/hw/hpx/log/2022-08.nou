@@ -348,3 +348,34 @@
       ::: FAIL: doesn't work, can't read /dev/ws/root ERR: /dev/mapper/encswap not found
         NEED: separatate partition with a key FAIL: it also should be encrypted
         >> TEMP: use 2nd long passwd to not compromise primary one in swap -- OR give up on hibernation
+
+
+15m 2025-03-20-Thu-W11
+  f3k [,] 22:45 15m #hpx CFG:ERR: mmc0: cannot verify signal voltage switch ⌇⡧⣩⢝⣟
+    [v5,4/4] mmc: core: Fixup signal voltage switch - Patchwork ⌇⡧⣜⢃⡽
+      https://patchwork.kernel.org/project/linux-mmc/patch/1357653962-10887-5-git-send-email-johan.rudholm@stericsson.com/
+      if (!host->ops->card_busy)
+    [•] BET? 214093 – rtsx_pci (Realtek RTS525A) I/O errors with SDXC card ⌇⡧⣩⢝⣌
+      https://bugzilla.kernel.org/show_bug.cgi?id=214093
+
+
+40m 2025-03-30-Sun-W12
+  [✓⡧⣩⢛⢆] 13:30 15m+25m #hpx CFG corrupted files on /media/mmc -> switches to readonly ⌇⡧⣪⢤⡃
+    [≈] 13:30 15m .
+      Exfat-utils or exfatprogs? - Support / Software & Applications - Manjaro Linux Forum ⌇⡧⣩⢙⣏
+        https://forum.manjaro.org/t/exfat-utils-or-exfatprogs/46915/3
+        ⁘ ✓exfatprogs
+        Issues Mounting exFAT Filesystem with Kernel 6.7.2 / Pacman & Package Upgrade Issues / Arch Linux Forums ⌇⡧⣩⢙⣶
+          https://bbs.archlinux.org/viewtopic.php?id=292475
+        what I should use? exfat-utils or exfatprogs ? : r/openSUSE ⌇⡧⣩⢙⣼
+          https://www.reddit.com/r/openSUSE/comments/18g54a1/what_i_should_use_exfatutils_or_exfatprogs/
+        ✓ OFF: File systems - ArchWiki ⌇⡧⣩⢚⠒
+          https://wiki.archlinux.org/title/File_systems
+      Is exfat.fsck from exfatprogs on Debian Bullseye broken? : r/debian ⌇⡧⣩⢙⢶
+        https://www.reddit.com/r/debian/comments/ypkljz/is_exfatfsck_from_exfatprogs_on_debian_bullseye/
+      fsck.exfat(8) — exfatprogs — Debian testing — Debian Manpages ⌇⡧⣩⢙⢾
+        https://manpages.debian.org/testing/exfatprogs/fsck.exfat.8.en.html
+      exfatprogs/exfatprogs: exFAT filesystem userspace utilities ⌇⡧⣩⢙⣁
+        https://github.com/exfatprogs/exfatprogs
+        $ fsck.exfat -p -s /dev/sda1
+    [X] 22:05 25m .
