@@ -446,7 +446,9 @@ audit_host = os.uname().nodename
 
 def audit_log(text: str, grp: str) -> None:
     ts = time.time()
-    sfx = time.strftime("%Y/%Y-%m-%d", time.localtime(ts))
+    lts = time.localtime(ts)
+    pfx = time.strftime("%H:%M:%S", lts)
+    sfx = time.strftime("%Y/%Y-%m-%d", lts)
     dst = fs.join(audit_dir, audit_host, grp, sfx)
     dst_dir = fs.dirname(dst)
     if fs.exists(audit_dir) and not fs.exists(dst_dir):
@@ -456,7 +458,7 @@ def audit_log(text: str, grp: str) -> None:
     #   ALSO:TODO: mkdir for "year"
     with open(dst, "a", encoding="utf-8") as f:
         # ALSO: state :: w.maximized w.minimized w.floating:
-        line = f"{int(ts)} {text}\n"
+        line = f"{pfx}\t{text}\n"
         # TODO: ensure file ends with \n before append
         f.write(line)
 
