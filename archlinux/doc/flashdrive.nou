@@ -25,6 +25,7 @@ Separate partition on drive for ArchLinux
   $# mount -o loop archlinux-2018.05.01-x86_64.iso /mnt/iso
   $# mount /dev/sdb2 /mnt/usb
   $# cp -a /mnt/iso/* /mnt/usb
+    # OR: $ sudo rsync -avP --delete ./iso/ /mnt/
   $# sync
   $# umount /mnt/iso
 

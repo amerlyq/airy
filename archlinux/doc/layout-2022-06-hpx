@@ -135,7 +135,7 @@ chattr +C /mnt/@/var/log
 #   ~/.local/share/qutebrowser/webengine/Service Worker/CacheStorage
 #   ~/.local/qute-proxy/data/webengine/Service Worker/CacheStorage
 # ALSO: config/Microsoft/Microsoft\ Teams
-for x in android/avd cabal cache cargo gradle local/share/Steam rustup
+for x in android/avd cabal cache cargo gradle local/share/{Steam,docker} rustup
 do v=/mnt/@/home/user/.$x; mkdir -vp ${v%/*}; btrfs subvolume create $v; done
 
 btrfs subvolume list /mnt
@@ -156,6 +156,7 @@ mount -o noatime,nofail,compress=zstd,autodefrag,ssd,subvol=/@ /dev/ws/data /mnt
 mount -o noatime,nofail,noauto,x-systemd.automount /dev/ws/cache /mnt/cache
 # FIXME: ensure fstab will contain automount
 #   FIXED:ERR: FAT-fs (nvme0n1p1): Volume was not properly unmounted. Some data may be corrupt.
+# NEW: mount --mkdir /dev/efi_system_partition /mnt/boot
 mount -o noauto,x-systemd.automount,fmask=0133 /dev/nvme0n1p1 /mnt/boot
 
 # FAIL:(snapper): can't mount snapshots somewhere rarely accessible (e.g. /root/*) to prevent automount
@@ -179,7 +180,7 @@ timedatectl set-ntp true
 timedatectl status
 
 # NEW: "base" is almost empty now -- install everything manually
-pacstrap /mnt  base intel-ucode linux linux-firmware cryptsetup lvm2 btrfs-progs base-devel neovim man git
+pacstrap -K /mnt  base intel-ucode linux linux-firmware cryptsetup lvm2 btrfs-progs base-devel neovim man git
 
 
 ## CHG: manually remove swap of host system (if necessary)
@@ -200,12 +201,17 @@ bootctl --path=/mnt/boot install
 mkdir -p /mnt/boot/loader/entries
 # <UUID> is raw encrypted device -- find by ':r!blkid -dno UUID /dev/nvme0n1p5' in vi (OR: ':< ...' in nvim)
 # ALT:(rootflags): use "btrfs {get,set}-default ..."
+# OLD: resume=/dev/ws/swap quiet i8042.noaux i8042.dritek=1
+# SECU:(vulnerabilities):CHECK: !lscpu
+#   https://linuxreviews.org/HOWTO_make_Linux_run_blazing_fast_(again)_on_Intel_CPUs
+#   PERF:BAD:(mitigations=off): only 2-3% faster, no sense
+# MAYBE:(for C4+): pcie_aspm.policy=powersave
 cat > /mnt/boot/loader/entries/arch.conf <<EOT
 title Arch Linux Enc
 linux /vmlinuz-linux
 initrd /intel-ucode.img
 initrd /initramfs-linux.img
-options cryptdevice=UUID=<UUID>:luks:allow-discards root=/dev/ws/root rw rootflags=subvol=@ resume=/dev/ws/swap quiet i8042.noaux i8042.dritek=1
+options cryptdevice=UUID=<UUID>:luks:allow-discards root=/dev/ws/root rw rootflags=subvol=@ resume=/dev/mapper/encswap quiet random.trust_cpu=on nowatchdog hpet=disable
 EOT
 
 ## ALT: "timeout 0 && default arch"
