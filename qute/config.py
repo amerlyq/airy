@@ -512,9 +512,9 @@ c.colors.statusbar.url.fg = "lime"  # @me
 # c.colors.webpage.bg = 'white'
 # c.colors.webpage.bg = "#101010"  # @me
 
-## Which algorithm to use for modifying how colors are rendered with
-## darkmode. The `lightness-cielab` value was added with QtWebEngine 5.14
-## and is treated like `lightness-hsl` with older QtWebEngine versions.
+## Which algorithm to use for modifying how colors are rendered with dark
+## mode. The `lightness-cielab` value was added with QtWebEngine 5.14 and
+## is treated like `lightness-hsl` with older QtWebEngine versions.
 ## Type: String
 ## Valid values:
 ##   - lightness-cielab: Modify colors by converting them to CIELAB color space and inverting the L value. Not available with Qt < 5.14.
@@ -528,40 +528,17 @@ c.colors.statusbar.url.fg = "lime"  # @me
 ## Type: Float
 # c.colors.webpage.darkmode.contrast = 0.0
 
-## Render all web contents using a dark theme. Example configurations
-## from Chromium's `chrome://flags`:  - "With simple HSL/CIELAB/RGB-based
-## inversion": Set   `colors.webpage.darkmode.algorithm` accordingly.  -
-## "With selective image inversion": Set
-## `colors.webpage.darkmode.policy.images` to `smart`.  - "With selective
-## inversion of non-image elements": Set
-## `colors.webpage.darkmode.threshold.text` to 150 and
-## `colors.webpage.darkmode.threshold.background` to 205.  - "With
-## selective inversion of everything": Combines the two variants   above.
-## - "With increased text contrast": Set
-## `colors.webpage.darkmode.increase_text_contrast` (QtWebEngine 6.3+)
+## Render all web contents using a dark theme. On QtWebEngine < 6.7, this
+## setting requires a restart and does not support URL patterns, only the
+## global setting is applied. Example configurations from Chromium's
+## `chrome://flags`: - "With simple HSL/CIELAB/RGB-based inversion": Set
+## `colors.webpage.darkmode.algorithm` accordingly, and   set
+## `colors.webpage.darkmode.policy.images` to `never`.  - "With selective
+## image inversion": qutebrowser default settings.
 ## Type: Bool
 # c.colors.webpage.darkmode.enabled = False
 
-## Render all colors as grayscale. This only has an effect when
-## `colors.webpage.darkmode.algorithm` is set to `lightness-hsl` or
-## `brightness-rgb`.
-## Type: Bool
-# c.colors.webpage.darkmode.grayscale.all = False
-
-## Desaturation factor for images in dark mode. If set to 0, images are
-## left as-is. If set to 1, images are completely grayscale. Values
-## between 0 and 1 desaturate the colors accordingly.
-## Type: Float
-# c.colors.webpage.darkmode.grayscale.images = 0.0
-
-## Increase text contrast by drawing an outline of the uninverted color.
-## Type: Bool
-# c.colors.webpage.darkmode.increase_text_contrast = False
-
-## Which images to apply dark mode to. With QtWebEngine 5.15.0, this
-## setting can cause frequent renderer process crashes due to a
-## https://codereview.qt-project.org/c/qt/qtwebengine-
-## chromium/+/304211[bug in Qt].
+## Which images to apply dark mode to.
 ## Type: String
 ## Valid values:
 ##   - always: Apply dark mode filter to all images.
@@ -582,7 +559,8 @@ c.colors.statusbar.url.fg = "lime"  # @me
 ## elements with brightness above this threshold will be inverted, and
 ## below it will be left as in the original, non-dark-mode page. Set to
 ## 256 to never invert the color or to 0 to always invert it. Note: This
-## behavior is the opposite of `colors.webpage.darkmode.threshold.text`!
+## behavior is the opposite of
+## `colors.webpage.darkmode.threshold.foreground`!
 ## Type: Int
 # c.colors.webpage.darkmode.threshold.background = 0
 
@@ -591,7 +569,7 @@ c.colors.statusbar.url.fg = "lime"  # @me
 ## left as in the original, non-dark-mode page. Set to 256 to always
 ## invert text color or to 0 to never invert text color.
 ## Type: Int
-# c.colors.webpage.darkmode.threshold.text = 256
+# c.colors.webpage.darkmode.threshold.foreground = 256
 
 ## Value to use for `prefers-color-scheme:` for websites. The "light"
 ## value is only available with QtWebEngine 5.15.2+. On older versions,
@@ -793,7 +771,9 @@ c.content.blocking.whitelist = ["adf.ly"]
 # c.content.cache.size = None
 
 ## Allow websites to read canvas elements. Note this is needed for some
-## websites to work properly.
+## websites to work properly. On QtWebEngine < 6.6, this setting requires
+## a restart and does not support URL patterns, only the global setting
+## is applied.
 ## Type: Bool
 # c.content.canvas_reading = True
 
@@ -904,14 +884,15 @@ c.content.geolocation = False  # @me
 ## QtWebEngine. * `{qt_version}`: The underlying Qt version. *
 ## `{upstream_browser_key}`: "Version" for QtWebKit, "Chrome" for
 ## QtWebEngine. * `{upstream_browser_version}`: The corresponding
-## Safari/Chrome version. * `{qutebrowser_version}`: The currently
-## running qutebrowser version.  The default value is equal to the
-## unchanged user agent of QtWebKit/QtWebEngine.  Note that the value
-## read from JavaScript is always the global value. With QtWebEngine
-## between 5.12 and 5.14 (inclusive), changing the value exposed to
-## JavaScript requires a restart.
+## Safari/Chrome version. * `{upstream_browser_version_short}`: The
+## corresponding Safari/Chrome   version, but only with its major
+## version. * `{qutebrowser_version}`: The currently running qutebrowser
+## version.  The default value is equal to the default user agent of
+## QtWebKit/QtWebEngine, but with the `QtWebEngine/...` part removed for
+## increased compatibility.  Note that the value read from JavaScript is
+## always the global value.
 ## Type: FormatString
-# c.content.headers.user_agent = 'Mozilla/5.0 ({os_info}) AppleWebKit/{webkit_version} (KHTML, like Gecko) {qt_key}/{qt_version} {upstream_browser_key}/{upstream_browser_version} Safari/{webkit_version}'
+# c.content.headers.user_agent = 'Mozilla/5.0 ({os_info}) AppleWebKit/{webkit_version} (KHTML, like Gecko) {upstream_browser_key}/{upstream_browser_version_short} Safari/{webkit_version}'
 
 ## Enable hyperlink auditing (`<a ping>`).
 ## Type: Bool
@@ -935,8 +916,9 @@ c.content.geolocation = False  # @me
 
 ## Allow JavaScript to read from or write to the clipboard. With
 ## QtWebEngine, writing the clipboard as response to a user interaction
-## is always allowed.
-## Type: String
+## is always allowed. On Qt < 6.8, the `ask` setting is equivalent to
+## `none` and permission needs to be granted manually via this setting.
+## Type: JSClipboardPermission
 ## Valid values:
 ##   - none: Disable access to clipboard.
 ##   - access: Allow reading from and writing to the clipboard.
@@ -959,6 +941,20 @@ config.set("content.javascript.enabled", True, "*://stackoverflow.com/*")
 config.set("content.javascript.enabled", True, "*://*.stackexchange.com/*")
 config.set("content.javascript.enabled", True, "*://*.google.com/*")
 config.set("content.javascript.enabled", True, "*://www.reddit.com/*")
+
+## Enables the legacy touch event feature. This affects JS APIs such as:
+## - ontouch* members on window, document, Element -
+## document.createTouch, document.createTouchList -
+## document.createEvent("TouchEvent") Newer Chromium versions have those
+## disabled by default:
+## https://bugs.chromium.org/p/chromium/issues/detail?id=392584
+## https://groups.google.com/a/chromium.org/g/blink-dev/c/KV6kqDJpYiE
+## Type: String
+## Valid values:
+##   - always: Legacy touch events are always enabled. This might cause some websites to assume a mobile device.
+##   - auto: Legacy touch events are only enabled if a touch screen was detected on startup.
+##   - never: Legacy touch events are always disabled.
+# c.content.javascript.legacy_touch_events = 'never'
 
 ## Log levels to use for JavaScript console logging messages. When a
 ## JavaScript message with the level given in the dictionary key is
@@ -1159,9 +1155,7 @@ c.content.register_protocol_handler = False  # @me: "ask" is infuriating on Gmai
 ## Disable a list of named quirks.
 ## Type: FlagList
 ## Valid values:
-##   - ua-whatsapp
 ##   - ua-google
-##   - ua-slack
 ##   - ua-googledocs
 ##   - js-whatsapp-web
 ##   - js-discord
@@ -1208,6 +1202,7 @@ c.content.tls.certificate_errors = "ask-block-thirdparty"
 ##   - disable-non-proxied-udp: WebRTC should only use TCP to contact peers or servers unless the proxy server supports UDP. This doesn't expose any local addresses either.
 # c.content.webrtc_ip_handling_policy = 'all-interfaces'
 # @me SECU:THINK:BET? = default-public-interface-only
+c.content.webrtc_ip_handling_policy = "default-public-interface-only"
 
 ## Monitor load requests for cross-site scripting attempts. Suspicious
 ## scripts will be blocked and reported in the devtools JavaScript
@@ -1533,7 +1528,7 @@ c.fileselect.single_file.command = ["st", "-e", "ranger", "--choosefile={}"]
 ## CSS selectors used to determine which elements on a page should have
 ## hints.
 ## Type: Dict
-# c.hints.selectors = {'all': ['a', 'area', 'textarea', 'select', 'input:not([type="hidden"])', 'button', 'frame', 'iframe', 'img', 'link', 'summary', '[contenteditable]:not([contenteditable="false"])', '[onclick]', '[onmousedown]', '[role="link"]', '[role="option"]', '[role="button"]', '[role="tab"]', '[role="checkbox"]', '[role="menuitem"]', '[role="menuitemcheckbox"]', '[role="menuitemradio"]', '[role="treeitem"]', '[aria-haspopup]', '[ng-click]', '[ngClick]', '[data-ng-click]', '[x-ng-click]', '[tabindex]:not([tabindex="-1"])'], 'links': ['a[href]', 'area[href]', 'link[href]', '[role="link"][href]'], 'images': ['img'], 'media': ['audio', 'img', 'video'], 'url': ['[src]', '[href]'], 'inputs': ['input[type="text"]', 'input[type="date"]', 'input[type="datetime-local"]', 'input[type="email"]', 'input[type="month"]', 'input[type="number"]', 'input[type="password"]', 'input[type="search"]', 'input[type="tel"]', 'input[type="time"]', 'input[type="url"]', 'input[type="week"]', 'input:not([type])', '[contenteditable]:not([contenteditable="false"])', 'textarea']}
+# c.hints.selectors = {'all': ['a', 'area', 'textarea', 'select', 'input:not([type="hidden"])', 'button', 'frame', 'iframe', 'img', 'link', 'summary', '[contenteditable]:not([contenteditable="false"])', '[onclick]', '[onmousedown]', '[role="link"]', '[role="option"]', '[role="button"]', '[role="tab"]', '[role="checkbox"]', '[role="switch"]', '[role="menuitem"]', '[role="menuitemcheckbox"]', '[role="menuitemradio"]', '[role="treeitem"]', '[aria-haspopup]', '[ng-click]', '[ngClick]', '[data-ng-click]', '[x-ng-click]', '[tabindex]:not([tabindex="-1"])'], 'links': ['a[href]', 'area[href]', 'link[href]', '[role="link"][href]'], 'images': ['img'], 'media': ['audio', 'img', 'video'], 'url': ['[src]', '[href]'], 'inputs': ['input[type="text"]', 'input[type="date"]', 'input[type="datetime-local"]', 'input[type="email"]', 'input[type="month"]', 'input[type="number"]', 'input[type="password"]', 'input[type="search"]', 'input[type="tel"]', 'input[type="time"]', 'input[type="url"]', 'input[type="week"]', 'input:not([type])', '[contenteditable]:not([contenteditable="false"])', 'textarea']}
 ## @me WTF
 # c.hints.selectors["code"] = [
 #     # Selects all code tags whose direct parent is not a pre tag
@@ -1724,7 +1719,7 @@ c.input.partial_timeout = 0  # @me
 # WAIT: https://github.com/qutebrowser/qutebrowser/issues/5378
 # DEBUG: chrome://gpu/
 c.qt.args += [
-    "use-gl=desktop",
+    # "use-gl=desktop",
     # "enable-gpu-rasterization",  # BET?
     "ignore-gpu-blacklist",
     "ignore-gpu-blocklist",
@@ -1732,7 +1727,7 @@ c.qt.args += [
     # "enable-vulkan",
     # --use-gl=desktop
     # --disable-gpu-driver-bug-workarounds
-    "disable-accelerated-2d-canvas",  # COS:(!7489)※⡥⡛⢷⣏
+    # "disable-accelerated-2d-canvas",  # COS:(!7489)※⡥⡛⢷⣏
     # "enable-accelerated-2d-canvas",
     # "enable-gpu-memory-buffer-video-frames",
     # "enable-native-gpu-memory-buffers",
@@ -1781,10 +1776,12 @@ c.qt.args += [
 ## Chromium's security layers**. To avoid sandboxing being accidentally
 ## disabled persistently, this setting can only be set via `config.py`,
 ## not via `:set`. See the Chromium documentation for more details: - htt
-## ps://chromium.googlesource.com/chromium/src/\+/HEAD/docs/linux/sandbox
-## ing.md[Linux] - https://chromium.googlesource.com/chromium/src/\+/HEAD
-## /docs/design/sandbox.md[Windows] - https://chromium.googlesource.com/c
-## hromium/src/\+/HEAD/docs/design/sandbox_faq.md[FAQ (Windows-centric)]
+## ps://chromium.googlesource.com/chromium/src/\+/HEAD/sandbox/linux/READ
+## ME.md[Linux] - https://chromium.googlesource.com/chromium/src/\+/HEAD/
+## docs/design/sandbox.md[Windows] - https://chromium.googlesource.com/ch
+## romium/src/\+/HEAD/sandbox/mac/README.md[Mac] - https://chromium.googl
+## esource.com/chromium/src/\+/HEAD/docs/design/sandbox_faq.md[FAQ
+## (Windows-centric)]
 ## Type: String
 ## Valid values:
 ##   - enable-all: Enable all available sandboxing mechanisms.
@@ -1796,6 +1793,7 @@ c.qt.args += [
 ## variable to null/None will unset it.
 ## Type: Dict
 # c.qt.environ = {}
+# c.qt.environ = {"QT_SCALE_FACTOR": "0.8"}
 
 ## Force a Qt platform to use. This sets the `QT_QPA_PLATFORM`
 ## environment variable and is useful to force using the XCB plugin when
@@ -1831,6 +1829,27 @@ c.qt.args += [
 c.qt.highdpi = True  # @me: TRY use everywhere for everyone
 # @me REF: https://github.com/qutebrowser/qutebrowser/issues/4786
 # ALT: run $  ...  -s qt.highdpi true
+
+## Disable accelerated 2d canvas to avoid graphical glitches. On some
+## setups graphical issues can occur on sites like Google sheets and
+## PDF.js. These don't occur when accelerated 2d canvas is turned off, so
+## we do that by default. So far these glitches only occur on some Intel
+## graphics devices.
+## Type: String
+## Valid values:
+##   - always: Disable accelerated 2d canvas
+##   - auto: Disable on Qt6 < 6.6.0, enable otherwise
+##   - never: Enable accelerated 2d canvas
+# c.qt.workarounds.disable_accelerated_2d_canvas = 'auto'
+
+## Disable the Hangouts extension. The Hangouts extension provides
+## additional APIs for Google domains only. Hangouts has been replaced
+## with Meet, which appears to work without this extension. Note this
+## setting gets ignored and the Hangouts extension is always disabled to
+## avoid crashes on Qt 6.5.0 to 6.5.3 if dark mode is enabled, as well as
+## on Qt 6.6.0.
+## Type: Bool
+# c.qt.workarounds.disable_hangouts_extension = False
 
 ## Work around locale parsing issues in QtWebEngine 5.15.3. With some
 ## locales, QtWebEngine 5.15.3 is unusable without this workaround. In
@@ -2311,7 +2330,7 @@ c.url.searchengines = {
 # c.url.start_pages = ['https://start.duckduckgo.com']
 c.url.start_pages = ["qute://history/"]  # @me
 
-## URL parameters to strip with `:yank url`.
+## URL parameters to strip when yanking a URL.
 ## Type: List of String
 # c.url.yank_ignored_parameters = ['ref', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'utm_name']
 
@@ -2635,13 +2654,13 @@ config.bind(
 )
 
 # config.bind('yD', 'yank domain -s')
-# config.bind('yM', 'yank inline [{title}]({url}) -s')
+# config.bind('yM', 'yank inline [{title}]({url:yank}) -s')
 # config.bind('yP', 'yank pretty-url -s')
 # config.bind('yT', 'yank title -s')
 # config.bind('yY', 'yank -s')
 config.bind("yc", "hint code userscript code_select.py")
 # config.bind('yd', 'yank domain')
-# config.bind('ym', 'yank inline [{title}]({url})')
+# config.bind('ym', 'yank inline [{title}]({url:yank})')
 # config.bind('yp', 'yank pretty-url')
 # config.bind('yt', 'yank title')
 config.bind("yv", "spawn --userscript yank_nou")
