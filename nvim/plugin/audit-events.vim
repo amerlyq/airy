@@ -11,7 +11,7 @@ if &cp||exists('g:loaded_auditevs')|finish|else|let g:loaded_auditevs=1|endif
 "   ALT(manually): get last edited file from ~/.cache/vim/{undo-tree,stay-view,neomru}
 "     >> and then manually use DFL :UndotreeShow to find out last edits time
 
-let s:d_audit = '/@/audit/' . hostname() . '/vim'
+let s:d_audit = '/d/audit/' . hostname() . '/vim'
 
 " FIXME: only run if daemon is running and session is started => ERR otherwise
 " systemctl --user is-active lttng-sessiond &>/dev/null
@@ -31,7 +31,8 @@ function! s:SaveEditEvent()
 
   " ALT:USE: = undotree().time_cur
   " let ts = strftime('%s')
-  let ts = strftime('%Y-%m-%d %H:%M:%S%z')
+  " let ts = strftime('%Y-%m-%d %H:%M:%S%z')
+  let ts = strftime('%H:%M:%S')
 
   " TRY: get line-span of edits from last save .instead-of. cursor position
   "   i.e. to estimate size of diff

@@ -4,6 +4,7 @@ from airy.api import Aur, Pkg, ln
 
 # VIZ. $ nvr to talk to vim from inside ranger
 Pkg("neovim")
+Pkg("tree-sitter-cli")
 # Aur("neovim-git")
 Aur("neovim-remote")
 

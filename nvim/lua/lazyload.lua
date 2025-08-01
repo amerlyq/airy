@@ -6,7 +6,6 @@ local seen_filetypes = {}
 
 local function ft_python()
   -- FIXME: load both for .py and .lua
-  require 'plug.treesitter'
   require 'lsp.init'
 
   --FAIL: should load mappings only inside buffer
@@ -24,13 +23,11 @@ end
 
 
 local function ft_cpp()
-  require 'plug.treesitter'
   require 'lsp.init'
 end
 
 
 local function ft_lua()
-  require 'plug.treesitter'
   require 'lsp.init'
 
   local t = seen_filetypes['lua']
@@ -61,8 +58,6 @@ end
 
 
 local function ft_lisp()
-  require 'plug.treesitter'
-
   if vim.bo.filetype == 'lisp' then
 
     local bufnr = seen_filetypes['lisp'].buf
@@ -150,6 +145,29 @@ end
 --  WKRND: should wrap everything behind "require" singletons
 --    BUT:FIXME: how to be with buffer-local mappings ?
 local function load_ondemand()
+
+  require 'plug.treesitter'
+  local parsersInstalled = require("nvim-treesitter.config").get_installed('parsers')
+  for _, parser in pairs(parsersInstalled) do
+    local filetypes = vim.treesitter.language.get_filetypes(parser)
+    -- FIXME:SPLIT: if multivalue e.g. filetypes=py,python
+    local enable = false
+    for _, ft in pairs(filetypes) do
+      if seen_filetypes[ft] then
+        enable = true
+        -- DEBUG: print(vim.inspect(ft))
+      end
+    end
+    if enable then
+      -- vim.treesitter.start()
+      if pcall(vim.treesitter.start) then
+        vim.o.foldmethod = "expr"  -- <RQ
+        vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+        vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+      end
+    end
+  end
+
   -- DEBUG: print(vim.inspect(g.lazy_filetypes))
   -- FIXED:(vim.bo.filetype): if ANY buffer had python
   if seen_filetypes['qf'] then
@@ -164,6 +182,11 @@ local function load_ondemand()
     ft_lua()
   elseif seen_filetypes['vim'] then
     ft_vim()
+  else
+    -- if seen_filetypes['bash']
+    --   or seen_filetypes['cmake']
+    --   or ...
+    -- then require 'plug.treesitter'
   end
 end
 

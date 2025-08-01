@@ -26,7 +26,8 @@ o.shortmess:remove { 'F' } -- DFL=filnxtToOF
 -- ? /usr/share/vim/vimfiles
 
 -- OR: vim.env.MYVIMRC.parent
-o.runtimepath = { MYCONF, vim.env.VIMRUNTIME, MYCONF .. '/after' }
+-- NOTE:(@xdg/data/site): for nvim-treesitter languages
+o.runtimepath = { MYCONF, vim.env.VIMRUNTIME, vim.fn.stdpath('data')..'/site', MYCONF .. '/after' }
 --DISABLED:(,...): prevent duplicates in &rtp
 --   MAYBE: always treat MYCONF as preload-only and then replace packpath by "/lazy" only
 o.packpath = { MYPLUG .. '/preload', MYCONF }
@@ -69,6 +70,7 @@ g.do_filetype_lua = 1
 -- g.loaded_zipPlugin = 0
 -- g.loaded_gzip = 0
 -- g.loaded_shada_plugin = 0  -- DISABLED: register FileType *.shada
+g.loaded_netrwPlugin = 0
 
 
 --ALSO:CHECK:
@@ -80,6 +82,7 @@ g.do_filetype_lua = 1
 -- let g:loaded_spellfile_plugin  = 0
 -- let g:loaded_netrw             = 0
 -- let g:loaded_remote_plugins    = 0
+g.loaded_netrw = 0
 
 
 --PERF: redraw
