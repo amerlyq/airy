@@ -15,11 +15,14 @@ else
 fi
 
 # h264_qsv av1_qsv
-# -vf 'scale_qsv=w=1920:h=1080,format=yuv420p'
+# -vf 'scale_qsv=w=1920:h=1080,format=yuv420p' \
 # -vf 'scale=w=1920:h=1080' \
+# -c:v h264_qsv -i "$1" -vf 'hwdownload' \
+# -c:v h264_qsv -i "$1" -vf 'scale_qsv=w=1920:h=1080' \
+  # -c:v h264_qsv -i "$1" -vf 'scale_qsv=w=-1:h=1080' \
 ffmpeg -v verbose -hide_banner \
   -hwaccel qsv -hwaccel_output_format qsv \
-  -c:v hevc_qsv -i "$1" -vf 'hwdownload' \
+  -c:v h264_qsv -i "$1" -vf 'hwdownload' \
   -c:v hevc_qsv "${cvargs[@]}" \
   -y "${1%.*}_${ifx}${qa}.${1##*.}"
 

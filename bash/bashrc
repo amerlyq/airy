@@ -5,11 +5,22 @@ export SHELL=$BASH  # NEED: when bash run from zsh
 
 # If not running interactively, don't do anything
 [[ $- == *i* ]] || return
+
+# NOTE: syntax highlighting and auto-suggestions in !bash
+# REF: https://github.com/akinomyoga/ble.sh
+source /d/plugins/zsh/ble.sh/out/ble.sh --noattach
+
 # BUG: cd has errors -- when '$ cd' in bash
 # BUG: bash can't '.a' to jump between dirs
 
 [[ -d ${TMPDIR:=/tmp} ]] || mkdir -p "$TMPDIR"
 TMPPREFIX=${TMPDIR%/}/${SHELL##*/}
+
+## SRC
+# https://askubuntu.com/questions/391082/how-to-see-time-stamps-in-bash-history
+# https://www.networkworld.com/article/2923844/bash-history-remembering-what-you-did-and-when-you-did-it.html
+# HISTTIMEFORMAT=': %s:0;'
+# HISTTIMEFORMAT='%s '
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -74,3 +85,5 @@ source "$BASH_AIRY/prompt"
 
 # [⡣⢴⢄⡭] FIXED:BUG disable blinking cursor after exiting !nvim
 # export PROMPT_COMMAND='echo -en "\e[2 q"'
+
+[[ ! ${BLE_VERSION-} ]] || ble-attach

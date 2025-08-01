@@ -2,6 +2,8 @@ from airy.api import Deps
 
 # DEBUG: airy/tmpl
 
+Deps("archlinux")  # RENAME? bootstrap
+
 # DISABLED: kbd pow
 Deps("hpx/" + x for x in "bt intel pci tpm wifi".split())
 

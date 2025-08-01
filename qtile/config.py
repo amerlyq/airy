@@ -185,6 +185,8 @@ keys = [
     #         for i in range(0, 10)
     #     ],
     # ),
+
+    # FAIL: libqtile core.py:grab_key():L511 Can't grab <Key ([], XF86AudioRaiseVolume)> (unknown keysym: 1008ff13)
     K("<XF86AudioRaiseVolume>", lazy.spawn("amixer -q -- sset Master playback 1%+")),
     K("<XF86AudioLowerVolume>", lazy.spawn("amixer -q -- sset Master playback 1%-")),
     K("<XF86AudioMute>", lazy.spawn("amixer -c 0 -q sset Master playback toggle")),
@@ -425,7 +427,7 @@ def disable_floating(window):
 
     if any(window.match(rule) for rule in rules):
         window.togroup(qtile.current_group.name)
-        window.cmd_disable_floating()
+        window.disable_floating()
 
 
 # WKRND:BUG: Floating windows re-open in the same Group · Issue #4523 · qtile/qtile ⌇⡥⡖⡚⢓
