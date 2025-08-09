@@ -21,3 +21,36 @@
     [≈] TRY: assign 4 to "next" monitor
       https://docs.qtile.org/en/stable/manual/faq.html#how-can-i-get-my-groups-to-stick-to-screens
       [⡧⠓⡼⡔] ✓ CHECK: after reboot ::: yep, affinity works
+
+
+1h40m 2025-08-08-Fri-W31
+  f85 [+] ⁂ 1h40m <W:env> !qtile TRY:CFG: multi-screen in config itself ⌇⡨⢖⢓⡭
+    [X] 5m .
+    [X] 10m .
+    [X] 10m upgrade !qtile only
+      $ sudo pacman -U https://geo.mirror.pkgbuild.com/archlinux/community-testing/os/x86_64/qtile-0.33.0-1-x86_64.pkg.tar.zst
+    [✗] 25m XLR qtile SRC how monitors are auto-detected -- maybe I can fix SRC itself ?
+      ⁘ BAD: some obscure machinery of xcb_get_setup()
+    [+] 20m CFG qtile vs DFL
+    [✗] 20m TRY: monkey-patch
+      ⁘ FAIL: crtc=0 for my newly created monitor
+      [≈] TRY: qtile shell -- will it work or not
+        ## OR:(qtile shell):
+        from libqtile.command.client import InteractiveCommandClient as ICC
+        c = ICC()
+        c.eval("__import__('libqtile').qtile.core.conn.randr.ext.GetScreenResources(__import__('libqtile').qtile.core.conn.screens[0].root.wid).reply().outputs")
+        c.eval("[__import__('libqtile').qtile.core.conn.randr.ext.GetOutputInfo(o, __import__('xcffib').CurrentTime).reply().crtc for o in __import__('libqtile').qtile.core.conn.randr.ext.GetScreenResources(__import__('libqtile').qtile.core.conn.screens[0].root.wid).reply().outputs]")
+        [✗] $ qtile shell
+          [(s.index, s.x, s.y, s.width, s.height) for s in qtile.screens]
+          # from libqtile import qtile
+          [m for m in qtile.core.x.core.randr_get_monitors()]
+    [≈] 10m DEV parse --listmonitor (or python analogue) by myself to fill-in fake_monitors
+        fake_screens = [
+            Screen(top=bar.Bar([widget.GroupBox(), widget.Clock()], 24), x=0, y=0, width=1920, height=1080),  # Laptop
+            Screen(top=bar.Bar([widget.GroupBox(), widget.Clock()], 24), x=1920, y=0, width=1280, height=1440),  # External left
+            Screen(top=bar.Bar([widget.GroupBox(), widget.Clock()], 24), x=3200, y=0, width=1280, height=1440),  # External right
+        ]
+    [_] FIXME: change !st patch to autoresize font
+      ~ based on *screen's* height>width (which is true only for side-left)
+      ~ or simply reduce fontsize when winsize decreases to fit more text inside
+        BAD: will resize font when I simply move window around on tiled screen

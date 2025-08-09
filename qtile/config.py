@@ -1,4 +1,5 @@
 # SEE: /usr/lib/python3.10/site-packages/libqtile/backend/x11/xkeysyms.py
+# DFL: /usr/share/doc/qtile/default_config.py
 # %DEBUG: $ tail -F ~/.local/share/qtile/qtile.log
 # import importlib
 import os
@@ -185,7 +186,6 @@ keys = [
     #         for i in range(0, 10)
     #     ],
     # ),
-
     # FAIL: libqtile core.py:grab_key():L511 Can't grab <Key ([], XF86AudioRaiseVolume)> (unknown keysym: 1008ff13)
     K("<XF86AudioRaiseVolume>", lazy.spawn("amixer -q -- sset Master playback 1%+")),
     K("<XF86AudioLowerVolume>", lazy.spawn("amixer -q -- sset Master playback 1%-")),
@@ -293,59 +293,75 @@ widget_defaults = dict(
 )
 extension_defaults = widget_defaults.copy()
 
-screens = [
-    Screen(
-        bottom=bar.Bar(
-            [
-                widget.CurrentLayoutIcon(),
-                # widget.AGroupBox(),
-                widget.GroupBox(highlight_method="block", inactive="242424"),
-                widget.Sep(),
-                widget.TextBox(" "),
-                widget.Prompt(),
-                widget.WindowName(),
-                widget.Chord(
-                    chords_colors={
-                        "launch": ("#ff0000", "#ffffff"),
-                    },
-                    name_transform=lambda name: name.upper(),
-                ),
-                # widget.TextBox("default config", name="default"),
-                # widget.TextBox("Press &lt;M-r&gt; to spawn", foreground="#d75f5f"),
-                widget.Systray(),
-                # widget.Clock(format="%Y-%m-%d %a %I:%M %p"),
-                widget.NetGraph(),
-                widget.MemoryGraph(fill_color="#00aa00"),
-                widget.HDDBusyGraph(device="nvme0n1", graph_color="#ad570f"),
-                widget.CPUGraph(),
-                # widget.PulseVolume(),
-                widget.Battery(
-                    format="{char}{percent:2.0%} {hour:d}h{min:02d}m {watt:.2f}W",
-                    foreground="#00971f",
-                ),
-                # widget.QuickExit(default_text="[X]", countdown_format="[{}]"),
-                # SRC: Support for Window Buttons · Issue #3182 · qtile/qtile ⌇⡢⣪⡶⢎
-                #   https://github.com/qtile/qtile/issues/3182
-                widget.TextBox(
-                    "[✗]",
-                    mouse_callbacks={"Button1": lazy.window.kill()},
-                    foreground="#4040ff",
-                ),
-                # minimize = widget.TextBox("-", mouse_callbacks={"Button1": lazy.window.toggle_minimize()})
-                # maximize = widget.TextBox("=", mouse_callbacks={"Button1": lazy.window.toggle_maximize()})
-                widget.GenPollText(
-                    func=lambda: ts_ymd3aw(ltoday()),
-                    update_interval=60,
-                    foreground="#fd971f",
-                ),
-                # widget.Clock(format="%Y-%m-%d-%a", update_interval=60, foreground="#fd971f"),
-                widget.Clock(format="%H:%M", update_interval=5),
-            ],
-            40,
-            # border_width=[2, 0, 2, 0],  # Draw top and bottom borders
-            # border_color=["ff00ff", "000000", "ff00ff", "000000"]  # Borders are magenta
+mybar = bar.Bar(
+    [
+        # widget.CurrentLayout(icon_first=True),
+        # widget.AGroupBox(),
+        widget.GroupBox(highlight_method="block", inactive="242424"),
+        widget.Sep(),
+        widget.TextBox(" "),
+        widget.Prompt(),
+        widget.WindowName(),
+        widget.Chord(
+            chords_colors={
+                "launch": ("#ff0000", "#ffffff"),
+            },
+            name_transform=lambda name: name.upper(),
         ),
+        # widget.TextBox("default config", name="default"),
+        # widget.TextBox("Press &lt;M-r&gt; to spawn", foreground="#d75f5f"),
+        widget.Systray(),
+        # widget.Clock(format="%Y-%m-%d %a %I:%M %p"),
+        widget.NetGraph(),
+        widget.MemoryGraph(fill_color="#00aa00"),
+        widget.HDDBusyGraph(device="nvme0n1", graph_color="#ad570f"),
+        widget.CPUGraph(),
+        # widget.PulseVolume(),
+        widget.Battery(
+            format="{char}{percent:2.0%} {hour:d}h{min:02d}m {watt:.2f}W",
+            foreground="#00971f",
+        ),
+        # widget.QuickExit(default_text="[X]", countdown_format="[{}]"),
+        # SRC: Support for Window Buttons · Issue #3182 · qtile/qtile ⌇⡢⣪⡶⢎
+        #   https://github.com/qtile/qtile/issues/3182
+        widget.TextBox(
+            "[✗]",
+            mouse_callbacks={"Button1": lazy.window.kill()},
+            foreground="#4040ff",
+        ),
+        # minimize = widget.TextBox("-", mouse_callbacks={"Button1": lazy.window.toggle_minimize()})
+        # maximize = widget.TextBox("=", mouse_callbacks={"Button1": lazy.window.toggle_maximize()})
+        widget.GenPollText(
+            func=lambda: ts_ymd3aw(ltoday()),
+            update_interval=60,
+            foreground="#fd971f",
+        ),
+        # widget.Clock(format="%Y-%m-%d-%a", update_interval=60, foreground="#fd971f"),
+        widget.Clock(format="%H:%M", update_interval=5),
+    ],
+    40,
+    # border_width=[2, 0, 2, 0],  # Draw top and bottom borders
+    # border_color=["ff00ff", "000000", "ff00ff", "000000"]  # Borders are magenta
+)
+
+# ALT:BET? parse output of run(['xrandr', '--listmonitors'])
+#   Monitors: 3
+#    0: +*eDP-1 3000/285x2000/190+0+1600  eDP-1
+#    1: DP-1~1 2926/666x1600/366+914+0  DP-1
+#    2: DP-1~2 914/208x1600/366+0+0  DP-1
+
+# logo = os.path.join(os.path.dirname(libqtile.resources.__file__), "logo.png")
+fake_screens = [
+    Screen(
+        wallpaper=None,
+        # background="#000000",
+        # wallpaper=logo,
+        # wallpaper_mode="center",
+        bottom=mybar,
+        x=0, y=1600, width=3000, height=2000,  # Laptop/Primary
     ),
+    Screen(x=914, y=0, width=2926, height=1600),  # External main/right
+    Screen(x=0, y=0, width=914, height=1600),  # External side/left
 ]
 
 # Drag floating layouts.
@@ -367,6 +383,7 @@ dgroups_key_binder = None
 dgroups_app_rules = []  # type: list
 follow_mouse_focus = False
 bring_front_click = False
+floats_kept_above = True
 cursor_warp = True
 floating_layout = layout.Floating(
     float_rules=[
@@ -398,7 +415,8 @@ floating_layout = layout.Floating(
 )
 auto_fullscreen = True
 focus_on_window_activation = "smart"
-reconfigure_screens = True
+focus_previous_on_window_remove = False
+reconfigure_screens = False
 
 # If things like steam games want to auto-minimize themselves when losing
 # focus, should we respect this or not?
@@ -406,6 +424,10 @@ auto_minimize = True
 
 # When using the Wayland backend, this can be used to configure input devices.
 wl_input_rules = None
+
+# xcursor theme (string or None) and size (integer) for Wayland backend
+wl_xcursor_theme = None
+wl_xcursor_size = 24
 
 # XXX: Gasp! We're lying here. In fact, nobody really uses or cares about this
 # string besides java UI toolkits; you can see several discussions on the
