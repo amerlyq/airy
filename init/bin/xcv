@@ -45,28 +45,28 @@ redshift -P -O 4600
 xrandr --output eDP-1 --auto --primary --output DP-1 --auto --above eDP-1
 
 ## DISABLED: update to !qtile=0.33 had broke this, now we need to define those manually in its config
-# refresh=
-# if xrandr --listmonitors | grep -wo "DP-1~[0-9]"; then
-#   if delargs=$(xrandr --listmonitors | grep -wo "DP-1~[0-9]" | sed 's/^/--delmonitor /' | paste -sd' ') \
-#     && [[ $delargs ]]; then xrandr ${delargs:?}; fi
-#   # xrandr --delmonitor DP-1~1 --delmonitor DP-1~2
-#   sleep 1
-#   refresh=1
-# fi
-#
-# ## NOTE: split the ext screen in my usual ratio
-# if xrandr -q | grep -q '^DP-1 connected'; then
-#   # OR:(reverse): xrandr --setmonitor DP-1~2 914/208x1600/366+0+0 DP-1 --setmonitor DP-1~1 2926/666x1600/366+914+0 none
-#   xrandr --setmonitor DP-1~1 2926/666x1600/366+914+0 DP-1 --setmonitor DP-1~2 914/208x1600/366+0+0 DP-1
-#   sleep 1
-#   refresh=1
-# fi
-#
-# if ((refresh)); then
-#   ## NEED!. press <M-C-r> to reload !qtile
-#   qtile cmd-obj -o cmd -f reload_config
-#   # qtile cmd-obj -o cmd -f restart
-# fi
+refresh=
+if xrandr --listmonitors | grep -wo "DP-1~[0-9]"; then
+  if delargs=$(xrandr --listmonitors | grep -wo "DP-1~[0-9]" | sed 's/^/--delmonitor /' | paste -sd' ') \
+    && [[ $delargs ]]; then xrandr ${delargs:?}; fi
+  # xrandr --delmonitor DP-1~1 --delmonitor DP-1~2
+  sleep 1
+  refresh=1
+fi
+
+## NOTE: split the ext screen in my usual ratio
+if xrandr -q | grep -q '^DP-1 connected'; then
+  # OR:(reverse): xrandr --setmonitor DP-1~2 914/208x1600/366+0+0 DP-1 --setmonitor DP-1~1 2926/666x1600/366+914+0 none
+  xrandr --setmonitor DP-1~1 2926/666x1600/366+914+0 DP-1 --setmonitor DP-1~2 914/208x1600/366+0+0 DP-1
+  sleep 1
+  refresh=1
+fi
+
+if ((refresh)); then
+  ## NEED!. press <M-C-r> to reload !qtile
+  qtile cmd-obj -o cmd -f reload_config
+  # qtile cmd-obj -o cmd -f restart
+fi
 
 # TEMP: store j.s at least on boot
 # FIXME: disconnect only if there was not connection yet

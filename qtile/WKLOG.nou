@@ -38,6 +38,9 @@
         ## OR:(qtile shell):
         from libqtile.command.client import InteractiveCommandClient as ICC
         c = ICC()
+        c.eval("__import__('libqtile').qtile.core.get_screen_info()")
+        c.eval("__import__('libqtile').qtile.core.conn.pseudoscreens")
+          # (True, '[ScreenRect(x=0, y=1600, width=3000, height=2000), ScreenRect(x=0, y=0, width=3840, height=1600)]')
         c.eval("__import__('libqtile').qtile.core.conn.randr.ext.GetScreenResources(__import__('libqtile').qtile.core.conn.screens[0].root.wid).reply().outputs")
         c.eval("[__import__('libqtile').qtile.core.conn.randr.ext.GetOutputInfo(o, __import__('xcffib').CurrentTime).reply().crtc for o in __import__('libqtile').qtile.core.conn.randr.ext.GetScreenResources(__import__('libqtile').qtile.core.conn.screens[0].root.wid).reply().outputs]")
         [✗] $ qtile shell

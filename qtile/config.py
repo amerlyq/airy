@@ -344,25 +344,69 @@ mybar = bar.Bar(
     # border_color=["ff00ff", "000000", "ff00ff", "000000"]  # Borders are magenta
 )
 
-# ALT:BET? parse output of run(['xrandr', '--listmonitors'])
+## FAIL: not available during startup
+# sc = qtile.get_screen_info()
+#  >> sc=[ScreenRect(x=0, y=1600, width=3000, height=2000), ScreenRect(x=0, y=0, width=3840, height=1600)]
+## ALT:BET? parse output of run(['xrandr', '--listmonitors'])
 #   Monitors: 3
 #    0: +*eDP-1 3000/285x2000/190+0+1600  eDP-1
 #    1: DP-1~1 2926/666x1600/366+914+0  DP-1
 #    2: DP-1~2 914/208x1600/366+0+0  DP-1
 
-# logo = os.path.join(os.path.dirname(libqtile.resources.__file__), "logo.png")
-fake_screens = [
-    Screen(
-        wallpaper=None,
-        # background="#000000",
-        # wallpaper=logo,
-        # wallpaper_mode="center",
-        bottom=mybar,
-        x=0, y=1600, width=3000, height=2000,  # Laptop/Primary
-    ),
-    Screen(x=914, y=0, width=2926, height=1600),  # External main/right
-    Screen(x=0, y=0, width=914, height=1600),  # External side/left
-]
+
+def get_monitors() -> list[dict[str, int]]:
+    import xcffib
+    import xcffib.randr
+
+    conn = xcffib.connect()
+    setup = conn.get_setup()
+    root = setup.roots[0].root
+    randr = conn(xcffib.randr.key)
+    res = randr.GetMonitors(root, 1).reply()
+    # return list(res.monitors)
+    return [
+        {
+            # "name": m.name.to_string(),
+            "x": m.x,
+            "y": m.y,
+            "width": m.width,
+            "height": m.height,
+            # "primary": m.primary,
+        }
+        for m in res.monitors
+    ]
+
+
+sc = get_monitors()
+if len(sc) == 1:
+    fake_screens = [Screen(wallpaper=None, bottom=mybar, **sc[0])]
+elif len(sc) == 2:
+    fake_screens = [
+        Screen(wallpaper=None, bottom=mybar, **sc[0]),
+        Screen(**sc[1]),
+    ]
+elif len(sc) == 3:
+    lmw = int(0.238 * sc[1]["width"])
+    fake_screens = [
+        Screen(wallpaper=None, bottom=mybar, **sc[0]),
+        # Screen(x=lmw, y=sc[1].y, width=sc[1].width - lmw, height=sc[1].height),
+        # Screen(x=sc[1].x, y=sc[1].y, width=lmw, height=sc[1].height),
+        # BET? directly use output of pre-split screens
+        Screen(**sc[1]),
+        Screen(**sc[2]),
+    ]
+else:
+    # logo = os.path.join(os.path.dirname(libqtile.resources.__file__), "logo.png")
+    screens = [
+        Screen(
+            wallpaper=None,
+            # background="#000000",
+            # wallpaper=logo,
+            # wallpaper_mode="center",
+            bottom=mybar,
+        )
+    ]
+
 
 # Drag floating layouts.
 mouse = [
