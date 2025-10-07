@@ -61,6 +61,14 @@ local parsersToInstall = vim.iter(ensureInstalled)
   :totable()
 
 -- WTF: downloads and compiles each time
+--   FIXED: "paci tree-sitter-cli" OR (!ubuntu=20.04) by !cargo ※⡨⣝⢯⠖
+-- SEE> :TSLog -- it doesn't seem to move .so into $XDG_DATA_HOME/nvim/site/parser
+--    debug(install/ini): Moving /home/user/.cache/nvim/tree-sitter-ini-tmp/tree-sitter-ini-... to /home/user/.cache/nvim/tree-sitter-ini/...
+--   :lua print(vim.fn.stdpath('data'))
+-- DEBUG> :checkhealth nvim-treesitter
+--   ERROR Nvim-treesitter requires Neovim 0.11.0 or later.
+--   ERROR tree-sitter CLI not found
+--     $ npm install -g tree-sitter-cli
 require("nvim-treesitter").install(parsersToInstall) -- OR: }):wait(300000) -- wait max. 5 minutes
 
 

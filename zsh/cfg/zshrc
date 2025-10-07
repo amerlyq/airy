@@ -7,7 +7,7 @@ if [[ $HOST =~ MINIPC ]]; then
   export EDITOR=nvim
 
   # FIXED: override PATH to more sane and controllable value
-  export PATH=/b:$HOME/.local/bin:/usr/bin
+  export PATH=/b:$HOME/.local/bin:$HOME/.cargo/bin:/usr/local/bin:/usr/bin
 
   ## TEMP: override for "clipboard"
   # OBSOL(due !su whitelist=DISPLAY): [[ -z ${DISPLAY-} && ... ]]
