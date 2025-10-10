@@ -54,11 +54,10 @@ local ensureInstalled = {
   "yaml",
 }
 
-local alreadyInstalled = require("nvim-treesitter.config").get_installed()
-
-local parsersToInstall = vim.iter(ensureInstalled)
-  :filter(function(parser) return not vim.tbl_contains(alreadyInstalled, parser) end)
-  :totable()
+-- local alreadyInstalled = require("nvim-treesitter.config").get_installed()
+-- local parsersToInstall = vim.iter(ensureInstalled)
+--   :filter(function(parser) return not vim.tbl_contains(alreadyInstalled, parser) end)
+--   :totable()
 
 -- WTF: downloads and compiles each time
 --   FIXED: "paci tree-sitter-cli" OR (!ubuntu=20.04) by !cargo ※⡨⣝⢯⠖
@@ -69,7 +68,8 @@ local parsersToInstall = vim.iter(ensureInstalled)
 --   ERROR Nvim-treesitter requires Neovim 0.11.0 or later.
 --   ERROR tree-sitter CLI not found
 --     $ npm install -g tree-sitter-cli
-require("nvim-treesitter").install(parsersToInstall) -- OR: }):wait(300000) -- wait max. 5 minutes
+-- require("nvim-treesitter").install(parsersToInstall) -- OR: }):wait(300000) -- wait max. 5 minutes
+require("nvim-treesitter").install(ensureInstalled)
 
 
 -- ALT:HACK: enable for all supported

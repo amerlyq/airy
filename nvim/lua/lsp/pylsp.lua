@@ -16,7 +16,12 @@ local settings = {
       pylint = { enabled = true }, -- , args = {"--rcfile=pylint.ini", "--disable C0301"}
       isort = { enabled = true },
       black = { enabled = true, cache_config = true },
-      mypy = { enabled = true },
+      mypy = { enabled = true,
+        -- overrides = { "--python-executable", "/d/miur/.venv/bin/python", true }
+        -- overrides = { "--config-file", mypy_config, true }
+        -- MAYBE? | This setting is required by pylsp-mypy for dynamic executable overrides.
+        --   allow_dangerous_code_execution = true,
+      },
       -- rope_completion = { enabled = true },
 
       -- DEP: pylsp-autoimport

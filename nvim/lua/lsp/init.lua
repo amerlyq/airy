@@ -2,6 +2,43 @@
 -- Collection of configurations for built-in LSP client
 -- SRC: https://github.com/neovim/nvim-lspconfig
 
+-- TODO: with Nvim 0.12 (nightly), you can use the builtin vim.pack plugin manager:
+-- vim.pack.add{
+--   { src = 'https://github.com/neovim/nvim-lspconfig' },
+-- }
+
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+-- The nvim-cmp almost supports LSP's capabilities so You should advertise it to LSP servers..
+capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
+
+vim.lsp.config('*', {
+  on_attach = require('lsp.attach'),
+  capabilities = capabilities,
+  -- root_markers = { '.git' },
+  -- --NOTE: dynamic enable/disable by reusing "root_dir"
+  -- root_dir = function(bufnr, on_dir)
+  --   if not vim.fn.bufname(bufnr):match('%.txt$') then
+  --     on_dir(vim.fn.getcwd())
+  --   end
+  -- end
+})
+
+-- FIXME! The `require('lspconfig')` "framework" is deprecated, use vim.lsp.config (see :help lspconfig-nvim-0.11) instead.
+--    Feature will be removed in nvim-lspconfig v3.0.0
+-- USE: vim.lsp.config('pylsp', { settings = require('lsp.' .. lsp), })
+--      vim.lsp.enable('pylsp') -- OR enable({'luals', 'pyright'}) OR enable('clangd', false)
+-- ex~:REF: https://github.com/neovim/nvim-lspconfig/blob/master/lsp/pylsp.lua
+-- ex~: ~/.config/nvim/lsp/lua_ls.lua
+--    return {
+--      cmd = { 'lua-language-server' },
+--      filetypes = { 'lua' },
+--      root_markers = { '.luarc.json', '.luacheckrc', '.git' },
+--    }
+-- DEBUG: open .py -> :checkhealth vim.lsp
+
+
+----------------------------------------------------------------------
+if false then
 --NOTE:(sfx=!): only add to &rtp for init.vim access, don't source plugin/*
 vim.cmd [[ packadd! nvim-lspconfig ]]
 
@@ -64,4 +101,6 @@ if vim.fn.has('vim_starting') == 0 then
   --WARN:(packadd again): usually plugin/* should be sourced AFTER vimrc, not before
   --  NICE: no duplicate &rtp entries added
   vim.cmd [[packadd nvim-lspconfig]]
+end
+
 end
