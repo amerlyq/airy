@@ -157,15 +157,20 @@ local function load_ondemand()
     for _, ft in pairs(filetypes) do
       if seen_filetypes[ft] then
         enable = true
-        -- DEBUG: print(vim.inspect(ft))
+        -- DEBUG: print(vim.inspect({parser, ft}))
       end
     end
+    -- FAIL: cfg applied systemwide only once on load, but should re-apply for each new buffer/window
+    --   FIXED? fn load_ondemand() is already called twice -- on startup, and on each ft once again
+    -- MOVE? into plug/treesitter.lua
     if enable then
-      -- vim.treesitter.start()
-      if pcall(vim.treesitter.start) then
+      if pcall(vim.treesitter.start) then  -- vim.treesitter.start()
         vim.o.foldmethod = "expr"  -- <RQ
         vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
-        vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+        -- FIXED: wrong indend for comments in 'ft=sh' ※⡨⣭⡰⢺
+        if not vim.tbl_contains({'sh'}, vim.bo.filetype) then
+          vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+        end
       end
     end
   end

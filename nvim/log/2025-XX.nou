@@ -32,3 +32,49 @@
       :w !pkexec env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY tee %
       [_] TRY? Lua solution to writing a file using sudo : r/neovim ⌇⡧⣗⡘⣘
         https://www.reddit.com/r/neovim/comments/p3b20j/lua_solution_to_writing_a_file_using_sudo/
+
+
+45m 2025-10-13-Mon-W41
+  [X] 23:25 45m !nvim FIXME newline : wrong indend for comments ⌇⡨⣭⡰⢺
+    ⁘ due to indentexpr=v:lua.require'nvim-treesitter'.indentexpr()
+      << me myself enabled it in :/lua/lazyload.lua
+    WHY: most likely due to loading TS on startup inof "opt" by filetype
+      => therefore now I need "sh" languae installed
+    WKRND? :autocmd FileType sh setlocal indentexpr=
+      OR: ✓:autocmd FileType sh setlocal nosmartindent
+        ~~ no effect -- it's already set
+    DEBUG: simply uncomment debug printing in lazyload.lua, and open intended file
+      :lua vim.print(require("nvim-treesitter.config").get_installed('parsers'))
+        { "awk", "lua", "markdown", "perl", "markdown_inline", "ini", "xml", "v", "c", "jq", "printf", "dockerfile", "cpp", "commonlisp", "dtd", "vimdoc", "vim", "strace", "ninja", "toml", "rst", "bash"
+        , "python", "regex", "yaml", "diff", "json", "cmake", "html" }
+      :lua vim.print(vim.treesitter.language.get_filetypes(parser))
+    require('nvim-treesitter.configs').setup {
+      highlight = {
+        enable = true, -- Enable highlighting for all languages by default
+        disable = { "rust", "python", "lua", "markdown" }, -- Disable for specific languages
+      },
+      indent = { enable = true }, -- You can also configure indentation similarly
+      -- Other nvim-treesitter configurations can go here
+    }
+    nvim-treesitter/README.md at main · nvim-treesitter/nvim-treesitter · GitHub ⌇⡨⣭⡦⠟
+      https://github.com/nvim-treesitter/nvim-treesitter/blob/main/README.md
+        vim.api.nvim_create_autocmd('FileType', {
+          pattern = { '<filetype>' },
+          callback = function() vim.treesitter.start() end,
+        })
+        vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+        vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+    :h nvim-treesitter-indentation-mod
+    https://www.reddit.com/r/neovim/comments/1ad8h6f/deleted_by_user/
+    wrong indentation with jsx · Issue #1019 · nvim-treesitter/nvim-treesitter ⌇⡨⣭⡢⣔
+      https://github.com/nvim-treesitter/nvim-treesitter/issues/1019
+    endwise for lua & ruby (and likely others) · Issue #703 · nvim-treesitter/nvim-treesitter ⌇⡨⣭⡣⡻
+      https://github.com/nvim-treesitter/nvim-treesitter/issues/703
+    Unable to enable indent only for specific languages · Issue #6723 · nvim-treesitter/nvim-treesitter ⌇⡨⣭⡣⣣
+      https://github.com/nvim-treesitter/nvim-treesitter/issues/6723
+      * vim.bo.indentexpr = "nvim_treesitter#indent()"
+        = in fact the recommended way past 1.0
+    HACK: Turning off Treesitter and LSP for Specific Files : r/neovim ⌇⡨⣭⡤⡁
+      https://www.reddit.com/r/neovim/comments/xqogsu/turning_off_treesitter_and_lsp_for_specific_files/
+    [solved] How to disable tree-sitter for TeX/LaTeX in Neovim? / Applications & Desktop Environments / Arch Linux Forums ⌇⡨⣭⡤⣈
+      https://bbs.archlinux.org/viewtopic.php?id=304382
