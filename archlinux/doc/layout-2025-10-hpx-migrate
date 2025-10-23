@@ -1,0 +1,110 @@
+#!sh ⌇⡨⣺⡵⣆
+
+## Insert backup flashdrive (with .img files from ※⡨⡺⡰⠂)
+sudo mount /dev/sda1 /mnt
+
+## SPLIT /dev/sdb partitions based on layout backup
+# ‼ WARN:(don't do this): $ sudo sgdisk --randomize-guids /dev/sdb
+#   << Windows may stop working, as it won't find EFI partition anymore
+sudo sgdisk --load-backup=/mnt/backup/gpt-backup.sgdisk /dev/sdb
+sudo parted /dev/sdb
+  - unit s
+  - print
+  ## $ calc> int(164206591/4096+1)*4096 -->
+  # BET: align on 64MiB to copy Windows faster
+  #   : 569344+int(163639296*512/(2097152*32)+1)*4096*32
+  - rm 4
+    - mkpart primary 164278272s 100%
+    - align-check opt 4
+    - name 4 'Samsung 990 PRO'
+  - rm 3
+    - mkpart primary 569344s 164278271s
+    - align-check opt 3
+    - set 3 msftdata on
+    - name 3 'Basic data partition'
+  - rm 2
+    - mkpart primary 536576s 569343s
+    - align-check opt 2
+    - set 2 msftres on
+    - name 2 'Microsoft reserved partition'
+  - rm 1
+    - mkpart primary 4096s 536575s
+    - align-check opt 1
+    - set 1 boot on
+    - set 1 esp on
+    - name 1 'EFI system partition'
+  - unit MiB
+  - print
+  - quit
+
+## CMP: with previous UUID/flags
+sudo fdisk -l /dev/sdb
+
+## restore Windows partitions
+sudo dd if=/mnt/backup/efi.img of=/dev/sdb1 bs=4M status=progress
+sudo dd if=/mnt/backup/msr.img of=/dev/sdb2 bs=4M status=progress
+sudo dd if=/mnt/backup/windows.img of=/dev/sdb3 bs=64M status=progress
+
+## CHECK: part-uuid for restored parts
+# [?] BAD: different part-uuid BUT same fs-uuid
+#   BUT: in blkid fs-uuid is actually UUID, and PARTUUID is smth different?
+sudo blkid /dev/sdb1
+lsblk -o+PARTUUID
+lsblk -f
+sudo umount /mnt
+
+
+### ================================
+### DIY make encrypted lvm for linux
+
+## CHECK ntpd sync on #hpx -- for correct timestamps in LVM
+ntpq -p
+ntptime
+
+
+cryptsetup -v luksFormat --type luks2 --cipher aes-xts-plain64 --hash sha512 --key-size 512 --sector-size 4096 /dev/sda4
+cryptsetup luksDump /dev/sda4
+cryptsetup --allow-discards --persistent luksOpen /dev/sda4 lukspro
+pvcreate --dataalignment 2m /dev/mapper/lukspro
+vgcreate hpx /dev/mapper/lukspro
+
+lvcreate hpx -Wy --yes -n swap -L 10G -C y     # = more swap -- for sleep-on-disk
+lvcreate hpx -Wy --yes -n root -L 120G         # = more root -- for Android dev
+lvcreate hpx -Wy --yes -n data -L 700G         # = more data -- for music and snapshots
+lvcreate hpx -Wy --yes -n cache -l +100%FREE   # = rest is cache
+lvs
+
+mkswap -L swap -f /dev/hpx/swap
+mkfs.btrfs -L root -f /dev/hpx/root
+mkfs.btrfs -L data -f /dev/hpx/data
+mkfs.ext4 -L cache /dev/hpx/cache
+
+## HACK: free-up 5% reserved disk space on non-root disks
+tune2fs -l /dev/hpx/cache | grep "^Block size:"
+tune2fs -r "$((200*1024*1024/4096))" /dev/hpx/cache  # =51200
+
+
+lsblk -ao NAME,HOTPLUG,SIZE,ROTA,FSTYPE,STATE,RM,LABEL,TYPE,MOUNTPOINT
+# NAME            HOTPLUG   SIZE ROTA FSTYPE      STATE   RM LABEL  TYPE  MOUNTPOINT
+# sda                   1   3.6T    0             running  0        disk
+# ├─sda1                1   260M    0 vfat                 0 SYSTEM part
+# ├─sda2                1    16M    0                      0        part
+# ├─sda3                1  78.1G    0 BitLocker            0        part
+# └─sda4                1   3.6T    0 crypto_LUKS          0        part
+#   └─lukspro           0   3.6T    0 LVM2_member running  0        crypt
+#     ├─hpx-swap        0    10G    0 swap        running  0 swap   lvm
+#     ├─hpx-root        0   120G    0 btrfs       running  0 root   lvm
+#     ├─hpx-data        0   700G    0 btrfs       running  0 data   lvm
+#     └─hpx-cache       0   2.8T    0 ext4        running  0 cache  lvm
+
+
+
+## chroot() and install ArchLinux directly from #hpx
+# TBD
+
+
+## TEMP:USAGE:
+# $ sudo cryptsetup luksOpen /dev/disk/by-partlabel/'Samsung 990 PRO' lukspro
+cryptsetup luksOpen /dev/disk/by-uuid/eb20ad3c-bb4e-4216-9b6f-471e81afb016 lukspro
+install -g amer -o amer -m2700 -d /media/pro
+mount -o noatime,nofail,noauto,x-systemd.automount /dev/hpx/cache /mnt/cache
