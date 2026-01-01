@@ -30,6 +30,8 @@ HISTCONTROL=ignoreboth
 shopt -s histappend
 
 # SRC: https://askubuntu.com/questions/67283/is-it-possible-to-make-writing-to-bash-history-immediate
+# OR:(ble.sh): bleopt history_share=1
+#   https://github.com/akinomyoga/ble.sh/issues/457
 PROMPT_COMMAND="history -a; history -n; ${PROMPT_COMMAND-}"
 
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)

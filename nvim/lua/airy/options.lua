@@ -90,6 +90,7 @@ o.foldlevel = 99 -- close folds below this depth, initially
 -- " set foldopen=all      " open on cursor touch, DISABLED: prevents 'za' fold
 -- set fillchars=fold:\    " don't place extra dashes on scr right after foldtext
 
+-- DFL: q: allow gq, c: format comments, j: remove comment leader when joining
 o.formatoptions:append({ o = true })
 
 

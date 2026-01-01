@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+#%SUMMARY: convert stdin titles to urls
+#%USAGE: $ ./$0
+set -r -o errexit -o errtrace -o noclobber -o noglob -o nounset -o pipefail
+
+db=$(find ~/.mozilla/firefox -maxdepth 2 -type f -path '*-release/places.sqlite' -print -quit)
+
+while IFS= read -r name; do
+  printf '\n%s\n' "$name"
+sqlite3 "$db" -separator ' ' <<EOF
+.headers off
+.mode tabs
+SELECT url, title
+FROM moz_places
+WHERE title LIKE '%' || replace('$name','''','''''') || '%';
+EOF
+# WHERE title GLOB '*' || :name || '*';
+done

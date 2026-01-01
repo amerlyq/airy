@@ -1,0 +1,1 @@
+/d/plugins/ranger/Ranger-Linemode/mediainfo_linemode.py

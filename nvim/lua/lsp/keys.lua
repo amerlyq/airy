@@ -35,6 +35,36 @@ local function lsp_mappings(client, bufnr)
 
   -- nnoremap <silent> g0    <cmd>lua B.document_symbol()<CR>
   KBn('gW', B.workspace_symbol, "workspace_symbol [LSP]")
+
+  -- FIXED: disable LSP for <gq> to allow comments-wrapping inof line-formatting by Black
+  vim.opt_local.formatexpr = ""
+
+  -- gQ = builtin gq (ignores formatexpr / formatprg)
+  vim.keymap.set({ "n", "x" }, "gQ", function()
+    local fe = vim.bo.formatexpr
+    local fp = vim.bo.formatprg
+    local tw = vim.bo.textwidth
+    -- disable external formatters
+    vim.bo.formatexpr = ""
+    vim.bo.formatprg = ""
+    vim.bo.textwidth = 90  -- <WHY: to fit into vert-split limit on DP1
+    vim.cmd("normal! gq")
+    vim.bo.formatexpr = fe
+    vim.bo.formatprg = fp
+    vim.bo.textwidth = tw
+  end, {
+    desc = "builtin <gq>"
+    buffer = true,
+  })
+  -- -- ALT: for "buffer = bufnr"
+  -- local fe = vim.bo[bufnr].formatexpr
+  -- local fp = vim.bo[bufnr].formatprg
+  -- vim.bo[bufnr].formatexpr = ""
+  -- vim.bo[bufnr].formatprg = ""
+  -- vim.cmd("normal! gq")
+  -- vim.bo[bufnr].formatexpr = fe
+  -- vim.bo[bufnr].formatprg = fp
+
 end
 
 return lsp_mappings

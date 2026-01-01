@@ -42,12 +42,16 @@ if [[ $blk == -- ]]; then
   pfx=
 fi
 
-title=$(printf '%s' "$title" | tr $'\n' $' ' | sed 's/^\s*//;s/\s*$//')
+title=$(printf '%s' "$title" | tr $'\n' $' ' | sed 's/^\s*//;s/\s*$//' | cut -c1-180)
+
+# HACK: delete params for Ads
+# DEBUG: exec 2>|/t/ss && set -x
+[[ $url =~ [?\&](gad_source|srsltid)= ]] && url=${url%%\?*}
 
 # SRC: https://stackoverflow.com/questions/296536/how-to-urlencode-data-for-curl-command
 printf -v pretty_url '%b' "${url//%/\\x}"
 
 exec xclip -selection clipboard <<EOT
 ${blk}$(printf "%$((count * 2))s")${pfx}${title}${xtref:+ $xtref}
-${blk}$(printf "%$(((count + 1) * 2))s")$pretty_url
+${blk}$(printf "%$(((count + 1) * 2))s")${pretty_url// / }
 EOT
