@@ -20,8 +20,8 @@ K('n', ',rq', '<Cmd>%s;[\'"`«»„“];;g<CR>', "Erase quotes")
 K('x', ',rq', ':s;[\'"`«»„“];;g<CR>', "Erase quotes")
 
 --SRC: https://www.reddit.com/r/neovim/comments/44g53k/multi_cursor_in_neovim/
-K('n', ',rw', "'<,'>g/^/norm ", "Rewrite by norm action")
-K('x', ',rw', 'g/^/norm ', "Erase quotes")
+K('n', ',rc', "'<,'>g/^/norm ", "Rewrite by norm action/command")
+K('x', ',rc', 'g/^/norm ', "Erase quotes")
 
 K('n', ',ry', "<Cmd>%s;;<C-r>=escape(getreg('\"'),';')<CR>;g<CR>", "Replace by pasted register")
 K('x', ',ry', ":s;;<C-r>=escape(getreg('\"'),';')<CR>;g<CR>", "Replace by pasted register")

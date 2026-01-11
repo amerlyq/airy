@@ -78,3 +78,56 @@
       https://www.reddit.com/r/neovim/comments/xqogsu/turning_off_treesitter_and_lsp_for_specific_files/
     [solved] How to disable tree-sitter for TeX/LaTeX in Neovim? / Applications & Desktop Environments / Arch Linux Forums ⌇⡨⣭⡤⣈
       https://bbs.archlinux.org/viewtopic.php?id=304382
+
+
+2h10m 2026-01-10-Sat-W01
+  [X] 15:45 2h10m #nvim WF: find-replace entries ⌇⡩⡢⡶⡤
+    * WF: telescope <BS r> /search/ <C-q> -> qf  (CFG: +stable sorting)
+    * edit/save matches with quicker.nvim (quickfix-reflector which works with bqf)
+    * delete entries by ∷ :cdo norm dd,s
+    * ENH: iterative
+      [!] TRY:WF: neovim - Is there a way to grep on files that are returned by Telescope's live_grep()? - Stack Overflow ⌇⡩⡢⡮⡥
+        https://stackoverflow.com/questions/77980402/is-there-a-way-to-grep-on-files-that-are-returned-by-telescopes-live-grep
+      ALSO: Proximity sort and tiebreak==index · Issue #939 · nvim-telescope/telescope.nvim ⌇⡩⡢⡭⠩
+        https://github.com/nvim-telescope/telescope.nvim/issues/939
+    [_] ALT: different WF to replace stuff in project
+      [_] chmln/sd: Intuitive find & replace CLI (sed alternative) ⌇⡩⡢⡞⣿
+        https://github.com/chmln/sd
+    [X] FIND: replacement for reflector, which works with Bqf
+      [≈] gabrielpoca/replacer.nvim: A powerful refactoring tool for nvim. ⌇⡩⡢⡛⠸
+        https://github.com/gabrielpoca/replacer.nvim
+      [✓] stevearc/quicker.nvim: Improved UI and workflow for the Neovim quickfix ⌇⡩⡢⡛⡍
+        https://github.com/stevearc/quicker.nvim
+    [$] FIND: :Rg or my :Ag or something
+      [>] BET? pip install python-ripgrep
+       ::py
+        from python_ripgrep import search
+        results = search(
+            patterns=["your_regex_pattern"],
+            paths=["/path/to/search"],
+            globs=["*.py"],
+        )
+        for result in results:
+            print(result)
+      [>] TODO: integ with #miur
+        [>] IDEA! use it to replace in files from #miur itself (inof qf-in-vim)
+      [_] TRY:ALT: (if any bindings exist)
+        [!] p-ranav/hypergrep: Recursively search directories for a regex pattern ⌇⡩⡢⡜⢏
+          https://github.com/p-ranav/hypergrep
+          ¦ hypergrep: A tool built on the Intel Hyperscan library that has
+          ¦ shown extremely fast results in single-file benchmarks, but its
+          ¦ general usage can be tricky due to the underlying library's semantics.
+        Fd and ripgrep/rg are the two "new" alternatives I use on a regular basis, and w... | Hacker News ⌇⡩⡢⡝⠅
+          https://news.ycombinator.com/item?id=31448649
+          A list of new(ish) command line tools ⌇⡩⡢⡝⣥
+            https://jvns.ca/blog/2022/04/12/a-list-of-new-ish--command-line-tools/
+            !ncdu NCurses Disk Usage ⌇⡩⡢⡟⠓
+              https://dev.yorhel.nl/ncdu
+        sts10/rust-command-line-utilities: A curated list of command-line utilities written in Rust ⌇⡩⡢⡟⡊
+          https://github.com/sts10/rust-command-line-utilities
+        Awesome Command Line Tools Written in Rust · jdhao's digital space ⌇⡩⡢⡟⡏
+          https://jdhao.github.io/2023/05/15/terminal_tool_alternative_written_in_rust/
+        Better Than Original? 14 Rust-based Alternative CLI Tools to Classic Linux Commands ⌇⡩⡢⡟⢃
+          https://itsfoss.com/rust-alternative-cli-tools/
+        [≫] ezrosent/frawk: an efficient awk-like language ⌇⡩⡢⡠⡖
+          https://github.com/ezrosent/frawk

@@ -150,22 +150,22 @@ K('', ']<Space>', '<Plug>(IndentWiseBlockScopeBoundaryEnd)', 'indent/.end')
 g.swap_no_default_key_mappings = 1
 K('n', ',ga', '<Plug>(swap-prev)', 'swap/prev')
 K('n', ',gA', '<Plug>(swap-next)', 'swap/next')
-K('nx', ',a', '<Plug>(swap-interactive)', 'swap/MODE')  -- OR: 'g<C-a>'
+K('nx', '<Leader>a', '<Plug>(swap-interactive)', 'swap/MODE')  -- OR: 'g<C-a>'
 K('ox', 'i,', '<Plug>(swap-textobject-i)', 'swap/textobj-i')
 K('ox', 'a,', '<Plug>(swap-textobject-a)', 'swap/textobj-a')
 
 
 -- SRC: https://github.com/AndrewRadev/sideways.vim
-K('n', 'ga', '<Plug>SidewaysLeft', 'sideways/left')
-K('n', 'gA', '<Plug>SidewaysRight', 'sideways/right')
+K('n', 'gB', '<Plug>SidewaysArgumentInsertFirst', 'sideways/insert-first')
+K('n', 'gb', '<Plug>SidewaysLeft', 'sideways/left')
+K('n', 'ga', '<Plug>SidewaysRight', 'sideways/right')
+K('n', 'gA', '<Plug>SidewaysArgumentAppendLast', 'sideways/insert-last')
+-- <Plug>SidewaysArgumentInsertBefore
+-- <Plug>SidewaysArgumentAppendAfter
 K('ox', 'ia', '<Plug>SidewaysArgumentTextobjI', 'sideways/textobj-i')
 K('ox', 'aa', '<Plug>SidewaysArgumentTextobjA', 'sideways/textobj-a')
 K('n', '[a', '<Cmd>SidewaysJumpLeft<CR>', 'sideways/jump-left')
 K('n', ']a', '<Cmd>SidewaysJumpRight<CR>', 'sideways/jump-right')
--- <Plug>SidewaysArgumentInsertBefore
--- <Plug>SidewaysArgumentAppendAfter
-K('n', 'ga', '<Plug>SidewaysArgumentInsertFirst', 'sideways/insert-first')
-K('n', 'ga', '<Plug>SidewaysArgumentAppendLast', 'sideways/insert-last')
 
 
 

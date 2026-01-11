@@ -6,7 +6,10 @@
 require('telescope').setup {
   defaults = {
     layout_strategy = 'vertical',
-    -- layout_config = { height = 0.95 },
+    -- layout_config = {
+    --   height = 0.95
+    --   prompt_position = "top", -- "top" or "bottom"
+    -- },
     mappings = {
       i = {
         ['<C-u>'] = false,
@@ -61,3 +64,29 @@ Kn('<Tab>q', T.quickfix, "T.quickfix")
 Kn('<Tab>r', T.live_grep, "T.live_grep (rg)")
 Kn('<Tab>s', T.grep_string, "T.grep_string (fuzzy)")
 Kn('<Tab>k', T.tagstack, "T.tagstack")
+
+-- FIXED: stop jumping same-looking entries, when I add single letter to search
+local sorters = require("telescope.sorters")
+function live_grep_stable()
+  return T.live_grep({
+    additional_args = function()
+      return { "--sort", "path" }
+    end,
+    layout_config = {
+      -- prompt_position = "top",
+    },
+    sorter = false,
+    sorting_strategy = "ascending",
+    -- A custom tiebreak function to force insertion order when scores are tied
+    -- local keep_order_tiebreak = function(current_entry, existing_entry, _)
+    --   return current_entry.index > existing_entry.index
+    -- end
+    -- tiebreak = keep_order_tiebreak,
+    -- file_sorter = sorters.get_substr_matcher, -- Use the non-fuzzy file sorter
+    -- generic_sorter = sorters.get_generic_substr_sorter, -- Use the non-fuzzy generic sorter
+  })
+end
+
+Kn(',as', live_grep_stable, "T.live_grep (rg)")
+Kn(',rs', live_grep_stable, "T.live_grep (rg)")
+Kn(',rw', T.grep_string, "T.grep_string (fuzzy word under cursor)")

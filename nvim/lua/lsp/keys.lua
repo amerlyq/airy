@@ -53,7 +53,7 @@ local function lsp_mappings(client, bufnr)
     vim.bo.formatprg = fp
     vim.bo.textwidth = tw
   end, {
-    desc = "builtin <gq>"
+    desc = "builtin <gq>",
     buffer = true,
   })
   -- -- ALT: for "buffer = bufnr"
