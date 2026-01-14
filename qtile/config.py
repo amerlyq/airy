@@ -316,7 +316,7 @@ mybar = bar.Bar(
         widget.MemoryGraph(fill_color="#00aa00"),
         widget.HDDBusyGraph(device="nvme0n1", graph_color="#ad570f"),
         widget.CPUGraph(),
-        # widget.PulseVolume(),
+        widget.Volume(),
         widget.Battery(
             format="{char}{percent:2.0%} {hour:d}h{min:02d}m {watt:.2f}W",
             foreground="#00971f",
@@ -553,37 +553,42 @@ def audit_focus(w: window.Window) -> None:
 
     audit_log(f"{app} {pid} {nm} {w.wid}\t{w.name}", "wm")
 
+def _register_x11_hooks():
+    @hook.subscribe.selection_change
+    def audit_cb(name, selection) -> None:
+        global prev_cbsel
+        oid = selection["owner"]
+        sel = selection["selection"]
+        if name != "CLIPBOARD" or (oid, sel) == prev_cbsel:
+            return
+        prev_cbsel = (oid, sel)
 
-@hook.subscribe.selection_change
-def audit_cb(name, selection) -> None:
-    global prev_cbsel
-    oid = selection["owner"]
-    sel = selection["selection"]
-    if name != "CLIPBOARD" or (oid, sel) == prev_cbsel:
-        return
-    prev_cbsel = (oid, sel)
+        ## FAIL: !copyq and !qtile always re-own selections
+        # if oid in qtile.windows_map:
+        #     owner = qtile.windows_map[oid].window
+        # else:
+        #     # owner = xcbq.window.XWindow(qtile.core.conn, oid)
+        #     owner = window.Window(window.XWindow(qtile.core.conn, oid), qtile)
 
-    ## FAIL: !copyq and !qtile always re-own selections
-    # if oid in qtile.windows_map:
-    #     owner = qtile.windows_map[oid].window
-    # else:
-    #     # owner = xcbq.window.XWindow(qtile.core.conn, oid)
-    #     owner = window.Window(window.XWindow(qtile.core.conn, oid), qtile)
+        ## FUT:ADD: black-listing
+        # if owner_class := owner.get_wm_class():
+        #     if any(x in owner_class for x in blacklist):
+        #         return
 
-    ## FUT:ADD: black-listing
-    # if owner_class := owner.get_wm_class():
-    #     if any(x in owner_class for x in blacklist):
-    #         return
+        nl = sel.count("\n") + 1
+        sel = sel.rstrip().replace("\r", "").replace("\n", "\r")
+        cnt = len(sel)
+        maxlen = 1024
+        if cnt > maxlen:
+            sel = sel[:maxlen] + "..."
 
-    nl = sel.count("\n") + 1
-    sel = sel.rstrip().replace("\r", "").replace("\n", "\r")
-    cnt = len(sel)
-    maxlen = 1024
-    if cnt > maxlen:
-        sel = sel[:maxlen] + "..."
+        audit_log(f"{oid} {nl}/{cnt}\t{sel}", "cb")
 
-    audit_log(f"{oid} {nl}/{cnt}\t{sel}", "cb")
 
+@hook.subscribe.startup_complete
+def _late_init():
+    if qtile.core and qtile.core.name == "x11":
+        _register_x11_hooks()
 
 # def toggle_focus_floating():
 #     """Toggle focus between floating window and other windows in group"""
