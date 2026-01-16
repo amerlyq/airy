@@ -7,5 +7,8 @@ PATH=/@/airy/airy/bin:$PATH
 # https://github.com/squizduos/ReadMangaDownloaderGUI/releases
 
 ### LINKS ###
+# TIP: merge keys by doing:
+# jq -S . keybindings.conf | sponge keybindings.conf
+# jq -S . preferences.conf | sponge preferences.conf
 linkcp -bct ~/.config/mcomix ./keybindings.conf
 linkcp -bct ~/.config/mcomix ./preferences.conf
