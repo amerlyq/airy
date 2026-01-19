@@ -154,12 +154,12 @@ bindkey -as ',d' 'S exit\n'
 bindkey  -s ',s' '^U fm\n'
 bindkey -as  's' 'S fm\n'
 bindkey  -s ',f' '^U fm\n'
-bindkey -as  'f' 'S fm\n'
+bindkey -as ',f' 'S fm\n'
 
-# store tmux pane id -- to send ",j" from !vim
-bindkey    '\C-x\C-j' store-tmux-pane
-bindkey -a '\C-x\C-j' store-tmux-pane
-
+# "./run"-script BET: abyss -> ctl -> run -> make
+bindkey  -s ',.' '^U ./run\n'
+bindkey  -s '.,' '^U ./run\n'
+bindkey -as '.,' 'S ./run\n'
 if [[ -r /usr/share/zsh/site-functions/abyss.zsh ]]; then
   source /usr/share/zsh/site-functions/abyss.zsh
 else
@@ -168,6 +168,10 @@ else
   bindkey    '\C-x\C-m' set-fast-exec-cmd
   bindkey -a '\C-x\C-m' set-fast-exec-cmd
 fi
+
+# store tmux pane id -- to send ",j" from !vim
+bindkey    '\C-x\C-j' store-tmux-pane
+bindkey -a '\C-x\C-j' store-tmux-pane
 
 
 ### Miscellaneous
