@@ -5,16 +5,25 @@ pfx=${2:-$PWD}
 # exec awk -vd="$pfx" '{if(/^[^/]/){print d"/"$0}else{print$0}}' |
 #   ifne nvr -q /dev/stdin -c 'if len(getwininfo())>1|close|en|if len(getqflist())>1|copen|else|cfirst|en'
 
-qf=$(awk -vd="$pfx" '{if(/^[^/]/){print d"/"$0}else{print$0}}')
-exec 3<<<"$qf"
+awk -vd="$pfx" '{if(/^[^/]/){print d"/"$0}else{print$0}}' > /tmp/nvim.qf
+# FAIL: stopped working with !nvr
+# qf=$(awk -vd="$pfx" '{if(/^[^/]/){print d"/"$0}else{print$0}}')
+# exec 3<<<"$qf"
 #caddfile /dev/fd/3|
 # TODO:SEE: how !rnvimr is closing its own window when you open files from it
 #   [_] FIXME: only close specific "rnvimr" window (by id or bufname)
 # exec nvr -q /dev/fd/3 -c 'if len(getwininfo())>1|close|en|if len(getqflist())>1|copen|else|cfirst|en'
 # exec nvr -q /dev/fd/3 -c 'exe"RnvimrToggle"|if len(getqflist())>1|copen|else|cfirst|en'
-exec nvr -q /dev/fd/3 -c 'if len(getqflist())>1|copen|else|cfirst|en'
+# exec nvr -q /dev/fd/3 -c 'if len(getqflist())>1|copen|else|cfirst|en'
+exec nvr -s -q /tmp/nvim.qf -c 'if len(getqflist())>1|copen|else|cfirst|en'
 
-exit
+# DEBUG: nvim --server "${NVIM-}" --remote -q /dev/fd/3 -c 'if len(getqflist())>1|copen|else|cfirst|en' 3<<<"./xtref:101:    --sort='yes'"
+# WAIT? https://github.com/neovim/neovim/issues/24788
+#   https://stackoverflow.com/questions/76024656/can-i-use-nvim-remote-to-replace-nvr
+#   https://github.com/mhinz/neovim-remote/issues/196
+# nvim -q /dev/fd/3 ${NVIM:+--server "$NVIM" --remote} +'if len(getqflist())>1|copen|else|cfirst|en'
+
+exit 13
 #########################
 
 # |bwipe
