@@ -2,6 +2,9 @@
 --EXPL: UI to select things (files, grep results, open buffers...)
 --SRC: https://github.com/nvim-telescope/telescope.nvim
 --DEP: plenary.nvim
+--ALT:BET? snacks-picker
+--   Why I'm Moving from Telescope to Snacks Picker | Why I'm not Using fzf-lua | Frecency feature | linkarzu ⌇⡩⡯⣯⡚
+--     https://linkarzu.com/posts/neovim/snacks-picker/
 
 require('telescope').setup {
   defaults = {
@@ -43,6 +46,29 @@ local T = require('telescope.builtin')
 local KG = vim.api.nvim_set_keymap
 local Kn = function(lhs, fn, s) KG('n', lhs, '', { callback = fn, noremap = true, desc = s }) end
 
+-- FIXED: stop jumping same-looking entries, when I add single letter to search
+local sorters = require("telescope.sorters")
+function live_grep_stable()
+  return T.live_grep({
+    additional_args = function()
+      return { "--sort=path" }
+      -- return { "--sortr=path" }
+    end,
+    -- layout_config = {
+    --   prompt_position = "top",
+    -- },
+    sorter = false,
+    sorting_strategy = "ascending",
+    -- A custom tiebreak function to force insertion order when scores are tied
+    -- local keep_order_tiebreak = function(current_entry, existing_entry, _)
+    --   return current_entry.index > existing_entry.index
+    -- end
+    -- tiebreak = keep_order_tiebreak,
+    -- file_sorter = sorters.get_substr_matcher, -- Use the non-fuzzy file sorter
+    -- generic_sorter = sorters.get_generic_substr_sorter, -- Use the non-fuzzy generic sorter
+  })
+end
+
 --Add leader shortcuts
 Kn('<Tab><CR>', T.builtin, "T.builtins")
 Kn('<Tab><Space>', T.buffers, "T.buffers")
@@ -61,32 +87,11 @@ Kn('<Tab>l', T.lsp_document_symbols, "lsp_document_symbols [T]")
 Kn('<Tab>m', T.oldfiles, "T.oldfiles")
 Kn('<Tab>o', (function() T.tags { only_current_buffer = true } end), "T.tags_buf")
 Kn('<Tab>q', T.quickfix, "T.quickfix")
-Kn('<Tab>r', T.live_grep, "T.live_grep (rg)")
+Kn('<Tab>r', live_grep_stable, "T.live_grep (rg/stable)")
+Kn('<Tab>R', T.live_grep, "T.live_grep (rg/parallel)")
 Kn('<Tab>s', T.grep_string, "T.grep_string (fuzzy)")
 Kn('<Tab>k', T.tagstack, "T.tagstack")
 
--- FIXED: stop jumping same-looking entries, when I add single letter to search
-local sorters = require("telescope.sorters")
-function live_grep_stable()
-  return T.live_grep({
-    additional_args = function()
-      return { "--sort", "path" }
-    end,
-    layout_config = {
-      -- prompt_position = "top",
-    },
-    sorter = false,
-    sorting_strategy = "ascending",
-    -- A custom tiebreak function to force insertion order when scores are tied
-    -- local keep_order_tiebreak = function(current_entry, existing_entry, _)
-    --   return current_entry.index > existing_entry.index
-    -- end
-    -- tiebreak = keep_order_tiebreak,
-    -- file_sorter = sorters.get_substr_matcher, -- Use the non-fuzzy file sorter
-    -- generic_sorter = sorters.get_generic_substr_sorter, -- Use the non-fuzzy generic sorter
-  })
-end
-
-Kn(',as', live_grep_stable, "T.live_grep (rg)")
-Kn(',rs', live_grep_stable, "T.live_grep (rg)")
+Kn(',as', live_grep_stable, "T.live_grep (rg/stable)")
+Kn(',rs', live_grep_stable, "T.live_grep (rg/stable)")
 Kn(',rw', T.grep_string, "T.grep_string (fuzzy word under cursor)")
