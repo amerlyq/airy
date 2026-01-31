@@ -1,0 +1,20 @@
+# vim:ft=dosini
+[binds]
+; FAIL:HYPO: supports only integers FIND:XLR:SRC
+; t = slideshow +0.5
+; <Shift+T> = slideshow -0.5
+<apostrophe> = quit
+
+; BAD: only absolute, not percentage
+<Shift+J> = pan 0  10
+<Shift+K> = pan 0 -10
+<Shift+H> = pan -10 0
+<Shift+L> = pan  10 0
+
+j = next 1
+k = prev 1
+
+; ALT: "p" prints to stdout
+l = exec bash -c 'printf "%s\\n" "$imv_pid $imv_current_index $imv_current_file" >> /t/imv_sel'
+m = exec bash -c 'printf "%s\\n" "$imv_pid $imv_current_index $imv_current_file" >> /t/imv_sel'
+<Return> = exec bash -c 'printf "%s\\n" "$imv_pid $imv_current_index $imv_current_file" >> /t/imv_sel'
