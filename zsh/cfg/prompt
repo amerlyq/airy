@@ -32,6 +32,14 @@ function prompt_elapsed { local var=$1
   ((dt > 120)) && t+=' %F{235}(%F{4}%*%F{235}…)'  # start of cmd
 
   print "%B%F{240}>>> elapsed time: %F{$color}${t}%f%b"
+
+  if ((dt > 90)) && (($+commands[notify-send])); then
+    local pcmd="$(fc -l -n -1)"
+    # WKRND: suppress long-running ncurses/etc. interactive commands
+    if ! [[ $pcmd =~ ^(bash|nvim|ranger)\\b.* ]]; then
+      notify-send --urgency=critical "ZSH" "$pcmd"
+    fi
+  fi
 }
 
 function prompt_precmd {
