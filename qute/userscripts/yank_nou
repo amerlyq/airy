@@ -42,7 +42,15 @@ if [[ $blk == -- ]]; then
   pfx=
 fi
 
-title=$(printf '%s' "$title" | tr $'\n' $' ' | sed 's/^\s*//;s/\s*$//' | cut -c1-180)
+# FAIL:(bytes) cut -c1-180
+# awk '{print substr($0,1,180)}'
+# perl -CS -pe '$_ = substr($_, 0, 180)'
+# BET?(visual-width)::
+#   perl -CS -MUnicode::GCString -ne '
+#     my $g = Unicode::GCString->new($_);
+#     print $g->substr(0, 180)->as_string;
+#   '
+title=$(printf '%s' "$title" | tr $'\n' $' ' | sed 's/^\s*//;s/\s*$//' | awk '{print substr($0,1,180)}')
 
 # HACK: delete params for Ads
 # DEBUG: exec 2>|/t/ss && set -x
