@@ -15,7 +15,7 @@ from libqtile.backend.x11 import window
 from libqtile.config import (Click, Drag, EzKey, Group, Key, KeyChord, Match,
                              Screen)
 from libqtile.lazy import lazy
-from libqtile.utils import guess_terminal
+from libqtile.utils import guess_terminal, send_notification
 from psutil import Process
 
 # pylint:disable=invalid-name
@@ -93,8 +93,11 @@ keys = [
     # FIXME:BAD:(swap bw screens):USE: toscreen_noswap()
     K("M-a", lazy.screen.toggle_group(), desc="Back'n'forth"),
     # Switch between windows
+    K("M-<Left>", lazy.layout.left(), desc="Move focus to left"),
+    K("M-<Right>", lazy.layout.right(), desc="Move focus to right"),
     # K("M-h", lazy.layout.left(), desc="Move focus to left"),
     K("M-h", lazy.spawn(terminal), desc="Launch terminal"),
+    K("M-S-<semicolon>", lazy.layout.left(), desc="Move focus to right"),
     K("M-<semicolon>", lazy.layout.right(), desc="Move focus to right"),
     K("M-j", lazy.layout.down(), desc="Move focus down"),
     K("M-k", lazy.layout.up(), desc="Move focus up"),
@@ -112,6 +115,10 @@ keys = [
     K("M-C-l", lazy.layout.grow_right(), desc="Grow window to the right"),
     K("M-C-j", lazy.layout.grow_down(), desc="Grow window down"),
     K("M-C-k", lazy.layout.grow_up(), desc="Grow window up"),
+    K("M-A-h", lazy.layout.flip_left(), desc="Flip window to the left"),
+    K("M-A-l", lazy.layout.flip_right(), desc="Flip window to the right"),
+    K("M-A-j", lazy.layout.flip_down(), desc="Flip window down"),
+    K("M-A-k", lazy.layout.flip_up(), desc="Flip window up"),
     K("M-n", lazy.layout.normalize(), desc="Reset all window sizes"),
     K("M-m", lazy.layout.maximize(), desc="Zoom window in layout"),
     # K("M-S-m", lazy.layout.minimize(), desc="Zoom window in layout"),
@@ -265,12 +272,11 @@ for i in groups:
 
 layouts = [
     # layout.Columns(border_focus_stack=["#d75f5f", "#8f3d3d"], border_width=4),
+    # layout.Columns(), # num_columns=1, insert_position=1
     # Try more layouts by unleashing below layouts.
     # layout.Stack(num_stacks=2),
-    # layout.Bsp(),
-    layout.VerticalTile(
-        ratio=0.6, border_focus="#00af00", border_normal="#000000", border_width=2
-    ),
+    # layout.Tile(ratio=0.6, border_focus="#00af00", border_normal="#000000", border_width=2),
+    layout.VerticalTile(ratio=0.6, border_focus="#00af00", border_normal="#000000", border_width=2),
     # layout.MonadTall(ratio=0.587, border_focus="#00af00"),
     # NOTE: emulate xrandr split-screen ratio for ultrawide ext monitor
     layout.MonadTall(ratio=0.238, border_focus="#00af00"),
@@ -281,9 +287,9 @@ layouts = [
     layout.Matrix(),
     # layout.MonadWide(),
     # layout.RatioTile(),
-    # layout.Tile(),
     # layout.TreeTab(),  ## FAIL: I need smth similar -- BUT horizontal (like i3)
     # layout.Zoomy(),
+    layout.Bsp(),
 ]
 
 widget_defaults = dict(
@@ -293,8 +299,10 @@ widget_defaults = dict(
 )
 extension_defaults = widget_defaults.copy()
 
-mybar = bar.Bar(
-    [
+def make_bar() -> bar.Bar:
+    # IMPORTANT: return a NEW Bar instance each time
+    return bar.Bar(
+    widgets=[
         # widget.CurrentLayout(icon_first=True),
         # widget.AGroupBox(),
         widget.GroupBox(highlight_method="block", inactive="242424"),
@@ -310,6 +318,9 @@ mybar = bar.Bar(
         ),
         # widget.TextBox("default config", name="default"),
         # widget.TextBox("Press &lt;M-r&gt; to spawn", foreground="#d75f5f"),
+        # widget.Clipboard(),
+        ## DISABLED: I installed !dunst, no with to fix this
+        # widget.Notify(),
         widget.Systray(),
         # widget.Clock(format="%Y-%m-%d %a %I:%M %p"),
         widget.NetGraph(),
@@ -339,10 +350,10 @@ mybar = bar.Bar(
         # widget.Clock(format="%Y-%m-%d-%a", update_interval=60, foreground="#fd971f"),
         widget.Clock(format="%H:%M", update_interval=5),
     ],
-    40,
+    size=40,
     # border_width=[2, 0, 2, 0],  # Draw top and bottom borders
     # border_color=["ff00ff", "000000", "ff00ff", "000000"]  # Borders are magenta
-)
+    )
 
 ## FAIL: not available during startup
 # sc = qtile.get_screen_info()
@@ -363,49 +374,63 @@ def get_monitors() -> list[dict[str, int]]:
     root = setup.roots[0].root
     randr = conn(xcffib.randr.key)
     res = randr.GetMonitors(root, 1).reply()
-    # return list(res.monitors)
-    return [
-        {
-            # "name": m.name.to_string(),
-            "x": m.x,
-            "y": m.y,
-            "width": m.width,
-            "height": m.height,
-            # "primary": m.primary,
-        }
-        for m in res.monitors
-    ]
+    # "name": m.name.to_string(),
+    # "primary": m.primary,
+    mons = [{"x": m.x, "y": m.y, "width": m.width, "height": m.height} for m in res.monitors]
+    # Deterministic ordering: top-to-bottom, then left-to-right
+    # mons.sort(key=lambda d: (d["y"], d["x"]))
+    return mons
 
 
-sc = get_monitors()
-if len(sc) == 1:
-    fake_screens = [Screen(wallpaper=None, bottom=mybar, **sc[0])]
-elif len(sc) == 2:
-    fake_screens = [
-        Screen(wallpaper=None, bottom=mybar, **sc[0]),
-        Screen(**sc[1]),
-    ]
-elif len(sc) == 3:
-    lmw = int(0.238 * sc[1]["width"])
-    fake_screens = [
-        Screen(wallpaper=None, bottom=mybar, **sc[0]),
-        # Screen(x=lmw, y=sc[1].y, width=sc[1].width - lmw, height=sc[1].height),
-        # Screen(x=sc[1].x, y=sc[1].y, width=lmw, height=sc[1].height),
-        # BET? directly use output of pre-split screens
-        Screen(**sc[1]),
-        Screen(**sc[2]),
-    ]
-else:
-    # logo = os.path.join(os.path.dirname(libqtile.resources.__file__), "logo.png")
-    screens = [
-        Screen(
-            wallpaper=None,
-            # background="#000000",
-            # wallpaper=logo,
-            # wallpaper_mode="center",
-            bottom=mybar,
-        )
-    ]
+def build_screens() -> list[Screen]:
+    mons = get_monitors()
+    if not mons:
+        return [Screen(wallpaper=None, bottom=make_bar())]
+    return [Screen(wallpaper=None, bottom=(make_bar() if i==0 else None), **m)
+            for i, m in enumerate(mons)]
+
+# initial load
+fake_screens = build_screens()
+reconfigure_screens = False
+
+@hook.subscribe.screen_change
+def _screen_change(_ev=None):
+    global fake_screens
+    fake_screens = build_screens()
+    send_notification("qtile", "Screen change detected.")
+    qtile.reconfigure_screens()
+
+
+# reconfigure_screens = True
+# sc = get_monitors()
+# if len(sc) == 1:
+#     fake_screens = [Screen(wallpaper=None, bottom=mybar, **sc[0])]
+# elif len(sc) == 2:
+#     fake_screens = [
+#         Screen(wallpaper=None, bottom=mybar, **sc[0]),
+#         Screen(**sc[1]),
+#     ]
+# elif len(sc) == 3:
+#     lmw = int(0.238 * sc[1]["width"])
+#     fake_screens = [
+#         Screen(wallpaper=None, bottom=mybar, **sc[0]),
+#         # Screen(x=lmw, y=sc[1].y, width=sc[1].width - lmw, height=sc[1].height),
+#         # Screen(x=sc[1].x, y=sc[1].y, width=lmw, height=sc[1].height),
+#         # BET? directly use output of pre-split screens
+#         Screen(**sc[1]),
+#         Screen(**sc[2]),
+#     ]
+# else:
+#     # logo = os.path.join(os.path.dirname(libqtile.resources.__file__), "logo.png")
+#     screens = [
+#         Screen(
+#             wallpaper=None,
+#             # background="#000000",
+#             # wallpaper=logo,
+#             # wallpaper_mode="center",
+#             bottom=mybar,
+#         )
+#     ]
 
 
 # Drag floating layouts.
@@ -460,7 +485,6 @@ floating_layout = layout.Floating(
 auto_fullscreen = True
 focus_on_window_activation = "smart"
 focus_previous_on_window_remove = False
-reconfigure_screens = False
 
 # If things like steam games want to auto-minimize themselves when losing
 # focus, should we respect this or not?
@@ -553,9 +577,13 @@ def audit_focus(w: window.Window) -> None:
 
     audit_log(f"{app} {pid} {nm} {w.wid}\t{w.name}", "wm")
 
+
 def _register_x11_hooks():
     @hook.subscribe.selection_change
     def audit_cb(name, selection) -> None:
+        # send_notification("qtile", "cb")
+        # logger.warning("selection_change name=%s owner=%s len=%s",
+        #         name, selection.get("owner"), len(selection.get("selection", "")))
         global prev_cbsel
         oid = selection["owner"]
         sel = selection["selection"]
@@ -586,9 +614,11 @@ def _register_x11_hooks():
 
 
 @hook.subscribe.startup_complete
-def _late_init():
-    if qtile.core and qtile.core.name == "x11":
-        _register_x11_hooks()
+def _late_init() -> None:
+    send_notification("qtile", "startup")
+    # if qtile.core and qtile.core.name == "x11":
+    _register_x11_hooks()
+
 
 # def toggle_focus_floating():
 #     """Toggle focus between floating window and other windows in group"""
