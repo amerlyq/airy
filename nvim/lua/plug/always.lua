@@ -213,3 +213,6 @@ require("quicker").setup({
     },
   },
 })
+
+
+require 'plug.opencode_cfg'

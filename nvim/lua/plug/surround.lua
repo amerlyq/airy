@@ -47,7 +47,7 @@ require("nvim-surround").setup {
 
       ["x"] = { add = { '⦅', '⦆' } },
       ["e"] = { add = { '⸢', '⸥' } },
-      ["B"] = { add = { '⦏', '⦐' } },
+      ["E"] = { add = { '⦏', '⦐' } },
       ["m"] = { add = { '【', '】' } },
 
       -- Define pairs based on function evaluations!

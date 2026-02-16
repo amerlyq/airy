@@ -116,3 +116,10 @@ o.scrolloff = 3     -- context lines visible at screen edge when scroll
 -- set scrolljump=0    " minimum number of lines to scroll, OR: =-50 (50%)
 -- set sidescroll=16   " horizontal scroll by 1 char (DFL:(0) -- half screen)
 -- set nostartofline   " keep column when  <C-[fbud]> or [ggGHML], :25
+
+-- SUM: update TERM title to full path WHY: better /d/audit
+-- NEED:(!tmux): set -g set-titles on; set -g set-titles-string "#T"
+o.title = true
+o.titlestring = '%F'
+-- set titlestring=%t%{&modified?' [+]':''}
+-- set titlestring=nvim:\ %t
