@@ -1,0 +1,36 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "autoupdate": false,
+  "share": "disabled",
+  "theme": "opencode",
+  "permission": {
+    "*": "allow",  // REF: https://opencode.ai/docs/permissions
+    "bash": {
+      "*": "ask",
+      "ls *": "allow",
+      "git *": "allow",
+      "git push*": "ask",
+      "grep *": "allow",
+      "rm *": "ask",
+      "sudo *": "deny"
+    },
+    "edit": {
+      "*": "ask",
+      "src/**/*.py": "allow"
+      // "/d/just/**": "ask"
+    }
+    // "external_directory": {
+    //   "/w/**": "allow"
+    // },
+    "read": {
+      "*": "allow",
+      "*.env": "deny",
+      "*.env.*": "deny"
+      // "*.env.example": "allow"
+    },
+    "websearch": "ask"  // websearch, codesearch — web/code search (matches the query)
+  },
+  "watcher": {
+    "ignore": ["&*", ".git/**", "*/out/**", "*/dl/**"]
+  }
+}
