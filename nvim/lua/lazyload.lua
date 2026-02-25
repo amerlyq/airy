@@ -7,7 +7,7 @@ local seen_filetypes = {}
 local function ft_python()
   -- FIXME: load both for .py and .lua
   require 'lsp.init'
-  vim.lsp.config('pylsp', { settings = require('lsp.pylsp') })
+  require('lsp.pylsp')
   vim.lsp.enable('pylsp')
 
   --FAIL: should load mappings only inside buffer

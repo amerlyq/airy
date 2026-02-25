@@ -1,24 +1,13 @@
+
 -- Use an on_attach function to only map the following keys
 -- after the language server attaches to the current buffer
 local on_attach = function(client, bufnr)
-
-  -- local util = require('lspconfig.util')
-  -- -- `pylsp-mypy` requires a specific override
-  -- -- Only configure pylsp-mypy if root_dir is available
-  -- -- local root_dir = vim.lsp.buf.root_dir()
-  -- local root_dir = util.find_git_ancestor(vim.fn.expand('%:p')) or vim.loop.cwd()
-  -- if root_dir then
-  --   -- local venv_executable = root_dir .. "/.venv/bin/python"
-  --   local venv_executable = util.path.join(root_dir, '.venv/bin/python')
-  --   if vim.fn.filereadable(venv_executable) then
-  --     client.config.settings.pylsp.plugins.pylsp_mypy = {
-  --       enabled = true,
-  --       overrides = {
-  --         "--python-executable",
-  --         venv_executable,
-  --         -- true,
-  --       },
-  --     }
+  -- if client and client.name == "pylsp" then
+  --   -- ALT: from LspAttach
+  --   -- local client = vim.lsp.get_client_by_id(args.data.client_id)
+  --   local status, err = pcall(pyvenv_mypy, client)
+  --   if not status then
+  --     vim.notify("pylsp-mypy config error: " .. err, vim.log.levels.ERROR)
   --   end
   -- end
 

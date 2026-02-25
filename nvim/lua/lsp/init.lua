@@ -7,6 +7,11 @@
 --   { src = 'https://github.com/neovim/nvim-lspconfig' },
 -- }
 
+-- DEBUG :lua vim.cmd.edit(vim.lsp.get_log_path())
+-- vim.lsp.set_log_level("debug")
+-- vim.lsp.set_log_level("TRACE")
+-- DEBUG: :LspInfo
+
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 -- The nvim-cmp almost supports LSP's capabilities so You should advertise it to LSP servers..
 capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)

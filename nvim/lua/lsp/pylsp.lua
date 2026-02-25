@@ -16,7 +16,9 @@ local settings = {
       pylint = { enabled = true }, -- , args = {"--rcfile=pylint.ini", "--disable C0301"}
       isort = { enabled = true },
       black = { enabled = true, cache_config = true },
-      mypy = { enabled = true,
+      pylsp_mypy = { enabled = true,
+        live_mode = false,  -- works by writing your unsaved buffer to a temporary file and running mypy on that
+        report_progress = true,
         -- overrides = { "--python-executable", "/d/miur/.venv/bin/python", true }
         -- overrides = { "--config-file", mypy_config, true }
         -- MAYBE? | This setting is required by pylsp-mypy for dynamic executable overrides.
@@ -42,7 +44,66 @@ local settings = {
   }
 }
 
-return settings
+
+-- WARN: may need to repeat inside on_attach()
+--   WHY: to show mypy errors, if you open /d/todo and then from there some /d/project
+local function on_init_pyvenv_mypy(settings, client)
+  if client then
+    -- NEW: = client.workspace_folders[1].name
+    local root_dir = client.root_dir
+  else
+    -- OLD: = vim.lsp.buf.root_dir()
+    -- OLD: = util.find_git_ancestor(vim.fn.expand('%:p')) or vim.loop.cwd()
+    local root_markers = { ".git", "pyproject.toml", "setup.py", ".venv", "requirements.txt" }
+    -- Get root for the current buffer (0)
+    local project_root = vim.fs.root(0, root_markers)
+    -- Fallback to current directory if no markers found
+    local root_dir = project_root or vim.fn.getcwd()
+  end
+
+  -- Fallback: if no root_dir, use the directory of the current file
+  local effective_root = root_dir or vim.fn.expand('%:p:h')
+  local overrides = {
+    -- "--show-column-numbers", -- CRITICAL for Neovim diagnostics
+  }
+
+  -- 1. Cache Override: Only if we are in a proper project (root_dir exists)
+  if root_dir then
+    table.insert(overrides, "--cache-dir")
+    table.insert(overrides, vim.fn.fnamemodify(root_dir .. "/.mypy_cache", ":p"))
+  end
+  -- 2. Venv Detection: Only if the venv exists at the effective root
+  local venv_python = vim.fn.fnamemodify(effective_root .. "/.venv/bin/python", ":p")
+  if vim.fn.executable(venv_python) == 1 then
+    table.insert(overrides, "--python-executable")
+    table.insert(overrides, venv_python)
+  end
+  -- 3. Always add the true marker
+  table.insert(overrides, true)
+
+  settings.pylsp.plugins.pylsp_mypy.overrides = overrides
+  -- client.config.settings = vim.tbl_deep_extend("force", client.config.settings or {},
+  --   { pylsp = { plugins = { pylsp_mypy = {
+  --     enabled = true,
+  --     live_mode = false,
+  --     overrides = overrides,
+  --     report_progress = true,
+  --   } } }
+  -- })
+  -- client.notify("workspace/didChangeConfiguration", { settings = client.config.settings })
+
+  -- DEBUG:
+  -- vim.schedule(function()
+  --   print("pylsp-mypy: Configured with venv -> " .. venv_python)
+  -- end)
+  -- vim.defer_fn(function()
+  --   print("AFTER: Pylint enabled is: " .. tostring(client.config.settings.pylsp.plugins.pylint.enabled))
+  -- end, 500) -- wait 500ms
+end
+
+on_init_pyvenv_mypy(settings)
+
+vim.lsp.config('pylsp', { settings = settings })
 
 -- ALT:DFL=pycodestyle
 --   FAIL: can't suppress file-wide errors like E266 "##" comments in !qute
