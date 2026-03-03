@@ -215,4 +215,5 @@ require("quicker").setup({
 })
 
 
+require 'plug.lint'
 require 'plug.opencode_cfg'

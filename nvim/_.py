@@ -15,10 +15,14 @@ Pkg("python-pylint")
 Pkg("python-lsp-server")
 Pkg("python-lsp-black")
 Aur("python-pylsp-mypy")
-Aur("python-pyls-isort")  # python-lsp-isort
-# pip_inst pyls-isort
+Aur("python-pyls-isort")  # ALT: python-lsp-isort
+Aur("python-lsp-ruff")  # CASE: auto-remove unused imports
+Pkg("ruff")  # CASE: native "ruff server"
+Aur("basedpyright-bin")  # CASE: go-to-def better works with generics than jedi regexes
+Aur("python-pylsp-rope")  # CASE: auto-add imports during completion
 
 Pkg("lua-language-server")
+
 
 ## ALT: don't use symlinks -- always copy whole file, and then install it by PKGBUILD
 ln(".", under="~/.config/nvim")

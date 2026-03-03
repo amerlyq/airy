@@ -1,9 +1,7 @@
-local KB = vim.api.nvim_buf_set_keymap
-local B = vim.lsp.buf
-
-
 -- REF: `:help vim.lsp.*` for documentation on any of the below functions
 local function lsp_mappings(client, bufnr)
+  local KB = vim.api.nvim_buf_set_keymap
+  local B = vim.lsp.buf
   local KBn = function(lhs, fn, s) KB(bufnr, 'n', lhs, '', { callback = fn, noremap = true, desc = s }) end
 
   KBn('gd', B.definition, "definition [LSP]")
@@ -23,8 +21,16 @@ local function lsp_mappings(client, bufnr)
   --   vim.inspect(B.list_workspace_folders())
   -- end)
 
+  -- CHECK: if isort isn't working, you can try the more generic source.fixAll context,
+  --   which triggers all available LSP fixes (like those from autoflake)
+  KBn(',R', function() B.code_action {  -- ALT=,ri
+    -- context = { only = { "source.fixAll" } }, apply = true
+    context = { only = { "source.fixAll", "source.organizeImports" } },
+    apply = true,
+  } end, "LSP: [R]emove unused [I]mports, fix issues and sort imports")
+
   KBn(',rn', B.rename, "Rename all under cursor [LSP]") -- ALT=<LocalLeader>R
-  KBn(',ra', B.code_action, "code_action [LSP]") -- DFL= <leader>ca
+  KBn(',rw', B.code_action, "code_action [LSP]") -- DFL= <leader>ca
   KBn('\\cg', function()
     vim.api.nvim_set_current_dir(client.config.root_dir)
   end, "Go to .git pj root") -- ALT: vim-rooter

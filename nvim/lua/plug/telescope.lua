@@ -94,4 +94,5 @@ Kn('<Tab>k', T.tagstack, "T.tagstack")
 
 Kn(',as', live_grep_stable, "T.live_grep (rg/stable)")
 Kn(',rs', live_grep_stable, "T.live_grep (rg/stable)")
-Kn(',rw', T.grep_string, "T.grep_string (fuzzy word under cursor)")
+Kn(',.', T.grep_string, "T.grep_string (fuzzy word under cursor)")
+Kn(',*', T.grep_string, "T.grep_string (fuzzy word under cursor)")

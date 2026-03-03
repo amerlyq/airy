@@ -36,9 +36,22 @@ local on_attach = function(client, bufnr)
 
   local B = vim.lsp.buf
   autocmd('BufWritePre', function() B.format { async = false } end, "Auto Format")
-  -- ALT: vim-illuminate
-  autocmd({ 'CursorHold', 'CursorHoldI' }, B.document_highlight, "hi! show under cursor")
-  autocmd('CursorMoved', B.clear_references, "hi! clear under cursor")
+
+  -- Only set up highlighting if the server supports it (Pylsp does, Ruff doesn't)
+  if client.server_capabilities.documentHighlightProvider then
+    -- ALT: vim-illuminate
+    autocmd({ 'CursorHold', 'CursorHoldI' }, B.document_highlight, "hi! show under cursor")
+    autocmd('CursorMoved', B.clear_references, "hi! clear under cursor")
+  end
+
+  -- INFO: if isort isn't aggressive enough, you can install pylsp-autoflake.
+  --   This tool is specifically designed to remove unused imports and variables.
+  -- NEED:(ruff/autoflake) orse FAIL: "No code actions found"
+  autocmd('BufWritePre', function()
+    -- FIXED: specify *.ruff sfx orse nvim brings pop-up on save with multiple actions from multiple sources
+    B.code_action { context = { only = { "source.fixAll.ruff" } }, apply = true }
+    B.code_action { context = { only = { "source.organizeImports.ruff" } }, apply = true }
+  end, "Auto-remove unused imports and sort them")
 end
 
 return on_attach
