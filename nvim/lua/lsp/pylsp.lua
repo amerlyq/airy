@@ -44,7 +44,7 @@ local settings = {
       --   Open your Python file and try "Go to Definition."
       --   :lua vim.cmd.edit(vim.lsp.get_log_path())
       jedi = {
-        enabled = true,
+        enabled = false,
         -- environment = "/d/miur/.venv",
         -- extra_paths = { vim.fn.getcwd() .. "/src" }, -- Adjust if src isn't the root
         -- environment = "/usr/bin/python", -- Force the Arch system python
@@ -59,16 +59,16 @@ local settings = {
         follow_builtin_imports = true,
       },
       -- Recommended for better navigation/completion
-      jedi_completion = { enabled = true },
-      -- jedi_rename = {enabled = false},
-      jedi_hover = { enabled = true },
-      jedi_references = { enabled = true },
-      jedi_symbols = { enabled = true },
+      jedi_completion = { enabled = false },
+      jedi_rename = {enabled = false},
+      jedi_hover = { enabled = false },
+      jedi_references = { enabled = false },
+      jedi_symbols = { enabled = false },
 
       -- Extended Refactoring (if pylsp-rope is installed)
       -- rope = { enabled = false },
       pylsp_rope = {
-        enabled = true,
+        enabled = false,
         ropeFolder = { pjroot .. "/.ropeproject" },
       },
       -- DEP: pylsp-autoimport
@@ -78,12 +78,12 @@ local settings = {
       -- NEED: $ pip install . --user
       -- DISABLED:ERR: code errors
       rope_autoimport = {
-        enabled = true,
+        enabled = false,
         memory_cache = true, -- Better performance
         completions = { enabled = true },
         code_actions = { enabled = true },
       },
-      rope_rename = { enabled = true },
+      rope_rename = { enabled = false },
       -- rope_completion = { enabled = true },
 
       -- DISABLED: prevent diagnostics/formatting from here (Ruff/Mypy LSP will take over)
