@@ -1,0 +1,159 @@
+#!/usr/bin/env bash
+
+if (return 0 2>/dev/null); then
+  [[ -v __app ]] && return 2
+  __app=$(realpath -e "${BASH_SOURCE[0]:-$0}") || return
+  # builtin source "${__app%/*}/aliases.sh" "$__app" "$@" || return
+  unset __app
+  return 0
+fi
+
+set -o errexit -o errtrace -o functrace -o noclobber -o noglob -o nounset -o pipefail
+shopt -qs inherit_errexit lastpipe
+[[ ${1-} == -x ]] && shift && set -x && xt=${-//[^x]}
+
+[[ " $(id -nG "$USER") " =~ " docker " ]] || sudo gpasswd -a "${USER:?}" docker
+[[ " $(id -nG) " =~ " docker " ]] || exec sg "docker" ${@+-c "$(printf '%q ' "$@")"}
+
+this=$(realpath -e "${BASH_SOURCE[0]:-$0}")
+readonly here=${this%/*} PATH=/usr/bin  # PATH=/b:$HOME/.local/bin:/usr/bin:/usr/sbin
+# source "$here/helpers.sh" "$this" "$@"
+
+readonly nm=airydev
+readonly cnm=$nm
+readonly vnm=$nm-data
+readonly ltag="localhost:0/$nm:latest"
+
+
+DockerActive(){ docker container inspect -f '{{.State.Status}}' -- "${@:?}" 2>/dev/null | grep -qwF running; }
+DockerExists(){ docker image inspect -f '{{.Id}}' -- "${@:?}" &>/dev/null; }
+DockerStopKill(){ docker container stop --signal=SIGTERM --timeout=3 -- "$@"; }
+
+while LC_COLLATE=C getopts 'BDiIklsxXZ-:' o; do
+case $o in :|'?') exit 2
+;; B) rebuild=1
+;; D) sudo systemctl start docker.service
+;; i) docker image ls; echo; docker container ps -a; exit
+;; I) docker image ls -a; echo; docker container ps -a; exit
+;; k) DockerStopKill "$cnm"; exit
+;; l) docker container logs -- "$cnm"; exit
+;; s) sudo du -sh "$(docker volume inspect "$vnm" --format '{{ .Mountpoint }}')"; exit
+;; X) docker container rm -- "$cnm" ||:; docker volume rm -- "$vnm" ||:; exit
+;; x) set -x && xt=${-//[^x]}
+;; Z) docker builder prune -a; exit
+esac; done; shift $((OPTIND-1)); unset o
+
+
+if DockerActive "$cnm"; then
+  docker ps
+  exit
+fi
+
+
+if [[ ${rebuild:+x} ]] || ! DockerExists "$ltag"; then
+  bargs=(\
+    --file="$here/Dockerfile.arch"
+    --tag="$ltag"
+    --force-rm=true
+    --network=host
+    --add-host="$cnm:127.0.0.1"
+
+    --progress=plain
+    # --no-cache
+    # --cache-from=type=registry,ref=docker.io/my/$nm:latest
+    --cache-from=type=registry,ref="$ltag"
+    --cache-to=type=inline
+
+    # --secret=id=netrc,src="$HOME/.netrc"
+    # --build-context=localhost:0/0:_=docker-image://archlinux@sha256:936039e47bc319f43c1acb93d9a9a6e58023a88cfca2ebed94177e18d0db3e81
+  )
+  env --chdir="$here" docker buildx build "${bargs[@]}" -- "$here"  # OR=$(git rev --top-root)
+fi
+
+
+
+# DockerActive "$cnm" && DockerStopKill "$cnm"
+# if ! docker volume inspect -f '{{.Name}}' "$vnm" &>/dev/null; then
+#   docker volume create "$vnm"
+#   docker run -ti --rm \
+#     --mount=type=bind,"src=$here/opencode.jsonc,dst=/boot/opencode.jsonc,ro=true" \
+#     --mount=type=volume,"src=$vnm,dst=/home/user,ro=false" \
+#     -- "$ltag" bash -xc '
+#       sudo chown -R -- "${USER:?}:$USER" /home/user
+#       # FIXED: copy file to avoid dangling bind-mount
+#       install -Dm644 -t ~/.config/opencode -- /boot/opencode.jsonc
+#     '
+# fi
+
+
+
+cd "${1:-$PWD}"
+pjdir="/d/${PWD##*/}"
+
+rargs=(\
+  --name="$cnm"
+  --hostname="$cnm"
+  --workdir="$pjdir"
+  --env=TZ="EET-2EEST,M3.5.0/3,M10.5.0/4"
+
+  # --privileged
+  --rm
+  --read-only=true
+  --interactive=true
+  --tty=true
+  --pull=never
+  --init
+
+  --network=host
+  --add-host="$cnm:127.0.0.1"
+  # --group-add=998
+
+  --log-driver=local
+  --log-opt=mode=non-blocking
+  --log-opt=max-buffer-size=16MiB
+
+  --mount=type=bind,"src=.,dst=$pjdir,ro=false,bind-propagation=rshared"
+  --mount=type=volume,"src=$vnm,dst=/home/user,ro=false"
+  # --mount=type=tmpfs,"dst=/tmp,tmpfs-mode=1777,tmpfs-noexec=false"
+  --tmpfs=/tmp:exec,mode=1777
+  # --mount=type=bind,src=$HOME/.gitconfig,dst=/home/user/.gitconfig,ro=true
+
+  # --mount=type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock,ro=false
+  # --mount=type=bind,src=$out/bash_history,dst=/home/user/.bash_history,ro=false
+  # --mount=type=bind,src=$HOME/.netrc,dst=/home/user/.netrc,ro=true
+  # --mount=type=bind,src=$HOME/.docker/config.json,dst=/home/user/.docker/config.json,ro=true
+
+  # BAD: left as dangling mount
+  #   $ sudo umount /var/lib/docker/volumes/airydev-data/_data/.config/opencode/opencode.jsonc
+  #   BET? copy into volume
+  # --mount=type=bind,src=$here/opencode.jsonc,dst=/home/user/.config/opencode/opencode.jsonc,ro=true
+
+  # --mount=type=bind,src=$out/codex,dst=/home/user/.codex,ro=false
+  # --mount=type=bind,src=$out/bun,dst=/home/user/.bun,ro=false
+  # --mount=type=bind,src=$out/opencode/cache,dst=/home/user/.cache/opencode,ro=false
+  # --mount=type=bind,src=$out/opencode/config,dst=/home/user/.config/opencode,ro=false
+  # --mount=type=bind,src=$out/opencode/share,dst=/home/user/.local/share/opencode,ro=false
+  # --mount=type=bind,src=$out/opencode/state,dst=/home/user/.local/state/opencode,ro=false
+
+  # --mount=type=bind,src=./src,dst=/opt/src,ro=true
+
+  --mount=type=bind,src=/usr/lib/terminfo/t/tmux-256color,dst=/usr/share/terminfo/t/tmux-256color
+  --env=TERM=tmux-256color
+)
+exec docker run "${rargs[@]}" -- "$ltag" "${@:2}" # bash -l
+
+# DEBUG:
+# export OPENCODE_EXPERIMENTAL_DISABLE_FILEWATCHER=true
+# export OPENCODE_OFFLINE_MODE=true
+# export OPENCODE_SKIP_MIGRATIONS=true
+# opencode config validate --config ~/.config/opencode/opencode.jsonc
+# tail -f ~/.local/share/opencode/log/*.log
+# rm -rf ~/.local/share/opencode/run/*
+# rm -f ~/.local/share/opencode/*.lock
+# pacman -S --noconfirm gcc-libs zlib glibc
+# export BUN_RUNTIME_TRANSIENT_DIR=/tmp
+# export TMPDIR=/tmp
+# opencode
+# opencode --print-logs --log-level DEBUG
+# Opencode become stuck all of a sudden. Does not launch anymore. · Issue #5485 · anomalyco/opencode ⌇⡩⢰⢯⢫
+#   https://github.com/anomalyco/opencode/issues/5485

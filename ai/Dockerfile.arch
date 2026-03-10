@@ -1,0 +1,358 @@
+#%USAGE: $ ./run
+
+# FROM localhost:0/0:_
+FROM archlinux:latest
+
+SHELL ["/usr/bin/bash", "-euo", "pipefail", "-xc"]
+WORKDIR /boot
+
+ENV LANG="C.UTF-8"
+RUN --mount=type=cache,id=pacman-cache,target=/var/cache/pacman/pkg,sharing=locked \
+<<"EOF"
+  echo "${LANG:?} UTF-8" >> /etc/locale.gen
+  echo "LANG=${LANG}" > /etc/locale.conf
+  locale-gen
+  ln -svfT /usr/share/zoneinfo/UTC /etc/localtime
+  ln -svfT bash /usr/bin/sh
+
+  # pacman-key --init
+  # pacman-key --populate archlinux
+  pacman -Syu --noconfirm --needed -- \
+    base-devel sudo zsh git  # base  man neovim tzdata ca-certificates curl
+
+  # # mymirror="http://localhost:8080"
+  # myarchive="https://archive.archlinux.org/repos"
+  # pacman --noconfirm -Syu --needed -- reflector
+  # { echo "${mymirror:+Server = $mymirror}"
+  #   reflector --score 5 --protocol https
+  #   printf "Server = %s/%s/\$repo/os/\$arch\n" "$myarchive" \
+  #      "$(date -r /var/lib/pacman/sync/core.db +%Y/%m/%d)"
+  # } > /etc/pacman.d/mirrorlist
+  # pacman --noconfirm --remove --recursive --unneeded -- reflector
+EOF
+
+
+# MAYBE: directly use USER,HOME ?
+ARG myuser=user
+ARG myhome=/home/${myuser:?}
+ARG myuid=1000
+ARG mygid=1000
+RUN --network=none <<"EOF"
+  groupadd --gid "${mygid:?}" "${myuser:?}"
+  useradd --create-home --home-dir "${myhome:?}" --shell "/usr/bin/zsh" --no-log-init \
+    --uid "${myuid:?}" --gid "$myuser" --groups "users,wheel" --comment "$myuser@host" -- "$myuser"
+
+  printf "%s\n" "$myuser:$myuser" | chpasswd
+  install --directory --mode=750 -- /etc/sudoers.d
+  # SECU:BAD: orse aur can't be installed
+  echo "$myuser ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/user
+  # printf "%s ALL=(ALL) NOPASSWD:SETENV: ALL\n" "$myuser" > "/etc/sudoers.d/$myuser"
+  # echo "$myuser ALL=(ALL) ALL" > /etc/sudoers.d/user
+
+  install --directory --owner="${myuser:?}" --group="$myuser" --mode=0755 -- \
+    /d  # "${myhome:?}/".{config,config/opencode}  # /opt /opt/venv /opt/airydev
+  # ln -sT -- /opt /d
+
+  # find /home -exec ls -lad {} +
+
+  # ssh-keygen -t ed25519 -C "ED_$(cat /etc/hostname)" -f /home/user/.ssh/id_ed25519
+EOF
+
+
+# RUN --mount=type=cache,id=pacman-cache,target=/var/cache/pacman/pkg,sharing=locked \
+# <<"EOF"
+#   pkgs=(
+#     less
+#     ncurses-base  # for terminfo ($TERM)
+#     neovim
+#     time
+#   )
+#   if [[ ${pkgs[@]:+x} ]]; then pacman -Syu "${pkgs[@]}"; fi
+#   # HACK: pre-compile for faster startup
+#   # DEBUG: $ PYTHONVERBOSE=import /opt/venv/miur/bin/python -S ./run 2>&1  | grep -E '\.pyc|source'
+#   py=$(realpath "$(command -v python)")
+#   "$py" -m compileall -q -j0 /usr/lib/"${py##*/}" /usr/local/lib/"${py##*/}"
+# EOF
+
+
+USER "${myuser:?}"
+
+ENV USER="${myuser:?}" \
+  HOME="${myhome:?}" \
+  SHELL="/usr/bin/zsh" \
+  EDITOR="nvim" \
+  PAGER="less" \
+  LESS="-A -i -j.5 -M -R -S -W -z-2 -x8"
+  # OR: LESS="-a -i -j6 -M -N -R -S -w -z-4 -x4"
+  # PATH="/usr/local/bin:/usr/bin:/usr/sbin"
+  # LD_LIBRARY_PATH="/opt/my/lib"
+
+
+# TRY: !paru (Rust) inof !pikaur
+RUN --mount=type=cache,id=pacman-cache,target=/var/cache/pacman/pkg,sharing=locked \
+    --mount=type=cache,id=cargo-cache,target=${myhome:?}/.cargo,uid=${myuid:?},gid=${mygid:?},sharing=locked \
+    --mount=type=tmpfs,target=/tmp \
+<<"EOF"
+  touch "${myhome:?}/.hushlogin"
+  cd /tmp
+  # FAIL: paru: error while loading shared libraries: libalpm.so.15: cannot open shared object file: No such file or directory
+  #   << latest pacman provides .so.16
+  # git clone --depth=1 https://aur.archlinux.org/paru-bin.git
+  ## DISABLED:PERF: building it takes takes >5min
+  # sudo pacman -S --noconfirm --needed -- cargo
+  # git clone --depth=1 https://aur.archlinux.org/paru.git
+  # cd paru
+  # ALT: curl -L https://aur.archlinux.org/cgit/aur.git/snapshot/pikaur.tar.gz | tar -xz
+  git clone --depth=1 https://aur.archlinux.org/pikaur.git
+  cd pikaur
+  makepkg --syncdeps --clean --install --noconfirm --force  # PKGBUILD --rmdeps --skippgpcheck
+  # ALT: sudo pacman -U --noconfirm paru*.pkg.tar.zst
+EOF
+
+
+# ALT:IDEA: get it from $PWD, as I run from /d/airy anyway
+# ADD --link https://github.com/amerlyq/airy.git /opt/airy
+
+# ALT:
+# FROM scratch AS dl
+# ADD --link --chmod=644 --checksum=sha256:788b3beba63d2addd6f8d98a687f05f3604f7b1d8c58c5c6a690968979d09e0e \
+#   https://redirector.gvt1.com/edgedl/android/repository/emulator-linux_x64-7140946.zip \
+#   emu.zip
+# ADD --link --chmod=644 https://github.com/amerlyq/airy.git#1da729baabf5cd35b203997a5db7c67d180e89e9:zsh/cfg/zshrc .
+# RUN --mount=type=bind,from=dl,source=/,target=/dl,ro \
+# <<"EOF"
+#   cp -t . -- /dl/uiauto*.apk
+#   unzip -q /dl/emu.zip -d .
+#   sudo unzip -qj /dl/adb.zip -d /usr/local/bin "platform-tools/adb"
+# EOF
+
+## ALT:FAIL?
+# ADD https://github.com/amerlyq/airy.git#1da729baabf5cd35b203997a5db7c67d180e89e9:zsh/cfg/zshrc .
+## FAIL: not supported "git" type
+# syntax=docker/dockerfile:1.7
+# RUN --mount=type=git,repo=https://github.com/moby/buildkit.git,ref=v0.14.1 \
+#     cp -r docs /buildkit-docs
+## FAIL: not supported this way, should pass as $ docker build --build-context apks="https://..."
+# FROM https://github.com/amerlyq/airy.git#1da729baabf5cd35b203997a5db7c67d180e89e9 AS airy
+# COPY --from=airy zsh/cfg /cfg
+
+
+# RUN --network=none <<"EOF"
+#   # OR: install -Dm644 -T -- cfg/bashrc ~/.bashrc
+#   ln -sT /opt/airy/zsh/cfg/zshrc ~/.zshrc
+#   ln -sT /opt/airy/zsh/cfg/zlogin ~/.zlogin
+#   ln -sT /opt/airy/zsh/cfg/aliases ~/.zsh_aliases
+#   ## WARN:PERF: store downloaded .tar in --cache (to avoid re-dld -- and to not store it in docker .img)
+#   # curl -LOJ "$(curl -s "https://api.github.com/repos/neovim/neovim/releases/latest" | awk -F '"' '/browser_download_url.*linux64.*gz"/{print$(NF-1)}')"
+#   # tar xzvf nvim-linux64.tar.gz
+#   # ln -sT ~/me/inst/nvim-linux64/bin/nvim ~/me/bin/nvim
+#   # ln -sT nvim ~/me/bin/v
+#   # sudo apt install cargo
+#   # git clone https://github.com/amerlyq/plugins
+#   # (cd plugins && ./update && ./recache)
+#   # git clone https://github.com/amerlyq/nou.vim
+#   # ln -s /d/airy/{nvim,ranger} -t ~/.config
+#   # sudo apt install universal-ctags tmux
+#   # mkdir ~/.config/tmux
+#   # ln -svft ~/.config/tmux -- ~/me/aura/airy/tmux/tmux.conf
+#   # curl -Lo ripgrep.deb "$(curl -s "https://api.github.com/repos/BurntSushi/ripgrep/releases/latest" | awk -F '"' '/browser_download_url.*amd64.deb"/{print$(NF-1)}')"
+#   # sudo apt install -y ./ripgrep.deb
+# EOF
+
+## BET:: uv
+# # Copy the uv binary from the official image
+COPY --link --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+# COPY --from=ghcr.io/astral-sh/uv:0.10.9 /uv /uvx /bin/
+# COPY --from=ghcr.io/astral-sh/uv@sha256:2381d6aa60c326b71fd40023f921a0a3b8f91b14d5db6b90402e65a635053709 /uv /uvx /bin/
+# WORKDIR /app
+# # Copy dependency files first to leverage Docker layer caching
+# COPY pyproject.toml uv.lock ./
+# # Install dependencies into a virtual environment (standard practice)
+# # Use --frozen to ensure the lockfile is followed exactly
+# RUN uv sync --frozen --no-install-project
+# # Copy the rest of the application
+# COPY . .
+# # Run the application using 'uv run' to automatically use the environment
+# CMD ["uv", "run", "python", "main.py"]
+
+## MAYBE:
+# # Disable development dependencies
+# ENV UV_NO_DEV=1
+
+
+## ALT: keep uv out of final img
+## WARN: ensure you add .venv to your .dockerignore file so your local environment doesn't get copied into the build stage.
+# # --- Stage 1: Builder ---
+# FROM python:3.12-slim AS builder
+# # Copy uv from its official image into our builder
+# COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+# # Environment variables to optimize the build
+# ENV UV_COMPILE_BYTECODE=1 \
+#     UV_LINK_MODE=copy  # silences warnings about not being able to link files since the cache and sync target are on separate file systems.
+#     # If you're not mounting the cache, image size can be reduced by using the --no-cache flag or setting UV_NO_CACHE.
+# # BET:
+# RUN uv python install --compile-bytecode
+# RUN uv sync --compile-bytecode
+# WORKDIR /app
+# # Install dependencies only (leverages Docker layer caching)
+# COPY pyproject.toml uv.lock ./
+# RUN --mount=type=cache,target=/root/.cache/uv \
+#     uv sync --frozen --no-install-project --no-dev
+# # --- Stage 2: Runtime ---
+# FROM python:3.12-slim AS runtime
+# WORKDIR /app
+# # Copy only the virtual environment from the builder
+# # This leaves uv and its cache behind
+# COPY --from=builder /app/.venv /app/.venv
+# # Copy your application code
+# COPY . .
+# # Place the virtual environment's binaries at the front of the PATH
+# ENV PATH="/app/.venv/bin:$PATH"
+# # Run your app directly (no 'uv run' needed here as uv is gone)
+# CMD ["python", "main.py"]
+
+
+# ARG PIP_CACHE_DIR="$HOME/.pip/cache"
+# ARG PIP_REQUIRE_VIRTUALENV="true"
+#
+# RUN --mount=type=cache,id=pip-cache,target=${PIP_CACHE_DIR:?},uid=${myuid:?},gid=${mygid:?} \
+#     --mount=type=secret,id=netrc,dst=/home/user/.netrc,mode=0600,uid=${myuid:?},gid=${mygid:?},required=true \
+# <<"EOF"
+#   python3.14 -m venv /opt/venv
+#   export PATH=/opt/venv/bin:$PATH
+#   # WARN: latest pip works only with latest setuptools
+#   pip --no-input install --upgrade pip setuptools wheel
+#   pip --no-input check --disable-pip-version-check
+#
+#   pip --no-input install --isolated --requirement ./requirements.txt
+#   pip --no-input cache list
+#   pip --no-input install .
+#
+#   pip install --require-virtualenv --no-input -- pytest pytest-cov
+#   python -m compileall -q -j0 /opt/venv
+# EOF
+
+# BET?PERF:TRY: put whole /opt/venv into VOLUME and only pip-sync it here
+#   BAD: probably impossible during build-time
+# RUN --mount=type=bind,source=pkg/pypi/requirements.txt,target=requirements.txt \
+#     --mount=type=cache,id=pip-cache,target=${PIP_CACHE_DIR:?},uid=${myuid:?},gid=${mygid:?} \
+# <<"EOF"
+#   echo "${PIP_REQUIRE_VIRTUALENV:?}"
+#   python -m venv /opt/venv/miur
+#   export PATH=/opt/venv/miur/bin:$PATH
+#   # WARN: latest pip works only with latest setuptools
+#   pip install --upgrade pip hatchling  # setuptools wheel
+#   pip check --disable-pip-version-check
+#   pip install --no-deps --requirement requirements.txt
+#   pip cache list
+# EOF
+
+
+# ARG MIUR_STATE_HOME="${HOME:?}/.local/state/miur"
+# ## DFL: install miur w/o demo deps (OPT: change ARG to install everything)
+# # ARG mycmpts=all,dev
+# ARG mycmpts=default
+#
+# RUN --network=none \
+#     --mount=type=bind,target=. \
+#     --mount=type=cache,id=pip-cache,target=${PIP_CACHE_DIR:?},uid=${myuid:?},gid=${mygid:?} \
+# <<"EOF"
+#   mkdir -p "${MIUR_STATE_HOME:?}"
+#   export PATH=/opt/venv/miur/bin:$PATH
+#   pip install --no-deps --no-build-isolation ".${mycmpts:+[$mycmpts]}"
+#   python -m compileall -q -j0 /opt/venv
+# EOF
+#
+# RUN --network=none \
+#   --mount=type=bind,source=airydev/cfg,target=cfg \
+# <<"EOF"
+#   install -Dm644 -T -- cfg/bashrc ~/.bashrc
+#   install -Dm644 -T -- cfg/bashrc_prompt ~/.bashrc_prompt
+#   install -Dm644 -T -- cfg/blerc ~/.blerc
+# EOF
+#
+#
+
+RUN --mount=type=cache,id=pacman-cache,target=/var/cache/pacman/pkg,sharing=locked \
+    --mount=type=cache,id=cargo-cache,target=${myhome:?}/.cargo,sharing=locked \
+    --mount=type=bind,"src=opencode.jsonc,dst=opencode.jsonc,ro=true" \
+<<"EOF"
+  # HACK: precreate config file to be copied into VOLUME during its creation
+  #   FIXED: prevents dangling-on-exit bind-mount over VOLUME
+  # ALT: COPY --link --chmod=0644 --chown=${USER:?}:${USER:?} \
+  #   opencode.jsonc  ${HOME:?}/.config/opencode/opencode.jsonc
+  install -Dm644 -t ~/.config/opencode -- opencode.jsonc
+
+  sudo pacman -S --noconfirm --needed -- bun
+  pikaur --noconfirm -S opencode-bin openai-codex-bin
+EOF
+
+## BET: install from AUR
+# RUN --mount=type=cache,id=airydev-bootstrap,target=.,uid=${myuid:?},gid=${mygid:?} \
+# <<"EOF"
+#   sudo install --directory --owner="${myuser:?}" --group="$myuser" --mode=0755 -- \
+#     /opt/ai /opt/ai/bin
+#
+#   exe=/opt/ai/bin/codex
+#   url="https://github.com/openai/${exe##*/}/releases/download/rust-v0.104.0/${exe##*/}-x86_64-unknown-linux-musl.zst"
+#   sha="37c6530d7beb6c4a0aaa8655e76782f39c0d6c35653b8bb8e25f22c45beae44c"
+#   dl="$PWD/${exe##*/}.zst"
+#   if ! sha256sum --check <<< "$sha  $dl"; then
+#     curl --fail --silent --show-error --location --output "$dl" -- "$url"
+#     sha256sum "$dl"
+#     sha256sum --check <<< "$sha  $dl"
+#   fi
+#   zstd --decompress "$dl" -o "$exe"
+#   chmod +x "$exe"
+#   sudo ln -sT "$exe" /usr/local/bin/"${exe##*/}"
+#   codex --version
+#
+#   exe=/opt/ai/bin/opencode
+#   url="https://github.com/anomalyco/${exe##*/}/releases/download/v1.2.10/${exe##*/}-linux-x64.tar.gz"
+#   sha="ebcc24012e8f067b10d7416430c88e9c429115ecfbccf8da9eb59db3b629a358"
+#   dl="$PWD/${exe##*/}.tar.gz"
+#   if ! sha256sum --check <<< "$sha  $dl"; then
+#     curl --fail --silent --show-error --location --output "$dl" -- "$url"
+#     sha256sum "$dl"
+#     sha256sum --check <<< "$sha  $dl"
+#   fi
+#   tar -C "${exe%/*}" -xzvf "$dl"
+#   chmod +x "$exe"
+#   sudo ln -sT "$exe" /usr/local/bin/"${exe##*/}"
+#   opencode --version
+# EOF
+
+
+## FAIL: they are annonymous and deleted when you "--rm" container
+# VOLUME ["${HOME:?}"]
+# VOLUME [/w/.venv]
+
+# TEMP:FIXME: avoid this var in ~/.zshrc
+# ENV XDG_RUNTIME_DIR="/tmp"
+
+
+WORKDIR /d
+
+
+# ENTRYPOINT ["/opt/venv/miur/bin/python", "-m", "miur" \
+#   , "--remember-hist=/home/user/.local/state/miur/hist" \
+#   , "--remember-url=/home/user/.local/state/miur/url" \
+#   , "--choosedir=/home/user/.local/state/miur/cwd" \
+# ]
+
+# CMD ["/usr/bin/bash", "-l"]
+# CMD ["opencode"]
+
+
+################################
+## HACK: adjust copy with the right ownership and permissions
+# FROM scratch
+# COPY --chmod=0777 --chown=123:456 --from=scratch / /hello/
+# COPY --from=docker:cli /usr/local/bin/docker /hello/
+
+## BET: produces a single-layer "scratch" image with just the /hello/docker binary in it;
+# RUN --mount=from=busybox:uclibc,src=/bin/,dst=/bin/ --mount=from=docker:cli,src=/usr/local/bin,dst=/tmp/source <<'EOT'
+# install -d -o 123 -g 456 -m 0755 /hello
+# install /tmp/source/docker /hello/docker
+# ls -la /hello
+# EOT
