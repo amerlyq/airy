@@ -44,15 +44,16 @@ local on_attach = function(client, bufnr)
     autocmd('CursorMoved', B.clear_references, "hi! clear under cursor")
   end
 
+  ---- DISABLED:(format={"I"}): sorting is part of !ruff formatting
   -- INFO: if isort isn't aggressive enough, you can install pylsp-autoflake.
   --   This tool is specifically designed to remove unused imports and variables.
   -- NEED:(ruff/autoflake) orse FAIL: "No code actions found"
-  autocmd('BufWritePre', function()
-    -- FIXED: specify *.ruff sfx orse nvim brings pop-up on save with multiple actions from multiple sources
-    -- DISABLED:BAD: removes imports for temporarily commented code BET apply fix manually by <,R> keybind
-    -- B.code_action { context = { only = { "source.fixAll.ruff" } }, apply = true }
-    B.code_action { context = { only = { "source.organizeImports.ruff" } }, apply = true }
-  end, "Auto-remove unused imports and sort them")
+  -- autocmd('BufWritePre', function()
+  --   -- FIXED: specify *.ruff sfx orse nvim brings pop-up on save with multiple actions from multiple sources
+  --   -- DISABLED:BAD: removes imports for temporarily commented code BET apply fix manually by <,R> keybind
+  --   -- B.code_action { context = { only = { "source.fixAll.ruff" } }, apply = true }
+  --   B.code_action { context = { only = { "source.organizeImports.ruff" } }, apply = true }
+  -- end, "Auto-remove unused imports and sort them")
 end
 
 return on_attach
