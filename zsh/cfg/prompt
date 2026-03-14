@@ -97,7 +97,7 @@ function prompt_setup {
   VIRTUAL_ENV_DISABLE_PROMPT=1
   local info=" %F{238}\${\${VIRTUAL_ENV+%B(\$VIRTUAL_ENV)%b}:-%~}%f"
 
-  if [[ $HOST =~ MINIPC ]]; then
+  if [[ $HOST =~ (MINIPC|VD600) ]]; then
     ## NOTE:(disable blinking cursor on WSL2/NUC):
     info+="%{"$'\e[2 q'"%}"
   fi

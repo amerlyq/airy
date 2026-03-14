@@ -2,7 +2,7 @@
 [[ ~/.zshrc.zwc -nt ~/.zshrc ]] || zcompile ~/.zshrc
 
 
-if [[ $HOST =~ MINIPC ]]; then
+if [[ $HOST =~ (MINIPC|VD600) ]]; then
   # TEMP: for WSL2 and NUC
   export EDITOR=nvim
 
@@ -17,6 +17,10 @@ if [[ $HOST =~ MINIPC ]]; then
   #   ALSO;BAD:OBSOL: export XDG_RUNTIME_DIR="/run/user/$(id -u)"
   # TEMP: for SSH connections to be immediately functional
   [[ -n ${DISPLAY:+x} ]] || export DISPLAY=":10.0"
+
+  ## FAIL: shell-out from ranger should keep $PWD intact
+  #   FIXED: do it in ~/.zlogin
+  # cd /w
 fi
 
 export SSH_AUTH_SOCK=${XDG_RUNTIME_DIR:?}/gnupg/S.gpg-agent.ssh

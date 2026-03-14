@@ -7,6 +7,6 @@ if [[ -z $DISPLAY && $XDG_VTNR = 1 ]]; then
   exec xinit
 fi
 
-if [[ $HOST == *-* ]]; then
+if [[ $HOST == (MINIPC|VD600) ]]; then
   cd /w
 fi
