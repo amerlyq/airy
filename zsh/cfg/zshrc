@@ -21,6 +21,11 @@ if [[ $HOST =~ (MINIPC|VD600) ]]; then
   ## FAIL: shell-out from ranger should keep $PWD intact
   #   FIXED: do it in ~/.zlogin
   # cd /w
+
+else
+  # DFL: /usr/local/bin:/usr/bin:/opt/android-sdk/cmdline-tools/latest/bin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl
+  # export PATH=/b:$HOME/.local/bin:$HOME/.cargo/bin:/usr/local/bin:/usr/bin
+  export PATH=/b:$HOME/.local/bin::/usr/bin
 fi
 
 export SSH_AUTH_SOCK=${XDG_RUNTIME_DIR:?}/gnupg/S.gpg-agent.ssh
