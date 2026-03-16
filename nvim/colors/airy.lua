@@ -71,6 +71,11 @@ local highlights = {
   DiffDelete = { fg = '#dc322f', bg = '#1a0000', bold = true },
   DiffText   = { fg = '#268bd2', bg = bg, sp = '#268bd2' },
 
+  -- FIXED: eye-bleeding diff in fugitive
+  Added = { link = "DiffAdd" },
+  Changed = { link = "DiffChange" },
+  Removed = { link = "DiffDelete" },
+
   GitSignsAddNr = { link = "DiffAdd" },
   GitSignsChangeNr = { link = "DiffChange" },
   GitSignsDeleteNr = { link = "DiffDelete" },

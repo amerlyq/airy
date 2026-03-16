@@ -40,7 +40,7 @@ require('mini.operators').setup({
     reindent_linewise = true,
   },
   sort = {
-    prefix = ',S',
+    prefix = '\\S',
     func = nil
   }
 })
@@ -216,4 +216,4 @@ require("quicker").setup({
 
 
 require 'plug.lint'
-require 'plug.opencode_cfg'
+-- require 'plug.opencode_cfg'
