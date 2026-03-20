@@ -1,0 +1,146 @@
+#!zsh
+# vim:ft=zsh
+# SEE: /d/research/airy/zsh/prezto/modules/git/alias.zsh
+
+
+## git
+alias cd:='gjj'
+alias cd::='gjJ'
+alias gjj='cd "$(git rev-parse --show-toplevel)"'
+alias gjJ='cd "$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"'
+
+alias gA='git annex add'
+alias gaS='git -c user.name=annex -c user.email=${HOST:?} annex sync --no-commit'
+alias gas='gaS --not-only-annex --content'  # = everything (both user and annex)
+alias gax='GIT_DISCOVERY_ACROSS_FILESYSTEM=1 git add .'
+
+alias ga='(){ git add "${@:-.}" }'  #  --all $(test -e $PWD/.git || echo .)
+alias ga.='git add .'
+alias gaa='git add --all'
+alias gap='git add --patch'
+alias gau='git add --update'
+
+alias gbl='git --no-pager branch -vv'
+alias gbL='git --no-pager branch -va'
+alias gbr='git for-each-ref --format="%(refname:short) %(push:track) --> %(upstream:short)" refs/heads'
+alias gbu='gbl --no-merged'
+alias gbU='gbL --no-merged'
+
+alias gs1='git submodule add --depth=1'
+alias gc='/d/airy/git/ctl/my-msg --index --modtime --commit $(test -e .git || echo --prefix=$PWD:t)'
+alias gc.='/d/airy/git/ctl/my-msg --index --modtime --commit --prefix=$PWD:t'
+# alias gcn='/d/airy/git/ctl/my-msg --index --modtime --commit --prefix'
+alias gd='gdf --cached'
+
+alias gc1='git clone --depth=1 --single-branch'
+alias gc1b='git clone --depth=1 --jobs=4 --recurse-submodules --shallow-submodules --single-branch --branch'
+
+alias gcf='git commit --amend --reuse-message HEAD'
+alias gcf-='gcf --no-verify'
+alias gcF='git commit --amend'  # --verbose
+alias gcm='git commit -m "wip" -m- -m"Issue: $(git branch --show-current|sed -r "s/^([A-Z]+-[0-9]+).*/\\1/")"'
+alias gcM='git commit'
+alias gcn='git commit --no-verify --message '
+alias gco='git checkout'
+alias gco-='git checkout -'
+alias gcs='git show'
+alias gcss='git show --stat'
+alias gcsd='git show --diff-filter=d --pretty=short --show-signature'
+alias gcsl='git --no-pager show --name-status --format=""'
+alias gcst='git --no-pager show --no-patch --pretty=tformat:%ad%n%cd'
+
+alias gdf='git diff -M --color-moved'
+alias gdf.='gdf .'
+alias gdfa='gdf --diff-filter=A'
+alias gdfm='gdf --diff-filter=M -w'
+alias gdfr='gdf --diff-filter=R'
+alias gdfs='gdf --stat'
+alias gdfsm='gdf --stat --diff-filter=mr'
+alias gdfsM='gdf --stat --diff-filter=MR'
+alias gdw='gdf -w --ignore-blank-lines'
+alias gdc='gdf --cached'
+
+# IDEA: "base .cmp. others(local)" and "merged .cmp. myown(remote)"
+alias gdm='git -c mergetool.vimdiff.cmd='\''nvim -d "$BASE" "$LOCAL" "$MERGED" "$REMOTE"'\'' mergetool --tool=vimdiff'
+alias gdmm='git -c mergetool.vimdiff.cmd='\''nvim -d "$LOCAL" "$MERGED" "$REMOTE"'\'' mergetool --tool=vimdiff'
+alias gdml='git -c mergetool.vimdiff.cmd='\''nvim -d "$MERGED" "$LOCAL"'\'' mergetool --tool=vimdiff'
+alias gdmr='git -c mergetool.vimdiff.cmd='\''nvim -d "$MERGED" "$REMOTE"'\'' mergetool --tool=vimdiff'
+alias gdmM='git -c mergetool.vimdiff.cmd='\''nvim -d "$LOCAL" "$BASE" "$REMOTE"'\'' mergetool --tool=vimdiff'
+alias gdmL='git -c mergetool.vimdiff.cmd='\''nvim -d "$BASE" "$LOCAL"'\'' mergetool --tool=vimdiff'
+alias gdmR='git -c mergetool.vimdiff.cmd='\''nvim -d "$BASE" "$REMOTE"'\'' mergetool --tool=vimdiff'
+
+alias gf='git fetch --verbose --progress --tags'
+alias gir='git reset'
+alias gir1='git reset --soft HEAD~'
+alias glg='git log --format=format:"%C(bold green)%ad%C(reset) %C(yellow)%h%C(reset) %<(48)%C(white)%s%C(reset)%C(bold red)%d%C(reset) %C(bold blue)[%aN]%C(reset)" --graph --date=short'
+alias glgs='glg --stat'
+alias glgp='glg --patch'
+alias glga='glg --stat --patch'
+
+alias glgl='glg -m -M --first-parent'
+alias glgi='gll "$(git rev-list --merges --max-count=1 HEAD)~..HEAD"'
+alias glgc='glg -m -M --no-merges'
+alias glgm='glg -m -M --merges'
+# HACK: show one commit ahead i.e. reverse op to "@~" WHY:CASE: check after fetch if local branch was merged or not
+alias glgn='glg $(git rev-list --all --not "$(git rev-parse HEAD)^@" --children | grep "^$(git rev-parse HEAD)")'
+
+alias glg.="glg 'origin/main^2..@'"
+alias glG='git log --format=format:"%C(bold blue)%cd%C(reset) %C(bold green)%ad%C(reset) %C(yellow)%h%C(reset) %<(50)%C(white)%s%C(reset)%C(bold red)%d%C(reset) %C(bold blue)[%aN]%C(reset)" --graph --date=format-local:%y%m%d/%a %H:%M:%S'
+alias gla='glg --all'
+alias glA='git log --format=fuller --graph --date=rfc2822 --all'
+alias gls='git log --patch -S '
+
+alias gl='git pull --rebase --verbose'
+alias gp='git push'
+alias gp.='git push --set-upstream origin "$(git branch --show-current)"'
+alias gpf='git push --force-with-lease'
+alias gpDb='git push origin --no-verify --delete'
+alias gpD.='gpD "$(git branch --show-current)"'
+
+alias gri='git rebase --interactive'
+alias grim='git rebase --interactive "$(git merge-base HEAD "@{u}@{1}")"'
+alias grc='git rebase --continue'
+alias gra='git rebase --abort'
+alias grm='git rebase origin/main'
+alias grom='git rebase --onto "@{u}" "$(git merge-base HEAD "@{u}@{1}")"'
+
+alias gs='git status -sb --show-stash'
+alias gsa='gs --untracked-files=all'
+alias gsi='gs --ignored'
+alias gso='git ls-files --others --ignored --exclude-standard'
+alias gtt='git tag --sort=-creatordate --format="%(HEAD)%(creatordate:format-local:%Y-%m-%d %H:%M:%S)%09%(refname:strip=2)%09%(contents:subject)"'
+
+alias gWa='git worktree add'  # <path> [<commit-ish>]
+alias gWb='git worktree add -b tmp "&tmp" main'
+alias gWs='git worktree add --no-checkout --detach'  # i.e. for sparse checkout READ git-read-tree
+alias gWl='git worktree list'
+alias gWL='git worktree list --porcelain'
+alias gWm='git worktree move'  # FAIL: for submodules
+alias gWr='git worktree repair'
+alias gWx='git worktree remove'
+
+
+for i in {1..5}; do
+  alias gcs$i="gcs @~$i"
+  alias gcss$i="gcss @~$i"
+  alias gdf$i="gdf @~$i"
+  alias gdfs$i="gdfs @~$i"
+  alias glg$i="glg @~$i.."
+  alias gri$i="gri @~$i"
+done
+
+
+## just.git
+alias Ga='just world dash modified --unrestricted'
+alias Gd='just world dash modified --files --patch'
+alias Gd.='just world dash -C . modified --files --patch'
+alias Gr='just world dash remotes'
+alias Gr.='just world dash -C . remotes'
+alias Gs='just world dash modified'
+alias Gs.='just world dash -C . modified'
+alias Gt='just world dash modified --files'
+alias Gta='just world dash modified --files --unrestricted'
+alias Gt.='just world dash -C . modified --files'
+alias Gu='just world dash unsynced'
+alias Gu.='just world dash -C . unsynced'
+alias gz1='/d/airy/git/ctl/snapshot'

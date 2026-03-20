@@ -113,11 +113,12 @@ source() {
   builtin source $@
 }
 
-source /d/airy/zsh/arc/amer-widgets.zsh
-source /d/airy/zsh/arc/amer-key-mix.zsh
-source /d/airy/zsh/arc/alias/aliases
-# TEMP: import from !fish
-source ~/.zsh_aliases
+_zshd="${${(%):-%x}:A:h:h}"  # =${BASH_SOURCE[0]:-...}
+source $_zshd/arc/amer-widgets.zsh
+source $_zshd/arc/amer-key-mix.zsh
+source $_zshd/arc/alias/aliases
+source $_zshd/cfg/aliases_git
+source $_zshd/cfg/aliases
 
 # TEMP: cdauto paths (OLD-style)
 # TODO:CHG:(cdauto): cd /path/to/somefile(:h)
