@@ -60,6 +60,13 @@ alias gdfsM='gdf --stat --diff-filter=MR'
 alias gdw='gdf -w --ignore-blank-lines'
 alias gdc='gdf --cached'
 
+alias gdf.d='gdf | delta'  # DEP=git-delta
+alias gdf.s='GIT_EXTERNAL_DIFF=difft git diff'  # DEP=difftastic
+alias gdf.t='nvim -c "au User LazyPluginsLoaded ++once Difft|only"'  # DEP=difft.nvim
+# alias gdf.t='nvim -c "au User LazyPluginsLoaded ++once call timer_start(50,{->execute(\"Difft|only\")})"'  # DEP=difft.nvim
+# OR: alias gdv=...
+alias gdf.f='nvim -c "au User LazyPluginsLoaded ++once call timer_start(50,{->execute(\"G|only\")})"'  # DEP=fugitive.vim
+
 # IDEA: "base .cmp. others(local)" and "merged .cmp. myown(remote)"
 alias gdm='git -c mergetool.vimdiff.cmd='\''nvim -d "$BASE" "$LOCAL" "$MERGED" "$REMOTE"'\'' mergetool --tool=vimdiff'
 alias gdmm='git -c mergetool.vimdiff.cmd='\''nvim -d "$LOCAL" "$MERGED" "$REMOTE"'\'' mergetool --tool=vimdiff'
