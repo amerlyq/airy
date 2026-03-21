@@ -5,16 +5,21 @@
   "permission": {
     "*": "allow",  // REF: https://opencode.ai/docs/permissions
     "bash": {
-      "*": "ask",
-      "ls *": "allow",
-      "git *": "allow",
+      "*": "allow",
+      // "git *": "allow",
       "git push*": "ask",
-      "grep *": "allow",
+      // "grep *": "allow",
+      // "head *": "allow",
+      // "ls *": "allow",
+      // "mkdir *": "allow",
+      // "python *": "allow",
       "rm *": "ask",
       "sudo *": "deny"
+      // "tail *": "allow",
+      // "uv *": "allow"
     },
     "edit": {
-      "*": "ask",
+      "*": "allow",
       "src/**/*.py": "allow"
       // "/d/just/**": "ask"
     },

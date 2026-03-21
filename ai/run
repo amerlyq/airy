@@ -38,10 +38,18 @@ case $o in :|'?') exit 2
 ;; k) DockerStopKill "$cnm"; exit
 ;; l) docker container logs -- "$cnm"; exit
 ;; s) sudo du -sh "$(docker volume inspect "$vnm" --format '{{ .Mountpoint }}')"; exit
+;; u) update=1
 ;; X) docker container rm -- "$cnm" ||:; docker volume rm -- "$vnm" ||:; exit
 ;; x) set -x && xt=${-//[^x]}
 ;; Z) docker builder prune -a; exit
 esac; done; shift $((OPTIND-1)); unset o
+
+
+if ! err=$(docker info --format '{{.OperatingSystem}}' 2>&1); then
+  if [[ $err =~ "/var/run/docker.sock: connect: no such file or directory" ]]; then
+    [[ -d /run/systemd/system ]] && sudo systemctl start docker
+  fi
+fi
 
 
 if DockerActive "$cnm"; then
@@ -71,30 +79,38 @@ if [[ ${rebuild:+x} ]] || ! DockerExists "$ltag"; then
 fi
 
 
-
-# DockerActive "$cnm" && DockerStopKill "$cnm"
-# if ! docker volume inspect -f '{{.Name}}' "$vnm" &>/dev/null; then
-#   docker volume create "$vnm"
-#   docker run -ti --rm \
-#     --mount=type=bind,"src=$here/opencode.jsonc,dst=/boot/opencode.jsonc,ro=true" \
-#     --mount=type=volume,"src=$vnm,dst=/home/user,ro=false" \
-#     -- "$ltag" bash -xc '
-#       sudo chown -R -- "${USER:?}:$USER" /home/user
-#       # FIXED: copy file to avoid dangling bind-mount
-#       install -Dm644 -t ~/.config/opencode -- /boot/opencode.jsonc
-#     '
-# fi
+stmp=${here%/*}/.git/_stamp/${here##*/}
+if [[ ${update:+x} ]] || [[ $stmp -ot $here/opencode.jsonc ]]; then
+  # DockerActive "$cnm" && DockerStopKill "$cnm"
+  if ! docker volume inspect -f '{{.Name}}' "$vnm" &>/dev/null; then
+    docker volume create "$vnm"
+  fi
+  docker run -ti --rm \
+    --mount=type=bind,"src=$here/opencode.jsonc,dst=/boot/opencode.jsonc,ro=true" \
+    --mount=type=volume,"src=$vnm,dst=/home/user,ro=false" \
+    -- "$ltag" bash -xc '
+      [[ "$(stat -c "%U:%G" ~)" = "${USER:?}:$USER" ]] || sudo chown -R --no-dereference -- $USER:$USER ~
+      # FIXED: copy file to avoid dangling bind-mount
+      install -Dm644 -t ~/.config/opencode -- /boot/opencode.jsonc
+    '
+  mkdir -p "${stmp%/*}"
+  touch "$stmp"
+fi
 
 
 
 cd "${1:-$PWD}"
 pjdir="/d/${PWD##*/}"
+(($#)) && shift
+(($#)) || set -- opencode  # bash -l
 
 rargs=(\
   --name="$cnm"
   --hostname="$cnm"
   --workdir="$pjdir"
-  --env=TZ="EET-2EEST,M3.5.0/3,M10.5.0/4"
+  # OR: -v /etc/localtime:/etc/localtime:ro -v /etc/timezone:/etc/timezone:ro
+  # OR: --env=TZ="EET-2EEST,M3.5.0/3,M10.5.0/4"
+  --env=TZ="$(realpath /etc/localtime | sed 's@.*zoneinfo/@@')"
 
   # --privileged
   --rm
@@ -140,7 +156,7 @@ rargs=(\
   --mount=type=bind,src=/usr/lib/terminfo/t/tmux-256color,dst=/usr/share/terminfo/t/tmux-256color
   --env=TERM=tmux-256color
 )
-exec docker run "${rargs[@]}" -- "$ltag" "${@:2}" # bash -l
+exec docker run "${rargs[@]}" -- "$ltag" "$@"
 
 # DEBUG:
 # export OPENCODE_EXPERIMENTAL_DISABLE_FILEWATCHER=true
