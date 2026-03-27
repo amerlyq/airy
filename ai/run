@@ -10,7 +10,8 @@ fi
 
 set -o errexit -o errtrace -o functrace -o noclobber -o noglob -o nounset -o pipefail
 shopt -qs inherit_errexit lastpipe
-[[ ${1-} == -x ]] && shift && set -x && xt=${-//[^x]}
+[[ ${1-} == -x ]] && shift && set -x && xt=${-//[^x]} ||
+  sudo(){ set -x; command sudo "$@"; { set +x; } 2>/dev/null; }
 
 [[ " $(id -nG "$USER") " =~ " docker " ]] || sudo gpasswd -a "${USER:?}" docker
 [[ " $(id -nG) " =~ " docker " ]] || exec sg "docker" ${@+-c "$(printf '%q ' "$@")"}
