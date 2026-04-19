@@ -281,10 +281,13 @@ RUN --mount=type=cache,id=pacman-cache,target=/var/cache/pacman/pkg,sharing=lock
   #   FIXED: prevents dangling-on-exit bind-mount over VOLUME
   # ALT: COPY --link --chmod=0644 --chown=${USER:?}:${USER:?} \
   #   opencode.jsonc  ${HOME:?}/.config/opencode/opencode.jsonc
-  install -Dm644 -t ~/.config/opencode -- opencode.jsonc
 
-  sudo pacman -S --noconfirm --needed -- bun
-  pikaur --noconfirm -S opencode-bin openai-codex-bin
+  # install -Dm644 -t ~/.config/opencode -- opencode.jsonc
+  # sudo pacman -S --noconfirm --needed -- bun
+  # pikaur --noconfirm -S opencode-bin
+
+  sudo pacman -S --noconfirm --needed -- bubblewrap
+  pikaur --noconfirm -S openai-codex-bin
 EOF
 
 ## BET: install from AUR

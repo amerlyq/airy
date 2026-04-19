@@ -83,18 +83,20 @@ fi
 
 
 stmp=${here%/*}/.git/_stamp/${here##*/}
-if [[ ${update:+x} ]] || [[ $stmp -ot $here/opencode.jsonc ]]; then
+if [[ ${update:+x} ]] || [[ $stmp -ot $here/opencode.jsonc ]] || [[ $stmp -ot $here/codex.toml ]]; then
   # DockerActive "$cnm" && DockerStopKill "$cnm"
   if ! docker volume inspect -f '{{.Name}}' "$vnm" &>/dev/null; then
     docker volume create "$vnm"
   fi
   docker run -ti --rm \
     --mount=type=bind,"src=$here/opencode.jsonc,dst=/boot/opencode.jsonc,ro=true" \
+    --mount=type=bind,"src=$here/codex.toml,dst=/boot/codex.toml,ro=true" \
     --mount=type=volume,"src=$vnm,dst=/home/user,ro=false" \
     -- "$ltag" bash -xc '
       [[ "$(stat -c "%U:%G" ~)" = "${USER:?}:$USER" ]] || sudo chown -R --no-dereference -- $USER:$USER ~
       # FIXED: copy file to avoid dangling bind-mount
       install -Dm644 -t ~/.config/opencode -- /boot/opencode.jsonc
+      install -Dm644 -t ~/.codex -- /boot/codex.toml
     '
   mkdir -p "${stmp%/*}"
   touch "$stmp"
@@ -105,7 +107,8 @@ fi
 cd "${1:-$PWD}"
 pjdir="/d/${PWD##*/}"
 (($#)) && shift
-(($#)) || set -- opencode  # bash -l
+# (($#)) || set -- opencode  # bash -l
+(($#)) || set -- codex
 
 rargs=(\
   --name="$cnm"

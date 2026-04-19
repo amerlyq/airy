@@ -1,0 +1,70 @@
+## SEE:
+#  * https://developers.openai.com/codex/config-basic
+#  * https://developers.openai.com/codex/config-advanced
+
+model = "gpt-5.4"
+model_provider = "openai"
+
+sandbox_mode = "workspace-write"
+approval_policy = "on-request"
+
+model_reasoning_effort = "medium"
+plan_mode_reasoning_effort = "high"
+model_reasoning_summary = "auto"
+model_verbosity = "low"
+
+hide_agent_reasoning = true
+show_raw_agent_reasoning = false
+# notify = false
+
+check_for_update_on_startup = false
+disable_paste_burst = true
+hide_full_access_warning = true
+hide_world_writable_warning = true
+hide_rate_limit_model_nudge = true
+hide_gpt5_1_migration_prompt = true
+hide_gpt-5.1-codex-max_migration_prompt = true
+
+project_root_markers = [
+  ".git",
+  "pyproject.toml",
+  "Makefile",
+]
+
+[shell_environment_policy]
+inherit = "all"
+
+[profiles.docker]
+model = "gpt-5.4"
+model_provider = "openai"
+sandbox_mode = "workspace-write"
+approval_policy = "on-request"
+model_reasoning_effort = "medium"
+plan_mode_reasoning_effort = "high"
+model_reasoning_summary = "auto"
+model_verbosity = "low"
+hide_agent_reasoning = true
+show_raw_agent_reasoning = false
+# notify = false
+check_for_update_on_startup = false
+disable_paste_burst = true
+
+
+# ALT:NOT:SECU!(suppress promprts):USAGE: $ codex -p docker_autonomous
+[profiles.docker_autonomous]
+model = "gpt-5.4"
+model_provider = "openai"
+sandbox_mode = "workspace-write"
+approval_policy = "never"
+model_reasoning_effort = "medium"
+plan_mode_reasoning_effort = "high"
+model_reasoning_summary = "auto"
+model_verbosity = "low"
+hide_agent_reasoning = true
+show_raw_agent_reasoning = false
+notify = false
+check_for_update_on_startup = false
+disable_paste_burst = true
+
+[projects."/data/g"]
+trust_level = "trusted"
