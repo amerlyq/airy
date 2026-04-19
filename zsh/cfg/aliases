@@ -62,6 +62,8 @@ alias ijq='jupyter run --existing ipython-kernel.json =(echo quit)'
 
 
 alias yt='noglob yt-dlp -o "%(title).64s.%(ext)s"'
+# "%(title)s - %(timestamp>%Y-%m-%dT%H-%M-%S)s [%(id)s].%(ext)s"
+yts(){ yt-dlp -q --progress --console-title -o "%(title).64s.%(ext)s" "$@" || notify-send --urgency=critical "yt-dlp" "$*"; }
 
 ## utils
 dec() { printf "%s\n" $(($*)); }

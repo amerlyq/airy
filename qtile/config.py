@@ -83,6 +83,10 @@ mod_open = [
 ]
 
 mod_info = [
+    Key([], "c", lazy.spawn(["dunstctl", "close"]), desc="Dunst ntf close"),
+    Key([], "S-c", lazy.spawn(["dunstctl", "close-all"]), desc="Dunst ntf close-all"),
+    Key([], "i", lazy.spawn(["dunstctl", "history-pop"]), desc="Dunst ntf history-pop"),
+    Key([], "o", lazy.spawn(["dunstctl", "action"]), desc="Dunst ntf action"),
     Key([], "e", lazy.spawn(["/d/airy/dict/run", "--en", "--dmenu"]), desc="Tr En"),
     Key([], "r", lazy.spawn(["/d/airy/dict/run", "--ru", "--dmenu"]), desc="Tr Ru"),
 ]
@@ -276,7 +280,9 @@ layouts = [
     # Try more layouts by unleashing below layouts.
     # layout.Stack(num_stacks=2),
     # layout.Tile(ratio=0.6, border_focus="#00af00", border_normal="#000000", border_width=2),
-    layout.VerticalTile(ratio=0.6, border_focus="#00af00", border_normal="#000000", border_width=2),
+    layout.VerticalTile(
+        ratio=0.6, border_focus="#00af00", border_normal="#000000", border_width=2
+    ),
     # layout.MonadTall(ratio=0.587, border_focus="#00af00"),
     # NOTE: emulate xrandr split-screen ratio for ultrawide ext monitor
     layout.MonadTall(ratio=0.238, border_focus="#00af00"),
@@ -299,61 +305,63 @@ widget_defaults = dict(
 )
 extension_defaults = widget_defaults.copy()
 
+
 def make_bar() -> bar.Bar:
     # IMPORTANT: return a NEW Bar instance each time
     return bar.Bar(
-    widgets=[
-        # widget.CurrentLayout(icon_first=True),
-        # widget.AGroupBox(),
-        widget.GroupBox(highlight_method="block", inactive="242424"),
-        widget.Sep(),
-        widget.TextBox(" "),
-        widget.Prompt(),
-        widget.WindowName(),
-        widget.Chord(
-            chords_colors={
-                "launch": ("#ff0000", "#ffffff"),
-            },
-            name_transform=lambda name: name.upper(),
-        ),
-        # widget.TextBox("default config", name="default"),
-        # widget.TextBox("Press &lt;M-r&gt; to spawn", foreground="#d75f5f"),
-        # widget.Clipboard(),
-        ## DISABLED: I installed !dunst, no with to fix this
-        # widget.Notify(),
-        widget.Systray(),
-        # widget.Clock(format="%Y-%m-%d %a %I:%M %p"),
-        widget.NetGraph(),
-        widget.MemoryGraph(fill_color="#00aa00"),
-        widget.HDDBusyGraph(device="nvme0n1", graph_color="#ad570f"),
-        widget.CPUGraph(),
-        widget.Volume(),
-        widget.Battery(
-            format="{char}{percent:2.0%} {hour:d}h{min:02d}m {watt:.2f}W",
-            foreground="#00971f",
-        ),
-        # widget.QuickExit(default_text="[X]", countdown_format="[{}]"),
-        # SRC: Support for Window Buttons · Issue #3182 · qtile/qtile ⌇⡢⣪⡶⢎
-        #   https://github.com/qtile/qtile/issues/3182
-        widget.TextBox(
-            "[✗]",
-            mouse_callbacks={"Button1": lazy.window.kill()},
-            foreground="#4040ff",
-        ),
-        # minimize = widget.TextBox("-", mouse_callbacks={"Button1": lazy.window.toggle_minimize()})
-        # maximize = widget.TextBox("=", mouse_callbacks={"Button1": lazy.window.toggle_maximize()})
-        widget.GenPollText(
-            func=lambda: ts_ymd3aw(ltoday()),
-            update_interval=60,
-            foreground="#fd971f",
-        ),
-        # widget.Clock(format="%Y-%m-%d-%a", update_interval=60, foreground="#fd971f"),
-        widget.Clock(format="%H:%M", update_interval=5),
-    ],
-    size=40,
-    # border_width=[2, 0, 2, 0],  # Draw top and bottom borders
-    # border_color=["ff00ff", "000000", "ff00ff", "000000"]  # Borders are magenta
+        widgets=[
+            # widget.CurrentLayout(icon_first=True),
+            # widget.AGroupBox(),
+            widget.GroupBox(highlight_method="block", inactive="242424"),
+            widget.Sep(),
+            widget.TextBox(" "),
+            widget.Prompt(),
+            widget.WindowName(),
+            widget.Chord(
+                chords_colors={
+                    "launch": ("#ff0000", "#ffffff"),
+                },
+                name_transform=lambda name: name.upper(),
+            ),
+            # widget.TextBox("default config", name="default"),
+            # widget.TextBox("Press &lt;M-r&gt; to spawn", foreground="#d75f5f"),
+            # widget.Clipboard(),
+            ## DISABLED: I installed !dunst, no with to fix this
+            # widget.Notify(),
+            widget.Systray(),
+            # widget.Clock(format="%Y-%m-%d %a %I:%M %p"),
+            widget.NetGraph(),
+            widget.MemoryGraph(fill_color="#00aa00"),
+            widget.HDDBusyGraph(device="nvme0n1", graph_color="#ad570f"),
+            widget.CPUGraph(),
+            widget.Volume(),
+            widget.Battery(
+                format="{char}{percent:2.0%} {hour:d}h{min:02d}m {watt:.2f}W",
+                foreground="#00971f",
+            ),
+            # widget.QuickExit(default_text="[X]", countdown_format="[{}]"),
+            # SRC: Support for Window Buttons · Issue #3182 · qtile/qtile ⌇⡢⣪⡶⢎
+            #   https://github.com/qtile/qtile/issues/3182
+            widget.TextBox(
+                "[✗]",
+                mouse_callbacks={"Button1": lazy.window.kill()},
+                foreground="#4040ff",
+            ),
+            # minimize = widget.TextBox("-", mouse_callbacks={"Button1": lazy.window.toggle_minimize()})
+            # maximize = widget.TextBox("=", mouse_callbacks={"Button1": lazy.window.toggle_maximize()})
+            widget.GenPollText(
+                func=lambda: ts_ymd3aw(ltoday()),
+                update_interval=60,
+                foreground="#fd971f",
+            ),
+            # widget.Clock(format="%Y-%m-%d-%a", update_interval=60, foreground="#fd971f"),
+            widget.Clock(format="%H:%M", update_interval=5),
+        ],
+        size=40,
+        # border_width=[2, 0, 2, 0],  # Draw top and bottom borders
+        # border_color=["ff00ff", "000000", "ff00ff", "000000"]  # Borders are magenta
     )
+
 
 ## FAIL: not available during startup
 # sc = qtile.get_screen_info()
@@ -376,7 +384,9 @@ def get_monitors() -> list[dict[str, int]]:
     res = randr.GetMonitors(root, 1).reply()
     # "name": m.name.to_string(),
     # "primary": m.primary,
-    mons = [{"x": m.x, "y": m.y, "width": m.width, "height": m.height} for m in res.monitors]
+    mons = [
+        {"x": m.x, "y": m.y, "width": m.width, "height": m.height} for m in res.monitors
+    ]
     # Deterministic ordering: top-to-bottom, then left-to-right
     # mons.sort(key=lambda d: (d["y"], d["x"]))
     return mons
@@ -386,12 +396,16 @@ def build_screens() -> list[Screen]:
     mons = get_monitors()
     if not mons:
         return [Screen(wallpaper=None, bottom=make_bar())]
-    return [Screen(wallpaper=None, bottom=(make_bar() if i==0 else None), **m)
-            for i, m in enumerate(mons)]
+    return [
+        Screen(wallpaper=None, bottom=(make_bar() if i == 0 else None), **m)
+        for i, m in enumerate(mons)
+    ]
+
 
 # initial load
 fake_screens = build_screens()
 reconfigure_screens = False
+
 
 @hook.subscribe.screen_change
 def _screen_change(_ev=None):

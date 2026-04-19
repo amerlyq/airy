@@ -21,6 +21,9 @@ class Scheme(Solarized):
         if ctx.inactive_pane:  # or ctx.marked
             return fg, bg, attr
 
+        if ctx.link_link:
+            return 31, bg, attr
+
         # E.G: aliases to *.nou
         if ctx.link:
             return fg, bg, attr

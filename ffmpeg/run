@@ -16,7 +16,7 @@ if [[ -n $ddst ]]; then
   path=$ddst/${fname##*/}
 fi
 
-exec >> /t/log
+exec &>> /t/log
 # exec &> /t/ffmpeg_${path##*/}.log
 printf "\n\n---\nARGS: %s\n" "$*"
 set -x

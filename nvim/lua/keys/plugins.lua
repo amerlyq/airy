@@ -14,7 +14,7 @@ local K = require 'keys.bind'.K
 -- BET:(new):USE: :Inspect | :InspectTree
 --   REF: https://github.com/nvim-treesitter/nvim-treesitter/issues/1228
 K('n', '<F3>', function()
-  vim.cmd 'packadd playground | TSHighlightCapturesUnderCursor'
+  -- vim.cmd 'packadd playground | TSHighlightCapturesUnderCursor'
   vim.cmd 'packadd xterm-color-table.vim'
   K('nx', '<F3>', '<Cmd>TSHighlightCapturesUnderCursor<CR>', "Show :hl group under cursor")
 end, "Show :hl group under cursor")

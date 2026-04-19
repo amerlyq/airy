@@ -7,6 +7,7 @@ import ranger.gui.widgets.browsercolumn as B
 
 class CustomKeys(Enum):
     annexed = auto()
+    link_link = auto()
     ext_nou = auto()
     wf_log = auto()
     wf_todo = auto()
@@ -29,10 +30,13 @@ def new_hook_before_drawing(fsobj, color_list):
     if fsobj.is_link:
         try:
             dst = os.readlink(fsobj.path)
-            if not dst.startswith("/") and ".git/annex/objects/" in dst:
-                color_list.append(CustomKeys.annexed.name)
         except FileNotFoundError:
             pass
+        else:
+            if not dst.startswith("/") and ".git/annex/objects/" in dst:
+                color_list.append(CustomKeys.annexed.name)
+            elif os.path.islink(dst):
+                color_list.append(CustomKeys.link_link.name)
     if fsobj.is_file:
         if nm.endswith(".nou"):
             color_list.append(CustomKeys.ext_nou.name)
