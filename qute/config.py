@@ -2593,6 +2593,9 @@ config.bind("pp", "nop")  #  'open -- {clipboard}')
 # config.bind('sk', 'cmd-set-text -s :bind')
 # config.bind('sl', 'cmd-set-text -s :set -t')
 # config.bind('ss', 'cmd-set-text -s :set')
+config.bind(
+    "tz", "config-cycle -p -u {url} content.javascript.clipboard access ;; reload"
+)
 # config.bind('tCH', 'config-cycle -p -u *://*.{url:host}/* content.cookies.accept all no-3rdparty never ;; reload')
 # config.bind('tCh', 'config-cycle -p -u *://{url:host}/* content.cookies.accept all no-3rdparty never ;; reload')
 # config.bind('tCu', 'config-cycle -p -u {url} content.cookies.accept all no-3rdparty never ;; reload')

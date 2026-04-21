@@ -28,6 +28,29 @@ vim.lsp.config('*', {
   -- end
 })
 
+if vim.bo.filetype == 'c' or vim.bo.filetype == 'cpp' then
+  vim.cmd [[ packadd clangd_extensions.nvim ]]
+
+  vim.lsp.config('clangd', {
+    -- DFL: //nvim-lspconfig/lsp/clangd.lua
+    -- filetypes = { 'c', 'cpp' },
+    -- root_markers = { 'pyproject.toml', 'setup.py', '.git' },
+    on_attach = require('lsp.attach'),
+    capabilities = capabilities,
+    -- settings = require('lsp.' .. 'clangd'),
+  })
+  -- FIXME: probably should be merged
+  -- require("clangd_extensions").setup {
+  --   server = {
+  --     on_attach = require('lsp.attach'),
+  --     capabilities = capabilities,
+  --     settings = require('lsp.' .. 'clangd'),
+  --   }
+  -- }
+  -- require 'lspconfig'["clangd"].launch()
+  vim.lsp.enable('clangd')
+end
+
 -- FIXME! The `require('lspconfig')` "framework" is deprecated, use vim.lsp.config (see :help lspconfig-nvim-0.11) instead.
 --    Feature will be removed in nvim-lspconfig v3.0.0
 -- USE: vim.lsp.config('pylsp', { settings = require('lsp.' .. lsp), })
@@ -86,18 +109,6 @@ if vim.bo.filetype == 'python' then
 --   require 'lspconfig'["sumneko_lua"].manager.try_add()
 end
 
-if vim.bo.filetype == 'c' or vim.bo.filetype == 'cpp' then
-  vim.cmd [[ packadd clangd_extensions.nvim ]]
-  -- FIXME: probably should be merged
-  require("clangd_extensions").setup {
-    server = {
-      on_attach = require('lsp.attach'),
-      capabilities = capabilities,
-      settings = require('lsp.' .. 'clangd'),
-    }
-  }
-  require 'lspconfig'["clangd"].launch()
-end
 
 
 -- NOTE:(vim_starting=1): if launched by opening .py file
