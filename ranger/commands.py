@@ -333,9 +333,12 @@ class cda(Command):
 
         if "m" in flags:
             from stat import S_ISREG as isfile
+
             files = __import__("glob").glob(path + "/**", recursive=True)
             files = [x for x in files if not x.endswith(".pyc")]
-            path = max((st.st_mtime, x) for x in files if isfile((st := os.stat(x)).st_mode))[1]
+            path = max(
+                (st.st_mtime, x) for x in files if isfile((st := os.stat(x)).st_mode)
+            )[1]
         elif fs.islink(path):
             if "l" in flags:
                 lpath = os.readlink(path)
@@ -349,12 +352,14 @@ class cda(Command):
             if "L" in flags:
                 path = fs.realpath(path)
 
-        if not fs.exists(path):
+        if not fs.lexists(path):
             return self.fm.notify("No such: " + path, bad=True)
 
         if fs.isdir(path):
             self.fm.cd(path)
         elif fs.isfile(path):
+            self.fm.select_file(path)
+        else:
             self.fm.select_file(path)
 
 
@@ -415,6 +420,7 @@ class df(Command):
             # DEV: substitute python-like placeholders -> {}, {1}, {2}
             #   else -> append filelist
             cmd += [f.path + ("/" if f.is_directory else "") for f in fls]
+            print(cmd)
             self.fm.execute_command(cmd, flags=flags)
 
 

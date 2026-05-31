@@ -14,21 +14,31 @@ else
   cvargs=( -preset slow -global_quality "$qa" )
 fi
 
-# h264_qsv av1_qsv
-# -vf 'scale_qsv=w=1920:h=1080,format=yuv420p' \
+# -c:v h264_qsv|av1_qsv|hevc_qsv OR:(auto): -init_hw_device qsv=qsv:hw
 # -vf 'scale=w=1920:h=1080' \
-# -c:v h264_qsv -i "$1" -vf 'hwdownload' \
-# -c:v h264_qsv -i "$1" -vf 'scale_qsv=w=1920:h=1080' \
-  # -c:v h264_qsv -i "$1" -vf 'scale_qsv=w=-1:h=1080' \
+# -vf 'hwdownload' \
+# -vf 'scale_qsv=w=1920:h=1080,format=yuv420p' \
+# -vf 'scale_qsv=w=-1:h=1080' \
+# "scale_qsv=w='min(iw,1920)':h='min(ih,1080)',format=qsv"
+set -x
 ffmpeg -v verbose -hide_banner \
-  -hwaccel qsv -hwaccel_output_format qsv \
-  -c:v h264_qsv -i "$1" -vf 'hwdownload' \
+  -init_hw_device qsv=qsv:hw -hwaccel qsv -hwaccel_output_format qsv \
+  -i "$1" -vf "scale_qsv=w='min(iw,1920)':h='min(ih,1080)',format=qsv" \
   -c:v hevc_qsv "${cvargs[@]}" \
   -y "${1%.*}_${ifx}${qa}.${1##*.}"
+
+
+## ALT: cuda
+# ffmpeg -hwaccel cuda -hwaccel_output_format cuda -i input.mp4 \
+# -vf "scale_cuda=w='min(iw,1920)':h='min(ih,1080)':format=yuv420p" \
+# -c:v h264_nvenc output.mp4
 
 ## ALT: vaapi
 # ffmpeg -hide_banner -hwaccel vaapi -hwaccel_output_format vaapi \
 #   -i "$1" -c:v hevc -global_quality "${2:-25}" -y "${1%.*}_c.${1##*.}"
+# ffmpeg -hwaccel vaapi -hwaccel_device /dev/dri/renderD128 -i input.mp4 \
+# -vf "scale_vaapi=w='min(iw,1920)':h='min(ih,1080)',hwdownload,format=nv12" \
+# -c:v libx264 output.mp4
 
 ## ALT:(sw): when vaapi doesn't work e.g: fps>30/re-scale
 # ffmpeg -y -hide_banner -i "$1" -vf 'fps=60,scale=w=1920:h=1080' \

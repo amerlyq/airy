@@ -84,7 +84,7 @@ mod_open = [
 
 mod_info = [
     Key([], "c", lazy.spawn(["dunstctl", "close"]), desc="Dunst ntf close"),
-    Key([], "S-c", lazy.spawn(["dunstctl", "close-all"]), desc="Dunst ntf close-all"),
+    Key([], "z", lazy.spawn(["dunstctl", "close-all"]), desc="Dunst ntf close-all"),
     Key([], "i", lazy.spawn(["dunstctl", "history-pop"]), desc="Dunst ntf history-pop"),
     Key([], "o", lazy.spawn(["dunstctl", "action"]), desc="Dunst ntf action"),
     Key([], "e", lazy.spawn(["/d/airy/dict/run", "--en", "--dmenu"]), desc="Tr En"),

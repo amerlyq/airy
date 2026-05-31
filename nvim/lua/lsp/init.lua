@@ -16,6 +16,10 @@ local capabilities = vim.lsp.protocol.make_client_capabilities()
 -- The nvim-cmp almost supports LSP's capabilities so You should advertise it to LSP servers..
 capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 
+-- FIXME? Two more 0.12 additions worth knowing:
+--   * vim.o.autocomplete = true for native insert-mode completion (nvim-cmp optional now),
+--   and vim.net.request() for HTTP calls from Lua without curl wrappers.
+
 vim.lsp.config('*', {
   on_attach = require('lsp.attach'),
   capabilities = capabilities,
@@ -32,6 +36,8 @@ if vim.bo.filetype == 'c' or vim.bo.filetype == 'cpp' then
   vim.cmd [[ packadd clangd_extensions.nvim ]]
 
   vim.lsp.config('clangd', {
+    -- Add both to be safe, but clang-21 is the priority
+    -- cmd = { "clangd", "--background-index", "--clang-tidy", "--query-driver=/usr/bin/clang-21,/usr/bin/gcc", },
     -- DFL: //nvim-lspconfig/lsp/clangd.lua
     -- filetypes = { 'c', 'cpp' },
     -- root_markers = { 'pyproject.toml', 'setup.py', '.git' },

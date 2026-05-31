@@ -10,6 +10,9 @@ from ranger.colorschemes.solarized import Solarized
 
 class Scheme(Solarized):
     def use(self, ctx):
+        if not ctx.in_browser or ctx.tag_marker:
+            return Solarized.use(self, ctx)
+
         # NOTE: only existing annexed symlinks must mimic to real files
         annexed = ctx.annexed and ctx.good
         if annexed:
@@ -22,6 +25,9 @@ class Scheme(Solarized):
             return fg, bg, attr
 
         if ctx.link_link:
+            return 31, bg, attr
+        if ctx.link_annex:
+            attr |= curses.A_ITALIC
             return 31, bg, attr
 
         # E.G: aliases to *.nou

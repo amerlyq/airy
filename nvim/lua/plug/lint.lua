@@ -20,10 +20,11 @@ local lint = require('lint')
 local pjroot = vim.fs.root(0, { '.git', 'pyproject.toml' }) or vim.fn.getcwd()
 
 -- DEBUG: :lua print(vim.inspect(require('lint').linters.dmypy))
-local args = {
+local dmypyargs = {
   -- ALT:(.gitignore): pjroot .. '/.dmypy.json'
   '--status-file', '/tmp/dmypy-' .. vim.fn.sha256(pjroot):sub(1, 8) .. '.json',
   'run',
+  '--timeout', '50000',
   '--',
   -- INFO: use shared cache to avoid pollution everywhere
   '--cache-dir', vim.fn.expand('~/.cache/mypy_cache'),
@@ -32,24 +33,31 @@ local args = {
   '--hide-error-context',
   '--no-color-output',
   '--no-error-summary',
-  -- '--no-pretty',
+  '--no-pretty',
   -- '--ignore-missing-imports',
   -- '--follow-imports=silent',
   -- '--hide-error-codes',
   -- '--no-color',
   -- '--no-error-summary',
+  -- '--python-executable', vim.fn.exepath('python3')
 }
 
 local venv_python = pjroot .. "/.venv/bin/python"
 if vim.fn.executable(venv_python) == 1 then
-  table.insert(args, '--python-executable')
-  table.insert(args, venv_python)
+  table.insert(dmypyargs, '--python-executable')
+  table.insert(dmypyargs, venv_python)
+
+  -- ALT:
+  -- table.insert(pylintargs, '--init-hook')
+  -- table.insert(pylintargs, "import pylint_venv; pylint_venv.inithook()")
+  lint.linters.pylint.cmd = venv_python
+  local orig = lint.linters.pylint.args
+  local pylintargs = { '-m', 'pylint' }
+  lint.linters.pylint.args = vim.list_extend(pylintargs, orig)
 end
 
-lint.linters.dmypy.args = args
+lint.linters.dmypy.args = dmypyargs
 
--- lint.linters.pylint.cmd = 'python'
--- lint.linters.pylint.args = { '-m', 'pylint', '-f', 'json' }
 
 -- Assign it to python files
 lint.linters_by_ft = {
