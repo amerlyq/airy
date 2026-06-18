@@ -8,6 +8,8 @@ local function ft_python()
   -- FIXME: load both for .py and .lua
   require 'lsp.init'
   require('lsp.pylsp')
+  vim.lsp.enable('ruff')
+  vim.lsp.enable('basedpyright')
 
   --FAIL: should load mappings only inside buffer
   if vim.bo.filetype == 'python' then

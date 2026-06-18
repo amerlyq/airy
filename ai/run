@@ -109,6 +109,13 @@ pjdir="/d/${PWD##*/}"
 (($#)) && shift
 # (($#)) || set -- opencode  # bash -l
 (($#)) || set -- codex
+# codex --sandbox danger-full-access
+# codex --dangerously-bypass-approvals-and-sandbox
+
+# cat /proc/sys/kernel/unprivileged_userns_clone 2>/dev/null || true
+# cat /proc/sys/user/max_user_namespaces
+# sudo sysctl -w kernel.unprivileged_userns_clone=1
+# sudo sysctl -w user.max_user_namespaces=28633
 
 rargs=(\
   --name="$cnm"
@@ -125,6 +132,11 @@ rargs=(\
   --tty=true
   --pull=never
   --init
+
+  # OR: --security-opt seccomp=unconfined --security-opt apparmor=unconfined
+  # DEBUG: unshare -Ur true && echo "userns ok"
+  #   bwrap --unshare-user --uid 0 --gid 0 --ro-bind / / /bin/true && echo "bwrap ok"
+  --security-opt seccomp=unconfined --cap-add SYS_ADMIN
 
   --network=host
   --add-host="$cnm:127.0.0.1"

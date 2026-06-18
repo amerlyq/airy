@@ -1,1 +1,1 @@
-/@/nou.vim
+/d/nou.vim

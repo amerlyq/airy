@@ -286,6 +286,8 @@ RUN --mount=type=cache,id=pacman-cache,target=/var/cache/pacman/pkg,sharing=lock
   # sudo pacman -S --noconfirm --needed -- bun
   # pikaur --noconfirm -S opencode-bin
 
+  # ERR: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces.
+  #  On e.g. debian this can be enabled with 'sysctl kernel.unprivileged_userns_clone=1'.
   sudo pacman -S --noconfirm --needed -- bubblewrap
   pikaur --noconfirm -S openai-codex-bin
 EOF

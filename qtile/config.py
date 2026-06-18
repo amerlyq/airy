@@ -4,6 +4,7 @@
 # import importlib
 import os
 import os.path as fs
+
 # import sys
 import time
 from typing import Any, cast
@@ -12,8 +13,7 @@ from just.ext.datetime.cvt import ts_ymd3aw
 from just.ext.datetime.local import ltoday
 from libqtile import bar, hook, layout, qtile, widget
 from libqtile.backend.x11 import window
-from libqtile.config import (Click, Drag, EzKey, Group, Key, KeyChord, Match,
-                             Screen)
+from libqtile.config import Click, Drag, EzKey, Group, Key, KeyChord, Match, Screen
 from libqtile.lazy import lazy
 from libqtile.utils import guess_terminal, send_notification
 from psutil import Process
@@ -338,6 +338,8 @@ def make_bar() -> bar.Bar:
             widget.Battery(
                 format="{char}{percent:2.0%} {hour:d}h{min:02d}m {watt:.2f}W",
                 foreground="#00971f",
+                # show_short_text=False,
+                # battery_name="BAT0",
             ),
             # widget.QuickExit(default_text="[X]", countdown_format="[{}]"),
             # SRC: Support for Window Buttons · Issue #3182 · qtile/qtile ⌇⡢⣪⡶⢎

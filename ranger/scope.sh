@@ -196,6 +196,13 @@ handle_image() {
 
         ## Image
         image/*)
+            ## DISABLED:WTF: this branch runs even for .mp4!
+            # FIXED: don't eat all RAM on animated .webp or large .gif
+            # if file --dereference --brief -- "${FILE_PATH}" | grep -qFw animated; then
+            #   exiftool "${FILE_PATH}"
+            #   exit 2;;
+            # fi
+
             local orientation
             orientation="$( identify -format '%[EXIF:Orientation]\n' -- "${FILE_PATH}" )"
             ## If orientation data is present and the image actually

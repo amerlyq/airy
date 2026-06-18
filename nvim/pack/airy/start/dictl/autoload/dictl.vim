@@ -1,1 +1,1 @@
-/@/airy/vim/autoload/dictl.vim
+../../../../../../vim/autoload/dictl.vim

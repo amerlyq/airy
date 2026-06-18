@@ -1,1 +1,0 @@
-/@/airy/vim/plugin/dictl.vim

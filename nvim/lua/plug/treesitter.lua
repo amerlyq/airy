@@ -9,6 +9,13 @@
 --MAINT:  :TSUpdate
 --DEBUG:  :TSModuleInfo
 
+-- [✓] Samuel Lawrentz | nvim-treesitter Was Archived. Here's What You Actually Need to Do. ⌇⡩⣩⠪⢋
+--   https://samuellawrentz.com/blog/nvim-treesitter-archived-neovim-0-12-migration/#:~:text=Here's the diff: -- Before,and run :TSInstall
+--     OLD: require('nvim-treesitter.configs').setup(...)
+--     NEW: -- After (0.12 native)
+--     -- Delete the block above. Highlighting is on by default.
+--     -- For languages not bundled, install tree-sitter-cli and run :TSInstall <lang>
+
 
 require('nvim-treesitter').setup {
   -- Directory to install parsers and queries to

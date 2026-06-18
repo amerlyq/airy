@@ -1,6 +1,10 @@
 -- REF: https://github.com/nvim-lua/kickstart.nvim/blob/master/init.lua
 local o, g = vim.opt, vim.g
 
+-- g.matchup_matchparen_cursor_highlight = 0
+-- let g:matchup_matchparen_offscreen = {'method': 'none'}
+-- g.matchup_matchparen_enabled = 0
+
 --Set highlight on search
 o.hlsearch = true
 

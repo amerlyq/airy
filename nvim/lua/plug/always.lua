@@ -3,7 +3,20 @@ require 'plug.cmp_' -- +luasnip
 require 'plug.gitsigns'
 
 -- BAD: which-key preview has long delay due to nested <ys/ds> mappings
-require 'plug.surround'
+-- DISABLED: keymaps need to be migrated/recreated
+-- require 'plug.surround'
+-- -- See `:h nvim-surround.options`
+-- vim.g.nvim_surround_no_normal_mappings = true
+-- -- See `:h nvim-surround.keymaps`
+-- vim.keymap.set("n", "sa", "<Plug>(nvim-surround-normal)", {
+--     desc = "Add a surrounding pair around a motion (normal mode)",
+-- })
+-- vim.keymap.set("n", "sd", "<Plug>(nvim-surround-delete)", {
+--     desc = "Delete a surrounding pair",
+-- })
+-- vim.keymap.set("n", "sr", "<Plug>(nvim-surround-change)", {
+--     desc = "Change a surrounding pair",
+-- })
 
 require('mini.move').setup({  --- ALT※⡤⣪⡒⡮
   mappings = {

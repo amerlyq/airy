@@ -2,9 +2,10 @@
 #  * https://developers.openai.com/codex/config-basic
 #  * https://developers.openai.com/codex/config-advanced
 
-model = "gpt-5.4"
+model = "gpt-5.5"
 model_provider = "openai"
 
+# sandbox_mode = "danger-full-access"
 sandbox_mode = "workspace-write"
 approval_policy = "on-request"
 
@@ -35,7 +36,7 @@ project_root_markers = [
 inherit = "all"
 
 [profiles.docker]
-model = "gpt-5.4"
+model = "gpt-5.5"
 model_provider = "openai"
 sandbox_mode = "workspace-write"
 approval_policy = "on-request"
@@ -52,7 +53,7 @@ disable_paste_burst = true
 
 # ALT:NOT:SECU!(suppress promprts):USAGE: $ codex -p docker_autonomous
 [profiles.docker_autonomous]
-model = "gpt-5.4"
+model = "gpt-5.5"
 model_provider = "openai"
 sandbox_mode = "workspace-write"
 approval_policy = "never"
@@ -66,5 +67,8 @@ notify = false
 check_for_update_on_startup = false
 disable_paste_burst = true
 
-[projects."/data/g"]
+[projects."/d/g"]
+trust_level = "trusted"
+
+[projects."/d/miur/src/miur"]
 trust_level = "trusted"

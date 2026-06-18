@@ -42,7 +42,7 @@ Server = https://archive.archlinux.org/repos/$udt/\$repo/os/\$arch"
 # HACK: skip 'exit 1' if update 'n' in pacman
 # BUG: skips upgrade if file exists -- because errcode=1
 # shellcheck disable=SC2046
-pkgupd(){ sudo pacman -Syu $(skip 'PKG_IGNORE[@]') || ((1==$?)); }
+pkgupd(){ sudo pacman -Syu $(skip 'PKG_IGNORE[@]'); }  #  || ((1==$?))
 refresh_mirrors "$([[ " $* " =~ " -r " ]]&&echo 1)"
 pkgupd
 # shellcheck disable=SC2046
