@@ -1,1 +1,1 @@
-/@/airy/vim/plugin/xtref.vim
+../../vim/plugin/xtref.vim

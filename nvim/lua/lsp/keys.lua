@@ -4,7 +4,10 @@ local function lsp_mappings(client, bufnr)
   local B = vim.lsp.buf
   local KBn = function(lhs, fn, s) KB(bufnr, 'n', lhs, '', { callback = fn, noremap = true, desc = s }) end
 
-  KBn('gd', B.definition, "definition [LSP]")
+  -- BAD: jumps to base class inof QFix list of derived classes
+  -- KBn('gd', B.definition, "definition [LSP]")
+  KBn('gd', require('telescope.builtin').lsp_definitions, 'LSP go to definition')
+
   -- KBn('gD', B.type_definition, "type_def [LSP]") -- DFL=,D | <LL>d
   KBn('gD', B.declaration, "decl [LSP]") -- NOT
   KBn('gw', B.references, "references [LSP]") -- DFL=gr  @me=<LocalLeader>u

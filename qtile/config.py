@@ -338,7 +338,7 @@ def make_bar() -> bar.Bar:
             widget.Battery(
                 format="{char}{percent:2.0%} {hour:d}h{min:02d}m {watt:.2f}W",
                 foreground="#00971f",
-                # show_short_text=False,
+                show_short_text=False,
                 # battery_name="BAT0",
             ),
             # widget.QuickExit(default_text="[X]", countdown_format="[{}]"),

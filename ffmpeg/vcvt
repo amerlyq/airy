@@ -20,10 +20,12 @@ fi
 # -vf 'scale_qsv=w=1920:h=1080,format=yuv420p' \
 # -vf 'scale_qsv=w=-1:h=1080' \
 # "scale_qsv=w='min(iw,1920)':h='min(ih,1080)',format=qsv"
+# "scale=w=1920:h=1920:force_original_aspect_ratio=decrease,format=qsv" \
+# "scale_qsv=w='if(gt(iw,ih),1920,round(1920*a/2)*2)':h='if(gt(ih,iw),1920,round(1920/a/2)*2)',format=qsv" \
 set -x
 ffmpeg -v verbose -hide_banner \
   -init_hw_device qsv=qsv:hw -hwaccel qsv -hwaccel_output_format qsv \
-  -i "$1" -vf "scale_qsv=w='min(iw,1920)':h='min(ih,1080)',format=qsv" \
+  -i "$1" -vf "scale_qsv=w='if(gt(iw,ih),min(iw,1920),trunc(1920*a/2)*2)':h='if(gt(ih,iw),min(ih,1920),trunc(1920/a/2)*2)',format=qsv" \
   -c:v hevc_qsv "${cvargs[@]}" \
   -y "${1%.*}_${ifx}${qa}.${1##*.}"
 

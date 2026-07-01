@@ -135,6 +135,7 @@ done < <(sed -r 's/(^|\s+)#.*$//; /^\s*$/d' /d/airy/airy/pathes)
 fm(){ local d f=${XDG_RUNTIME_DIR:?}/ranger/cwd
   # NOTE: exit ranger-nested shell && sync last PWD (inof ZSHEXIT)
   [[ -n ${RANGER_LEVEL-} ]] && exit  # && (set +C && pwd > "$f")
+  [[ -d ${f%/*} ]] || command mkdir -p "${f%/*}"
   command fm --choosedir="$f" "$@"
   [[ -s $f ]] && d=$(<"$f")
   if [[ -d ${d-} && $d != $PWD ]]; then builtin cd -- "$d" || return; fi
