@@ -41,7 +41,7 @@ index 18341c5..e8e669c 100644
  }
 @@ -945,6 +955,11 @@ ttyresize(int tw, int th)
  void
- ttyhangup()
+ ttyhangup(void)
  {
 +	if (use_mux) {
 +		setenv("MUX_NM", mux_nm, 1);
@@ -76,7 +76,7 @@ index 18341c5..e8e669c 100644
 +		}
 +		break;
  	case 'b': /* REP -- if last char is printable print it <n> more times */
- 		DEFAULT(csiescseq.arg[0], 1);
+ 		LIMIT(csiescseq.arg[0], 1, 65535);
 diff --git a/st.h b/st.h
 index 13203fc..11d86bd 100644
 --- a/st.h

@@ -1,0 +1,64 @@
+diff --git a/config.def.h b/config.def.h
+index 71d931b..9cd8654 100644
+--- a/config.def.h
++++ b/config.def.h
+@@ -5,7 +5,7 @@
+  *
+  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
+  */
+-static char *font = "Liberation Mono:pixelsize=12:antialias=true:autohint=true";
++static char *font = "monospace-13";
+ static int borderpx = 2;
+ 
+ /*
+@@ -109,8 +109,8 @@ static unsigned int cursorthickness = 2;
+  *    Bold affects lines thickness if boxdraw_bold is not 0. Italic is ignored.
+  * 0: disable (render all U25XX glyphs normally from the font).
+  */
+-const int boxdraw = 0;
+-const int boxdraw_bold = 0;
++const int boxdraw = 1;
++const int boxdraw_bold = 1;
+ 
+ /* braille (U28XX):  1: render as adjacent "pixels",  0: use font */
+ const int boxdraw_braille = 0;
+@@ -250,14 +250,15 @@ static unsigned int defaultrcs = 258;
+  * 7: blinking st cursor
+  * 8: steady st cursor
+  */
+-static unsigned int cursorstyle = 1;
++static unsigned int cursorstyle = 2;
+ static Rune stcursor = 0x2603; /* snowman ("☃") */
+ 
+ /*
+  * Default columns and rows numbers
+  */
+ 
+-static unsigned int cols = 80;
++// Keep geometry for floating windows to fit python comments
++static unsigned int cols = 118;
+ static unsigned int rows = 24;
+ 
+ /*
+@@ -301,6 +302,10 @@ static MouseShortcut mshortcuts[] = {
+ 
+ #define ACMPL_MOD ControlMask|Mod1Mask
+ 
++/* THINK: pass more inner vars from st instance */
++static char *pipe_url[] = { "/d/airy/st/run-pipe", "--url", NULL };
++static char *pipe_vim[] = { "/d/airy/st/run-pipe", "--vim", NULL };
++
+ static Shortcut shortcuts[] = {
+ 	/* mask                 keysym          function        argument */
+ 	{ XK_ANY_MOD,           XK_Break,       sendbreak,      {.i =  0} },
+@@ -316,7 +321,9 @@ static Shortcut shortcuts[] = {
+ 	{ TERMMOD,              XK_Y,           selpaste,       {.i =  0} },
+ 	{ ShiftMask,            XK_Insert,      selpaste,       {.i =  0} },
+ 	{ TERMMOD,              XK_Num_Lock,    numlock,        {.i =  0} },
+-	{ XK_ANY_MOD,           XK_F6,          swapcolors,     {.i =  0} },
++	{ TERMMOD,              XK_F6,          swapcolors,     {.i =  0} },
++	{ TERMMOD,              XK_U,           externalpipe,   {.v = pipe_url} },
++	{ TERMMOD,              XK_space,       externalpipe,   {.v = pipe_vim} },
+ 	{ TERMMOD,              XK_Return,      newterm,        {.i =  0} },
+ 	{ ACMPL_MOD,            XK_slash,       autocomplete,   { .i = ACMPL_WORD        } },
+ 	{ ACMPL_MOD,            XK_period,      autocomplete,   { .i = ACMPL_FUZZY_WORD  } },

@@ -28,17 +28,17 @@ index e5f1737..7e759b0 100644
  	if (IS_SET(MODE_MOUSE) && !(e->xbutton.state & forcemousemod)) {
  		mousereport(e);
  		return;
-@@ -1111,12 +1123,12 @@ void
+@@ -1099,12 +1111,12 @@ void
  xinit(int cols, int rows)
  {
  	XGCValues gcvalues;
 -	Cursor cursor;
- 	Window parent;
+ 	Window parent, root;
  	pid_t thispid = getpid();
  	XColor xmousefg, xmousebg;
-+	Pixmap blankpm;
  	XWindowAttributes attr;
  	XVisualInfo vis;
++	Pixmap blankpm;
  
  	if (!(xw.dpy = XOpenDisplay(NULL)))
  		die("can't open display\n");

@@ -1,8 +1,19 @@
+From f5a53a03f9ed6b8e1a764274eb9b0aed99319d6b Mon Sep 17 00:00:00 2001
+From: Max Schillinger <maxschillinger@web.de>
+Date: Fri, 17 Jun 2022 20:21:40 +0200
+Subject: [PATCH] solarized-both patch for st commit baa9357
+
+---
+ config.def.h | 73 ++++++++++++++++++++++++++++++----------------------
+ st.h         |  1 +
+ x.c          | 26 +++++++++++++++----
+ 3 files changed, 64 insertions(+), 36 deletions(-)
+
 diff --git a/config.def.h b/config.def.h
-index 6f05dce..f68cd06 100644
+index 91ab8ca..0c37a3a 100644
 --- a/config.def.h
 +++ b/config.def.h
-@@ -95,42 +95,70 @@ unsigned int tabspaces = 8;
+@@ -95,44 +95,54 @@ unsigned int tabspaces = 8;
  
  /* Terminal colors (16 first used in escape sequence) */
  static const char *colorname[] = {
@@ -25,6 +36,14 @@ index 6f05dce..f68cd06 100644
 -	"magenta",
 -	"cyan",
 -	"white",
+-
+-	[255] = 0,
+-
+-	/* more colors can be added after 255 to use with DefaultXX */
+-	"#cccccc",
+-	"#555555",
+-	"gray90", /* default foreground colour */
+-	"black", /* default background colour */
 +	/* solarized dark */
 +	"#073642",  /*  0: black    */
 +	"#dc322f",  /*  1: red      */
@@ -42,15 +61,6 @@ index 6f05dce..f68cd06 100644
 +	"#6c71c4",  /* 13: brmagenta*/
 +	"#93a1a1",  /* 14: brcyan   */
 +	"#fdf6e3",  /* 15: brwhite  */
- 
- 	[255] = 0,
- 
- 	/* more colors can be added after 255 to use with DefaultXX */
--	"#cccccc",
-+	"#839496",  /* FIXED: solarized base0/12 */
-+	"#000000",
-+	"#eeeeee",
- 	"#555555",
  };
  
 +/* Terminal colors for alternate (light) palette */
@@ -72,33 +82,33 @@ index 6f05dce..f68cd06 100644
 +	"#6c71c4",  /* 13: brmagenta*/
 +	"#586e75",  /* 14: brcyan   */
 +	"#002b36",  /* 15: brwhite  */
-+
-+	[255] = 0,
-+
-+	/* more colors can be added after 255 to use with DefaultXX */
-+	"#000000",
-+	"#839496",  /* FIXED: solarized base0/12 */
-+	"#555555",
-+	"#eeeeee",
 +};
  
  /*
   * Default colors (colorname index)
   * foreground, background, cursor, reverse cursor
   */
--unsigned int defaultfg = 7;
--unsigned int defaultbg = 0;
--static unsigned int defaultcs = 256;
+-unsigned int defaultfg = 258;
+-unsigned int defaultbg = 259;
+-unsigned int defaultcs = 256;
 -static unsigned int defaultrcs = 257;
-+unsigned int defaultfg = 256;
-+unsigned int defaultbg = 257;
-+unsigned int defaultcs = 258;
-+unsigned int defaultrcs = 259;
++unsigned int defaultfg = 12;
++unsigned int defaultbg = 8;
++unsigned int defaultcs = 14;
++static unsigned int defaultrcs = 15;
  
  /*
   * Default shape of cursor
+@@ -201,6 +211,7 @@ static Shortcut shortcuts[] = {
+ 	{ TERMMOD,              XK_Y,           selpaste,       {.i =  0} },
+ 	{ ShiftMask,            XK_Insert,      selpaste,       {.i =  0} },
+ 	{ TERMMOD,              XK_Num_Lock,    numlock,        {.i =  0} },
++	{ XK_ANY_MOD,           XK_F6,          swapcolors,     {.i =  0} },
+ };
+ 
+ /*
 diff --git a/st.h b/st.h
-index 3d351b6..03f5206 100644
+index fd3b0d8..4b4d5ab 100644
 --- a/st.h
 +++ b/st.h
 @@ -120,6 +120,7 @@ extern wchar_t *worddelimiters;
@@ -110,7 +120,7 @@ index 3d351b6..03f5206 100644
  extern unsigned int defaultfg;
  extern unsigned int defaultbg;
 diff --git a/x.c b/x.c
-index 210f184..d94c42b 100644
+index 2a3bd38..144ed40 100644
 --- a/x.c
 +++ b/x.c
 @@ -55,6 +55,7 @@ static void clipcopy(const Arg *);
@@ -123,7 +133,7 @@ index 210f184..d94c42b 100644
  static void zoomreset(const Arg *);
 @@ -254,6 +255,8 @@ static char *opt_title = NULL;
  
- static int oldbutton = 3; /* button event on startup: 3 = release */
+ static uint buttons; /* bit field of pressed buttons */
  
 +int usealtcolors = 0; /* 1 to use alternate palette */
 +
@@ -137,27 +147,27 @@ index 210f184..d94c42b 100644
 +void
 +swapcolors(const Arg *dummy)
 +{
-+	usealtcolors = !usealtcolors;
-+	xloadcols();
-+	redraw();
++ usealtcolors = !usealtcolors;
++ xloadcols();
++ redraw();
 +}
 +
  void
  zoom(const Arg *arg)
  {
-@@ -748,6 +759,11 @@ sixd_to_16bit(int x)
+@@ -766,6 +777,11 @@ sixd_to_16bit(int x)
  	return x == 0 ? 0 : 0x3737 + 0x2828 * x;
  }
  
 +const char* getcolorname(int i)
 +{
-+	return (usealtcolors) ?  altcolorname[i] : colorname[i];
++    return (usealtcolors) ?  altcolorname[i] : colorname[i];
 +}
 +
  int
  xloadcolor(int i, const char *name, Color *ncolor)
  {
-@@ -766,7 +782,7 @@ xloadcolor(int i, const char *name, Color *ncolor)
+@@ -784,7 +800,7 @@ xloadcolor(int i, const char *name, Color *ncolor)
  			return XftColorAllocValue(xw.dpy, xw.vis,
  			                          xw.cmap, &color, ncolor);
  		} else
@@ -166,7 +176,7 @@ index 210f184..d94c42b 100644
  	}
  
  	return XftColorAllocName(xw.dpy, xw.vis, xw.cmap, name, ncolor);
-@@ -789,8 +805,8 @@ xloadcols(void)
+@@ -807,8 +823,8 @@ xloadcols(void)
  
  	for (i = 0; i < dc.collen; i++)
  		if (!xloadcolor(i, NULL, &dc.col[i])) {
@@ -177,7 +187,7 @@ index 210f184..d94c42b 100644
  			else
  				die("could not allocate color %d\n", i);
  		}
-@@ -1169,13 +1185,13 @@ xinit(int cols, int rows)
+@@ -1200,13 +1216,13 @@ xinit(int cols, int rows)
  	cursor = XCreateFontCursor(xw.dpy, mouseshape);
  	XDefineCursor(xw.dpy, xw.win, cursor);
  
@@ -193,3 +203,6 @@ index 210f184..d94c42b 100644
  		xmousebg.red   = 0x0000;
  		xmousebg.green = 0x0000;
  		xmousebg.blue  = 0x0000;
+-- 
+2.36.1
+

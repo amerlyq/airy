@@ -62,8 +62,8 @@ index 684311c..ce1c418 100644
  char *argv0;
  #include "arg.h"
 @@ -45,5 +46,18 @@ typedef struct {
- 	signed char appcursor; /* application cursor */
- } Key;
+ #define XK_NO_MOD     0
+ #define XK_SWITCH_MOD (1<<13|1<<14)
 
 +typedef struct {
 +	const char *name;
@@ -78,8 +78,8 @@ index 684311c..ce1c418 100644
 +
 +static void refreshxrandr(const Arg *dummy);
 +
- /* X modifiers */
- #define XK_ANY_MOD    UINT_MAX
+ /* function definitions used in config.h */
+ static void clipcopy(const Arg *);
 @@ -233,7 +233,12 @@ static XWindow xw;
  	[PropertyNotify] = propnotify,
  	[SelectionRequest] = selrequest,

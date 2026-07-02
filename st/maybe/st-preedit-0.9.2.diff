@@ -1,0 +1,388 @@
+diff --git a/st.c b/st.c
+index b9f66e7..ede6d6b 100644
+--- a/st.c
++++ b/st.c
+@@ -109,6 +109,12 @@ typedef struct {
+ 	int alt;
+ } Selection;
+ 
++typedef struct {
++	Glyph *text;   /* preedit text */
++	int len;       /* text length */
++	PLine pline;
++} Preedit;
++
+ /* Internal representation of the screen */
+ typedef struct {
+ 	int row;      /* nb row */
+@@ -202,6 +208,7 @@ static int32_t tdefcolor(const int *, int *, int);
+ static void tdeftran(char);
+ static void tstrsequence(uchar);
+ 
++static void pelineupdate(void);
+ static void drawregion(int, int, int, int);
+ 
+ static void selnormalize(void);
+@@ -221,6 +228,7 @@ static ssize_t xwrite(int, const char *, size_t);
+ /* Globals */
+ static Term term;
+ static Selection sel;
++static Preedit preedit;
+ static CSIEscape csiescseq;
+ static STREscape strescseq;
+ static int iofd = 1;
+@@ -1179,6 +1187,9 @@ tmoveto(int x, int y)
+ 	term.c.state &= ~CURSOR_WRAPNEXT;
+ 	term.c.x = LIMIT(x, 0, term.col-1);
+ 	term.c.y = LIMIT(y, miny, maxy);
++
++	if (preedit.len > 0)
++		pelineupdate();
+ }
+ 
+ void
+@@ -2627,6 +2638,115 @@ resettitle(void)
+ 	xsettitle(NULL);
+ }
+ 
++void
++pereset(void)
++{
++	preedit.len = 0;
++	preedit.pline.width = 0;
++	pelineupdate();
++}
++
++void
++peupdate(int caret, int chg_fst, int chg_len,
++		unsigned short str_len, const ushort *modes, const char *str)
++{
++	int i;
++	int defmode;
++	Glyph *text, *g;
++	int chg_last, len;
++
++	chg_fst  = MIN(chg_fst,  preedit.len);
++	chg_len  = MIN(chg_len,  preedit.len - chg_fst);
++	chg_last = chg_fst + chg_len;
++	len = preedit.len - chg_len + (str ? str_len : 0);
++
++	/* default glyph mode */
++	defmode = ATTR_NULL;
++	if (preedit.len > 0)
++		defmode = (chg_fst < preedit.len) ?
++			preedit.text[chg_fst].mode :
++			preedit.text[chg_fst - 1].mode;
++	defmode &= ~ATTR_WIDE;
++
++	/* create new text and copy old glyphs */
++	text = xmalloc(len * sizeof(Glyph));
++	if (preedit.len > 0) {
++		memcpy(text, preedit.text, chg_fst * sizeof(Glyph));
++		memcpy(text + chg_fst + (str ? str_len : 0),
++				preedit.text + chg_last,
++				(preedit.len - chg_last) * sizeof(Glyph));
++		free(preedit.text);
++	}
++	preedit.text = text;
++	preedit.len = len;
++
++	/* new glyphs */
++	if (str) {
++		for (i = 0; i < str_len; i++) {
++			g = text + chg_fst + i;
++			*g = (Glyph){ 0, defmode, defaultfg, defaultbg };
++			str += utf8decode(str, &g->u, UTF_SIZ);
++			if (wcwidth(g->u) > 1)
++				g->mode |= ATTR_WIDE;
++		}
++	}
++
++	/* glyph mode */
++	if (modes) {
++		for (i = 0; i < str_len; i++) {
++			g = text + chg_fst + i;
++			g->mode = modes[i] | (g->mode & ATTR_WIDE);
++		}
++	}
++
++	/* visual width and caret position */
++	preedit.pline.width = 0;
++	preedit.pline.caret = 0;
++	for (i = 0; i < len; i++) {
++		preedit.pline.width += MAX(wcwidth(text[i].u), 1);
++		if (i + 1 == caret)
++			preedit.pline.caret = preedit.pline.width;
++	}
++
++	pelineupdate();
++}
++
++void
++pelineupdate()
++{
++	int i, x;
++
++	free(preedit.pline.line);
++	preedit.pline.line = xmalloc((term.col + 1) * sizeof(Glyph));
++	for (i = 0; i < term.col + 1; i++)
++		preedit.pline.line[i] = (Glyph){ ' ', ATTR_WDUMMY };
++
++	x = term.col / 2 - preedit.pline.caret;
++	x = MIN(x, 0);
++	x = MAX(x, term.col - preedit.pline.width);
++	x = MIN(x, term.c.x);
++	preedit.pline.offset = x;
++
++	for (i = 0; i < preedit.len; i++) {
++		if (term.col < x)
++			break;
++		if (0 <= x)
++			preedit.pline.line[x] = preedit.text[i];
++		x += MAX(wcwidth(preedit.text[i].u), 1);
++	}
++
++	if (preedit.len == 0)
++		term.dirty[term.c.y] = 1;
++
++	if (preedit.pline.l.u == 0) {
++		preedit.pline.l = preedit.pline.r = (Glyph){
++			0, ATTR_REVERSE, defaultfg, defaultbg
++		};
++		utf8decode("<", &preedit.pline.l.u, UTF_SIZ);
++		utf8decode(">", &preedit.pline.r.u, UTF_SIZ);
++	}
++}
++
+ void
+ drawregion(int x1, int y1, int x2, int y2)
+ {
+@@ -2660,6 +2780,7 @@ draw(void)
+ 	drawregion(0, 0, term.col, term.row);
+ 	xdrawcursor(cx, term.c.y, term.line[term.c.y][cx],
+ 			term.ocx, term.ocy, term.line[term.ocy][term.ocx]);
++	xdrawpreedit(&preedit.pline, term.line[term.c.y], term.c.y, term.col);
+ 	term.ocx = cx;
+ 	term.ocy = term.c.y;
+ 	xfinishdraw();
+diff --git a/st.h b/st.h
+index fd3b0d8..97e1491 100644
+--- a/st.h
++++ b/st.h
+@@ -69,6 +69,14 @@ typedef struct {
+ 
+ typedef Glyph *Line;
+ 
++typedef struct {
++	Line line;
++	int offset;
++	int width;
++	int caret;
++	Glyph l,r;
++} PLine;
++
+ typedef union {
+ 	int i;
+ 	uint ui;
+@@ -95,6 +103,8 @@ int ttynew(const char *, char *, const char *, char **);
+ size_t ttyread(void);
+ void ttyresize(int, int);
+ void ttywrite(const char *, size_t, int);
++void pereset(void);
++void peupdate(int, int, int, unsigned short, const ushort *, const char *);
+ 
+ void resettitle(void);
+ 
+diff --git a/win.h b/win.h
+index 6de960d..fb5a1d5 100644
+--- a/win.h
++++ b/win.h
+@@ -27,6 +27,7 @@ void xbell(void);
+ void xclipcopy(void);
+ void xdrawcursor(int, int, Glyph, int, int, Glyph);
+ void xdrawline(Line, int, int, int);
++void xdrawpreedit(PLine *, Line, int, int);
+ void xfinishdraw(void);
+ void xloadcols(void);
+ int xsetcolorname(int, const char *);
+diff --git a/x.c b/x.c
+index bd23686..fd6308e 100644
+--- a/x.c
++++ b/x.c
+@@ -99,6 +99,7 @@ typedef struct {
+ 		XIC xic;
+ 		XPoint spot;
+ 		XVaNestedList spotlist;
++		XVaNestedList preeditattrs;
+ 	} ime;
+ 	Draw draw;
+ 	Visual *vis;
+@@ -150,6 +151,10 @@ static int ximopen(Display *);
+ static void ximinstantiate(Display *, XPointer, XPointer);
+ static void ximdestroy(XIM, XPointer, XPointer);
+ static int xicdestroy(XIC, XPointer, XPointer);
++static void xpreeditstart(XIM , XPointer, XPointer);
++static void xpreeditdone(XIM, XPointer, XPointer);
++static void xpreeditdraw(XIM, XPointer, XIMPreeditDrawCallbackStruct *);
++static void xpreeditcaret(XIM, XPointer, XIMPreeditCaretCallbackStruct *);
+ static void xinit(int, int);
+ static void cresize(int, int);
+ static void xresize(int, int);
+@@ -1077,6 +1082,16 @@ ximopen(Display *dpy)
+ {
+ 	XIMCallback imdestroy = { .client_data = NULL, .callback = ximdestroy };
+ 	XICCallback icdestroy = { .client_data = NULL, .callback = xicdestroy };
++	static XIMCallback pestart = { NULL, xpreeditstart };
++	static XIMCallback pedone  = { NULL, xpreeditdone };
++	static XIMCallback pedraw  = { NULL, (XIMProc)xpreeditdraw };
++	static XIMCallback pecaret = { NULL, (XIMProc)xpreeditcaret };
++	XIMStyles *styles;
++	XIMStyle candidates[] = {
++		XIMPreeditCallbacks | XIMStatusNothing,
++		XIMPreeditNothing | XIMStatusNothing
++	};
++	int i, j;
+ 
+ 	xw.ime.xim = XOpenIM(xw.dpy, NULL, NULL, NULL);
+ 	if (xw.ime.xim == NULL)
+@@ -1089,12 +1104,38 @@ ximopen(Display *dpy)
+ 	xw.ime.spotlist = XVaCreateNestedList(0, XNSpotLocation, &xw.ime.spot,
+ 	                                      NULL);
+ 
++	if (XGetIMValues(xw.ime.xim, XNQueryInputStyle, &styles, NULL)) {
++		fprintf(stderr, "XGetIMValues:"
++				"Could not get XNQueryInputStyle.\n");
++		return 1;
++	}
++	for (i = 0; i < LEN(candidates); i++)
++		for (j = 0; j < styles->count_styles; j++)
++			if (candidates[i] == styles->supported_styles[j])
++				goto match;
++	fprintf(stderr, "XGetIMValues: "
++	                "None of the candidates styles matched.\n");
++	XFree(styles);
++	return 1;
++match:
++	XFree(styles);
++
+ 	if (xw.ime.xic == NULL) {
+ 		xw.ime.xic = XCreateIC(xw.ime.xim, XNInputStyle,
+-		                       XIMPreeditNothing | XIMStatusNothing,
++		                       candidates[i],
+ 		                       XNClientWindow, xw.win,
+ 		                       XNDestroyCallback, &icdestroy,
+ 		                       NULL);
++		if (xw.ime.xic && candidates[i] & XIMPreeditCallbacks) {
++			xw.ime.preeditattrs = XVaCreateNestedList(0,
++					XNPreeditStartCallback, &pestart,
++					XNPreeditDoneCallback,  &pedone,
++					XNPreeditDrawCallback,  &pedraw,
++					XNPreeditCaretCallback, &pecaret,
++					NULL);
++			XSetICValues(xw.ime.xic, XNPreeditAttributes,
++					xw.ime.preeditattrs, NULL);
++		}
+ 	}
+ 	if (xw.ime.xic == NULL)
+ 		fprintf(stderr, "XCreateIC: Could not create input context.\n");
+@@ -1123,9 +1164,64 @@ int
+ xicdestroy(XIC xim, XPointer client, XPointer call)
+ {
+ 	xw.ime.xic = NULL;
++	XFree(xw.ime.preeditattrs);
++	xw.ime.preeditattrs = NULL;
+ 	return 1;
+ }
+ 
++void
++xpreeditstart(XIM xim, XPointer client, XPointer call)
++{
++	pereset();
++}
++
++void
++xpreeditdone(XIM xim, XPointer client, XPointer call)
++{
++	pereset();
++}
++
++void
++xpreeditdraw(XIM xim, XPointer client, XIMPreeditDrawCallbackStruct *call)
++{
++	const XIMText *text = call->text;
++	ushort *m, *modes = NULL;
++	int i;
++	XIMFeedback fb;
++
++	if (!text) {
++		peupdate(call->caret, call->chg_first, call->chg_length,
++				0, NULL, NULL);
++		return;
++	}
++
++	if (text->feedback) {
++		modes = xmalloc(text->length * sizeof(ushort));
++		for (i = 0; i < text->length; i++) {
++			m = modes + i;
++			fb = text->feedback[i];
++			*m = ATTR_NULL;
++			*m |= fb & XIMReverse   ? ATTR_REVERSE    : ATTR_NULL;
++			*m |= fb & XIMUnderline ? ATTR_UNDERLINE  : ATTR_NULL;
++			*m |= fb & XIMHighlight ? ATTR_BOLD       : ATTR_NULL;
++			*m |= fb & XIMPrimary   ? ATTR_ITALIC     : ATTR_NULL;
++			*m |= fb & XIMSecondary ? ATTR_FAINT      : ATTR_NULL;
++			*m |= fb & XIMTertiary  ? ATTR_BOLD_FAINT : ATTR_NULL;
++		}
++	}
++
++	peupdate(call->caret, call->chg_first, call->chg_length,
++			text->length, modes, text->string.multi_byte);
++
++	free(modes);
++}
++
++void
++xpreeditcaret(XIM xim, XPointer client, XIMPreeditCaretCallbackStruct *call)
++{
++	peupdate(call->position, 0, 0, 0, NULL, NULL);
++}
++
+ void
+ xinit(int cols, int rows)
+ {
+@@ -1682,6 +1778,35 @@ xdrawline(Line line, int x1, int y1, int x2)
+ 		xdrawglyphfontspecs(specs, base, i, ox, y1);
+ }
+ 
++void
++xdrawpreedit(PLine *pl, Line base, int y, int col)
++{
++	int head, tail;
++	int tcur;
++	const int offc = pl->offset + pl->caret;
++
++	if (pl->width == 0 || !(win.mode & MODE_FOCUSED))
++		return;
++
++	xdrawline(base, 0, y, col);
++
++	head = MAX(pl->offset, 0);
++	tail = MIN(pl->offset + pl->width, col);
++	if (pl->line[head].mode & ATTR_WDUMMY)
++		head++;
++	xdrawline(pl->line, head, y, tail);
++
++	tcur = win.cursor;
++	win.cursor = 6;
++	xdrawcursor(offc, y, pl->line[offc], head, y, pl->line[head]);
++	win.cursor = tcur;
++
++	if (pl->offset < 0)
++		xdrawline(&pl->l, 0, y, 1);
++	if (col < pl->offset + pl->width)
++		xdrawline(&pl->r - (col - 1), col - 1, y, col);
++}
++
+ void
+ xfinishdraw(void)
+ {

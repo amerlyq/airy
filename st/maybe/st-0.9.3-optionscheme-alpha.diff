@@ -1,0 +1,621 @@
+diff -up st-0.9.3-alpha/config.def.h st-0.9.3-optionscheme-alpha/config.def.h
+--- st-0.9.3-alpha/config.def.h	2025-12-23 16:14:47.967839255 +0300
++++ st-0.9.3-optionscheme-alpha/config.def.h	2025-12-23 18:36:25.099995678 +0300
+@@ -96,46 +96,211 @@ unsigned int tabspaces = 8;
+ /* bg opacity */
+ float alpha = 0.8;
+ 
+-/* Terminal colors (16 first used in escape sequence) */
+-static const char *colorname[] = {
+-	/* 8 normal colors */
+-	"black",
+-	"red3",
+-	"green3",
+-	"yellow3",
+-	"blue2",
+-	"magenta3",
+-	"cyan3",
+-	"gray90",
+-
+-	/* 8 bright colors */
+-	"gray50",
+-	"red",
+-	"green",
+-	"yellow",
+-	"#5c5cff",
+-	"magenta",
+-	"cyan",
+-	"white",
+-
+-	[255] = 0,
+-
+-	/* more colors can be added after 255 to use with DefaultXX */
+-	"#cccccc",
+-	"#555555",
+-	"gray90", /* default foreground colour */
+-	"black", /* default background colour */
++/* loaded if couldn't find scheme, has to be present */
++static const OptionScheme optionscheme_default = {
++	.name = "default",
++	.colors = {
++		/* 8 normal colors */
++		"black",     /* 0 */
++		"red3",      /* 1 */
++		"green3",    /* 2 */
++		"yellow3",   /* 3 */
++		"blue2",     /* 4 */
++		"magenta3",  /* 5 */
++		"cyan3",     /* 6 */
++		"gray90",    /* 7 */
++
++		/* 8 bright colors */
++		"gray50",    /* 8 */
++		"red",       /* 9 */
++		"green",     /* 10 */
++		"yellow",    /* 11 */
++		"#5c5cff",   /* 12 */
++		"magenta",   /* 13 */
++		"cyan",      /* 14 */
++		"white",     /* 15 */
++
++		[255] = 0,
++
++		/* DefaultXX colors */
++		"#cccccc",   /* 256 */
++		"#555555",   /* 257 */
++		"gray90",    /* 258 default foreground */
++		"black",     /* 259 default background */
++	},
++	.defaultfg  = 258,
++	.defaultbg  = 259,
++	.defaultcs  = 258,
++	.defaultrcs = 259,
+ };
+ 
++static const OptionScheme optionscheme_dracula = {
++    .name = "dracula",
++    .colors = {
++        /* 8 normal */
++        [0] = "#282a36", [1] = "#ff5555", [2] = "#50fa7b", [3] = "#f1fa8c",
++        [4] = "#bd93f9", [5] = "#ff79c6", [6] = "#8be9fd", [7] = "#bbbbbb",
++        /* 8 bright */
++        [8] = "#6272a4", [9] = "#ff6e6e", [10] = "#69ff94", [11] = "#ffffa5",
++        [12] = "#d6acff", [13] = "#ff92df", [14] = "#a4ffff", [15] = "#ffffff",
++
++        [255] = 0,
++
++        /* DefaultXX */
++        [256] = "#f8f8f2", /* cursor */
++        [257] = "#44475a", /* reverse cursor */
++        [258] = "#f8f8f2", /* fg */
++        [259] = "#282a36"  /* bg */
++    },
++    .defaultfg = 258,
++    .defaultbg = 259,
++    .defaultcs = 256,
++    .defaultrcs = 257
++};
++
++static const OptionScheme optionscheme_solarized = {
++    .name = "solarized",
++    .colors = {
++        /* 8 normal colors */
++        [0] = "#002b36", [1] = "#dc322f", [2] = "#859900", [3] = "#b58900",
++        [4] = "#268bd2", [5] = "#6c71c4", [6] = "#2aa198", [7] = "#93a1a1",
++        /* 8 bright colors */
++        [8] = "#657b83", [9] = "#dc322f", [10] = "#859900", [11] = "#b58900",
++        [12] = "#268bd2", [13] = "#6c71c4", [14] = "#2aa198", [15] = "#fdf6e3",
++
++        [255] = 0,
++
++        /* DefaultXX */
++        [256] = "#839496", [257] = "#002b36", [258] = "#839496", [259] = "#002b36"
++    },
++    .defaultfg = 258,
++    .defaultbg = 259,
++    .defaultcs = 256,
++    .defaultrcs = 257
++};
++
++static const OptionScheme optionscheme_nord = {
++    .name = "nord",
++    .colors = {
++        /* 8 normal */
++        [0] = "#3b4252", [1] = "#bf616a", [2] = "#a3be8c", [3] = "#ebcb8b",
++        [4] = "#81a1c1", [5] = "#b48ead", [6] = "#88c0d0", [7] = "#e5e9f0",
++        /* 8 bright */
++        [8] = "#4c566a", [9] = "#bf616a", [10] = "#a3be8c", [11] = "#ebcb8b",
++        [12] = "#81a1c1", [13] = "#b48ead", [14] = "#8fbcbb", [15] = "#eceff4",
++
++        [255] = 0,
++
++        /* DefaultXX */
++        [256] = "#d8dee9", [257] = "#2e3440", [258] = "#d8dee9", [259] = "#2e3440"
++    },
++    .defaultfg = 258,
++    .defaultbg = 259,
++    .defaultcs = 256,
++    .defaultrcs = 257
++};
++
++static const OptionScheme optionscheme_gruvbox = {
++    .name = "gruvbox",
++    .colors = {
++        /* 8 normal */
++        [0] = "#282828", [1] = "#cc241d", [2] = "#98971a", [3] = "#d79921",
++        [4] = "#458588", [5] = "#b16286", [6] = "#689d6a", [7] = "#a89984",
++        /* 8 bright */
++        [8] = "#928374", [9] = "#fb4934", [10] = "#b8bb26", [11] = "#fabd2f",
++        [12] = "#83a598", [13] = "#d3869b", [14] = "#8ec07c", [15] = "#ebdbb2",
++
++        [255] = 0,
++
++        /* DefaultXX */
++        [256] = "#ebdbb2", [257] = "#282828", [258] = "#ebdbb2", [259] = "#282828"
++    },
++    .defaultfg = 258,
++    .defaultbg = 259,
++    .defaultcs = 256,
++    .defaultrcs = 257
++};
++
++static const OptionScheme optionscheme_plan9 = {
++    .name = "plan9",
++    .colors = {
++        /* 8 normal colors */
++        [0] = "#000000", [1] = "#9c0000", [2] = "#008000", [3] = "#999900",
++        [4] = "#00009c", [5] = "#990099", [6] = "#009999", [7] = "#7f7f7f",
++        /* 8 bright colors */
++        [8] = "#c0c0c0", [9] = "#ff0000", [10] = "#00ff00", [11] = "#ffff00",
++        [12] = "#5c5cff", [13] = "#ff00ff", [14] = "#00ffff", [15] = "#ffffff",
++
++        [255] = 0,
++
++        /* DefaultXX colors */
++        [256] = "#000000", [257] = "#9ecfff", [258] = "#000000", [259] = "#ffffea"
++    },
++    .defaultfg = 258,
++    .defaultbg = 259,
++    .defaultcs = 256,
++    .defaultrcs = 257
++};
++
++static const OptionScheme optionscheme_cyberpunk = {
++    .name = "cyberpunk",
++    .colors = {
++        /* 8 normal */
++        [0] = "#0d0221", [1] = "#ff004d", [2] = "#00ff9f", [3] = "#fffa72",
++        [4] = "#00caff", [5] = "#ff00ff", [6] = "#0affef", [7] = "#a0a0a0",
++        /* 8 bright */
++        [8] = "#3a0f5c", [9] = "#ff4d79", [10] = "#4dffb8", [11] = "#fffaa0",
++        [12] = "#4dd2ff", [13] = "#ff4dff", [14] = "#4df9ff", [15] = "#ffffff",
++
++        [255] = 0,
++
++        /* DefaultXX */
++        [256] = "#00ffcc", [257] = "#0d0221", [258] = "#00ffcc", [259] = "#0d0221"
++    },
++    .defaultfg = 258,
++    .defaultbg = 259,
++    .defaultcs = 256,
++    .defaultrcs = 257
++};
++
++static const OptionScheme optionscheme_light = {
++    .name = "light",
++    .colors = {
++        /* 8 normal colors */
++        [0] = "#000000", [1] = "#d70000", [2] = "#008700", [3] = "#af8700",
++        [4] = "#005faf", [5] = "#8700af", [6] = "#00afaf", [7] = "#d0d0d0",
++        /* 8 bright colors */
++        [8] = "#808080", [9] = "#ff0000", [10] = "#00ff00", [11] = "#ffff00",
++        [12] = "#5c5cff", [13] = "#ff00ff", [14] = "#00ffff", [15] = "#ffffff",
++
++        [255] = 0,
++
++        /* DefaultXX colors */
++        [256] = "#000000", [257] = "#4a90e2", [258] = "#000000", [259] = "#eeeeee"
++    },
++    .defaultfg = 258,
++    .defaultbg = 259,
++    .defaultcs = 256,
++    .defaultrcs = 257
++};
+ 
+ /*
+- * Default colors (colorname index)
+- * foreground, background, cursor, reverse cursor
+- */
+-unsigned int defaultfg = 258;
+-unsigned int defaultbg = 259;
+-unsigned int defaultcs = 256;
+-static unsigned int defaultrcs = 257;
++ * you can move the schemes to a different header and do #include "optionschemes.h"
++ * or you can move each scheme to its own file
++ * and do #include optionscheme_light.h, #include optionscheme_plan9.h, ...
++ * */
++
++static const OptionScheme *optionschemes[] = {
++    &optionscheme_default,
++    &optionscheme_light,
++    &optionscheme_plan9,
++    &optionscheme_dracula,
++    &optionscheme_solarized,
++    &optionscheme_nord,
++    &optionscheme_gruvbox,
++    &optionscheme_cyberpunk,
++    NULL /* has to be NULL terminated */
++};
+ 
+ /*
+  * Default shape of cursor
+diff -up st-0.9.3-alpha/st.1 st-0.9.3-optionscheme-alpha/st.1
+--- st-0.9.3-alpha/st.1	2025-12-23 16:14:37.637839051 +0300
++++ st-0.9.3-optionscheme-alpha/st.1	2025-12-23 21:00:52.432648093 +0300
+@@ -4,6 +4,8 @@ st \- simple terminal
+ .SH SYNOPSIS
+ .B st
+ .RB [ \-aiv ]
++.RB [ \-S
++.IR colorscheme ]
+ .RB [ \-c
+ .IR class ]
+ .RB [ \-f
+@@ -28,6 +30,8 @@ st \- simple terminal
+ .PP
+ .B st
+ .RB [ \-aiv ]
++.RB [ \-S
++.IR colorscheme ]
+ .RB [ \-c
+ .IR class ]
+ .RB [ \-f
+@@ -55,6 +59,22 @@ is a simple terminal emulator.
+ .B \-a
+ disable alternate screens in terminal
+ .TP
++.BI \-S " scheme"
++Sets the terminal color scheme.
++The following schemes are supported:
++.BR default ,
++.BR light ,
++.BR plan9 ,
++.BR dracula ,
++.BR solarized ,
++.BR nord ,
++.BR gruvbox ,
++and
++.BR cyberpunk .
++If no scheme is specified, or if an unknown scheme is given,
++.B default
++is used.
++.TP
+ .BI \-c " class"
+ defines the window class (default $TERM).
+ .TP
+diff -up st-0.9.3-alpha/st.c st-0.9.3-optionscheme-alpha/st.c
+--- st-0.9.3-alpha/st.c	2025-12-23 16:14:37.637839051 +0300
++++ st-0.9.3-optionscheme-alpha/st.c	2025-12-23 16:41:21.057870817 +0300
+@@ -1014,8 +1014,8 @@ treset(void)
+ 
+ 	term.c = (TCursor){{
+ 		.mode = ATTR_NULL,
+-		.fg = defaultfg,
+-		.bg = defaultbg
++		.fg = seloptsch->defaultfg,
++		.bg = seloptsch->defaultbg
+ 	}, .x = 0, .y = 0, .state = CURSOR_DEFAULT};
+ 
+ 	memset(term.tabs, 0, term.col * sizeof(*term.tabs));
+@@ -1038,7 +1038,7 @@ treset(void)
+ void
+ tnew(int col, int row)
+ {
+-	term = (Term){ .c = { .attr = { .fg = defaultfg, .bg = defaultbg } } };
++	term = (Term){ .c = { .attr = { .fg = seloptsch->defaultfg, .bg = seloptsch->defaultbg } } };
+ 	tresize(col, row);
+ 	treset();
+ }
+@@ -1366,8 +1366,8 @@ tsetattr(const int *attr, int l)
+ 				ATTR_REVERSE    |
+ 				ATTR_INVISIBLE  |
+ 				ATTR_STRUCK     );
+-			term.c.attr.fg = defaultfg;
+-			term.c.attr.bg = defaultbg;
++			term.c.attr.fg = seloptsch->defaultfg;
++			term.c.attr.bg = seloptsch->defaultbg;
+ 			break;
+ 		case 1:
+ 			term.c.attr.mode |= ATTR_BOLD;
+@@ -1421,14 +1421,14 @@ tsetattr(const int *attr, int l)
+ 				term.c.attr.fg = idx;
+ 			break;
+ 		case 39: /* set foreground color to default */
+-			term.c.attr.fg = defaultfg;
++			term.c.attr.fg = seloptsch->defaultfg;
+ 			break;
+ 		case 48:
+ 			if ((idx = tdefcolor(attr, &i, l)) >= 0)
+ 				term.c.attr.bg = idx;
+ 			break;
+ 		case 49: /* set background color to default */
+-			term.c.attr.bg = defaultbg;
++			term.c.attr.bg = seloptsch->defaultbg;
+ 			break;
+ 		case 58:
+ 			/* This starts a sequence to change the color of
+@@ -1887,9 +1887,9 @@ strhandle(void)
+ 	char *p = NULL, *dec;
+ 	int j, narg, par;
+ 	const struct { int idx; char *str; } osc_table[] = {
+-		{ defaultfg, "foreground" },
+-		{ defaultbg, "background" },
+-		{ defaultcs, "cursor" }
++		{ seloptsch->defaultfg, "foreground" },
++		{ seloptsch->defaultbg, "background" },
++		{ seloptsch->defaultcs, "cursor" }
+ 	};
+ 
+ 	term.esc &= ~(ESC_STR_END|ESC_STR);
+diff -up st-0.9.3-alpha/st.h st-0.9.3-optionscheme-alpha/st.h
+--- st-0.9.3-alpha/st.h	2025-12-23 16:14:37.637839051 +0300
++++ st-0.9.3-optionscheme-alpha/st.h	2025-12-23 16:38:18.397867197 +0300
+@@ -59,6 +59,15 @@ typedef unsigned short ushort;
+ 
+ typedef uint_least32_t Rune;
+ 
++typedef struct {
++	const char *name;
++	const char *colors[260];
++	unsigned int defaultfg;
++	unsigned int defaultbg;
++	unsigned int defaultcs;
++	unsigned int defaultrcs;
++} OptionScheme;
++
+ #define Glyph Glyph_
+ typedef struct {
+ 	Rune u;           /* character code */
+@@ -121,6 +130,4 @@ extern int allowaltscreen;
+ extern int allowwindowops;
+ extern char *termname;
+ extern unsigned int tabspaces;
+-extern unsigned int defaultfg;
+-extern unsigned int defaultbg;
+-extern unsigned int defaultcs;
++extern const OptionScheme *seloptsch;
+diff -up st-0.9.3-alpha/x.c st-0.9.3-optionscheme-alpha/x.c
+--- st-0.9.3-alpha/x.c	2025-12-23 16:14:47.967839255 +0300
++++ st-0.9.3-optionscheme-alpha/x.c	2025-12-23 16:41:13.161203992 +0300
+@@ -141,6 +141,8 @@ typedef struct {
+ 	GC gc;
+ } DC;
+ 
++const OptionScheme *seloptsch = &optionscheme_default;
++static const char *seloptschname = NULL;
+ static inline ushort sixd_to_16bit(int);
+ static int xmakeglyphfontspecs(XftGlyphFontSpec *, const Glyph *, int, int, int);
+ static void xdrawglyphfontspecs(const XftGlyphFontSpec *, Glyph, int, int, int);
+@@ -152,6 +154,7 @@ static void ximinstantiate(Display *, XP
+ static void ximdestroy(XIM, XPointer, XPointer);
+ static int xicdestroy(XIC, XPointer, XPointer);
+ static void xinit(int, int);
++static int countoptsch();
+ static void cresize(int, int);
+ static void xresize(int, int);
+ static void xhints(void);
+@@ -785,7 +788,7 @@ xloadcolor(int i, const char *name, Colo
+ 			return XftColorAllocValue(xw.dpy, xw.vis,
+ 			                          xw.cmap, &color, ncolor);
+ 		} else
+-			name = colorname[i];
++			name = seloptsch->colors[i];
+ 	}
+ 
+ 	return XftColorAllocName(xw.dpy, xw.vis, xw.cmap, name, ncolor);
+@@ -802,21 +805,21 @@ xloadcols(void)
+ 		for (cp = dc.col; cp < &dc.col[dc.collen]; ++cp)
+ 			XftColorFree(xw.dpy, xw.vis, xw.cmap, cp);
+ 	} else {
+-		dc.collen = MAX(LEN(colorname), 256);
++		dc.collen = MAX(LEN(seloptsch->colors), 256);
+ 		dc.col = xmalloc(dc.collen * sizeof(Color));
+ 	}
+ 
+ 	for (i = 0; i < dc.collen; i++)
+ 		if (!xloadcolor(i, NULL, &dc.col[i])) {
+-			if (colorname[i])
+-				die("could not allocate color '%s'\n", colorname[i]);
++			if (seloptsch->colors[i])
++				die("could not allocate color '%s'\n", seloptsch->colors[i]);
+ 			else
+ 				die("could not allocate color %d\n", i);
+ 		}
+ 
+-	dc.col[defaultbg].color.alpha = (unsigned short)(0xffff * alpha);
+-	dc.col[defaultbg].pixel &= 0x00FFFFFF;
+-	dc.col[defaultbg].pixel |= (unsigned char)(0xff * alpha) << 24;
++	dc.col[seloptsch->defaultbg].color.alpha = (unsigned short)(0xffff * alpha);
++	dc.col[seloptsch->defaultbg].pixel &= 0x00FFFFFF;
++	dc.col[seloptsch->defaultbg].pixel |= (unsigned char)(0xff * alpha) << 24;
+ 	loaded = 1;
+ }
+ 
+@@ -847,10 +850,10 @@ xsetcolorname(int x, const char *name)
+ 	XftColorFree(xw.dpy, xw.vis, xw.cmap, &dc.col[x]);
+ 	dc.col[x] = ncolor;
+ 
+-	if (x == defaultbg) {
+-		dc.col[defaultbg].color.alpha = (unsigned short)(0xffff * alpha);
+-		dc.col[defaultbg].pixel &= 0x00FFFFFF;
+-		dc.col[defaultbg].pixel |= (unsigned char)(0xff * alpha) << 24;
++	if (x == seloptsch->defaultbg) {
++		dc.col[seloptsch->defaultbg].color.alpha = (unsigned short)(0xffff * alpha);
++		dc.col[seloptsch->defaultbg].pixel &= 0x00FFFFFF;
++		dc.col[seloptsch->defaultbg].pixel |= (unsigned char)(0xff * alpha) << 24;
+ 	}
+ 
+ 	return 0;
+@@ -863,7 +866,7 @@ void
+ xclear(int x1, int y1, int x2, int y2)
+ {
+ 	XftDrawRect(xw.draw,
+-			&dc.col[IS_SET(MODE_REVERSE)? defaultfg : defaultbg],
++			&dc.col[IS_SET(MODE_REVERSE)? seloptsch->defaultfg : seloptsch->defaultbg],
+ 			x1, y1, x2-x1, y2-y1);
+ }
+ 
+@@ -1137,6 +1140,15 @@ xicdestroy(XIC xim, XPointer client, XPo
+ 	return 1;
+ }
+ 
++int
++countoptsch()
++{ 
++	int i, optsch_limit = 256;
++	for(i = 0; optionschemes[i] != NULL && i < optsch_limit; i++)
++		;
++	return i;
++}
++
+ void
+ xinit(int cols, int rows)
+ {
+@@ -1173,6 +1185,15 @@ xinit(int cols, int rows)
+ 	xloadfonts(usedfont, 0);
+ 
+ 	/* colors */
++	if (seloptschname) {
++		int optschcount = countoptsch();
++		for (int i = 0; optionschemes[i] && i < optschcount; i++) {
++			if (strcmp(optionschemes[i]->name, seloptschname) == 0) {
++				seloptsch = optionschemes[i];
++				break;
++			}
++		}
++	}
+ 	xw.cmap = XCreateColormap(xw.dpy, parent, xw.vis, None);
+ 	xloadcols();
+ 
+@@ -1185,8 +1206,8 @@ xinit(int cols, int rows)
+ 		xw.t += DisplayHeight(xw.dpy, xw.scr) - win.h - 2;
+ 
+ 	/* Events */
+-	xw.attrs.background_pixel = dc.col[defaultbg].pixel;
+-	xw.attrs.border_pixel = dc.col[defaultbg].pixel;
++	xw.attrs.background_pixel = dc.col[seloptsch->defaultbg].pixel;
++	xw.attrs.border_pixel = dc.col[seloptsch->defaultbg].pixel;
+ 	xw.attrs.bit_gravity = NorthWestGravity;
+ 	xw.attrs.event_mask = FocusChangeMask | KeyPressMask | KeyReleaseMask
+ 		| ExposureMask | VisibilityChangeMask | StructureNotifyMask
+@@ -1206,7 +1227,7 @@ xinit(int cols, int rows)
+ 			&gcvalues);
+ 	xw.buf = XCreatePixmap(xw.dpy, xw.win, win.w, win.h,
+ 			xw.depth);
+-	XSetForeground(xw.dpy, dc.gc, dc.col[defaultbg].pixel);
++	XSetForeground(xw.dpy, dc.gc, dc.col[seloptsch->defaultbg].pixel);
+ 	XFillRectangle(xw.dpy, xw.buf, dc.gc, 0, 0, win.w, win.h);
+ 
+ 	/* font spec buffer */
+@@ -1225,13 +1246,13 @@ xinit(int cols, int rows)
+ 	cursor = XCreateFontCursor(xw.dpy, mouseshape);
+ 	XDefineCursor(xw.dpy, xw.win, cursor);
+ 
+-	if (XParseColor(xw.dpy, xw.cmap, colorname[mousefg], &xmousefg) == 0) {
++	if (XParseColor(xw.dpy, xw.cmap, seloptsch->colors[mousefg], &xmousefg) == 0) {
+ 		xmousefg.red   = 0xffff;
+ 		xmousefg.green = 0xffff;
+ 		xmousefg.blue  = 0xffff;
+ 	}
+ 
+-	if (XParseColor(xw.dpy, xw.cmap, colorname[mousebg], &xmousebg) == 0) {
++	if (XParseColor(xw.dpy, xw.cmap, seloptsch->colors[mousebg], &xmousebg) == 0) {
+ 		xmousebg.red   = 0x0000;
+ 		xmousebg.green = 0x0000;
+ 		xmousebg.blue  = 0x0000;
+@@ -1442,8 +1463,8 @@ xdrawglyphfontspecs(const XftGlyphFontSp
+ 		fg = &dc.col[base.fg + 8];
+ 
+ 	if (IS_SET(MODE_REVERSE)) {
+-		if (fg == &dc.col[defaultfg]) {
+-			fg = &dc.col[defaultbg];
++		if (fg == &dc.col[seloptsch->defaultfg]) {
++			fg = &dc.col[seloptsch->defaultbg];
+ 		} else {
+ 			colfg.red = ~fg->color.red;
+ 			colfg.green = ~fg->color.green;
+@@ -1454,8 +1475,8 @@ xdrawglyphfontspecs(const XftGlyphFontSp
+ 			fg = &revfg;
+ 		}
+ 
+-		if (bg == &dc.col[defaultbg]) {
+-			bg = &dc.col[defaultfg];
++		if (bg == &dc.col[seloptsch->defaultbg]) {
++			bg = &dc.col[seloptsch->defaultfg];
+ 		} else {
+ 			colbg.red = ~bg->color.red;
+ 			colbg.green = ~bg->color.green;
+@@ -1561,21 +1582,21 @@ xdrawcursor(int cx, int cy, Glyph g, int
+ 
+ 	if (IS_SET(MODE_REVERSE)) {
+ 		g.mode |= ATTR_REVERSE;
+-		g.bg = defaultfg;
++		g.bg = seloptsch->defaultfg;
+ 		if (selected(cx, cy)) {
+-			drawcol = dc.col[defaultcs];
+-			g.fg = defaultrcs;
++			drawcol = dc.col[seloptsch->defaultcs];
++			g.fg = seloptsch->defaultrcs;
+ 		} else {
+-			drawcol = dc.col[defaultrcs];
+-			g.fg = defaultcs;
++			drawcol = dc.col[seloptsch->defaultrcs];
++			g.fg = seloptsch->defaultcs;
+ 		}
+ 	} else {
+ 		if (selected(cx, cy)) {
+-			g.fg = defaultfg;
+-			g.bg = defaultrcs;
++			g.fg = seloptsch->defaultfg;
++			g.bg = seloptsch->defaultrcs;
+ 		} else {
+-			g.fg = defaultbg;
+-			g.bg = defaultcs;
++			g.fg = seloptsch->defaultbg;
++			g.bg = seloptsch->defaultcs;
+ 		}
+ 		drawcol = dc.col[g.bg];
+ 	}
+@@ -1714,7 +1735,7 @@ xfinishdraw(void)
+ 			win.h, 0, 0);
+ 	XSetForeground(xw.dpy, dc.gc,
+ 			dc.col[IS_SET(MODE_REVERSE)?
+-				defaultfg : defaultbg].pixel);
++				seloptsch->defaultfg : seloptsch->defaultbg].pixel);
+ }
+ 
+ void
+@@ -2048,11 +2069,11 @@ run(void)
+ void
+ usage(void)
+ {
+-	die("usage: %s [-aiv] [-c class] [-f font] [-g geometry]"
++	die("usage: %s [-aiv] [-S colorscheme] [-c class] [-f font] [-g geometry]"
+ 	    " [-n name] [-o file]\n"
+ 	    "          [-T title] [-t title] [-w windowid]"
+ 	    " [[-e] command [args ...]]\n"
+-	    "       %s [-aiv] [-c class] [-f font] [-g geometry]"
++	    "       %s [-aiv] [-S colorscheme] [-c class] [-f font] [-g geometry]"
+ 	    " [-n name] [-o file]\n"
+ 	    "          [-T title] [-t title] [-w windowid] -l line"
+ 	    " [stty_args ...]\n", argv0, argv0);
+@@ -2109,6 +2130,9 @@ main(int argc, char *argv[])
+ 	case 'v':
+ 		die("%s " VERSION "\n", argv0);
+ 		break;
++	case 'S':
++		seloptschname = EARGF(usage());
++		break;
+ 	default:
+ 		usage();
+ 	} ARGEND;

@@ -1,27 +1,26 @@
-From 49342f1039b41d2c95dde3f9cc26efbdc85d0272 Mon Sep 17 00:00:00 2001
-From: Ashish Kumar Yadav <ashishkumar.yadav@students.iiserpune.ac.in>
-Date: Wed, 11 Aug 2021 20:24:07 +0530
-Subject: [PATCH] Implement support for CSI 22 and 23
+From c90af45228c1100377d64ad021fa3f0cff9a1df4 Mon Sep 17 00:00:00 2001
+From: wael <40663@protonmail.com>
+Date: Mon, 11 Apr 2022 21:28:43 +0300
+Subject: [PATCH] [st][patch][csi 22 23] update to 0.8.5
 
-This patch implements title stack into st.
 ---
- st.c    | 34 +++++++++++++++++++++++++++++++---
+ st.c    | 36 ++++++++++++++++++++++++++++++++----
  st.info |  4 ++--
  win.h   |  4 +++-
- x.c     | 44 +++++++++++++++++++++++++++++++++++++++-----
- 4 files changed, 75 insertions(+), 11 deletions(-)
+ x.c     | 41 ++++++++++++++++++++++++++++++++++++++---
+ 4 files changed, 75 insertions(+), 10 deletions(-)
 
 diff --git a/st.c b/st.c
-index 76b7e0d..092b93c 100644
+index f43cfd3..2802381 100644
 --- a/st.c
 +++ b/st.c
-@@ -1806,6 +1806,33 @@ csihandle(void)
+@@ -1801,6 +1801,33 @@ csihandle(void)
  			goto unknown;
  		}
  		break;
 +	case 't': /* title stack operations */
 +		switch (csiescseq.arg[0]) {
-+		case 22: /* push current title on stack */
++		case 22: /* pust current title on stack */
 +			switch (csiescseq.arg[1]) {
 +			case 0:
 +			case 1:
@@ -49,7 +48,8 @@ index 76b7e0d..092b93c 100644
  	}
  }
  
-@@ -1856,16 +1883,16 @@ strhandle(void)
+@@ -1885,7 +1912,7 @@ strhandle(void)
+ 		switch (par) {
  		case 0:
  			if (narg > 1) {
 -				xsettitle(strescseq.args[1]);
@@ -57,9 +57,7 @@ index 76b7e0d..092b93c 100644
  				xseticontitle(strescseq.args[1]);
  			}
  			return;
- 		case 1:
- 			if (narg > 1)
- 				xseticontitle(strescseq.args[1]);
+@@ -1895,7 +1922,7 @@ strhandle(void)
  			return;
  		case 2:
  			if (narg > 1)
@@ -68,7 +66,7 @@ index 76b7e0d..092b93c 100644
  			return;
  		case 52:
  			if (narg > 2 && allowwindowops) {
-@@ -1892,7 +1919,7 @@ strhandle(void)
+@@ -1973,7 +2000,7 @@ strhandle(void)
  		}
  		break;
  	case 'k': /* old title set compatibility */
@@ -77,7 +75,7 @@ index 76b7e0d..092b93c 100644
  		return;
  	case 'P': /* DCS -- Device Control String */
  	case '_': /* APC -- Application Program Command */
-@@ -2264,6 +2291,7 @@ eschandle(uchar ascii)
+@@ -2345,6 +2372,7 @@ eschandle(uchar ascii)
  		break;
  	case 'c': /* RIS -- Reset to initial state */
  		treset();
@@ -85,7 +83,7 @@ index 76b7e0d..092b93c 100644
  		resettitle();
  		xloadcols();
  		break;
-@@ -2546,7 +2574,7 @@ tresize(int col, int row)
+@@ -2631,7 +2659,7 @@ tresize(int col, int row)
  void
  resettitle(void)
  {
@@ -117,10 +115,10 @@ index 8201ad6..aeef606 100644
  	smkx=\E[?1h\E=,
  	smso=\E[7m,
 diff --git a/win.h b/win.h
-index a6ef1b9..e24337e 100644
+index e6e4369..ef67fd6 100644
 --- a/win.h
 +++ b/win.h
-@@ -30,7 +30,9 @@ void xdrawline(Line, int, int, int);
+@@ -31,7 +31,9 @@ void xfinishdraw(void);
  void xloadcols(void);
  int xsetcolorname(int, const char *);
  void xseticontitle(char *);
@@ -132,7 +130,7 @@ index a6ef1b9..e24337e 100644
  void xsetmode(int, unsigned int);
  void xsetpointermotion(int);
 diff --git a/x.c b/x.c
-index 210f184..b4bebff 100644
+index 2a3bd38..babb04c 100644
 --- a/x.c
 +++ b/x.c
 @@ -63,6 +63,9 @@ static void ttysend(const Arg *);
@@ -154,25 +152,26 @@ index 210f184..b4bebff 100644
  
  /* Font Ring Cache */
  enum {
-@@ -1580,18 +1585,48 @@ xsetenv(void)
+@@ -1626,10 +1631,30 @@ xseticontitle(char *p)
  }
  
  void
+-xsettitle(char *p)
 +xfreetitlestack(void)
-+{
+ {
+-	XTextProperty prop;
+-	DEFAULT(p, opt_title);
 +	for (int i = 0; i < LEN(titlestack); i++) {
 +		free(titlestack[i]);
 +		titlestack[i] = NULL;
 +	}
 +}
 +
-+ void
--xsettitle(char *p)
++void
 +xsettitle(char *p, int pop)
- {
- 	XTextProperty prop;
--	DEFAULT(p, opt_title);
-+
++{
++ 	XTextProperty prop;
++ 
 +	free(titlestack[tstki]);
 +	if (pop) {
 +		titlestack[tstki] = NULL;
@@ -187,9 +186,7 @@ index 210f184..b4bebff 100644
  
  	if (Xutf8TextListToTextProperty(xw.dpy, &p, 1, XUTF8StringStyle,
  	                                &prop) != Success)
- 		return;
- 	XSetWMName(xw.dpy, xw.win, &prop);
- 	XSetTextProperty(xw.dpy, xw.win, &prop, xw.netwmname);
+@@ -1639,6 +1664,16 @@ xsettitle(char *p)
  	XFree(prop.value);
  }
  
@@ -207,5 +204,5 @@ index 210f184..b4bebff 100644
  xstartdraw(void)
  {
 -- 
-2.32.0
+2.35.1
 

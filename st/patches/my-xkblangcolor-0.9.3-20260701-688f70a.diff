@@ -1,0 +1,176 @@
+diff --git a/config.def.h b/config.def.h
+index 2cd740a..1965ad2 100644
+--- a/config.def.h
++++ b/config.def.h
+@@ -118,9 +118,12 @@ static const char *colorname[] = {
+ 	[255] = 0,
+ 
+ 	/* more colors can be added after 255 to use with DefaultXX */
+-	"#cccccc",
+-	"#555555",
+ 	"gray90", /* default foreground colour */
+ 	"black", /* default background colour */
++	"#555555", /* = defaultrcs (reverse cursor / during selection) */
++	"#cccccc", /* grp0(en) = white = defaultcs (normal cursor) */
++	"#009eee", /* grp1(ru) = cyan */
++	"#ee9e00", /* grp2(ua) = yellow */
++	"#9e00ee", /* grp3(xx) = magenta */
+ };
+ 
+@@ -129,8 +132,9 @@ static const char *colorname[] = {
+  * Default colors (colorname index)
+  * foreground, background, cursor, reverse cursor
+  */
+-unsigned int defaultfg = 258;
+-unsigned int defaultbg = 259;
+-unsigned int defaultcs = 256;
+-static unsigned int defaultrcs = 257;
++const unsigned int xkbbasecolor = 259;
++unsigned int defaultfg = 256;
++unsigned int defaultbg = 257;
++unsigned int defaultcs = xkbbasecolor;
++static unsigned int defaultrcs = 258;
+ 
+diff --git a/st.c b/st.c
+index 6f40e35..efd8466 100644
+--- a/st.c
++++ b/st.c
+@@ -2697,6 +2697,23 @@ draw(void)
+ 		xximspot(term.ocx, term.ocy);
+ }
+ 
++void
++redrawcursor(int grp)
++{
++	// DEBUG: fprintf(stderr, "Xkb lang group[0-3]: %d\n", grp);
++	if (grp < 0 || grp > 3)
++		die("Xkb unlikely invalid lang group: %d\n", grp);
++	if (defaultcs == xkbbasecolor + grp)
++		return;  // NOTE: prevent unnecessary redraw
++	// MAYBE:ENH: map color to lang code "en" instead of index
++	//   SEE: libkbdd.c:569: _kbdd_group_names_initialize
++	defaultcs = xkbbasecolor + grp;
++	if (!xstartdraw())
++		return;
++	xdrawcursor(term.c.x, term.c.y, term.line[term.c.y][term.c.x],
++		    term.ocx, term.ocy, term.line[term.ocy][term.ocx]);
++}
++
+ void
+ redraw(void)
+ {
+diff --git a/st.h b/st.h
+index fd3b0d8..a828556 100644
+--- a/st.h
++++ b/st.h
+@@ -79,5 +79,6 @@ typedef union {
+ 
+ void die(const char *, ...);
++void redrawcursor(int);
+ void redraw(void);
+ void draw(void);
+ 
+@@ -123,4 +124,5 @@ extern char *termname;
+ extern unsigned int tabspaces;
+ extern unsigned int defaultfg;
+ extern unsigned int defaultbg;
++extern const unsigned int xkbbasecolor;
+ extern unsigned int defaultcs;
+diff --git a/x.c b/x.c
+index d73152b..3ddd6bd 100644
+--- a/x.c
++++ b/x.c
+@@ -1786,6 +1786,10 @@ focus(XEvent *ev)
+ 		xseturgency(0);
+ 		if (IS_SET(MODE_FOCUS))
+ 			ttywrite("\033[I", 3, 0);
++		XkbStateRec xkbstate;
++		if (XkbGetState(xw.dpy, XkbUseCoreKbd, &xkbstate) == Success) {
++			redrawcursor(xkbstate.group);
++		}
+ 	} else {
+ 		if (xw.ime.xic)
+ 			XUnsetICFocus(xw.ime.xic);
+@@ -1946,6 +1950,25 @@ run(void)
+ 		}
+ 	} while (ev.type != MapNotify);
+ 
++	int xkb_major = XkbMajorVersion;
++	int xkb_minor = XkbMinorVersion;
++	if (!XkbLibraryVersion(&xkb_major, &xkb_minor)) {
++		die("Xkb library (%d.%d) is incompatible with runtime (%d.%d)\n",
++		    XkbMajorVersion, XkbMinorVersion, xkb_major, xkb_minor);
++	}
++	int xkb_opcode, xkb_event_base, xkb_error_base;
++	if (!XkbQueryExtension(xw.dpy, &xkb_opcode, &xkb_event_base, &xkb_error_base, &xkb_major, &xkb_minor)) {
++		die("Xkb server extension is not available (or incompatible)\n");
++	}
++	if (!XkbSelectEventDetails(xw.dpy, XkbUseCoreKbd, XkbStateNotify, XkbAllStateComponentsMask,
++				XkbGroupStateMask | XkbModifierLatchMask | XkbModifierStateMask)) {
++		die("Xkb subscribe to states gone wrong\n");
++	}
++	if (!XkbSelectEventDetails(xw.dpy, XkbUseCoreKbd, XkbControlsNotify,
++				XkbAllControlsMask, XkbControlsEnabledMask)) {
++		die("Xkb subscribe to events gone wrong\n");
++	}
++
+ 	ttyfd = ttynew(opt_line, shell, opt_io, opt_cmd);
+ 	cresize(w, h);
+ 
+@@ -1977,6 +2000,56 @@ run(void)
+ 			XNextEvent(xw.dpy, &ev);
+ 			if (XFilterEvent(&ev, None))
+ 				continue;
++			if (LASTEvent <= ev.type) {
++				if (xkb_event_base == ev.type) {
++					// NOTE: keep cursor unchanged for other background windows
++					// INFO: xkb events are broadcasted regardless of kbd focus TRY: PerClientFlags
++					if (!(IS_SET(MODE_FOCUSED)))
++						continue;
++					int const xkb_type = ((XkbAnyEvent *)&ev)->xkb_type;
++					// DEBUG: fprintf(stderr, "Xkb event: %d\n", xkb_type);
++
++					if (xkb_type == XkbStateNotify) {
++						uint const changed = ((XkbStateNotifyEvent*)&ev)->changed;
++						if (changed & XkbGroupStateMask) {
++							redrawcursor(((XkbStateNotifyEvent*)&ev)->group);
++						} else if (changed & (XkbModifierLatchMask | XkbModifierStateMask)) {
++							int const mods = ((XkbStateNotifyEvent*)&ev)->mods;
++							if (mods & (Mod3Mask | Mod5Mask)) {
++								redrawcursor(2);  // TEMP: reuse grp3 Xkb color
++							} else {
++								// NOTE: field "group" is valid even on mods change event
++								redrawcursor(((XkbStateNotifyEvent*)&ev)->group);
++							}
++						} else {
++							fprintf(stderr, "Xkb unexpected state changed: %d\n", changed);
++						}
++					} else if (xkb_type == XkbControlsNotify) {
++						uint const changes = ((XkbControlsNotifyEvent*)&ev)->enabled_ctrl_changes;
++						if (changes & XkbOverlay1Mask) {
++							uint const state = ((XkbControlsNotifyEvent*)&ev)->enabled_ctrls;
++							// DEBUG: fprintf(stderr, "Xkb ctrls: %d & %d\n", state, changes);
++							if (state & XkbOverlay1Mask) {
++								redrawcursor(3);  // TEMP: reuse grp4 Xkb color
++							} else {
++								// HACK: query active lang inof restoring last known group
++								//   FIXED: overlay release should not override group changed through overlay
++								XkbStateRec xkbstate;
++								if (XkbGetState(xw.dpy, XkbUseCoreKbd, &xkbstate) == Success) {
++									redrawcursor(xkbstate.group);
++								}
++							}
++						} else {
++							fprintf(stderr, "Xkb unexpected ctrl changes: %d\n", changes);
++							continue;
++						}
++					} else {
++						fprintf(stderr, "Xkb unexpected event\n");
++					}
++					continue;
++				}
++				continue;
++			}
+ 			if (handler[ev.type])
+ 				(handler[ev.type])(&ev);
+ 		}

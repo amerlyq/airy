@@ -1,61 +1,61 @@
-diff --git i/config.def.h w/config.def.h
-index 6f05dce..05343a2 100644
---- i/config.def.h
-+++ w/config.def.h
-@@ -178,7 +178,10 @@ static const char *colorname[] = {
- 	"#839496",  /* FIXED: solarized base0/12 */
- 	"#000000",
--	"#eeeeee",
--	"#555555",
-+	"#555555",  // = defaultrcs (reverse cursor / during selection)
-+	"#eeeeee",  // grp0(en) = white = defaultcs (normal cursor)
-+	"#009eee",  // grp1(ru) = cyan
-+	"#ee9e00",  // grp2(ua) = yellow
-+	"#9e00ee",  // grp3(xx) = magenta
+diff --git a/config.def.h b/config.def.h
+index 83fc8e8..2a21d2b 100644
+--- a/config.def.h
++++ b/config.def.h
+@@ -112,6 +112,17 @@ static const char *colorname[] = {
+ 	"#6c71c4",  /* 13: brmagenta*/
+ 	"#93a1a1",  /* 14: brcyan   */
+ 	"#fdf6e3",  /* 15: brwhite  */
++
++	[255] = 0,
++
++	/* more colors can be added after 255 to use with DefaultXX */
++	"#839496", /* default foreground colour */
++	"#000000", /* default background colour */
++	"#555555", /* = defaultrcs (reverse cursor / during selection) */
++	"#eeeeee", /* grp0(en) = white = defaultcs (normal cursor) */
++	"#009eee", /* grp1(ru) = cyan */
++	"#ee9e00", /* grp2(ua) = yellow */
++	"#9e00ee", /* grp3(xx) = magenta */
  };
  
  /* Terminal colors for alternate (light) palette */
-@@ -210,8 +210,11 @@ static const char *altcolorname[] = {
- 	"#000000",
- 	"#839496",  /* FIXED: solarized base0/12 */
--	"#555555",
--	"#eeeeee",
-+	"#eeeeee",  // = defaultrcs (reverse cursor / during selection)
-+	"#222222",  // grp0(en) = dim white = defaultcs (normal cursor)
-+	"#006aaa",  // grp1(ru) = dim cyan
-+	"#aa6a00",  // grp2(ua) = dim yellow
-+	"#6a00aa",  // grp3(xx) = dim magenta
+@@ -133,14 +144,26 @@ static const char *altcolorname[] = {
+ 	"#6c71c4",  /* 13: brmagenta*/
+ 	"#586e75",  /* 14: brcyan   */
+ 	"#002b36",  /* 15: brwhite  */
++
++	[255] = 0,
++
++	/* more colors can be added after 255 to use with DefaultXX */
++	"#000000", /* default foreground colour */
++	"#839496", /* default background colour */
++	"#eeeeee", /* = defaultrcs (reverse cursor / during selection) */
++	"#222222", /* grp0(en) = dim white = defaultcs (normal cursor) */
++	"#006aaa", /* grp1(ru) = dim cyan */
++	"#aa6a00", /* grp2(ua) = dim yellow */
++	"#6a00aa", /* grp3(xx) = dim magenta */
  };
  
  /*
   * Default colors (colorname index)
-@@ -226,8 +226,9 @@ 
+  * foreground, background, cursor, reverse cursor
   */
- unsigned int defaultfg = 256;
- unsigned int defaultbg = 257;
--unsigned int defaultcs = 258;
--unsigned int defaultrcs = 259;
-+unsigned int defaultrcs = 258;
+-unsigned int defaultfg = 12;
+-unsigned int defaultbg = 8;
+-unsigned int defaultcs = 14;
+-static unsigned int defaultrcs = 15;
 +const unsigned int xkbbasecolor = 259;
++unsigned int defaultfg = 256;
++unsigned int defaultbg = 257;
 +unsigned int defaultcs = xkbbasecolor;
++static unsigned int defaultrcs = 258;
  
- /*
-  * Default shape of cursor
-diff --git i/st.h w/st.h
-index fa2eddf..5600282 100644
---- i/st.h
-+++ w/st.h
-@@ -76,4 +76,5 @@ void *xmalloc(size_t);
- extern unsigned int tabspaces;
- extern unsigned int defaultfg;
- extern unsigned int defaultbg;
-+extern const unsigned int xkbbasecolor;
- extern unsigned int defaultcs;
-diff --git i/st.c w/st.c
-index a1e7d23..27a1a57 100644
---- i/st.c
-+++ w/st.c
-@@ -2755,6 +2755,24 @@ draw(void)
+diff --git a/st.c b/st.c
+index 6f40e35..efd8466 100644
+--- a/st.c
++++ b/st.c
+@@ -2697,6 +2697,23 @@ draw(void)
  		xximspot(term.ocx, term.ocy);
  }
  
@@ -73,30 +73,34 @@ index a1e7d23..27a1a57 100644
 +	if (!xstartdraw())
 +		return;
 +	xdrawcursor(term.c.x, term.c.y, term.line[term.c.y][term.c.x],
-+	    term.ocx, term.ocy, term.line[term.ocy][term.ocx],
-+	    term.line[term.ocy], term.col);
++		    term.ocx, term.ocy, term.line[term.ocy][term.ocx]);
 +}
 +
  void
  redraw(void)
  {
-diff --git i/st.h w/st.h
-index f5934b8..5600282 100644
---- i/st.h
-+++ w/st.h
-@@ -87,6 +87,7 @@ typedef union {
- } Arg;
+diff --git a/st.h b/st.h
+index 4b4d5ab..04bdb57 100644
+--- a/st.h
++++ b/st.h
+@@ -79,5 +79,6 @@ typedef union {
  
  void die(const char *, ...);
 +void redrawcursor(int);
  void redraw(void);
  void draw(void);
  
-diff --git i/x.c w/x.c
-index cee7c50..8df71f8 100644
---- i/x.c
-+++ w/x.c
-@@ -2061,6 +2061,10 @@ focus(XEvent *ev)
+@@ -124,4 +125,5 @@ extern int usealtcolors;
+ extern unsigned int tabspaces;
+ extern unsigned int defaultfg;
+ extern unsigned int defaultbg;
++extern const unsigned int xkbbasecolor;
+ extern unsigned int defaultcs;
+diff --git a/x.c b/x.c
+index 7db2c33..a0a8eae 100644
+--- a/x.c
++++ b/x.c
+@@ -1802,6 +1802,10 @@ focus(XEvent *ev)
  		xseturgency(0);
  		if (IS_SET(MODE_FOCUS))
  			ttywrite("\033[I", 3, 0);
@@ -107,9 +111,7 @@ index cee7c50..8df71f8 100644
  	} else {
  		if (xw.ime.xic)
  			XUnsetICFocus(xw.ime.xic);
-@@ -2248,6 +2248,25 @@ run(void)
- 	FcPatternGetDouble(dc.font.match->pattern, FC_SIZE, 0, &defaultrelfontsize);
- 	refreshxrandr(0);
+@@ -1964,4 +1968,23 @@ run(void)
  
 +	int xkb_major = XkbMajorVersion;
 +	int xkb_minor = XkbMinorVersion;
@@ -133,10 +135,11 @@ index cee7c50..8df71f8 100644
  	ttyfd = ttynew(opt_line, shell, opt_io, opt_cmd);
  	cresize(w, h);
  
-@@ -2280,6 +2297,53 @@ run(void)
+@@ -1993,6 +2016,56 @@ run(void)
+ 			XNextEvent(xw.dpy, &ev);
  			if (XFilterEvent(&ev, None))
  				continue;
- 			if (LASTEvent <= ev.type) {
++			if (LASTEvent <= ev.type) {
 +				if (xkb_event_base == ev.type) {
 +					// NOTE: keep cursor unchanged for other background windows
 +					// INFO: xkb events are broadcasted regardless of kbd focus TRY: PerClientFlags
@@ -184,6 +187,8 @@ index cee7c50..8df71f8 100644
 +					}
 +					continue;
 +				}
- 				if (rr_event_base + RRNotify == ev.type &&
- 					RRNotify_CrtcChange == ((XRRNotifyEvent *)&ev)->subtype)
- 				{
++				continue;
++			}
+ 			if (handler[ev.type])
+ 				(handler[ev.type])(&ev);
+ 		}

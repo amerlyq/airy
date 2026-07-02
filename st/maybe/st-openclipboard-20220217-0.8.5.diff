@@ -1,0 +1,91 @@
+From 1e752ae33791652d050e7d03e6d8e9df3fb459e3 Mon Sep 17 00:00:00 2001
+From: Santtu Lakkala <inz@inz.fi>
+Date: Thu, 17 Feb 2022 18:11:35 +0200
+Subject: [PATCH] Open url from clipboard
+
+Based on the previous versions of the patch, but uses double-fork/execlp
+instead of system() to avoid potential shell escaping issues and make
+the command line building unnecessary.
+---
+ config.def.h |  1 +
+ st.c         |  2 +-
+ st.h         |  1 +
+ x.c          | 21 +++++++++++++++++++++
+ 4 files changed, 24 insertions(+), 1 deletion(-)
+
+diff --git a/config.def.h b/config.def.h
+index 91ab8ca..a696ec7 100644
+--- a/config.def.h
++++ b/config.def.h
+@@ -201,6 +201,7 @@ static Shortcut shortcuts[] = {
+ 	{ TERMMOD,              XK_Y,           selpaste,       {.i =  0} },
+ 	{ ShiftMask,            XK_Insert,      selpaste,       {.i =  0} },
+ 	{ TERMMOD,              XK_Num_Lock,    numlock,        {.i =  0} },
++	{ MODKEY,               XK_o,           opencopied,     {.v = "xdg-open"} },
+ };
+ 
+ /*
+diff --git a/st.c b/st.c
+index 51049ba..4fbc5c8 100644
+--- a/st.c
++++ b/st.c
+@@ -810,7 +810,7 @@ ttynew(const char *line, char *cmd, const char *out, char **args)
+ 		break;
+ 	default:
+ #ifdef __OpenBSD__
+-		if (pledge("stdio rpath tty proc", NULL) == -1)
++		if (pledge("stdio rpath tty proc exec", NULL) == -1)
+ 			die("pledge\n");
+ #endif
+ 		close(s);
+diff --git a/st.h b/st.h
+index 519b9bd..3b4b395 100644
+--- a/st.h
++++ b/st.h
+@@ -81,6 +81,7 @@ void die(const char *, ...);
+ void redraw(void);
+ void draw(void);
+ 
++void opencopied(const Arg *);
+ void printscreen(const Arg *);
+ void printsel(const Arg *);
+ void sendbreak(const Arg *);
+diff --git a/x.c b/x.c
+index 8a16faa..3a4e5f0 100644
+--- a/x.c
++++ b/x.c
+@@ -5,6 +5,7 @@
+ #include <locale.h>
+ #include <signal.h>
+ #include <sys/select.h>
++#include <sys/wait.h>
+ #include <time.h>
+ #include <unistd.h>
+ #include <libgen.h>
+@@ -2078,3 +2079,23 @@ run:
+ 
+ 	return 0;
+ }
++
++void
++opencopied(const Arg *arg)
++{
++	char * const clip = xsel.clipboard;
++	pid_t chpid;
++
++	if(!clip) {
++		fprintf(stderr, "Warning: nothing copied to clipboard\n");
++		return;
++	}
++
++	if ((chpid = fork()) == 0) {
++		if (fork() == 0)
++			execlp(arg->v, arg->v, clip, NULL);
++		exit(1);
++	}
++	if (chpid > 0)
++		waitpid(chpid, NULL, 0);
++}
+-- 
+2.32.0
+

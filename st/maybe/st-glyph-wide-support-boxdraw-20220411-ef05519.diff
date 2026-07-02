@@ -1,8 +1,15 @@
-https://github.com/LukeSmithxyz/st/pull/224
-from Azumgi/glyph_truncation_fix
+From 9583955da47177c9557210f70baaaf9511ba106c Mon Sep 17 00:00:00 2001
+From: wael <40663@protonmail.com>
+Date: Mon, 11 Apr 2022 17:14:06 +0300
+Subject: [PATCH] boxdraw support for glyph wide support
+
+---
+ st.h |   6 +++
+ x.c  | 139 ++++++++++++++++++++++++++++++-----------------------------
+ 2 files changed, 76 insertions(+), 69 deletions(-)
 
 diff --git a/st.h b/st.h
-index 33cc5d4..b85474b 100644
+index 07a7c66..3b8c97d 100644
 --- a/st.h
 +++ b/st.h
 @@ -37,6 +37,12 @@ enum glyph_attribute {
@@ -10,19 +17,19 @@ index 33cc5d4..b85474b 100644
  };
  
 +enum drawing_mode {
-+	DRAW_NONE = 0,
-+	DRAW_BG   = 1 << 0,
-+	DRAW_FG   = 1 << 1,
++    DRAW_NONE = 0,
++    DRAW_BG = 1 << 0,
++    DRAW_FG = 1 << 1,
 +};
 +
  enum selection_mode {
  	SEL_IDLE = 0,
  	SEL_EMPTY = 1,
 diff --git a/x.c b/x.c
-index 55f4a61..c1f050b 100644
+index bf6bbf9..1311c0d 100644
 --- a/x.c
 +++ b/x.c
-@@ -152,7 +152,7 @@ typedef struct {
+@@ -142,7 +142,7 @@ typedef struct {
  
  static inline ushort sixd_to_16bit(int);
  static int xmakeglyphfontspecs(XftGlyphFontSpec *, const Glyph *, int, int, int);
@@ -31,7 +38,7 @@ index 55f4a61..c1f050b 100644
  static void xdrawglyph(Glyph, int, int);
  static void xclear(int, int, int, int);
  static int xgeommasktogravity(int);
-@@ -1445,14 +1445,13 @@ xmakeglyphfontspecs(XftGlyphFontSpec *specs, const Glyph *glyphs, int len, int x
+@@ -1379,7 +1379,7 @@ xmakeglyphfontspecs(XftGlyphFontSpec *specs, const Glyph *glyphs, int len, int x
  }
  
  void
@@ -40,14 +47,7 @@ index 55f4a61..c1f050b 100644
  {
  	int charlen = len * ((base.mode & ATTR_WIDE) ? 2 : 1);
  	int winx = borderpx + x * win.cw, winy = borderpx + y * win.ch,
- 	    width = charlen * win.cw;
- 	Color *fg, *bg, *temp, revfg, revbg, truefg, truebg;
- 	XRenderColor colfg, colbg;
--	XRectangle r;
- 
- 	/* Fallback on color display for attributes not supported by the font */
- 	if (base.mode & ATTR_ITALIC && base.mode & ATTR_BOLD) {
-@@ -1532,51 +1531,45 @@ xdrawglyphfontspecs(const XftGlyphFontSpec *specs, Glyph base, int len, int x, i
+@@ -1470,51 +1470,45 @@ xdrawglyphfontspecs(const XftGlyphFontSpec *specs, Glyph base, int len, int x, i
  	if (base.mode & ATTR_INVISIBLE)
  		fg = bg;
  
@@ -82,59 +82,61 @@ index 55f4a61..c1f050b 100644
 -		/* Render the glyphs. */
 -		XftDrawGlyphFontSpec(xw.draw, fg, specs, len);
 -	}
-+	if (dmode & DRAW_BG) {
-+		/* Intelligent cleaning up of the borders. */
-+		if (x == 0) {
-+			xclear(0, (y == 0)? 0 : winy, borderpx,
-+					winy + win.ch +
-+					((winy + win.ch >= borderpx + win.th)? win.h : 0));
-+		}
-+		if (winx + width >= borderpx + win.tw) {
-+			xclear(winx + width, (y == 0)? 0 : winy, win.w,
-+					((winy + win.ch >= borderpx + win.th)? win.h : (winy + win.ch)));
-+		}
-+		if (y == 0)
-+			xclear(winx, 0, winx + width, borderpx);
-+		if (winy + win.ch >= borderpx + win.th)
-+			xclear(winx, winy + win.ch, winx + width, win.h);
- 
--	/* Render underline and strikethrough. */
--	if (base.mode & ATTR_UNDERLINE) {
--		XftDrawRect(xw.draw, fg, winx, winy + dc.font.ascent + 1,
--				width, 1);
-+		/* Fill the background */
-+		XftDrawRect(xw.draw, bg, winx, winy, width, win.ch);
- 	}
- 
--	if (base.mode & ATTR_STRUCK) {
--		XftDrawRect(xw.draw, fg, winx, winy + 2 * dc.font.ascent / 3,
--				width, 1);
--	}
-+	if (dmode & DRAW_FG) {
++    if (dmode & DRAW_BG) {
++        /* Intelligent cleaning up of the borders. */
++        if (x == 0) {
++            xclear(0, (y == 0)? 0 : winy, borderpx,
++                   winy + win.ch +
++                   ((winy + win.ch >= borderpx + win.th)? win.h : 0));
++        }
++        if (winx + width >= borderpx + win.tw) {
++            xclear(winx + width, (y == 0)? 0 : winy, win.w,
++                   ((winy + win.ch >= borderpx + win.th)? win.h : (winy + win.ch)));
++        }
++        if (y == 0)
++            xclear(winx, 0, winx + width, borderpx);
++        if (winy + win.ch >= borderpx + win.th)
++            xclear(winx, winy + win.ch, winx + width, win.h);
++        /* Fill the background */
++        XftDrawRect(xw.draw, bg, winx, winy, width, win.ch);
++    }
++
++
++    if (dmode & DRAW_FG) {
 +		if (base.mode & ATTR_BOXDRAW) {
 +			drawboxes(winx, winy, width / len, win.ch, fg, bg, specs, len);
 +		} else {
 +			/* Render the glyphs. */
 +			XftDrawGlyphFontSpec(xw.draw, fg, specs, len);
 +		}
-+
-+		/* Render underline and strikethrough. */
-+		if (base.mode & ATTR_UNDERLINE) {
-+			XftDrawRect(xw.draw, fg, winx, winy + dc.font.ascent + 1,
-+					width, 1);
-+		}
  
+-	/* Render underline and strikethrough. */
+-	if (base.mode & ATTR_UNDERLINE) {
+-		XftDrawRect(xw.draw, fg, winx, winy + dc.font.ascent * chscale + 1,
+-				width, 1);
+-	}
++        /* Render underline and strikethrough. */
++        if (base.mode & ATTR_UNDERLINE) {
++            XftDrawRect(xw.draw, fg, winx, winy + dc.font.ascent + 1,
++                        width, 1);
++        }
+ 
+-	if (base.mode & ATTR_STRUCK) {
+-		XftDrawRect(xw.draw, fg, winx, winy + 2 * dc.font.ascent * chscale / 3,
+-				width, 1);
+-	}
+-
 -	/* Reset clip to none. */
 -	XftDrawSetClip(xw.draw, 0);
-+		if (base.mode & ATTR_STRUCK) {
-+			XftDrawRect(xw.draw, fg, winx, winy + 2 * dc.font.ascent / 3,
-+					width, 1);
-+		}
-+	}
++        if (base.mode & ATTR_STRUCK) {
++            XftDrawRect(xw.draw, fg, winx, winy + 2 * dc.font.ascent / 3,
++                        width, 1);
++        }
++    }
  }
  
  void
-@@ -1586,7 +1579,7 @@ xdrawglyph(Glyph g, int x, int y)
+@@ -1524,7 +1518,7 @@ xdrawglyph(Glyph g, int x, int y)
  	XftGlyphFontSpec spec;
  
  	numspecs = xmakeglyphfontspecs(&spec, &g, 1, x, y);
@@ -143,7 +145,7 @@ index 55f4a61..c1f050b 100644
  }
  
  void
-@@ -1705,32 +1698,39 @@ xstartdraw(void)
+@@ -1659,32 +1653,39 @@ xstartdraw(void)
  void
  xdrawline(Line line, int x1, int y1, int x2)
  {
@@ -174,7 +176,7 @@ index 55f4a61..c1f050b 100644
 +	numspecs_cached = xmakeglyphfontspecs(xw.specbuf, &line[x1], x2 - x1, x1, y1);
 +
 +	/* Draw line in 2 passes: background and foreground. This way wide glyphs
-+	   won't get truncated (#223) */
++       won't get truncated (#223) */
 +	for (int dmode = DRAW_BG; dmode <= DRAW_FG; dmode <<= 1) {
 +		specs = xw.specbuf;
 +		numspecs = numspecs_cached;
@@ -206,3 +208,6 @@ index 55f4a61..c1f050b 100644
  }
  
  void
+-- 
+2.35.1
+

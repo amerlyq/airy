@@ -1,23 +1,8 @@
-From 3f3b80b9966c60086f4ed80ce4de0cbf03468d36 Mon Sep 17 00:00:00 2001
-From: "Avi Halachmi (:avih)" <avihpit@yahoo.com>
-Date: Wed, 26 Dec 2018 14:51:45 +0200
-Subject: [PATCH] boxdraw_v2: custom render lines/blocks/braille for perfect
- alignment
+From 46a1124957b8de5e7f827656b64bfc3baeaa097f Mon Sep 17 00:00:00 2001
+From: wael <40663@protonmail.com>
+Date: Mon, 11 Apr 2022 17:04:30 +0300
+Subject: [PATCH] [st][patch][boxdraw] update to 0.8.5
 
-It seems impossible to ensure that blocks and line drawing glyphs
-align without visible gaps for all combinations of arbitrary font,
-size and width/height scale factor.
-
-This commit adds options to render most of the lines/blocks and
-braille codepoints without using the font such that they align
-perfectly regardless of font, size or other configuration values.
-
-Supported codepoints are U+2500 - U+259F except dashes/diagonals,
-and U28XX.
-
-The lines/blocks data is stored as 16-bit values at boxdraw_data.h
-
-boxdraw/braille are independent, disabled by default at config[.def].h
 ---
  Makefile       |   3 +-
  boxdraw.c      | 194 ++++++++++++++++++++++++++++++++++++++++++++
@@ -472,10 +457,10 @@ index 0000000..7890500
 +	/* U+2571 - U+2573: unsupported (diagonals) */
 +};
 diff --git a/config.def.h b/config.def.h
-index 0895a1f..bf6718b 100644
+index 91ab8ca..7bb3ff7 100644
 --- a/config.def.h
 +++ b/config.def.h
-@@ -58,6 +58,18 @@ static unsigned int blinktimeout = 800;
+@@ -67,6 +67,18 @@ static unsigned int blinktimeout = 800;
   */
  static unsigned int cursorthickness = 2;
  
@@ -485,7 +470,7 @@ index 0895a1f..bf6718b 100644
 + *    Bold affects lines thickness if boxdraw_bold is not 0. Italic is ignored.
 + * 0: disable (render all U25XX glyphs normally from the font).
 + */
-+const int boxdraw = 1;
++const int boxdraw = 0;
 +const int boxdraw_bold = 0;
 +
 +/* braille (U28XX):  1: render as adjacent "pixels",  0: use font */
@@ -495,10 +480,10 @@ index 0895a1f..bf6718b 100644
   * bell volume. It must be a value between -100 and 100. Use 0 for disabling
   * it
 diff --git a/st.c b/st.c
-index 0ce6ac2..c035e19 100644
+index f43cfd3..baa2bed 100644
 --- a/st.c
 +++ b/st.c
-@@ -1230,6 +1230,9 @@ tsetchar(Rune u, Glyph *attr, int x, int y)
+@@ -1214,6 +1214,9 @@ tsetchar(Rune u, const Glyph *attr, int x, int y)
  	term.dirty[y] = 1;
  	term.line[y][x] = *attr;
  	term.line[y][x].u = u;
@@ -509,7 +494,7 @@ index 0ce6ac2..c035e19 100644
  
  void
 diff --git a/st.h b/st.h
-index d978458..a6c382a 100644
+index 519b9bd..07a7c66 100644
 --- a/st.h
 +++ b/st.h
 @@ -33,6 +33,7 @@ enum glyph_attribute {
@@ -520,9 +505,9 @@ index d978458..a6c382a 100644
  	ATTR_BOLD_FAINT = ATTR_BOLD | ATTR_FAINT,
  };
  
-@@ -111,6 +112,14 @@ void *xmalloc(size_t);
- void *xrealloc(void *, size_t);
- char *xstrdup(char *);
+@@ -113,6 +114,14 @@ char *xstrdup(const char *);
+ 
+ int xgetcolor(int x, unsigned char *r, unsigned char *g, unsigned char *b);
  
 +int isboxdraw(Rune);
 +ushort boxdrawindex(const Glyph *);
@@ -535,16 +520,16 @@ index d978458..a6c382a 100644
  /* config.h globals */
  extern char *utmp;
  extern char *scroll;
-@@ -139,3 +148,4 @@ extern char *termname;
+@@ -126,3 +135,4 @@ extern unsigned int tabspaces;
  extern unsigned int defaultfg;
  extern unsigned int defaultbg;
- extern float alpha;
+ extern unsigned int defaultcs;
 +extern const int boxdraw, boxdraw_bold, boxdraw_braille;
 diff --git a/x.c b/x.c
-index e5f1737..6f7ea2c 100644
+index 2a3bd38..bf6bbf9 100644
 --- a/x.c
 +++ b/x.c
-@@ -1205,6 +1205,8 @@ xinit(int cols, int rows)
+@@ -1237,6 +1237,8 @@ xinit(int cols, int rows)
  	xsel.xtarget = XInternAtom(xw.dpy, "UTF8_STRING", 0);
  	if (xsel.xtarget == None)
  		xsel.xtarget = XA_STRING;
@@ -553,7 +538,7 @@ index e5f1737..6f7ea2c 100644
  }
  
  int
-@@ -1251,8 +1253,13 @@ xmakeglyphfontspecs(XftGlyphFontSpec *specs, const Glyph *glyphs, int len, int x
+@@ -1283,8 +1285,13 @@ xmakeglyphfontspecs(XftGlyphFontSpec *specs, const Glyph *glyphs, int len, int x
  			yp = winy + font->ascent;
  		}
  
@@ -569,7 +554,7 @@ index e5f1737..6f7ea2c 100644
  		if (glyphidx) {
  			specs[numspecs].font = font->match;
  			specs[numspecs].glyph = glyphidx;
-@@ -1456,8 +1463,12 @@ xdrawglyphfontspecs(const XftGlyphFontSpec *specs, Glyph base, int len, int x, i
+@@ -1488,8 +1495,12 @@ xdrawglyphfontspecs(const XftGlyphFontSpec *specs, Glyph base, int len, int x, i
  	r.width = width;
  	XftDrawSetClipRectangles(xw.draw, winx, winy, &r, 1);
  
@@ -584,7 +569,7 @@ index e5f1737..6f7ea2c 100644
  
  	/* Render underline and strikethrough. */
  	if (base.mode & ATTR_UNDERLINE) {
-@@ -1500,7 +1511,7 @@ xdrawcursor(int cx, int cy, Glyph g, int ox, int oy, Glyph og)
+@@ -1532,7 +1543,7 @@ xdrawcursor(int cx, int cy, Glyph g, int ox, int oy, Glyph og)
  	/*
  	 * Select the right color for the right mode.
  	 */
@@ -593,8 +578,6 @@ index e5f1737..6f7ea2c 100644
  
  	if (IS_SET(MODE_REVERSE)) {
  		g.mode |= ATTR_REVERSE;
-
-base-commit: 43a395ae91f7d67ce694e65edeaa7bbc720dd027
 -- 
-2.20.1
+2.35.1
 

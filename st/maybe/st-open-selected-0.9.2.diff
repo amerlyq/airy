@@ -1,0 +1,74 @@
+diff --git a/config.def.h b/config.def.h
+index 2cd740a..d362d6b 100644
+--- a/config.def.h
++++ b/config.def.h
+@@ -176,6 +176,7 @@ static uint forcemousemod = ShiftMask;
+  */
+ static MouseShortcut mshortcuts[] = {
+ 	/* mask                 button   function        argument       release */
++	{ ControlMask,          Button2, selopen,        {.i = 0},      1 },
+ 	{ XK_ANY_MOD,           Button2, selpaste,       {.i = 0},      1 },
+ 	{ ShiftMask,            Button4, ttysend,        {.s = "\033[5;2~"} },
+ 	{ XK_ANY_MOD,           Button4, ttysend,        {.s = "\031"} },
+diff --git a/st.c b/st.c
+index 2e3800e..f55facb 100644
+--- a/st.c
++++ b/st.c
+@@ -1903,6 +1903,16 @@ strhandle(void)
+ 			if (narg > 1)
+ 				xsettitle(strescseq.args[1]);
+ 			return;
++		case 7:
++			if (strstr(strescseq.args[1], "file://") != strescseq.args[1]) {
++				fprintf(stderr, "erresc: dir %s must have prefix 'file://'\n",
++				        strescseq.args[1]);
++				return;
++			}
++			if (chdir(strescseq.args[1] + 7) != 0) /* +7 to remove prefix */
++				fprintf(stderr, "erresc: invalid directory %s\n",
++				        strescseq.args[1]);
++			return;
+ 		case 52:
+ 			if (narg > 2 && allowwindowops) {
+ 				dec = base64dec(strescseq.args[2]);
+diff --git a/x.c b/x.c
+index d73152b..e44d61c 100644
+--- a/x.c
++++ b/x.c
+@@ -5,6 +5,7 @@
+ #include <locale.h>
+ #include <signal.h>
+ #include <sys/select.h>
++#include <sys/wait.h>
+ #include <time.h>
+ #include <unistd.h>
+ #include <libgen.h>
+@@ -55,6 +56,7 @@ static void clipcopy(const Arg *);
+ static void clippaste(const Arg *);
+ static void numlock(const Arg *);
+ static void selpaste(const Arg *);
++static void selopen(const Arg *);
+ static void zoom(const Arg *);
+ static void zoomabs(const Arg *);
+ static void zoomreset(const Arg *);
+@@ -286,6 +288,20 @@ selpaste(const Arg *dummy)
+ 			xw.win, CurrentTime);
+ }
+ 
++void
++selopen(const Arg *dummy)
++{
++	pid_t chpid;
++
++	if ((chpid = fork()) == 0) {
++		if (fork() == 0)
++			execlp("xdg-open", "xdg-open", getsel(), NULL);
++		exit(1);
++	}
++	if (chpid > 0)
++		waitpid(chpid, NULL, 0);
++}
++
+ void
+ numlock(const Arg *dummy)
+ {
