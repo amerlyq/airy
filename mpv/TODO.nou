@@ -28,3 +28,26 @@ DEV
     http://xpressrazor.wordpress.com/2014/05/04/using-mpv-to-escape-start-and-end-of-videos-like-in-anime-tv-shows-etc/
   [_] mpv osc (Fixed in mpv 0.3.10-dmo3)
     https://github.com/mpv-player/mpv/blob/master/DOCS/man/osc.rst
+
+
+2h45m 2026-07-03-Fri-W26
+  [+] 00:15 2h30m #vd CFG mpv/ffmpeg : CMP video bef/aft cvt ⌇⡪⡉⡇⢸
+    Play side-by-side
+      $ mpv original.mp4 --external-file=reencoded.mp4 --lavfi-complex="[vid1] [vid2] hstack [vo]"
+      $ mpv original.mp4 --external-file=reencoded.mp4 --lavfi-complex="[vid1] scale=1920x1080 [v1]; [vid2] scale=1920x1080 [v2]; [v1] [v2] hstack [vo]".
+      [✓] $ mpv --lavfi-complex="[vid1][vid2]hstack[vo];[aid1][aid2]amix[ao]" video1.mp4 --external-file=video2.mp4
+      [Feature request?] Play multiple videos sides by sides · Issue #3854 · mpv-player/mpv ⌇⡪⡈⠮⢹
+        https://github.com/mpv-player/mpv/issues/3854
+    View Difference (Negative Space)
+      [✗] $ mpv original.mp4 --external-file=reencoded.mp4 --lavfi-complex="[vid1] [vid2] blend=mode=difference [vo]"
+      $ mpv original.mp4 --external-file=reencoded.mp4 --lavfi-complex="[vid1] [vid2] blend=all_mode=difference [vo]"
+      [✓] $ mpv original.mp4 --external-file=reencoded.mp4 --lavfi-complex="[vid1] [vid2] blend=all_mode=grainextract [vo]"
+    Find which watch_later for video to delete
+      :shell -w echo -n '%p' | md5sum - | tr 'a-z' 'A-Z' | cut -d' ' -f1 | xci
+      OR: <DEL>
+      OR: sort by mtime
+    NOTE: for lazy-loading script -- move it out of ./scripts and make a keybind
+      l script-message load-script /path/to/your-plugin.lua
+      u script-message unload-script script_internal_name
+      $ echo 'load-script /path/to/your-plugin.lua' | socat - /tmp/mpvsocket
+  [≈] 03:30 15m #vd CFG mpv/ffmpeg

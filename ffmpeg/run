@@ -93,14 +93,23 @@ elif [[ $fmt == fast ]]; then
   # av1_qsv h264_qsv hevc_qsv
   # -c:v h264_qsv -i ...
   # -vf "scale_qsv=w=1920:h=1080"
+
+  # ffmpeg -hide_banner -nostats -nostdin \
+  #   -hwaccel qsv -hwaccel_output_format qsv \
+  #   -ss "${beg:-00:00}" -to "${end:--00:00}" \
+  #   -i "$fname" -vf 'hwdownload' \
+  #   -c:v hevc_qsv -preset slow -global_quality 23 \
+  #   -codec:a copy -codec:d copy \
+  #   "$path"
+  #
   ffmpeg -hide_banner -nostats -nostdin \
     -hwaccel qsv -hwaccel_output_format qsv \
-    -ss "${beg:-00:00}" -to "${end:--00:00}" \
-    -i "$fname" -vf 'hwdownload' \
+    -i "$fname" \
+    ${beg:+-ss "$beg"} ${end:+to "$end"} \
+    -vf 'hwdownload,format=nv12' \
     -c:v hevc_qsv -preset slow -global_quality 23 \
-    -codec:a copy -codec:d copy \
+    -c:a aac -codec:d copy \
     "$path"
-
 
   # x4.5: ffmpeg -y -hide_banner -hwaccel vaapi -hwaccel_output_format vaapi -i input.mp4 -c:v hevc_vaapi -global_quality 25 output.mp4
 

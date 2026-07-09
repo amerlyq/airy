@@ -36,7 +36,8 @@ IMAGE_CACHE_PATH="${4}"  # Full path that should be used to cache image preview
 PV_IMAGE_ENABLED="${5}"  # 'True' if image previews are enabled, 'False' otherwise.
 
 FILE_EXTENSION="${FILE_PATH##*.}"
-FILE_EXTENSION_LOWER="$(printf "%s" "${FILE_EXTENSION}" | tr '[:upper:]' '[:lower:]')"
+# FILE_EXTENSION_LOWER="$(printf "%s" "${FILE_EXTENSION}" | tr '[:upper:]' '[:lower:]')"
+FILE_EXTENSION_LOWER=${FILE_EXTENSION,,}
 
 ## Settings
 HIGHLIGHT_SIZE_MAX=262143  # 256KiB
@@ -69,6 +70,8 @@ preview_archive(){ local f=$1 sfx=${2:-#/} avfsdir=$XDG_RUNTIME_DIR/avfs
 handle_extension() {
     # shellcheck disable=SC2221,SC2222
     case "${FILE_EXTENSION_LOWER}" in
+        part) exit 1;;  # avoid crash due to spammed preview of .mp4.part downloads
+
         ## use AVFS for archive exploration
         # VIZ: $ grep -hroP '\.from = "\.\K[^"]+' /path/to/src/avfs |sort -u| paste -sd'|'
         Z|a|apk|bz|bz2|deb|ear|gz|jar|lz|lzma|rar|sfx|\
@@ -139,6 +142,11 @@ handle_extension() {
 
         ## JSON
         json)
+            if [[ "$( stat --printf='%s' -- "${FILE_PATH}" )" -gt 10000 ]]; then
+                exit 2
+            fi
+            # jq --color-output --stream 'fromstream(1|truncate_stream(inputs))' "${FILE_PATH}" && exit 5
+            # head -c 100 "${FILE_PATH}" | jq --color-output . && exit 5
             jq --color-output . "${FILE_PATH}" && exit 5
             python -m json.tool -- "${FILE_PATH}" && exit 5
             ;;

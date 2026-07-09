@@ -297,6 +297,14 @@ def hook_ready(fm: FM) -> None:
 
     # bind selection-change signal
     fm.signal_bind("move", _on_move, priority=0, weak=False)
+
+    fm.signal_bind(
+        "runner.execute.before",
+        lambda s: __import__("sys").stdout.write("---\n"),
+        priority=0,
+        weak=False,
+    )
+
     if _HOOK_READY_OLD:
         _HOOK_READY_OLD(fm)
 
