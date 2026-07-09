@@ -27,8 +27,11 @@ cmp.setup {
     ['<C-e>'] = cmp.mapping.abort(),
     ['<CR>'] = cmp.mapping.confirm {
       -- behavior = cmp.ConfirmBehavior.Replace,
-      -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+      --# Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
       select = false,
+      --# Select the item and trigger the textEdit (inserts the import statement)
+      -- behavior = cmp.confirm_behavior.Insert,
+      -- select = true,
     },
     ['<Tab>'] = function(fallback)
       if cmp.visible() then

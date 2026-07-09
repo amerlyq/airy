@@ -48,6 +48,7 @@ local function lsp_mappings(client, bufnr)
   -- FIXED: disable LSP for <gq> to allow comments-wrapping inof line-formatting by Black
   vim.opt_local.formatexpr = ""
 
+  -- ALT:DFL: 'norm! gw' does the same
   -- gQ = builtin gq (ignores formatexpr / formatprg)
   vim.keymap.set({ "n", "x" }, "gQ", function()
     local fe = vim.bo.formatexpr

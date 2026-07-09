@@ -324,6 +324,7 @@ EOT
   ## NOTE: stop shared "users" access to /data
   fmd(){ mkdir -p "${@:3}" && chown -R "$1" -- "${@:3}" && chmod -R "$2" -- "${@:3}"; }
   fmd root:users  750 {,/data}/.snapshots
+  # ALSO:(for !uv): btrfs subvolume create /data/.cache
   fmd amer:users  750 /cache/_steam  /media/winsys
   fmd amer:amer  2700 /home/user /cache/{,vm,work}  /data/{,_dld,aura,music}  /media/amer  /net/share
   chmod -R 700 /home
