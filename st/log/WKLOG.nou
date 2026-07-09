@@ -2,3 +2,17 @@
 2022-04-07-Thu-W14
   [_] IDEA: !st auto-reduce fontsize based on window width ⌇⡢⡎⢛⠮
     WF: laptop right-side windows on 13.3" laptop
+
+
+2026-07-01-Wed-W26
+  [^] upgrade !st=0.9.3 + all patches
+
+
+2026-07-06-Mon-W27
+  g6r [✗] <env> CHECK:ERR !st in !st-M (due to tmux, no err with !st-M in !st-M) ⌇⡪⡋⢐⢕
+    * erresc: unknown private set/reset mode 2031
+      ~/.tmux.conf set -g focus-events on
+    * erresc: unknown csi ESC[?996n
+      = is an unknown or unsupported Device Status Report (DSR) request
+      ? Mismatched TERM Variable
+      [_] TRY: :set -sg escape-time 10
