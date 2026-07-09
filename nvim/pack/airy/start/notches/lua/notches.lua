@@ -32,6 +32,9 @@ function M.iabbrev()
   local enxkb = 'qwertyuiop asdfghjkl zxcvbnm QWERTYUIOP ASDFGHJKL ZXCVBNM'
   local ruxkb = 'йцукенгшщз фывапролд ячсмить ЙЦУКЕНГШЩЗ ФЫВАПРОЛД ЯЧСМИТЬ'
   local exclude = { ['ти'] = true } -- suppress abbrevs overlapping with real-life words
+
+  local bufnr = vim.api.nvim_get_current_buf()
+
   for _, vrgx in pairs(spec.patterns) do
     vrgx = vrgx:gsub('[\\]', '')  -- ALSO: strip wb='<%()>'
     for notch in string.gmatch(vrgx, '([^|]+)') do
@@ -41,8 +44,13 @@ function M.iabbrev()
       local ru_ = vim.fn.tr(string.upper(norm), enxkb, ruxkb)
       if exclude[ru] == nil then
         -- DEBUG: print(notch)
-        vim.cmd(string.format('iab <buffer> %s %s', ru, notch))
-        vim.cmd(string.format('iab <buffer> %s %s', ru_, notch))
+        -- DISABLED:FAIL: triggers recursive loop: $ nvim -V1 --startuptime startup.log ./TODO.nou
+        --   ERR: sourcing nvim_exec2() called at FileType Autocommands for "nou":0
+        -- vim.cmd(string.format('iab <buffer> %s %s', ru, notch))
+        -- vim.cmd(string.format('iab <buffer> %s %s', ru_, notch))
+        -- Native Neovim buffer-local abbreviation api maps cleanly without side effects
+        vim.keymap.set('ia', ru, notch, { buffer = bufnr, remap = false })
+        vim.keymap.set('ia', ru_, notch, { buffer = bufnr, remap = false })
       end
     end
   end

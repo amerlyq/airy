@@ -1,12 +1,10 @@
 -- REF: https://github.com/nvim-lua/kickstart.nvim/blob/master/init.lua
 local o, g = vim.opt, vim.g
 
--- g.matchup_matchparen_cursor_highlight = 0
--- let g:matchup_matchparen_offscreen = {'method': 'none'}
--- g.matchup_matchparen_enabled = 0
-
 --Set highlight on search
 o.hlsearch = true
+-- Pressing <Esc> in normal mode clears highlights cleanly without an autocommand loop
+vim.keymap.set('n', '<Esc>', '<Cmd>nohlsearch<CR>')
 
 o.clipboard = 'unnamedplus'
 if vim.fn.has("wsl") == 1 then
@@ -71,6 +69,7 @@ o.ignorecase = true
 o.smartcase = true
 
 --Decrease update time for write(swap) and CursorHold
+--  BAD: don't decrease <1s, as it also governs how long "Pattern not found" is shown
 o.updatetime = 1000
 --DISABLED('number'): I'm used to detect LSP finished loading by the time when column appears
 vim.wo.signcolumn = 'auto'

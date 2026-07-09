@@ -57,7 +57,8 @@ autocmd("BufWritePre", {
 })
 
 
-autocmd('CursorMoved', {
+-- autocmd('CursorMoved', {
+autocmd('CursorHold', {
   desc = "(Nou) cvt ts -> date",
   callback = function()
     local word = vim.fn.expand('<cword>')

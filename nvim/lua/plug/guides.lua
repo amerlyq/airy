@@ -54,6 +54,9 @@ vim.g.rainbow_delimiters.highlight = highlights  -- @me (don't override whole cf
 
 -- FIXED? dynamic scope colors based on indent level
 require("ibl").setup {
+    exclude = {
+      filetypes = { "help", "nou", "markdown" }
+    },
     indent = {
         char = "┊",
         -- char = "│",
@@ -63,8 +66,20 @@ require("ibl").setup {
         enabled = true,
         -- char = "│",
         highlight = highlights,
-    }
+        exclude = {
+          language = {
+            "nou",
+            "markdown",
+            "json",
+            "log",
+            "txt",
+            "csv",
+            "yaml" -- Indent scanning on massive YAML files kills performance
+          }
+        },
+    },
 }
+
 hooks.register(hooks.type.SCOPE_HIGHLIGHT, function(tick, bufnr, scope, scope_index)
     -- Check if a valid Treesitter scope node exists
     if not scope then return 1 end

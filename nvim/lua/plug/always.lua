@@ -59,6 +59,14 @@ require('mini.operators').setup({
 })
 
 
+-- Structural Text Objects (di), ca")mini.ai
+-- Outperforms nvim-treesitter-textobjects in speed, setup simplicity, and parsing.
+require('mini.ai').setup()
+-- Auto-Closing Brackets/Quotesmini.pairs
+-- Zero overhead. It is a single Lua module with no active loop listeners.
+require('mini.pairs').setup()
+
+
 --Enable Comment.nvim
 -- https://github.com/numToStr/Comment.nvim
 --   ALT: mini.comment
@@ -233,3 +241,7 @@ require 'plug.difftools'
 
 require 'plug.guides'
 require 'plug.diagnostics'
+require 'plug.matchup'
+require 'plug.search'
+require 'plug.neotest'
+require 'plug.debugger'

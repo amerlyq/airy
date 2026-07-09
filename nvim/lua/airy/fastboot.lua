@@ -74,7 +74,6 @@ g.loaded_netrwPlugin = 0
 
 
 --ALSO:CHECK:
--- let g:loaded_matchparen        = 0
 -- let g:loaded_matchit           = 0
 -- let g:loaded_logiPat           = 0
 -- let g:loaded_rrhelper          = 0

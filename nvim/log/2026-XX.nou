@@ -119,3 +119,54 @@
           https://samuellawrentz.com/blog/neovim-ai-plugins-avante-codecompanion/
         [%] Samuel Lawrentz | Neovim 0.12's Built-in Plugin Manager — Should You Ditch lazy.nvim? ⌇⡩⣩⠫⣣
           https://samuellawrentz.com/blog/neovim-vim-pack-vs-lazy-nvim/
+
+
+2026-07-08-Wed-W27
+  [^] CFG more .py tools ⌇⡪⡏⡇⢐
+    [≈] GitHub - mfussenegger/nvim-dap-python: Mirror of https://codeberg.org/mfussenegger/nvim-dap-python · GitHub ⌇⡪⡎⣬⡛
+      https://github.com/mfussenegger/nvim-dap-python
+    [≈] GitHub - nvim-neotest/neotest-python: · GitHub ⌇⡪⡎⣬⡨
+      https://github.com/nvim-neotest/neotest-python
+    [✓] GitHub - rachartier/tiny-inline-diagnostic.nvim: A Neovim plugin for displaying inline diagnostic messages with customizable styles and icons. · GitHub ⌇⡪⡎⣬⡾
+      https://github.com/rachartier/tiny-inline-diagnostic.nvim
+    [✓] GitHub - lukas-reineke/indent-blankline.nvim: Indent guides for Neovim · GitHub ⌇⡪⡎⣬⢒
+      https://github.com/lukas-reineke/indent-blankline.nvim
+    [✓] GitHub - HiPhish/rainbow-delimiters.nvim: Rainbow delimiters for Neovim with Tree-sitter · GitHub ⌇⡪⡎⣱⡹
+      https://github.com/HiPhish/rainbow-delimiters.nvim
+    [✓] GitHub - Nimblesite/basilisk.nvim: Nimblesite Neovim plugin suite · GitHub ⌇⡪⡏⠛⠷
+      https://github.com/Nimblesite/basilisk.nvim
+    [≫] GitHub - ThePrimeagen/refactoring.nvim: The Refactoring library based off the Refactoring book by Martin Fowler · GitHub ⌇⡪⡏⠚⣟
+      https://github.com/ThePrimeagen/refactoring.nvim
+    [_] MAYBE: integ with some AI tools
+      [?] GitHub - folke/sidekick.nvim: Your Neovim AI sidekick · GitHub ⌇⡪⡎⣼⠴
+        https://github.com/folke/sidekick.nvim
+        SEE:(integ): https://github.com/rachartier/tiny-inline-diagnostic.nvim
+
+
+2026-07-09-Thu-W27
+  [X] DEBUG !nvim slow cursor move ⌇⡪⡏⢇⢪
+    [X] ALT: $ nvim -V1 --startuptime startup.log +q /d/todo/work/TODO.nou
+      ## FAIL:
+      # :lua require('plenary.profile').start('profile.log')
+      # Hold down j and k to move your cursor rapidly for 5–10 seconds.
+      # :lua require('plenary.profile').stop()
+      ---
+      :profile start profile.log
+      :profile func *
+      :profile file *
+      :profile stop
+      ---
+      :syntime on
+      # Scroll and move cursor around for a bit
+      :syntime report
+     XLR
+      :TSBufDisable highlight
+      :NoMatchParen
+      :syntax off
+    [✓] CHG: vim-cool
+      Use iswap.nvim or search.nvim patternsIf you prefer a plugin that manages
+      search highlights flawlessly via Lua without any CursorMoved performance
+      degradation, replace vim-cool with ✓nvim-hlslens. It adds virtual text
+      counts and clears search highlights asynchronously.
+    [✓] CHG: vim-matchup by Neovim's built-in ✓matchparen
+      OR: ts mini.pairs / mini.jumpone / nvim-treesitter-textobjects or mini.ai
