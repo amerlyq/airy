@@ -7,9 +7,29 @@ local seen_filetypes = {}
 local function ft_python()
   -- FIXME: load both for .py and .lua
   require 'lsp.init'
-  require('lsp.pylsp')
   vim.lsp.enable('ruff')
+
+  -- OFF: https://www.basilisk-python.dev/docs/install-cli/
+  --   https://www.basilisk-python.dev/docs/installation/
+  -- NOTE:FAIL: auto-downloads basilisk into nvim plugin, but still requires to install cli
+  --   DEBUG: rm -rf ~/.local/share/nvim/basilisk/
+  --     :lua require("basilisk.binary").download()
+  -- OR: cargo install basilisk --root .venv/
+  --   ALT:(cmdline): curl -sSfL https://github.com/Nimblesite/Basilisk/releases/latest/download/basilisk-x86_64-unknown-linux-gnu.tar.gz | tar xz && sudo mv basilisk /usr/local/bin/
+  -- NEED:DEP: $ cargo install basilisk-cli
+  --   cargo install --git https://github.com/Nimblesite/Basilisk --bin basilisk-cli [--force] basilisk-cli
+  -- vim.env.BASILISK_PATH = "/path/to/basilisk"
+  -- ERR:(misuse/binary-not-found): /d/plugins/nvim/lazy/pack/ide/start/basilisk.nvim/after/lsp/basilisk.lua: not a table
+  require("basilisk").setup({
+    -- binary_path = nil,               -- auto-detect, download
+    -- /d/xdg_share/nvim/basilisk/v0.32.0/basilisk
+    -- binary_path = "/home/user/.cargo/bin/basilisk",
+  })
+  vim.lsp.enable("basilisk")
+
   vim.lsp.enable('basedpyright')
+  vim.lsp.enable("pylsp")
+  require 'lsp.lint'
 
   --FAIL: should load mappings only inside buffer
   if vim.bo.filetype == 'python' then

@@ -1,3 +1,12 @@
+-- vim.api.nvim_create_autocmd("LspAttach", {
+--     callback = function(args)
+--         local client = vim.lsp.get_client_by_id(args.data.client_id)
+--         -- Only target Basilisk, leaving other servers unharmed
+--         if client and client.name == "basilisk" then
+--             client.server_capabilities.semanticTokensProvider = nil
+--         end
+--     end,
+-- })
 
 -- Use an on_attach function to only map the following keys
 -- after the language server attaches to the current buffer
@@ -10,6 +19,13 @@ local on_attach = function(client, bufnr)
   --     vim.notify("pylsp-mypy config error: " .. err, vim.log.levels.ERROR)
   --   end
   -- end
+
+  -- MAYBE: Disable LSP semantic highlights to let Tree-sitter handle imports
+  -- client.server_capabilities.semanticTokensProvider = nil
+  -- Only target Basilisk, leaving other servers unharmed
+  if client and client.name == "basilisk" then
+      client.server_capabilities.semanticTokensProvider = nil
+  end
 
   require('lsp.keys')(client, bufnr)
 

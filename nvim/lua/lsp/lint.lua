@@ -1,6 +1,26 @@
 
 local lint = require('lint')
 
+-- Assign it to python files
+lint.linters_by_ft = {
+  python = { 'dmypy', 'pylint' },
+  -- python = { "opengrep", "refurb", 'dmypy', 'pylint' },
+}
+
+vim.api.nvim_create_autocmd({ "BufWritePost", "BufEnter" }, {
+  group = vim.api.nvim_create_augroup("nvim-lint", { clear = true }),
+  callback = function()
+    -- try_lint without arguments runs the linters defined in `linters_by_ft`
+    -- for the current filetype
+    require("lint").try_lint()
+
+    -- You can call `try_lint` with a linter name or a list of names to always
+    -- run specific linters, independent of the `linters_by_ft` configuration
+    -- require("lint").try_lint("cspell")
+  end,
+})
+
+
 -- HACK: get the root_dir from the first active LSP client attached to this buffer
 -- local function get_root()
 --   local client = vim.lsp.get_clients({ bufnr = 0 })[1]
@@ -59,24 +79,6 @@ end
 lint.linters.dmypy.args = dmypyargs
 
 
--- Assign it to python files
-lint.linters_by_ft = {
-  python = { 'dmypy', 'pylint' },
-}
-
-vim.api.nvim_create_autocmd({ "BufWritePost", "BufEnter" }, {
-  group = vim.api.nvim_create_augroup("nvim-lint", { clear = true }),
-  callback = function()
-    -- try_lint without arguments runs the linters defined in `linters_by_ft`
-    -- for the current filetype
-    require("lint").try_lint()
-
-    -- You can call `try_lint` with a linter name or a list of names to always
-    -- run specific linters, independent of the `linters_by_ft` configuration
-    -- require("lint").try_lint("cspell")
-  end,
-})
-
 -- 2. Hot-start dmypy on Project Entry
 -- To avoid the "first run" lag, we trigger a background start when you open a Python file.
 -- This ensures the daemon is warming up while you're still typing your first lines.
@@ -100,3 +102,52 @@ vim.api.nvim_create_autocmd({ "BufWritePost", "BufEnter" }, {
 --   },
 --   format_on_save = { timeout_ms = 500 },
 -- })
+
+
+-- 2. Define custom parser for Refurb (since it isn't built into nvim-lint)
+lint.linters.refurb = {
+  cmd = "refurb",
+  stdin = false, -- Refurb reads files from disk
+  append_fname = true,
+  stream = "stdout",
+  ignore_exitcode = true,
+  args = { "--quiet" },
+  parser = require("lint.parser").from_pattern(
+    -- Refurb error pattern format: path/to/file.py:line:col: [code] description
+    "^([^:]+):(%d+):(%d+):%s+(.*)$",
+    { "file", "lnum", "col", "message" },
+    nil,
+    { ["source"] = "refurb" }
+  ),
+}
+
+-- 2. Explicitly define Opengrep (leveraging identical JSON structure to Semgrep)
+lint.linters.opengrep = {
+  cmd = "opengrep",
+  stdin = false,
+  append_fname = true,
+  stream = "stdout",
+  ignore_exitcode = true,
+  -- Uses local auto-discovery rules and outputs clean json format
+  args = { "scan", "--config", "auto", "--json", "$FILENAME" },
+  parser = function(output, bufnr)
+    local status, decoded = pcall(vim.json.decode, output)
+    if not status or not decoded or not decoded.results then
+      return {}
+    end
+
+    local diagnostics = {}
+    for _, item in ipairs(decoded.results) do
+      table.insert(diagnostics, {
+        source = "opengrep",
+        lnum = (item.start.line or 1) - 1,
+        col = (item.start.col or 1) - 1,
+        end_lnum = (item["end"].line or 1) - 1,
+        end_col = (item["end"].col or 1) - 1,
+        severity = item.extra.severity == "ERROR" and vim.diagnostic.severity.ERROR or vim.diagnostic.severity.WARN,
+        message = ("[%s] %s"):format(item.check_id, item.extra.message),
+      })
+    end
+    return diagnostics
+  end,
+}

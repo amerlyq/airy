@@ -228,6 +228,8 @@ require("quicker").setup({
 })
 
 
-require 'plug.lint'
 require 'plug.difftools'
 -- require 'plug.opencode_cfg'
+
+require 'plug.guides'
+require 'plug.diagnostics'

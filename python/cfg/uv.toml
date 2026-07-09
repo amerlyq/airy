@@ -3,3 +3,14 @@
 #   NEED: $ btrfs subvolume create /data/.cache
 #   DEBUG: $ uv cache dir
 cache-dir = "/data/.cache/uv"
+
+# # Centralize cache and tools on the BTRFS drive to avoid cross-filesystem penalties
+# export UV_CACHE_DIR="/data/.cache/uv"
+# export UV_TOOL_DIR="/data/.local/share/uv/tools"
+# export UV_TOOL_BIN_DIR="/data/.local/bin"
+# # (Optional) Add the global tool binary directory to your PATH
+# export PATH="$PATH:$UV_TOOL_BIN_DIR"
+
+
+# [preview]
+# centralized-project-envs = true

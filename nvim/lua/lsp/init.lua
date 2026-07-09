@@ -12,9 +12,29 @@
 -- vim.lsp.set_log_level("TRACE")
 -- DEBUG: :LspInfo
 
-local capabilities = vim.lsp.protocol.make_client_capabilities()
--- The nvim-cmp almost supports LSP's capabilities so You should advertise it to LSP servers..
-capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
+
+-- MAYBE: use this for autoload?
+-- local M = {}
+-- function M.get_capabilities()
+--   ...
+-- end
+-- return M
+
+-- Generates global capabilities including auto-completion configurations
+function get_capabilities()
+  local capabilities = vim.lsp.protocol.make_client_capabilities()
+  -- Integrate blink.cmp or nvim-cmp selection capabilities smoothly if active
+  local has_blink, blink = pcall(require, "blink.cmp")
+  if has_blink then
+    capabilities = blink.get_lsp_capabilities(capabilities)
+  else
+    local has_cmp, cmp_lsp = pcall(require, "cmp_nvim_lsp")
+    if has_cmp then
+      capabilities = cmp_lsp.default_capabilities(capabilities)
+    end
+  end
+  return capabilities
+end
 
 -- FIXME? Two more 0.12 additions worth knowing:
 --   * vim.o.autocomplete = true for native insert-mode completion (nvim-cmp optional now),
@@ -22,7 +42,7 @@ capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 
 vim.lsp.config('*', {
   on_attach = require('lsp.attach'),
-  capabilities = capabilities,
+  capabilities = get_capabilities(),
   -- root_markers = { '.git' },
   -- --NOTE: dynamic enable/disable by reusing "root_dir"
   -- root_dir = function(bufnr, on_dir)

@@ -48,6 +48,11 @@ require 'keys.yank'
 require 'airy.diagnostics'
 require 'keys.plugins'
 
+-- plugins with pure "vim.g" configs (w/o require())
+require 'preload.rainbow'
+require 'preload.neotest'
+require 'preload.debugger'
+
 require 'lazyload'
 require 'plug.rnvimr'
 
