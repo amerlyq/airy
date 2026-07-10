@@ -15,8 +15,15 @@ local function lsp_mappings(client, bufnr)
   -- KBn('gW', B.outgoing_calls) -- NOT
   -- KBn('<LocalLeader>g', B.implementation) -- DFL=gi NOT
 
-  KBn('<F1>', B.hover, "hover [LSP]") -- DFL=K | <LL>K
+  -- 1. Preview documentation for symbol under cursor (Normal mode)
+  -- KBn('<F1>', B.hover, "hover [LSP]") -- DFL=K | <LL>K
+  KBn('g?', B.hover, 'hover symbol help [LSP]')
   -- KBn('<C-k>', B.signature_help)
+  -- 2. Manually trigger signature help inside parenthesis (Insert mode)
+  KB(bufnr, 'i', '<C-s>', '', { callback = B.signature_help, noremap = true, desc = 'LSP: Signature Help' })
+  -- vim.keymap.set('i', '<C-s>', B.signature_help, { desc = 'LSP: Signature Help' })
+
+
 
   -- KBn('<leader>wa', B.add_workspace_folder)
   -- KBn('<leader>wr', B.remove_workspace_folder)
@@ -78,3 +85,26 @@ local function lsp_mappings(client, bufnr)
 end
 
 return lsp_mappings
+
+
+
+-- -- 3. Automatically trigger signature help when typing '(' or ',' inside parameters
+-- vim.api.nvim_create_autocmd('InsertCharPre', {
+--   pattern = '*',
+--   callback = function()
+--     -- Check if the typed character is an opening parenthesis or a comma
+--     if vim.v.char == '(' or vim.v.char == ',' then
+--       -- Schedule execution right after the character is inserted into the buffer
+--       vim.schedule(function()
+--         -- Only trigger if an active LSP client supports signature help
+--         local clients = vim.lsp.get_clients({ bufnr = 0 })
+--         for _, client in ipairs(clients) do
+--           if client.supports_method('textDocument/signatureHelp') then
+--             vim.lsp.buf.signature_help()
+--             break
+--           end
+--         end
+--       end)
+--     end
+--   end,
+-- })

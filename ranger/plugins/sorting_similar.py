@@ -1,12 +1,13 @@
 # This plugin adds the sorting algorithm called 'random'.  To enable it, type
 # ":set sort=random" or create a key binding with ":map oz set sort=random"
 
-from os import path as fs
+import os
 
 from ranger.container.directory import Directory
 
 Directory.sort_dict["from_end"] = lambda x: x.relative_path[::-1]
 Directory.sort_dict["name_len"] = lambda x: (len(x.relative_path), x.relative_path)
+Directory.sort_dict["lctime"] = lambda x: -(os.lstat(x.path).st_ctime or 1)
 
 # TODO:ALSO:(o,|o.): use rest/tail after _any_ punct symbol
 # THINK: how to sort mixed dir with both "a-b" and "b" -- mix or separate

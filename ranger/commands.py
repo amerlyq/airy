@@ -9,6 +9,14 @@ from ranger.ext.shell_escape import shell_quote
 # os.environ["RANGER_DEVICONS_SEPARATOR"]="  "
 
 
+# to ensure ranger visual indicators show tags correctly for realpath files, override get_tags in
+# ~/.config/ranger/commands.py (or your overriding class):
+# def get_tags(self, path):
+#     """Resolve symlink and retrieve tags for the real path."""
+#     real_path = os.path.realpath(path)
+#     return self.fm.tags.get(real_path)
+
+
 # NOTE: jump to next day only at 7:00AM
 def today_date(delta=7):
     import datetime
@@ -331,13 +339,16 @@ class cda(Command):
         # Strip :lnum:lpos:
         path = re.sub(r"(?::\d+){1,2}:?$", "", path)
 
-        if "m" in flags:
-            from stat import S_ISREG as isfile
+        if "m" in flags or "M" in flags:
+            from stat import S_ISDIR
 
-            files = __import__("glob").glob(path + "/**", recursive=True)
+            patt = "/**" if "m" in flags else f"/{today_date()}*/*"
+            files = __import__("glob").glob(path + patt, recursive=True)
             files = [x for x in files if not x.endswith(".pyc")]
             path = max(
-                (st.st_mtime, x) for x in files if isfile((st := os.stat(x)).st_mode)
+                (max([st.st_mtime, st.st_ctime]), x)
+                for x in files
+                if not S_ISDIR((st := os.lstat(x)).st_mode)
             )[1]
         elif fs.islink(path):
             if "l" in flags:
@@ -352,12 +363,14 @@ class cda(Command):
             if "L" in flags:
                 path = fs.realpath(path)
 
-        if not fs.lexists(path):
-            return self.fm.notify("No such: " + path, bad=True)
+        # if not fs.lexists(path):
+        #     return self.fm.notify("No such: " + path, bad=True)
 
         if fs.isdir(path):
             self.fm.cd(path)
         elif fs.isfile(path):
+            self.fm.select_file(path)
+        elif fs.islink(path):
             self.fm.select_file(path)
         else:
             self.fm.select_file(path)
