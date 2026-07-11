@@ -5,7 +5,7 @@ vim.diagnostic.config({
     virtual_lines = false, -- Turns off native under-the-line multiline text
     -- Crucial: Prevents native jumps from automatically opening the float window
     jump = {
-        float = false,
+        on_jump = false,
     },
 })
 

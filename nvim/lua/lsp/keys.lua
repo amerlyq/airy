@@ -23,6 +23,11 @@ local function lsp_mappings(client, bufnr)
   KB(bufnr, 'i', '<C-s>', '', { callback = B.signature_help, noremap = true, desc = 'LSP: Signature Help' })
   -- vim.keymap.set('i', '<C-s>', B.signature_help, { desc = 'LSP: Signature Help' })
 
+  -- TRY: auto-close signature-help
+  -- vim.lsp.handlers['textDocument/signatureHelp'] = vim.lsp.with(
+  --   vim.lsp.handlers['signature_help'],
+  --   { close_events = {"CursorMoved", "BufHidden", "InsertLeave"} }
+  -- )
 
 
   -- KBn('<leader>wa', B.add_workspace_folder)

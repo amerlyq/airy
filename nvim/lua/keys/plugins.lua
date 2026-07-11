@@ -13,6 +13,7 @@ local K = require 'keys.bind'.K
 --   NOTE: Renamed vim.treesitter.playground to vim.treesitter.dev.
 -- BET:(new):USE: :Inspect | :InspectTree
 --   REF: https://github.com/nvim-treesitter/nvim-treesitter/issues/1228
+--   DEBUG:(get hi! for virt-text): :lua local r = vim.api.nvim_win_get_cursor(0)[1]-1; for _, m in ipairs(vim.api.nvim_buf_get_extmarks(0, -1, {r, 0}, {r, -1}, {details=true})) do if m[4] and m[4].virt_text then print(vim.inspect(m[4].virt_text)) end end
 K('n', '<F3>', function()
   -- vim.cmd 'packadd playground | TSHighlightCapturesUnderCursor'
   vim.cmd 'packadd xterm-color-table.vim'

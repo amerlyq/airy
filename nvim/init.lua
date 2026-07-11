@@ -19,7 +19,9 @@ MYPLUG = '/d/plugins/nvim'
 -- (native): adds the Lua loader using the byte-compilation cache
 -- FIXED:ERR: Error executing vim.schedule lua callback: /@/airy/nvim/lua/plug/cmp.lua:4: module 'cmp' not found:
 -- vim.opt.packpath = { MYPLUG .. '/preload', MYPLUG .. '/lazy', MYCONF }
--- vim.loader.enable()
+-- if vim.loader then
+--   vim.loader.enable()
+-- end
 
 
 -- DEBUG: what files ':runtime' found
@@ -52,6 +54,15 @@ require 'keys.plugins'
 require 'preload.rainbow'
 -- require 'preload.neotest'
 -- require 'preload.debugger'
+
+
+-- local status, basilisk = pcall(require, "basilisk")
+-- -- if status then
+--   basilisk.setup({})
+--   -- This registers the internal FileType hook long before any buffer opens
+--   vim.lsp.enable("basilisk")
+-- -- end
+
 
 require 'lazyload'
 require 'plug.rnvimr'

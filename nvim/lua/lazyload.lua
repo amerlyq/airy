@@ -288,6 +288,18 @@ local function on_delayed_startup()
   --DISABLED: very distracting periphery text change
   -- vim.notify("Lazy: DONE")
   -- vim.notify(("%s %s"):format(count, name), res == "err" and vim.log.levels.ERROR)
+
+  -- local current_buf = vim.api.nvim_get_current_buf()
+  -- if vim.api.nvim_buf_is_valid(current_buf) and vim.bo[current_buf].buftype == "" then
+  --   -- -- Re-fire the events so basilisk catches the already opened file
+  --   -- vim.api.nvim_exec_autocmds({ "BufReadPost", "FileType" }, { buffer = current_buf })
+  --   -- Force Neovim to completely re-detect the file type globally
+  --   -- This kicks off all plugin and internal LSP attachment logic
+  --   vim.cmd("filetype detect")
+  --   -- Programmatically force the global LSP system to look at this buffer
+  --   -- (Essential for basilisk.nvim since it hooks into Neovim's LSP client)
+  --   vim.api.nvim_exec_autocmds("FileType", { group = "basilisk" })
+  -- end
 end
 
 vim.api.nvim_create_autocmd('FileType', {
@@ -315,4 +327,36 @@ vim.api.nvim_create_autocmd('VimEnter', {
 -- vim.api.nvim_create_autocmd('VimEnter', {
 --   desc = "Lazy packadd by filetype + cmp",
 --   callback = on_delayed_startup
+-- })
+--
+
+
+-- -- 2. Hook into the modern 0.12+ notification pipeline
+-- -- This forces a clean semantic map update the exact millisecond basilisk signals readiness
+-- vim.api.nvim_create_autocmd("LspNotify", {
+--   callback = function(args)
+--     -- Verify the notification is originating from basilisk
+--     local client = vim.lsp.get_client_by_id(args.data.client_id)
+--     if client and client.name == "basilisk" then
+--       -- Track if we already completed the initial render handshake for this window
+--       local bufnr = args.buf
+--       if vim.api.nvim_buf_is_valid(bufnr) and not vim.b[bufnr].basilisk_rendered then
+--         vim.b[bufnr].basilisk_rendered = true
+--         -- Forces the native client engine to pull down and draw all metadata
+--         -- (including parameter virtual text) right onto the open viewport
+--         vim.lsp.util._refresh_from_lsp(bufnr, "textDocument/inlayHint")
+--       end
+--     end
+--   end,
+-- })
+
+-- -- 2. Root cause fix: Defer enablement until the global filetype option is set.
+-- -- This ensures Neovim has parsed terminal arguments and mapped shebangs,
+-- -- so the initial buffer is fully visible to the modern LSP config engine.
+-- vim.api.nvim_create_autocmd("OptionSet", {
+--   pattern = "filetype",
+--   once = true, -- Only needs to fire once for the initial startup file
+--   callback = function()
+--     vim.lsp.enable("basilisk")
+--   end,
 -- })

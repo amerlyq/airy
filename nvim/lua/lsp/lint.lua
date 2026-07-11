@@ -3,8 +3,9 @@ local lint = require('lint')
 
 -- Assign it to python files
 lint.linters_by_ft = {
+  -- UNUSED:(too slow and somewhat useless -- run them from cli):
+  --   { ..., "opengrep", "refurb" }
   python = { 'dmypy', 'pylint' },
-  -- python = { "opengrep", "refurb", 'dmypy', 'pylint' },
 }
 
 vim.api.nvim_create_autocmd({ "BufWritePost", "BufEnter" }, {
@@ -39,6 +40,7 @@ vim.api.nvim_create_autocmd({ "BufWritePost", "BufEnter" }, {
 -- 1. Identify your project root
 local pjroot = vim.fs.root(0, { '.git', 'pyproject.toml' }) or vim.fn.getcwd()
 
+-- TODO: remove from mypy/pylint everything already covered by ruff/basedpyright
 -- DEBUG: :lua print(vim.inspect(require('lint').linters.dmypy))
 local dmypyargs = {
   -- ALT:(.gitignore): pjroot .. '/.dmypy.json'

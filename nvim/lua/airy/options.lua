@@ -1,6 +1,13 @@
 -- REF: https://github.com/nvim-lua/kickstart.nvim/blob/master/init.lua
 local o, g = vim.opt, vim.g
 
+-- Swaps out the rigid hit-enter prompt rule for an instant 0ms wait timeout.
+-- This safely logs everything directly to :messages without blocking startup.
+-- DFL: messagesopt=hit-enter,history:500,progress:c
+-- FAIL: err
+-- o.messagesopt:remove({ 'hit-enter' })
+-- o.messagesopt = "history:500,progress:c"
+
 --Set highlight on search
 o.hlsearch = true
 -- Pressing <Esc> in normal mode clears highlights cleanly without an autocommand loop

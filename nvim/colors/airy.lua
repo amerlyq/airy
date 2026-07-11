@@ -168,6 +168,8 @@ local highlights = {
   LspReferenceText = { fg = '#ffffff', bg = '#d7005f' },
   LspReferenceRead = { fg = '#ffffff', bg = '#689d6a' },
   LspReferenceWrite = { fg = '#ffffff', bg = '#d65d0e' },
+  -- LspInlayHint = { link = "Whitespace" },
+  LspInlayHint = { fg = '#073642', italic = true },
 
   -- TODO: reuse fore some TS* groups
   -- semshiLocal    xxx ctermfg=209 guifg=#ff875f
@@ -190,6 +192,12 @@ local highlights = {
   LeapMatch = { fg = 'white', bold = true, nocombine = true },
 
   ["@variable"] = { link = "Normal" },
+
+  -- Highlight all variations of 'true/false' across languages
+  ["@boolean.true"] = { fg = '#78c359', bold = true, reverse = true },
+  ["@boolean.false"] = { fg = '#d06c75', bold = false },
+  -- ["lua.boolean.true"] = { fg = '#98c379', bold = true },
+  -- ["lua.boolean.false"] = { fg = '#e06c75', bold = true },
 }
 
 local nvim_set_hl = vim.api.nvim_set_hl
@@ -202,3 +210,35 @@ end
 -- FAIL: nvim_call_atomic not available via Lua on nvim 0.4.3 or 0.4.4 · Issue #13191 · neovim/neovim ⌇⡢⡵⠲⡀
 --   https://github.com/neovim/neovim/issues/13191
 -- vim.api.nvim_call_atomic(reqs)
+
+
+-- vim.api.nvim_create_autocmd('FileType', {
+--   pattern = 'python',
+--   callback = function()
+--     -- Give Python inlay hints a different highlight
+--     vim.api.nvim_set_hl(0, 'LspInlayHint', { fg = '#a9b1d6', bg = '#24283b', italic = true })
+--   end,
+-- })
+
+
+---- NICE: Create a dynamic injector for every language parser loaded
+-- vim.api.nvim_create_autocmd('FileType', {
+--   callback = function(args)
+--     -- Verify tree-sitter is actually active for this buffer
+--     local has_parser, parser = pcall(vim.treesitter.get_parser, args.buf)
+--     if not has_parser or not parser then return end
+--
+--     local lang = parser:lang()
+--
+--     -- Inject the text-matching queries into the language on-the-fly
+--     vim.treesitter.query.set(lang, 'highlights', [[
+--       ; extends
+--       ((boolean) @boolean.true (#any-of? @boolean.true "true" "True" "TRUE"))
+--       ((boolean) @boolean.false (#any-of? @boolean.false "false" "False" "FALSE"))
+--
+--       ; Fallback for languages like Lua/Python that use literal structural node names
+--       ((true) @boolean.true)
+--       ((false) @boolean.false)
+--     ]], true)
+--   end
+-- })
