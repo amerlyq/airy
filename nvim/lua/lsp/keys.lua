@@ -8,6 +8,16 @@ local function lsp_mappings(client, bufnr)
   -- KBn('gd', B.definition, "definition [LSP]")
   KBn('gd', require('telescope.builtin').lsp_definitions, 'LSP go to definition')
 
+  -- NOTE: toggle only to see hints on demand, as they are distracting and interfer with editing
+  vim.lsp.inlay_hint.enable(false)
+  vim.lsp.codelens.enable(false)
+  KBn(',rh', function()
+    local hints_enabled = vim.lsp.inlay_hint.is_enabled({ bufnr = 0 })
+    vim.lsp.inlay_hint.enable(not hints_enabled, { bufnr = 0 })
+    -- e.g. "1 reference" above function/class
+    vim.lsp.codelens.enable(not hints_enabled, { bufnr = 0 })
+  end, 'Toggle LSP Inlay Hints')
+
   -- KBn('gD', B.type_definition, "type_def [LSP]") -- DFL=,D | <LL>d
   KBn('gD', B.declaration, "decl [LSP]") -- NOT
   KBn('gw', B.references, "references [LSP]") -- DFL=gr  @me=<LocalLeader>u

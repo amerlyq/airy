@@ -48,9 +48,22 @@ require('mini.operators').setup({
 -- Structural Text Objects (di), ca")mini.ai
 -- Outperforms nvim-treesitter-textobjects in speed, setup simplicity, and parsing.
 require('mini.ai').setup()
+
+-- DISABLED: irritating as hell -- I too often manually insert stuff into functions or add quotes post-factum,
+--   and this shit either inserts unnecessary 2nd pair of quotes or too early closing parenthesis which I need to delete,
+--   or it eats my attempt to type closing brace on the other end of function args, resulting in typing everything N+1 based on the number of closing braces I had before
 -- Auto-Closing Brackets/Quotesmini.pairs
 -- Zero overhead. It is a single Lua module with no active loop listeners.
-require('mini.pairs').setup()
+-- require('mini.pairs').setup()
+
+-- BET:TRY:
+-- It checks the actual code syntax before deciding to close a bracket, preventing it from breaking your function arguments.
+-- require('nvim-autopairs').setup({
+--   check_ts = true, -- Uses treesitter to check for context
+--   ts_config = {
+--     lua = {'string'}, -- Don't add pairs inside lua strings
+--   }
+-- })
 
 
 --Enable Comment.nvim

@@ -57,6 +57,11 @@ return {
           reportUnusedVariable = "none",
           reportDuplicateImport = "none",
         },
+
+        -- inlayHints = {
+        --   callArgumentNames = false, -- This completely disables 'src=' and 'dst='
+        --   variableTypes = true,      -- This keeps type hints active
+        -- },
       }
     }
   }

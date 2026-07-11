@@ -88,3 +88,27 @@ require 'airy.statusline'
 -- }
 
 -- require("refactoring").setup({})
+
+
+-- FIXED? neovim don't open or diff (nvim -d) files if filesize is >100k
+--   BET: disable all features
+--   OLD: https://github.com/LunarVim/bigfile.nvim
+--   TRY: https://github.com/pteroctopus/faster.nvim
+-- local max_filesize = 100 * 1024 -- 100 KB
+-- vim.api.nvim_create_autocmd({ "BufReadPre" }, {
+--   pattern = "*",
+--   callback = function(ev)
+--     -- Check if the target is a valid, existing file
+--     local file = ev.match
+--     local stats = vim.uv.fs_stat(file)
+--
+--     if stats and stats.size > max_filesize then
+--       -- Print a warning in the terminal layout
+--       vim.schedule(function()
+--         vim.notify("File too large (>100KB). Aborting open.", vim.log.levels.WARN)
+--         -- Delete the buffer completely to avoid opening it
+--         vim.cmd("bd!")
+--       end)
+--     end
+--   end,
+-- })
