@@ -1,4 +1,6 @@
 ALG
+  Qs pacman get list of installed packages sorted by size to decide what to uninstall to reduce upgrades
+    $ LC_ALL=C.UTF-8 pacman -Qi | awk '/^Name/{name=$3} /^Installed Size/{print $4$5, name}' | LC_ALL=C.UTF-8 sort -h
   pacman cache clean (free up space)
     $ paccache -d      # dry-run
     $ paccache -vduk0  # list cache of uninstalled

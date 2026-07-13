@@ -12,6 +12,8 @@ alias pacr1='pactree --color --depth 1'
 alias pacR1='pactree --color --depth 1 --reverse'
 alias pacr='pactree -c'
 alias pacR='pactree -cr'
+alias pacm="LC_ALL=C.UTF-8 pacman -Qi | awk '/^Name/{name=\$3} /^Installed Size/{print \$4\$5, name}' | LC_ALL=C.UTF-8 sort -h"
+alias pacM='for pkg in $(pacman -Qqe); do echo "$(pactree -u "$pkg" | wc -l) $pkg"; done | sort -n'
 
 alias pac\?='checkupdates'
 alias pacD='sudo pacman -D --asdeps'

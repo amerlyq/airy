@@ -43,17 +43,37 @@ autocmd('BufReadPost', {
 --   %s/\%^\n\+//          -- trim first line
 --   %s/\(\n\n\)\n\+/\1/   -- replace multiple blank lines with a single line
 autocmd("BufWritePre", {
-  desc = "(Save) strip trailing spaces and empty lines",
+  desc = "(Save) Strip trailing whitespace and normalize EOF newlines",
   callback = function()
-    local save = vim.fn.winsaveview()
-    --BAD:(keeppatterns): prevents us using shortcut :g/xxx/s///e
-    --TEMP: remove shit from MSTeams copy-paste
-    vim.api.nvim_exec('keepjumps keeppatterns silent g/[\\r\\u200b]/s/[\\r\\u200b]//e', false)
-    vim.api.nvim_exec('keepjumps keeppatterns silent g/\\s\\+$/s/\\s\\+$//e', false)
-    vim.api.nvim_exec('keepjumps keeppatterns silent! /\\v^%(\\_s*\\S)@!/,$d_', false)
-    --ALSO: let &fixeol=g:strip_lines
-    vim.fn.winrestview(save)
-  end
+    local buf = vim.api.nvim_get_current_buf()
+    local view = vim.fn.winsaveview()
+
+    -- TEMP: remove shit from MSTeams copy-paste
+    -- @me OLD vim.api.nvim_exec('keepjumps keeppatterns silent g/[\\r\\u200b]/s/[\\r\\u200b]//e', false)
+    -- OR: vim.api.nvim_buf_set_text(0, 0, 0, -1, -1, {vim.fn.substitute(table.concat(lines, "\n"), "\\%u200b", "", "g")})
+
+    -- 1. Strip trailing whitespace from all lines
+    -- Uses internal API to avoid regex overhead
+    -- @me OLD vim.api.nvim_exec('keepjumps keeppatterns silent g/\\s\\+$/s/\\s\\+$//e', false)
+    --   BAD:(keeppatterns): prevents us using shortcut :g/xxx/s///e
+    vim.api.nvim_exec2([[%s/\s\+$//e]], {})
+
+    -- 2. Strip excessive trailing newlines
+    -- Reads lines and removes empty strings from the end of the list
+    -- Only update if changes are needed to prevent cursor flicker
+    -- @me OLD: vim.api.nvim_exec('keepjumps keeppatterns silent! /\\v^%(\\_s*\\S)@!/,$d_', false)
+    --   ALSO: let &fixeol=g:strip_lines
+    local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+    local last = #lines
+    while last > 1 and lines[last] == "" and lines[last - 1] == "" do
+      last = last - 1
+    end
+    if last < #lines then
+      vim.api.nvim_buf_set_lines(buf, last, -1, false, {})
+    end
+
+    vim.fn.winrestview(view)
+  end,
 })
 
 
