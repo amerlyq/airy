@@ -39,7 +39,10 @@ if (($+commands[gnuplot])); then
 fi
 
 # USAGE: $ r.rsync-ssh --dry-run --delete-after --no-t --  ./ lc:/me/vd G ' <f' | cut -d' ' -f4- LP
-alias -g LP="X zsh -c 'command ln -svT --backup=numbered -- "'"$1:a" "$0/${1//\//⁄}"'"' "'"$(d=/t/res && mkdir -p "$d" && echo "$d")"'
+# OLD: alias -g LP="X zsh -c 'command ln -svT --backup=numbered -- "'"$1:a" "$0/${1//\//⁄}"'"' "'"$(d=/t/res && mkdir -p "$d" && echo "$d")"'
+# alias -g LZ="t=\${0:?}/\${1//\//⁄}' command ln -svT --backup=numbered -- "'"$1:a" "$t"'"'"
+function LZ { d=${1:?}; [[ -d $d ]] || mkdir -p "$d"; while IFS= read -r f; do command ln -svT --backup=numbered -- "${f:a}" "$d/${f//\//⁄}"; done; }
+alias -g LP='| LZ /t/at'
 
 # Line trim W/H to term size (w/o two prompts and errcode)
 alias -g CW='| expand | cut -c-"$(tput cols)"'

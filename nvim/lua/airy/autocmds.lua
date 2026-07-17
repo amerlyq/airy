@@ -65,7 +65,7 @@ autocmd("BufWritePre", {
     --   ALSO: let &fixeol=g:strip_lines
     local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
     local last = #lines
-    while last > 1 and lines[last] == "" and lines[last - 1] == "" do
+    while last > 1 and lines[last] == "" do  -- and lines[last - 1] == "" do
       last = last - 1
     end
     if last < #lines then

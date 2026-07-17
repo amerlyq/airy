@@ -5,7 +5,9 @@ local lint = require('lint')
 lint.linters_by_ft = {
   -- UNUSED:(too slow and somewhat useless -- run them from cli):
   --   { ..., "opengrep", "refurb" }
-  python = { 'dmypy', 'pylint' },
+  -- DISABLED: too cpu-intensive with little benefits over basedpyright and ruff
+  --   >> run them separately before commit inof on each save
+  -- python = { 'dmypy', 'pylint' },
 }
 
 vim.api.nvim_create_autocmd({ "BufWritePost", "BufEnter" }, {

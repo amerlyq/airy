@@ -24,6 +24,10 @@ local function ft_python()
     -- binary_path = nil,               -- auto-detect, download
     -- /d/xdg_share/nvim/basilisk/v0.32.0/basilisk
     -- binary_path = "/home/user/.cargo/bin/basilisk",
+    keymaps = {
+      enabled = false,
+      prefix = "<leader>b",
+    },
   })
   vim.lsp.enable("basilisk")
 

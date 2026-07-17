@@ -25,6 +25,9 @@ local on_attach = function(client, bufnr)
   -- Only target Basilisk, leaving other servers unharmed
   if client and client.name == "basilisk" then
       client.server_capabilities.semanticTokensProvider = nil
+  elseif client.name == "basedpyright" then
+      -- FIXED: disable duplicate <gd> in Telescope
+      client.server_capabilities.definitionProvider = false
   end
 
   require('lsp.keys')(client, bufnr)
