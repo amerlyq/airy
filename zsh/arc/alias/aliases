@@ -43,6 +43,8 @@ fi
 # alias -g LZ="t=\${0:?}/\${1//\//⁄}' command ln -svT --backup=numbered -- "'"$1:a" "$t"'"'"
 function LZ { d=${1:?}; [[ -d $d ]] || mkdir -p "$d"; while IFS= read -r f; do command ln -svT --backup=numbered -- "${f:a}" "$d/${f//\//⁄}"; done; }
 alias -g LP='| LZ /t/at'
+alias LPmv='for l in /t/at/*(@); do mv --backup=t -t. -- $l:A; done'
+function sd { d=/t/at/${1//\//⁄}; command fd "$@" | LZ "$d" && cd "$d"; }
 
 # Line trim W/H to term size (w/o two prompts and errcode)
 alias -g CW='| expand | cut -c-"$(tput cols)"'

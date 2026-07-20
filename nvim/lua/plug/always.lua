@@ -47,7 +47,13 @@ require('mini.operators').setup({
 
 -- Structural Text Objects (di), ca")mini.ai
 -- Outperforms nvim-treesitter-textobjects in speed, setup simplicity, and parsing.
-require('mini.ai').setup()
+require('mini.ai').setup {
+  mappings = {
+    -- FIXED: defaults conflicted with @me xtref <g[>
+    goto_left = 'g<',
+    goto_right = 'g>',
+  }
+}
 
 -- DISABLED: irritating as hell -- I too often manually insert stuff into functions or add quotes post-factum,
 --   and this shit either inserts unnecessary 2nd pair of quotes or too early closing parenthesis which I need to delete,
