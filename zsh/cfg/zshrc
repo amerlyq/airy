@@ -10,10 +10,6 @@ if [[ $HOST =~ (MINIPC|VD600) ]]; then
   # OR:CFG: $ echo '. "$HOME/.cargo/env"' >> ~/.zshenv
   export PATH=/b:$HOME/.local/bin:$HOME/.cargo/bin:/usr/local/bin:/usr/bin
 
-  ## TEMP: override for "clipboard"
-  # OBSOL(due !su whitelist=DISPLAY): [[ -z ${DISPLAY-} && ... ]]
-  [[ -n ${SSH_CONNECTION+x} && $PATH != *bin/xc-ssh:* && -d $HOME/me/bin/xc-ssh ]] && PATH=$HOME/me/bin/xc-ssh:$PATH
-
   # BET:USAGE: $ sudo systemd-run --system --scope -- su -l myuser -w DISPLAY
   #   ALSO;BAD:OBSOL: export XDG_RUNTIME_DIR="/run/user/$(id -u)"
   # TEMP: for SSH connections to be immediately functional
@@ -28,6 +24,10 @@ else
   # export PATH=/b:$HOME/.local/bin:$HOME/.cargo/bin:/usr/local/bin:/usr/bin
   export PATH=/b:$HOME/.local/bin:/usr/bin
 fi
+
+## TEMP: override for "clipboard"
+# OBSOL(due !su whitelist=DISPLAY): [[ -z ${DISPLAY-} && ... ]]
+[[ -n ${SSH_CONNECTION+x} && $PATH != */b/xc-ssh:* && -d /b/xc-ssh ]] && PATH=/b/xc-ssh:$PATH
 
 export SSH_AUTH_SOCK=${XDG_RUNTIME_DIR:?}/gnupg/S.gpg-agent.ssh
 [[ -n $SSH_CONNECTION ]] && export PINENTRY_USER_DATA='USE_CURSES=1'

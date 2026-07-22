@@ -6,7 +6,8 @@
 # linkcp -t /etc/X11 xkb
 # BET: create local PKGBUILD and install settings through package
 # linkcp -kt '/usr/share/X11' xkb/{compat,rules,symbols,types}/*
-PATH=/@/airy/airy/bin:$PATH
+PATH=/d/airy/airy/bin:$PATH
+linkcp -ct /etc/X11/xorg.conf.d -- unit/10-xkb-hpx.conf
 (cd cfg && linkcp -kt '/usr/share/xkeyboard-config-2' {compat,rules,symbols,types}/*)
 exit
 

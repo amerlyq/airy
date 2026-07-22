@@ -44,8 +44,8 @@ kbds["ZSA Technology Labs Moonlander Mark I"]="airy:zsa"
 # kbds["AT Translated Set 2 keyboard"]="airy:neo"
 kbds["AT Translated Set 2 keyboard"]="airy:hpx"
 kbds["Kinesis Advantage2 Keyboard"]="airy:hpx"
+kbds["Logitech K750"]="airy:hpx"
 # "Logitech K340"
-# "Logitech K750"
 
 for k in "${!kbds[@]}"; do
   if id=$(xinput list --id-only "keyboard:$k" 2>/dev/null); then

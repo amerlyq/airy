@@ -207,9 +207,9 @@ timedatectl status
 # NEW: "base" is almost empty now -- install everything manually
 pacstrap /mnt  base amd-ucode linux linux-firmware sof-firmware \
   base-devel cryptsetup lvm2 btrfs-progs neovim curl man git ntp openssh zstd \
-  xorg-server nvidia-open nvidia-utils nvidia-settings  # lib32-nvidia-utils
+  earlyoom nvidia-open nvidia-utils nvidia-settings  # lib32-nvidia-utils
 # TRY:(onboard audio): sof-firmware
-# TRY: linux-zen linux-zen-headers
+# FAIL:(no Threadripper balancer, optimized for 6-16 cores only): linux-zen linux-zen-headers
 
 
 ## CHG: manually remove swap of host system (if necessary)
@@ -290,7 +290,7 @@ arch-chroot -S /mnt
   # timedatectl set-timezone Europe/Kyiv
   ln -sf /usr/share/zoneinfo/Europe/Kyiv /etc/localtime
   hwclock --systohc --utc
-  systemctl enable ntpd sshd
+  systemctl enable ntpd sshd earlyoom
 
   echo fractal > /etc/hostname
   nvim /etc/hosts
@@ -511,3 +511,81 @@ btrfs subvolume list /mnt
 umount /mnt
 
 # CONT: from "### LAYOUT"
+
+
+### SSH (minimal) #########
+cd /aura/aura
+git clone -b main https://github.com/amerlyq/airy
+git clone -b flower https://github.com/amerlyq/nou.vim
+git clone https://github.com/amerlyq/plugins
+(cd /d/plugins && git submodule init && git submodule update --recursive --jobs=8)
+
+make -C /aura/aura/at
+sudo ln -svT /aura/aura/at/feature /d
+sudo ln -svT /usr/local/bin /b
+
+sudo pacman -S tmux zsh fd fzf bat ripgrep tree-sitter-cli ctags gawk moreutils socat
+pikaur -S ranger-git neovim-remote kbdd-git
+
+ln -svfT /d/airy/zsh/cfg/zshrc ~/.zshrc
+ln -svfT /d/airy/zsh/cfg/zlogin ~/.zlogin
+ln -svfT /d/airy/zsh/cfg/aliases ~/.zsh_aliases
+mkdir -p ~/.config/tmux
+ln -svft ~/.config/tmux -- /d/airy/tmux/tmux.conf
+ln -sv /d/airy/{nvim,ranger} -t ~/.config
+# OR:(NOT sudo): chsh -s /usr/bin/zsh
+sudo usermod -s "$(command -v zsh)" "$(whoami)"
+
+sudo ln -svT /usr/bin/nvim /b/v
+sudo ln -svT /usr/bin/nvim /b/vim
+sudo ln -svT /usr/bin/ranger /b/fm
+sudo ln -svT /d/airy/grep/ctl/ia /b/rs
+sudo ln -svT /d/airy/grep/ctl/repo /b/re
+sudo ln -svT /d/airy/vim/ctl/qf /b/vq
+
+# USAGE: $ ssh -O exit lf && /d/airy/ssh/run-xc lf && ssh lf
+sudo ln -svft /b -- /d/airy/xsel/bin/*
+sudo ln -svfT /d/airy/ssh/xc/ /b/xc-ssh/
+sudo nvim /etc/ssh/sshd_config
+  StreamLocalBindUnlink yes
+  # AllowUsers amer amer@127.0.0.1
+  # Match User amer
+  #   PasswordAuthentication no
+  #   KbdInteractiveAuthentication no
+  #   PubkeyAuthentication yes
+  #   StreamLocalBindUnlink yes
+sudo sshd -t
+sudo pkill -SIGHUP sshd
+
+
+v -c ':checkhealth'
+
+sudo install -Dvt /etc/systemd/system/getty@tty1.service.d -- /d/airy/init/unit/autologin.conf
+
+### XORG (minimal) #########
+
+sudo pacman -S xorg-{server,xinit,xinput} qtile picom xclip
+
+/d/airy/xkb/setup
+/d/aura/aura/erian/fonts/setup
+/d/airy/fonts/setup
+/d/airy/fonts/recache
+fc-match monospace
+
+mkdir -p ~/.config/qtile
+ln -st ~/.config/qtile -- /d/airy/qtile/config.py
+# NEED: comment-out "just.lib"
+nvim /d/airy/qtile/config.py
+
+nvim ~/.xinitrc
+  #!/bin/sh
+  xset b off s off dpms 900 1500 1800 r rate 250 40
+  /d/airy/xkb/run
+  kbdd
+  # redshift -P -O 4600
+  exec /usr/bin/qtile start
+nvim ~/.xserverrc
+  #!/bin/sh
+  exec /usr/bin/Xorg :0 -verbose 2 -nolisten tcp -keeptty dpms -c -f 0 -s 0 -ardelay 250 -arinterval 40 -dpi 220 "$@" vt${XDG_VTNR:?}
+chmod +x ~/.xinitrc ~/.xserverrc
+xinit
