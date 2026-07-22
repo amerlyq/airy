@@ -157,7 +157,7 @@ mount -o noatime,nofail,noauto,x-systemd.automount /dev/ws/cache /mnt/cache
 # FIXME: ensure fstab will contain automount
 #   FIXED:ERR: FAT-fs (nvme0n1p1): Volume was not properly unmounted. Some data may be corrupt.
 # NEW: mount --mkdir /dev/efi_system_partition /mnt/boot
-mount -o noauto,x-systemd.automount,fmask=0133 /dev/nvme0n1p1 /mnt/boot
+mount --mkdir -o noauto,nofail,x-systemd.automount,noatime,fmask=0077,dmask=0077 /dev/nvme0n1p1 /mnt/boot
 
 # FAIL:(snapper): can't mount snapshots somewhere rarely accessible (e.g. /root/*) to prevent automount
 #   [_] TODO: exclude it from system-wide grep and updatedb (MAYBE: by using chmod 000)
@@ -357,7 +357,7 @@ EOT
     curl -L https://aur.archlinux.org/cgit/aur.git/snapshot/pikaur.tar.gz | tar -xz
     cd pikaur
     makepkg -fsi
-    pikaur -S gotop-bin
+    # pikaur -S gotop-bin
   }
 
   ## FAIL:(snapper): hardcoded dir /.snapshots must be always present and mounted
