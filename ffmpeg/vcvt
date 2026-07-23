@@ -1,38 +1,66 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # DEBUG: $ ffprobe input.mp4
-set -euo pipefail
+set -o errexit -o errtrace -o functrace -o noclobber -o noglob -o nounset -o pipefail
+shopt -qs inherit_errexit lastpipe
 
-# BAD: only for intel/software
-if [[ ${2-} == -a ]]; then
-  # REF: https://www.ffmpeg.org/ffmpeg-codecs.html#Ratecontrol-Method
+qa=23
+ifx=c
+
+while LC_COLLATE=C getopts 'asx-:' o; do
+case $o in :|'?') exit 2
+;; a|c)
+  # CURRENT_ARG="${!OPTIND}"
+  # Check if there is text directly attached after "-a"
+  # $OPTIND points to the NEXT argument index, so we look backward
+  # Extract everything after the first two characters (the "-a")
+  _prev_arg_index=$((OPTIND - 1))
+  _full_arg="${!_prev_arg_index}"
+  _argtail="${_full_arg:2}"
+  # OR:(mandatory "a:"): qa=${OPTARG:-25}
+  [[ $o == a ]] && qa="${_argtail:-25}" || qa="${_argtail:-$qa}"
+  # REF:(qa): https://www.ffmpeg.org/ffmpeg-codecs.html#Ratecontrol-Method
   #   For the ICQ modes, global quality range is 1 to 51, with 1 being the best quality.
-  qa=${3:-25}
-  ifx=a
-  cvargs=( -preset slow -tune animation -global_quality "$qa" )
-else
-  qa=${2:-23}
-  ifx=c
-  cvargs=( -preset slow -global_quality "$qa" )
-fi
+  [[ $o == a ]] && ifx=a && cvargs=( -tune animation )  # BAD: only for intel and software-render
+;; s) byserver=1
+;; x) set -x && xt=${-//[^x]}
+esac; done; shift $((OPTIND-1)); unset o
 
-out="${1%.*}_${ifx}${qa}.${1##*.}"
-ffmpeg="ffmpeg -v error -hide_banner"  # -v verbose
 
 # TRY: REMOTE-cvt:
-#   $ ssh user@arch-pc-ip 'ffmpeg ... -i pipe:0 ... -f mp4 pipe:1' < local_input.mp4 > local_output.mp4
+# ONELINE: $ ssh lf 'ffmpeg ... -i pipe:0 ... -f mp4 pipe:1' < local_input.mp4 > local_output.mp4
 #   [?] BET:DEV: python ThreadPool() watching a dir to parallelize queue of jobs=5 (measure)
+if [[ -t 0 ]]; then
+  fin=$1
+  out="${fin%.*}_${ifx}${qa}.${fin##*.}"
+else
+  fin='pipe:0'
+  [[ -t 1 ]] && exit 2
+  out="pipe:1"
+fi
 
-set -x
+if [[ -e $out ]]; then
+  # FIXME: use mtime?
+  mv -vfT --backup=t -- "$out" "${out%.*}_prev${RANDOM}.${out##*.}"
+fi
+
+if [[ ${byserver-} ]]; then
+  # NEED: sudo ln -svft /b -- /d/airy/ffmpeg/vcvt
+  exec ssh lf 'vcvt' <"$fin" >"$out"
+  exit 13
+fi
+
+ffmpeg=(echo ffmpeg -v error -hide_banner)  # -v verbose
+
+[[ $out == "pipe:1" ]] && out=(-f mp4 "pipe:1") || out=(-y "$out")
 
 if [[ -e /dev/nvidia0 ]]; then
   # PC with Dedicated NVIDIA (Always active, no integrated graphics)
-  #   OR: [[ -e /etc/bumblebee/bumblebee.conf ]] && ffmpeg="optirun $ffmpeg"
+  #   OR: [[ -e /etc/bumblebee/bumblebee.conf ]] && ffmpeg=(optirun "${ffmpeg[@]}")
 
   # INFO: hardware encoding via NVENC will still be significantly faster than software encoding, even with 32-cores
   #   * NVENC on consumer cards supports up to 3..12 concurrent encoding sessions.
   #   DEBUG:(number of sessions): nvidia-smi --query-gpu=driver_version --format=csv,noheader
   #   DEBUG:(GPU memory used): watch -n 1 nvidia-smi
-  # MAYBE? paci libva-nvidia-driver
 
   # BAD: no "-tune animation", only "fill flat areas"
   #   INFO: -aq-strength=0–15, no single "correct" value — worth testing 6/8/10 on a sample clip if quality matters here.
@@ -42,16 +70,16 @@ if [[ -e /dev/nvidia0 ]]; then
   ## ALT: cuda
   # -hwaccel cuda -hwaccel_device 0 -c:v h264_cuvid ...
   # -vf "scale_cuda=w='min(iw,1920)':h='min(ih,1080)':format=yuv420p" \
-  exec $ffmpeg \
-    -hwaccel cuda -hwaccel_output_format cuda -i "$1" \
+  exec "${ffmpeg[@]}" \
+    -hwaccel cuda -hwaccel_output_format cuda -i "$fin" \
     -vf "scale_cuda=w='if(gt(iw,ih),min(iw,1920),trunc(1920*iw/ih/2)*2)':h='if(gt(ih,iw),min(ih,1920),trunc(1920*ih/iw/2)*2)':format=yuv420p" \
     -c:v hevc_nvenc -preset p5 -tune hq -rc vbr -cq "$qa" -b:v 0 \
     -c:a copy \
-    -y "$out"
+    "${out[@]}"
 
   ## ALT: 3..12 concurrent encoding sessions with NVENC
   #   OR:(re-exec): $ ls *.mp4 | xargs -P4 -I{} vcvt {}
-  # convert_one(){ $ffmpeg ... }
+  # convert_one(){ "${ffmpeg[@]}" ... }
   # export -f convert_one
   # export CQ
   # ls *.mp4 | xargs -P "$PARALLEL" -I{} bash -c 'convert_one "$@"' _ {}
@@ -70,10 +98,11 @@ if [[ -d /sys/module/i915 ]] || [[ -d /sys/module/xe ]]; then
   # "scale_qsv=w='min(iw,1920)':h='min(ih,1080)',format=qsv"
   # "scale=w=1920:h=1920:force_original_aspect_ratio=decrease,format=qsv" \
   # "scale_qsv=w='if(gt(iw,ih),1920,round(1920*a/2)*2)':h='if(gt(ih,iw),1920,round(1920/a/2)*2)',format=qsv" \
-  exec $ffmpeg \
+  exec "${ffmpeg[@]}" \
     -init_hw_device qsv=qsv:hw -hwaccel qsv -hwaccel_output_format qsv \
-    -i "$1" -vf "scale_qsv=w='if(gt(iw,ih),min(iw,1920),trunc(1920*a/2)*2)':h='if(gt(ih,iw),min(ih,1920),trunc(1920/a/2)*2)',format=qsv" \
-    -c:v hevc_qsv "${cvargs[@]}" -y "$out"
+    -i "$fin" -vf "scale_qsv=w='if(gt(iw,ih),min(iw,1920),trunc(1920*a/2)*2)':h='if(gt(ih,iw),min(ih,1920),trunc(1920/a/2)*2)',format=qsv" \
+    -c:v hevc_qsv "${cvargs[@]}" -preset slow -global_quality "$qa" "${out[@]}"
+
 fi
 
 >&2 echo "MAYBE: Fallback to Software Encoding"
@@ -86,6 +115,7 @@ exit 2
 
 ## ALT: vaapi (non-NVIDIA hardware w/o proprietary vendor APIs):
 ##   e.g. AMD Radeon GPUs and older Intel chips (pre-Broadwell / 5th Gen w/o QuickSync API)
+## MAYBE? paci libva-nvidia-driver -- for vaapi-only chromium to use nvidia-cuda
 # ffmpeg -hide_banner -hwaccel vaapi -hwaccel_output_format vaapi \
 #   -i "$1" -c:v hevc -global_quality "${2:-25}" -y "${1%.*}_c.${1##*.}"
 # ffmpeg -hwaccel vaapi -hwaccel_device /dev/dri/renderD128 -i input.mp4 \
