@@ -2,6 +2,7 @@
 # DEBUG: $ ffprobe input.mp4
 set -euo pipefail
 
+# BAD: only for intel/software
 if [[ ${2-} == -a ]]; then
   # REF: https://www.ffmpeg.org/ffmpeg-codecs.html#Ratecontrol-Method
   #   For the ICQ modes, global quality range is 1 to 51, with 1 being the best quality.
@@ -14,35 +15,79 @@ else
   cvargs=( -preset slow -global_quality "$qa" )
 fi
 
-# -c:v h264_qsv|av1_qsv|hevc_qsv OR:(auto): -init_hw_device qsv=qsv:hw
-# -vf 'scale=w=1920:h=1080' \
-# -vf 'hwdownload' \
-# -vf 'scale_qsv=w=1920:h=1080,format=yuv420p' \
-# -vf 'scale_qsv=w=-1:h=1080' \
-# "scale_qsv=w='min(iw,1920)':h='min(ih,1080)',format=qsv"
-# "scale=w=1920:h=1920:force_original_aspect_ratio=decrease,format=qsv" \
-# "scale_qsv=w='if(gt(iw,ih),1920,round(1920*a/2)*2)':h='if(gt(ih,iw),1920,round(1920/a/2)*2)',format=qsv" \
+out="${1%.*}_${ifx}${qa}.${1##*.}"
+ffmpeg="ffmpeg -v error -hide_banner"  # -v verbose
+
+# TRY: REMOTE-cvt:
+#   $ ssh user@arch-pc-ip 'ffmpeg ... -i pipe:0 ... -f mp4 pipe:1' < local_input.mp4 > local_output.mp4
+#   [?] BET:DEV: python ThreadPool() watching a dir to parallelize queue of jobs=5 (measure)
+
 set -x
-ffmpeg -v verbose -hide_banner \
-  -init_hw_device qsv=qsv:hw -hwaccel qsv -hwaccel_output_format qsv \
-  -i "$1" -vf "scale_qsv=w='if(gt(iw,ih),min(iw,1920),trunc(1920*a/2)*2)':h='if(gt(ih,iw),min(ih,1920),trunc(1920/a/2)*2)',format=qsv" \
-  -c:v hevc_qsv "${cvargs[@]}" \
-  -y "${1%.*}_${ifx}${qa}.${1##*.}"
 
+if [[ -e /dev/nvidia0 ]]; then
+  # PC with Dedicated NVIDIA (Always active, no integrated graphics)
+  #   OR: [[ -e /etc/bumblebee/bumblebee.conf ]] && ffmpeg="optirun $ffmpeg"
 
-## ALT: cuda
-# ffmpeg -hwaccel cuda -hwaccel_output_format cuda -i input.mp4 \
-# -vf "scale_cuda=w='min(iw,1920)':h='min(ih,1080)':format=yuv420p" \
-# -c:v h264_nvenc output.mp4
+  # INFO: hardware encoding via NVENC will still be significantly faster than software encoding, even with 32-cores
+  #   * NVENC on consumer cards supports up to 3..12 concurrent encoding sessions.
+  #   DEBUG:(number of sessions): nvidia-smi --query-gpu=driver_version --format=csv,noheader
+  #   DEBUG:(GPU memory used): watch -n 1 nvidia-smi
+  # MAYBE? paci libva-nvidia-driver
 
-## ALT: vaapi
+  # BAD: no "-tune animation", only "fill flat areas"
+  #   INFO: -aq-strength=0–15, no single "correct" value — worth testing 6/8/10 on a sample clip if quality matters here.
+  #   -preset p7 -tune hq -rc vbr -cq 25 -b:v 0 -spatial_aq 1 -aq-strength 8 -rc-lookahead 32 \
+  #   -preset p7 -tune hq -profile:v main10 -pix_fmt p010le -rc vbr -cq 22 -b:v 0 -spatial_aq 1 -aq-strength 10 -rc-lookahead 32 \
+
+  ## ALT: cuda
+  # -hwaccel cuda -hwaccel_device 0 -c:v h264_cuvid ...
+  # -vf "scale_cuda=w='min(iw,1920)':h='min(ih,1080)':format=yuv420p" \
+  exec $ffmpeg \
+    -hwaccel cuda -hwaccel_output_format cuda -i "$1" \
+    -vf "scale_cuda=w='if(gt(iw,ih),min(iw,1920),trunc(1920*iw/ih/2)*2)':h='if(gt(ih,iw),min(ih,1920),trunc(1920*ih/iw/2)*2)':format=yuv420p" \
+    -c:v hevc_nvenc -preset p5 -tune hq -rc vbr -cq "$qa" -b:v 0 \
+    -c:a copy \
+    -y "$out"
+
+  ## ALT: 3..12 concurrent encoding sessions with NVENC
+  #   OR:(re-exec): $ ls *.mp4 | xargs -P4 -I{} vcvt {}
+  # convert_one(){ $ffmpeg ... }
+  # export -f convert_one
+  # export CQ
+  # ls *.mp4 | xargs -P "$PARALLEL" -I{} bash -c 'convert_one "$@"' _ {}
+fi
+
+if [[ -d /sys/module/i915 ]] || [[ -d /sys/module/xe ]]; then
+  # elif [ -d /sys/class/drm/card0/device/intel-guc ] || [ -e /dev/dri/by-path/*-pci-*-intel-* ] || [ -d /sys/module/i915 ];
+  # Laptop with Intel QSV (Intel driver loaded, no active NVIDIA)
+
+  ## ALT: qsv variants
+  # -c:v h264_qsv|av1_qsv|hevc_qsv OR:(auto): -init_hw_device qsv=qsv:hw
+  # -vf 'scale=w=1920:h=1080' \
+  # -vf 'hwdownload' \
+  # -vf 'scale_qsv=w=1920:h=1080,format=yuv420p' \
+  # -vf 'scale_qsv=w=-1:h=1080' \
+  # "scale_qsv=w='min(iw,1920)':h='min(ih,1080)',format=qsv"
+  # "scale=w=1920:h=1920:force_original_aspect_ratio=decrease,format=qsv" \
+  # "scale_qsv=w='if(gt(iw,ih),1920,round(1920*a/2)*2)':h='if(gt(ih,iw),1920,round(1920/a/2)*2)',format=qsv" \
+  exec $ffmpeg \
+    -init_hw_device qsv=qsv:hw -hwaccel qsv -hwaccel_output_format qsv \
+    -i "$1" -vf "scale_qsv=w='if(gt(iw,ih),min(iw,1920),trunc(1920*a/2)*2)':h='if(gt(ih,iw),min(ih,1920),trunc(1920/a/2)*2)',format=qsv" \
+    -c:v hevc_qsv "${cvargs[@]}" -y "$out"
+fi
+
+>&2 echo "MAYBE: Fallback to Software Encoding"
+## ALT:(sw): when vaapi doesn't work e.g: fps>30/re-scale
+# ffmpeg -y -hide_banner -i "$1" -vf 'fps=60,scale=w=1920:h=1080' \
+# ffmpeg -y -hide_banner -i "$1" \
+#   -c:v hevc -global_quality "${2:-25}" "${1%.*}_c.${1##*.}"
+#  ... "-c:v libx265"
+exit 2
+
+## ALT: vaapi (non-NVIDIA hardware w/o proprietary vendor APIs):
+##   e.g. AMD Radeon GPUs and older Intel chips (pre-Broadwell / 5th Gen w/o QuickSync API)
 # ffmpeg -hide_banner -hwaccel vaapi -hwaccel_output_format vaapi \
 #   -i "$1" -c:v hevc -global_quality "${2:-25}" -y "${1%.*}_c.${1##*.}"
 # ffmpeg -hwaccel vaapi -hwaccel_device /dev/dri/renderD128 -i input.mp4 \
 # -vf "scale_vaapi=w='min(iw,1920)':h='min(ih,1080)',hwdownload,format=nv12" \
 # -c:v libx264 output.mp4
-
-## ALT:(sw): when vaapi doesn't work e.g: fps>30/re-scale
-# ffmpeg -y -hide_banner -i "$1" -vf 'fps=60,scale=w=1920:h=1080' \
-# ffmpeg -y -hide_banner -i "$1" \
-#   -c:v hevc -global_quality "${2:-25}" "${1%.*}_c.${1##*.}"

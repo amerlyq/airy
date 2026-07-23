@@ -114,16 +114,18 @@ source() {
   builtin source $@
 }
 
-_zshd="${${(%):-%x}:A:h:h}"  # =${BASH_SOURCE[0]:-...}
-source $_zshd/arc/amer-widgets.zsh
-source $_zshd/arc/amer-key-mix.zsh
-source $_zshd/arc/alias/aliases
-source $_zshd/cfg/aliases_git
-source $_zshd/cfg/aliases
+_airy="${${(%):-%x}:A:h:h:h}"  # =${BASH_SOURCE[0]:-...}
+source $_airy/zsh/arc/amer-widgets.zsh
+source $_airy/zsh/arc/amer-key-mix.zsh
+source $_airy/zsh/arc/alias/aliases
+source $_airy/zsh/cfg/aliases_git
+source $_airy/zsh/cfg/aliases
+
+source $_airy/ssh/alias
 
 # TEMP: cdauto paths (OLD-style)
 # TODO:CHG:(cdauto): cd /path/to/somefile(:h)
-source /d/airy/sh/alias/cd
+source $_airy/sh/alias/cd
 while read -r k p; do
   # SEE: https://vincent.bernat.ch/en/blog/2015-zsh-directory-bookmarks
   # USAGE: cd ~.a

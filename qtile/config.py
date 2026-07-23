@@ -4,16 +4,14 @@
 # import importlib
 import os
 import os.path as fs
-
 # import sys
 import time
 from typing import Any, cast
 
-from just.ext.datetime.cvt import ts_ymd3aw
-from just.ext.datetime.local import ltoday
 from libqtile import bar, hook, layout, qtile, widget
 from libqtile.backend.x11 import window
-from libqtile.config import Click, Drag, EzKey, Group, Key, KeyChord, Match, Screen
+from libqtile.config import (Click, Drag, EzKey, Group, Key, KeyChord, Match,
+                             Screen)
 from libqtile.lazy import lazy
 from libqtile.utils import guess_terminal, send_notification
 from psutil import Process
@@ -307,6 +305,18 @@ extension_defaults = widget_defaults.copy()
 
 
 def make_bar() -> bar.Bar:
+    try:
+        from just.ext.datetime.cvt import ts_ymd3aw
+        from just.ext.datetime.local import ltoday
+    except Exception:
+        dtwg = widget.Clock(
+            format="%Y-%m-%d-%a", update_interval=60, foreground="#fd971f"
+        )
+    else:
+        dtwg = widget.GenPollText(
+            func=lambda: ts_ymd3aw(ltoday()), update_interval=60, foreground="#fd971f"
+        )
+
     # IMPORTANT: return a NEW Bar instance each time
     return bar.Bar(
         widgets=[
@@ -351,12 +361,7 @@ def make_bar() -> bar.Bar:
             ),
             # minimize = widget.TextBox("-", mouse_callbacks={"Button1": lazy.window.toggle_minimize()})
             # maximize = widget.TextBox("=", mouse_callbacks={"Button1": lazy.window.toggle_maximize()})
-            widget.GenPollText(
-                func=lambda: ts_ymd3aw(ltoday()),
-                update_interval=60,
-                foreground="#fd971f",
-            ),
-            # widget.Clock(format="%Y-%m-%d-%a", update_interval=60, foreground="#fd971f"),
+            dtwg,
             widget.Clock(format="%H:%M", update_interval=5),
         ],
         size=40,
