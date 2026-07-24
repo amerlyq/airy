@@ -54,6 +54,15 @@ lsblk -f
 sudo umount /mnt
 
 
+# OPT: rand(uuid) $# sgdisk -G /dev/sdc
+sudo umount /dev/sdX1
+sudo fatlabel -i /dev/sdX1 1ADF2789
+# OR: sudo mlabel -i /dev/sdX1 -N 1ADF2789
+# WARN: may need to restore id for Windows to boot, and then
+#   mount boot by diskpart and use bcdedit to fix it before linux
+# sudo fatlabel -i /dev/sdX1 9ADF2789
+
+
 ### ================================
 ### DIY make encrypted lvm for linux
 

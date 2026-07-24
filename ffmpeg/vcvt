@@ -49,7 +49,7 @@ if [[ ${byserver-} ]]; then
   exit 13
 fi
 
-ffmpeg=(echo ffmpeg -v error -hide_banner)  # -v verbose
+ffmpeg=(ffmpeg -v error -hide_banner)  # -v verbose
 
 [[ $out == "pipe:1" ]] && out=(-f mp4 "pipe:1") || out=(-y "$out")
 

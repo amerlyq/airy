@@ -345,11 +345,14 @@ class cda(Command):
             patt = "/**" if "m" in flags else f"/{today_date()}*/*"
             files = __import__("glob").glob(path + patt, recursive=True)
             files = [x for x in files if not x.endswith(".pyc")]
-            path = max(
-                (max([st.st_mtime, st.st_ctime]), x)
-                for x in files
-                if not S_ISDIR((st := os.lstat(x)).st_mode)
-            )[1]
+            if files:
+                path = max(
+                    (max([st.st_mtime, st.st_ctime]), x)
+                    for x in files
+                    if not S_ISDIR((st := os.lstat(x)).st_mode)
+                )[1]
+            else:
+                path = max(x for x in __import__("glob").glob(path + "/*"))
         elif fs.islink(path):
             if "l" in flags:
                 lpath = os.readlink(path)

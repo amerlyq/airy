@@ -11,8 +11,13 @@
 <Shift+H> = pan -10 0
 <Shift+L> = pan  10 0
 
-j = next 1
-k = prev 1
+# HACK: force screen refresh when holding "next" (with some delay)
+#   BAD: still doesn't block
+# j = next; exec sleep 0.05
+j = next; flip horizontal; flip horizontal
+k = prev; rotate by 0
+# j = next 1
+# k = prev 1
 
 ; ALT: "p" prints to stdout
 l = exec bash -c 'printf "%s\\n" "$imv_pid $imv_current_index $imv_current_file" >> /t/imv_sel'
