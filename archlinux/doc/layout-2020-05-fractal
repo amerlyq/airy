@@ -205,10 +205,11 @@ timedatectl set-ntp true
 timedatectl status
 
 # NEW: "base" is almost empty now -- install everything manually
-pacstrap /mnt  base amd-ucode linux linux-firmware sof-firmware \
+pacstrap /mnt  base amd-ucode linux \
+  linux-firmware-nvidia linux-firmware-intel linux-firmware-other \
   base-devel cryptsetup lvm2 btrfs-progs neovim curl man git ntp openssh zstd \
   earlyoom nvidia-open nvidia-utils nvidia-settings  # lib32-nvidia-utils
-# TRY:(onboard audio): sof-firmware
+# TRY:(onboard audio): sof-firmware ? but snd-hda-intel should be enough
 # FAIL:(no Threadripper balancer, optimized for 6-16 cores only): linux-zen linux-zen-headers
 
 

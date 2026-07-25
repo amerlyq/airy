@@ -34,9 +34,26 @@ echo "$rconn"
 #   << EXPL: ssh prolongates any session, which still has active connections
 #   NICE: can auto-stop forwarding when socat is closed
 #   BAD? seems don't work for -R forwarding
-# [_] FUTURE:(reverse): exit socat when ssh is disconnected
 
-exec socat UNIX-LISTEN:"$loc",mode=600,flock-ex-nb,fork EXEC:"xc"
+## PREV:
+# exec socat UNIX-LISTEN:"$loc",mode=600,flock-ex-nb,fork EXEC:"xc"
+
+# [_] TRY: exit socat when ssh is disconnected
+#   ALT: fork in bkgr and monitor ssh:
+#     while [ -S "$control_socket" ]; do sleep 5; done; kill "$socat_pid" 2>/dev/null; rm -f "$loc"
+#     inotifywait -e delete_self "$ctl_sock" >/dev/null 2>&1; kill "$socat_pid" 2>/dev/null; rm -f "$loc"
+# INFO: max-children=1 forces the parent socat to exit immediately after one clipboard event finishes.
+while socat UNIX-LISTEN:"$loc",mode=600,flock-ex-nb,fork,max-children=1 EXEC:"xc"; do
+  # ctl_sock="$XDG_RUNTIME_DIR/ssh-control.$host"
+  # Check if the Master SSH connection or remote target is still alive.
+  # If the SSH tunnel drops, break the loop and exit the script cleanly.
+  if ! ssh -O check -- "$host" 2>/dev/null; then
+    echo "SSH connection lost. Cleaning up..."
+    rm -f "$loc"
+    break
+  fi
+done
+
 
 # MAYBE: must fork "xc" somehow to be continous/reentrant
 # FAIL: $ socat EXEC:"ssh -vvv -W '127.0.0.1:28223' wkme" EXEC:"xc"

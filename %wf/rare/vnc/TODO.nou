@@ -8,6 +8,9 @@ REMOTE:
     $ paci x11vnc
     $ x11vnc -localhost -display :0
       << NEED:ATT! running Xorg
+    OR:PERF:(video on tigervnc inof x11vnc):
+      $ x0vncserver -display :0 -SecurityTypes None -localhost yes
+      # OR: vncpasswd && x0vncserver -display :0 -rfbauth ~/.vnc/passwd
 
 
 LOCAL: ⌇⡞⡃⣑⣄

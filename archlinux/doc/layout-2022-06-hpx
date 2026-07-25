@@ -180,7 +180,10 @@ timedatectl set-ntp true
 timedatectl status
 
 # NEW: "base" is almost empty now -- install everything manually
-pacstrap -K /mnt  base intel-ucode linux linux-firmware cryptsetup lvm2 btrfs-progs base-devel neovim man git
+pacstrap -K /mnt  base intel-ucode linux \
+  linux-firmware-intel linux-firmware-other linux-firmware-cirrus \
+  cryptsetup lvm2 btrfs-progs base-devel neovim man git
+# TRY:AGAIN: internal speakers with cirrus
 
 
 ## CHG: manually remove swap of host system (if necessary)
