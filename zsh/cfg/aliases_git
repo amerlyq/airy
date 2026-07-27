@@ -111,6 +111,11 @@ alias gra='git rebase --abort'
 alias grm='git rebase origin/main'
 alias grom='git rebase --onto "@{u}" "$(git merge-base HEAD "@{u}@{1}")"'
 
+alias gss='git stash save'
+alias gsp='git stash pop'
+alias gds='gdf "stash@{0}"'
+alias gdS='git stash show -p'
+
 alias gs='git status -sb --show-stash'
 alias gsa='gs --untracked-files=all'
 alias gsi='gs --ignored'

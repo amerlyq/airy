@@ -20,6 +20,10 @@ LOCAL: ⌇⡞⡃⣑⣄
     SEE: $ man vncviewer
   USE: <F8> for context menu
     => fullscreen to grab keyboard and send <M> to remote WM
+ :OR:
+  # $ ssh -O forward -tL '5901:localhost:5901' lf
+  $ ssh -L '5901:localhost:5901' lf 'x11vnc -nopw -localhost -display :0'
+  $ vncviewer -PreferredEncoding=ZRLE -via lf localhost::5901
 
 
 %%%% "Virtual" remote desktop
