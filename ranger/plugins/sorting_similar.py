@@ -57,7 +57,7 @@ else:
                     # MediaInfo returns duration in milliseconds (as a string or int)
                     duration = int(track.duration)  # pyright: ignore[reportUnknownArgumentType, reportUnknownMemberType]
                     return duration if duration > 0 else 1
-        except ValueError, TypeError, AttributeError, Exception:
+        except (ValueError, TypeError, AttributeError, Exception):
             return -1  # corrupt files or missing data
         return -1
 
