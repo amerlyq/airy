@@ -1,8 +1,10 @@
 import os
 import re
 from os import path as fs
+from typing import cast
 
 from ranger.api.commands import Command
+from ranger.core.fm import FM
 from ranger.ext.shell_escape import shell_quote
 
 # HACK:FIXME: wide icons (OR: narrow font)
@@ -648,3 +650,75 @@ class unfilter(Command):
 
     def execute(self):
         self.unfilter(self.fm.thisdir)
+
+
+class cd_symlink1(Command):
+    """
+    Follows a symlink exactly 1 level deep, maintaining a strict history chain.
+    Handles broken symlinks by navigating to the closest parent directory.
+    Trims future history when branching off via <H> + <cl>.
+    """
+
+    def execute(self) -> None:
+        fm = cast(FM, self.fm)
+        thisfile = fm.thisfile
+
+        if not thisfile or not thisfile.is_link:
+            fm.notify("Not a symlink!", bad=True)
+            return
+
+        origin_dir: str = fm.thisdir.path
+        origin_file: str = thisfile.path
+
+        # 1. Read 1-level link target
+        try:
+            link_target: str = os.readlink(origin_file)
+        except OSError as e:
+            fm.notify(f"Cannot read link: {e}", bad=True)
+            return
+
+        # 2. Resolve target path
+        target_path: str = (
+            fs.normpath(link_target)
+            if fs.isabs(link_target)
+            else fs.normpath(fs.join(origin_dir, link_target))
+        )
+
+        # 3. Truncate forward history if we moved back with 'H'
+        history = fm.thistab.history
+        if history and history.index < len(history) - 1:
+            # history.container = history.container[: history.index + 1]
+            # history._list = history._list[: history.index + 1]
+            # if hasattr(history, "history"):
+            history.history = history.history[: history.index + 1]
+
+        # 4. Handle existing target (Directory or File)
+        if fs.isdir(target_path):
+            fm.cd(str(target_path))
+            return
+
+        if fs.isfile(target_path):
+            parent_dir: str = fs.dirname(target_path)
+            fm.cd(str(parent_dir))
+            if fm.thisdir:
+                fm.thisdir.move_to_obj(str(target_path))
+            return
+
+        # 5. Handle broken symlink -> find nearest existing directory
+        target_dir: str = (
+            target_path if fs.isdir(target_path) else fs.dirname(target_path)
+        )
+        while target_dir and not fs.exists(target_dir):
+            parent: str = fs.dirname(target_dir)
+            if parent == target_dir:
+                break
+            target_dir = parent
+
+        if fs.exists(target_dir):
+            fm.notify(
+                f"Link target missing! Navigating to closest dir: {target_dir}",
+                bad=True,
+            )
+            fm.cd(str(target_dir))
+        else:
+            fm.notify("Link target and parent directories do not exist!", bad=True)
