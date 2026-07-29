@@ -6,7 +6,7 @@ local D = vim.diagnostic
 
 K('n', '[d', D.goto_prev)
 K('n', ']d', D.goto_next)
-K('n', ',tf', D.open_float)
+K('n', ',tf', D.open_float)  -- DFL="<leader>vd"
 -- K('n', ',tx', D.hide)
 -- K('n', ',tX', D.disable)
 

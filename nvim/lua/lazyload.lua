@@ -28,8 +28,11 @@ local function ft_python()
       enabled = false,
       prefix = "<leader>b",
     },
+    -- analysis_mode = "wholeModule",
+    -- formatter = "ruff",
   })
-  vim.lsp.enable("basilisk")
+  -- DISABLED: may conflict with plugin itself
+  -- vim.lsp.enable("basilisk")
 
   vim.lsp.enable('basedpyright')
   vim.lsp.enable("pylsp")

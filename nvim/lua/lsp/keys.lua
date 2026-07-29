@@ -31,6 +31,7 @@ local function lsp_mappings(client, bufnr)
   -- KBn('<C-k>', B.signature_help)
   -- 2. Manually trigger signature help inside parenthesis (Insert mode)
   -- DFL=i<C-k>
+  -- ALT="<C-h>"
   KB(bufnr, 'i', '<C-s>', '', { callback = B.signature_help, noremap = true, desc = 'LSP: Signature Help' })
   -- vim.keymap.set('i', '<C-s>', B.signature_help, { desc = 'LSP: Signature Help' })
 

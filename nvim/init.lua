@@ -3,8 +3,14 @@
 
 -- OFF: https://github.com/neovim/neovim/wiki/FAQ#why-lua-51-instead-of-lua-53
 -- ONLY: /usr/share/luajit-2.1.0-beta3/?.lua -- plenary/profile
+-- DEBUG: :lua print(package.path)
+-- DISABLED: resolves relative to CWD?
 package.path = './?.lua'
 package.cpath = './?.so'
+-- -- Remove CWD references from package.path
+-- package.path = package.path:gsub("%./%?%.lua;?", ""):gsub("%./%?%/init%.lua;?", "")
+-- package.path = ''
+-- package.cpath = ''
 
 
 -- USAGE: vim.env.MYLUA
@@ -66,6 +72,8 @@ require 'preload.rainbow'
 
 require 'lazyload'
 require 'plug.rnvimr'
+
+require 'preload/blinkcmp_cfg'
 
 require 'airy.statusline'
 -- require 'airy.notches'

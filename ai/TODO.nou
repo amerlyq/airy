@@ -63,3 +63,111 @@
       https://medium.com/@gbadahamza18/bringing-docker-model-runner-to-arch-linux-a-one-command-install-via-aur-90ed70290eed
     binhex ⌇⡩⢰⡷⢩
       https://hub.docker.com/u/binhex
+
+
+2026-07-29-Wed-W30
+  [:] CMP: speed/latency
+    OpenRouter ⌇⡪⡪⠻⡲
+      https://openrouter.ai/
+    Performance of llama.cpp on Apple Silicon M-series · ggml-org/llama.cpp · Discussion #4167 · GitHub ⌇⡪⡪⠻⢄
+      https://github.com/ggml-org/llama.cpp/discussions/4167
+  [X] Qs simplest CFG for offline gpt ⌇⡪⡪⠑⢗
+    $ sudo pacman -S ollama-cuda
+    $ sudo systemctl enable --now ollama
+    DEBUG:
+      $ journalctl -fu ollama
+      $ pgrep -l ollama
+    [•] FIXME: avoid flooding journal
+      # sudo systemctl edit ollama.service
+      # [Service]
+      ## StandardOutput=null
+      # StandardError=journal
+      # Environment="GIN_MODE=release"
+      # Environment="OLLAMA_KEEP_ALIVE=-1"
+      # Environment="OLLAMA_KEEP_ALIVE=10m"
+        1. NVENC Uses Independent ASIC Chips, Not VRAM
+          - dedicated fixed-function hardware blocks physically separate from the GPU's CUDA cores.
+          - unless you run filters / CUDA-accelerated tasks:
+            Topaz Video AI, AI frame interpolation (RIFE), or heavy GPU denoising
+      # ---
+      # sudo systemctl daemon-reload
+      # sudo systemctl restart ollama
+      # journalctl --disk-usage
+      #   $ GIN_MODE=release ollama serve > /dev/null 2>&1 &
+    [✓] B. Inline Refactoring, FD/Buffer Logic & Algorithms (Mid-Weight)
+      [_] ALT: Codestral 22B or Devstral Small 2 24B (Q4_K_M)
+      Pull Qwen 2.5 Coder 14B (Fits 100% in your 11GB VRAM, fast & precise)
+        $ ollama pull qwen2.5-coder:14b       # For local chat & buffer editing
+    # C. Architecture Planning & Deep Graph Debugging (Heavy Reasoning)The Choice: Qwen2.5-Coder-32B-Instruct (Q4_K_M)
+    [•] A. Inline Fill-In-The-Middle (FIM) Ghost-Text Autocomplete (Low Latency)
+      [✗] * The Choice: Qwen2.5-Coder-7B-Instruct or Qwen3.5-9B-MTP (Q4/Q8)
+        $ ollama pull qwen2.5-coder:7b        # For instant completion
+        Ollama GPU Offloading Tuning: Force Ollama to keep the 7B model
+        permanently locked in GPU memory so you never experience a cold-start delay during ghost-text autocompletion:
+          # Add to /etc/systemd/system/ollama.service.d/override.conf
+          [Service]
+          Environment="OLLAMA_KEEP_ALIVE=-1"
+          Environment="OLLAMA_NUM_PARALLEL=2"
+      ∷ NOT: no point to use :7b if I have >20tok/sec
+        Ghost-text autocomplete needs to feel instant. Human perception breaks down like this:
+          100 ms to first token: Ideal for single-word typing autocomplete.
+          200–300 ms to first token: Perfectly comfortable for multi-line block completions.
+    Connect to #pc
+      [✓] ssh -N -L 11434:localhost:11434 lf
+      [✓] curl http://localhost:11434/api/tags
+    ---
+    [•] ALSO? minuet-ai.nvim for standard AI ghost-text completions
+      [$] TRY:ALT:
+        [✗] * supermaven-nvim — Lightweight dedicated plugins for fast ghost-text completion.
+          ollama: None (Cloud Only), no FIM
+        [≈] * copilot.lua
+          ollama: Limited / Experimental, no FIM
+        [•] * minuet-ai.nvim — Connects to local or cloud LLMs (Ollama, Claude, OpenAI) specifically for inline/ghost-text completion.
+          * Native Fill-In-The-Middle (FIM) Support:
+        [?] * Neovim Native Inline LSP (textDocument/inlineCompletion) — Works with LLM LSP servers that support the LSP inline completion specification.
+    [_] ALT: !rust (?mostly for online models?)
+      require('avante').setup({
+        provider = 'ollama',
+        vendors = {
+          ollama = {
+            __inherited_from = 'openai',
+            api_key_name = '',
+            endpoint = 'http://127.0.0.1:11434/v1',
+            # model = 'qwen2.5-coder:14b',
+            model = 'qwen2.5-coder:32b', -- Runs offloaded across VRAM + 64GB System RAM
+            parse_curl_args = function(opts)
+              return {
+                url = opts.endpoint .. '/chat/completions',
+                headers = { ['Content-Type'] = 'application/json' },
+                body = {
+                  model = opts.model,
+                  messages = require('avante.providers').openai.parse_messages(opts),
+                  temperature = 0, -- Set to 0 for strict algorithmic/systems logic
+                  max_tokens = 4096,
+                  stream = true,
+                },
+              }
+            end,
+          },
+        },
+      })
+    OLD?
+      -- gen.nvim config on laptop
+      require('gen').setup({
+        model = "qwen2.5-coder:14b",
+        # show_model = true,
+        host = "localhost", -- It routes through your SSH tunnel automatically!
+        port = "11434",
+      })
+      [_] GitHub - srackham/gen.nvim at enhancements · GitHub ⌇⡪⡪⠙⢯
+        https://github.com/srackham/gen.nvim/tree/enhancements
+      [_] GitHub - dengzhizhi/gen.nvim at zz-enhance · GitHub ⌇⡪⡪⠙⣎
+        https://github.com/dengzhizhi/gen.nvim/tree/zz-enhance
+    [_] OR:BET? GitHub - olimorris/codecompanion.nvim: ✨ AI Coding, Vim Style · GitHub ⌇⡪⡪⠘⣛
+      https://github.com/olimorris/codecompanion.nvim
+    ---
+    [_] ALT:TRY: sep app
+      $ pipx install aider-chat
+      $ aider --model ollama_chat/qwen2.5-coder:14b
+    [_] 7 Best Open-Source LLM Orchestration & Routing Tools (2026) ⌇⡪⡪⢊⡁
+      https://www.ayautomate.com/blog/open-source-llm-orchestration-tools

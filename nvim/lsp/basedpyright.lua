@@ -22,6 +22,18 @@ return {
   --   return vim.fs.root(fname, { "src" }) or vim.fs.root(fname, { "pyproject.toml", ".git" })
   -- end,
 
+  -- If you're using a completion plugin (blink.cmp, nvim-cmp/cmp-nvim-lsp)
+  -- that already builds a capabilities table, merge into that instead of overwriting it — e.g.
+  --   vim.tbl_deep_extend("force", require("blink.cmp").get_lsp_capabilities(), { workspace = { didChangeWatchedFiles = { dynamicRegistration = true } } }).
+  -- CHECK: should fix "symbol not found" when importing from newly created modules without nvim restart
+  capabilities = {
+    workspace = {
+      didChangeWatchedFiles = {
+        dynamicRegistration = true,
+      },
+    },
+  },
+
   -- Fallback block for runtime configuration modifications
   settings = {
     --# DEBUG: :lua print(vim.inspect(vim.lsp.get_clients({name = "basedpyright"})[1].config.settings))

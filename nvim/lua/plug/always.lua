@@ -1,5 +1,5 @@
 
-require 'plug.cmp_' -- +luasnip
+-- require 'plug.cmp_' -- +luasnip
 require 'plug.gitsigns'
 
 require 'plug.surround'
@@ -135,7 +135,10 @@ require('dressing').setup()
 require('fold-preview').setup()
 
 
-require 'plug.telescope'
+-- WTF: was forced to rename it to avoid circular import
+--   (after putting codecompanion.nvim and plenary.nvim into preload)
+-- DEBUG: :lua print(package.path)
+require 'plug.telescope_cfg'
 
 -- BUG:WTF: :verb map v -> "viÞ <Nop>" waiting pause
 -- SRC: https://github.com/folke/which-key.nvim
@@ -250,3 +253,5 @@ require 'plug.matchup'
 require 'plug.search'
 require 'plug.neotest'
 require 'plug.debugger'
+
+require 'plug.ai_offline'

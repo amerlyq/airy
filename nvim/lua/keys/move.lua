@@ -13,8 +13,8 @@ local K = require 'keys.bind'.K
 -- vim.keymap.set('n', 'j', move_and_clear('j'), { expr = true, silent = true })
 -- vim.keymap.set('n', 'k', move_and_clear('k'), { expr = true, silent = true })
 --DISABLED:OLD:Remap for dealing with word wrap (and hide hl like slow vim-cool)
--- vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
--- vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
+vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
+vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
 
 --Buffers switch
