@@ -255,3 +255,4 @@ require 'plug.neotest'
 require 'plug.debugger'
 
 require 'plug.ai_offline'
+require 'plug/blinkcmp_cfg'

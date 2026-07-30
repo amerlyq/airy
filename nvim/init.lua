@@ -73,7 +73,7 @@ require 'preload.rainbow'
 require 'lazyload'
 require 'plug.rnvimr'
 
-require 'preload/blinkcmp_cfg'
+-- require 'preload/blinkcmp_cfg'
 
 require 'airy.statusline'
 -- require 'airy.notches'

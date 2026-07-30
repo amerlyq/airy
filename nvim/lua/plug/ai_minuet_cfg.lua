@@ -85,6 +85,9 @@ require('minuet').setup({
     auto_trigger_ft = { '*' },
     -- useful when auto-completion is enabled for all file types i.e., when auto_trigger_ft = { '*' }
     auto_trigger_ignore_ft = {},
+    -- Blink normally opens its menu while typing; keep the FIM ghost text
+    -- visible instead of suppressing it whenever that menu is present.
+    show_on_completion_menu = true,
     keymap = {
       -- ALT: accept = '<A-a>',     -- Alt+a to accept ghost text
       -- ALT: accept_line = '<A-l>',-- Alt+l to accept just one line
@@ -117,34 +120,15 @@ require('minuet').setup({
   -- }
 })
 
+-- This configuration is loaded during delayed startup, after the current
+-- buffer's FileType event. Minuet normally initializes this flag from a
+-- FileType autocmd, so initialize the already-open buffer explicitly.
+vim.b.minuet_virtual_text_auto_trigger = true
+
 -- vim.keymap.set('i', '<A-x>', function() vim.lsp.inline_completion.get() end, { desc = 'accept' })
 -- vim.keymap.set('i', '<A-c>', function() vim.lsp.inline_completion.select { count = 1 } end, { desc = 'cycle to next' })
 -- vim.keymap.set('i', '<A-v>', function() vim.lsp.inline_completion.select { count = -1 } end, { desc = 'cycle to prev' })
 
--- require('blink-cmp').setup {
---     keymap = {
---         -- Manually invoke minuet completion.
---         ['<A-y>'] = require('minuet').make_blink_map(),
---     },
---     sources = {
---          -- Enable minuet for autocomplete
---         default = { 'lsp', 'path', 'buffer', 'snippets', 'minuet' },
---         -- For manual completion only, remove 'minuet' from default
---         providers = {
---             minuet = {
---                 name = 'minuet',
---                 module = 'minuet.blink',
---                 async = true,
---                 -- Should match minuet.config.request_timeout * 1000,
---                 -- since minuet.config.request_timeout is in seconds
---                 timeout_ms = 3000,
---                 score_offset = 50, -- Gives minuet higher priority among suggestions
---             },
---         },
---     },
---     -- Recommended to avoid unnecessary request
---     completion = { trigger = { prefetch_on_insert = false } },
--- }
 
 -- ALT: if you don't use blink.cmp or nvim-cmp
 -- -- ====================================================================

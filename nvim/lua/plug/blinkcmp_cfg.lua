@@ -84,7 +84,9 @@ blink.setup({
     ['<Down>'] = { 'select_next', 'fallback' },
     ['<C-p>']  = { 'select_prev', 'fallback_to_mappings' },
     ['<C-n>']  = { 'select_next', 'fallback_to_mappings' },
-    ['<C-h>']  = { 'show_signature', 'hide_signature', 'fallback' },
+    ['<C-q>']  = { 'show_signature', 'hide_signature', 'fallback' },
+    -- ['<A-y>'] = require('minuet').make_blink_map(),
+    ['<C-h>'] = require('minuet').make_blink_map(),
 
     ['<Tab>'] = {
       -- Accept the selected item; if none is selected, accept the first item.
@@ -124,12 +126,28 @@ blink.setup({
       max_items = 40,
     },
     documentation = { auto_show = true, auto_show_delay_ms = 300 },
+
+    -- Recommended to avoid unnecessary request with minuet
+    trigger = { prefetch_on_insert = false },
   },
 
   sources = {
-    default = { 'lsp', 'path', 'snippets', 'buffer' },
+    -- Enable minuet for autocomplete
+    default = { 'lsp', 'path', 'snippets', 'buffer', 'minuet' },
     -- Match the old nvim-cmp Python setup: no buffer/path noise for members.
     -- per_filetype = { python = { 'lsp', 'snippets' } },
+    -- For manual completion only, remove 'minuet' from default
+    providers = {
+        minuet = {
+            name = 'minuet',
+            module = 'minuet.blink',
+            async = true,
+            -- Should match minuet.config.request_timeout * 1000,
+            -- since minuet.config.request_timeout is in seconds
+            timeout_ms = 10000,
+            score_offset = 50, -- Gives minuet higher priority among suggestions
+        },
+    },
   },
 
   -- -- Optional but highly recommended: adjust weights so paths don't crowd LSP completions
@@ -154,7 +172,7 @@ blink.setup({
     enabled = true,
     trigger = {
       show_on_keyword = true,
-      show_on_accept = true,
+      -- REGR: show_on_accept = true,
     },
     window = { show_documentation = true },
   },
