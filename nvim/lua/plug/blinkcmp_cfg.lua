@@ -110,8 +110,9 @@ blink.setup({
       'fallback',
     },
 
-    ['<C-b>'] = { 'scroll_documentation_up', 'fallback' },
-    ['<C-f>'] = { 'scroll_documentation_down', 'fallback' },
+    -- DFL: C-b/C-f
+    ['<PageUp>'] = { 'scroll_documentation_up', 'fallback' },
+    ['<PageDown>'] = { 'scroll_documentation_down', 'fallback' },
   },
 
   -- Link blink natively to the standard LuaSnip engine

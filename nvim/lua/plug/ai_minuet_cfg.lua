@@ -125,6 +125,20 @@ require('minuet').setup({
 -- FileType autocmd, so initialize the already-open buffer explicitly.
 vim.b.minuet_virtual_text_auto_trigger = true
 
+
+-- Accept FIM only when it is still visible at the typing position. Once the
+-- cursor has moved (arrows, <C-b>, etc.), Minuet clears the preview and this
+-- returns the normal insert-mode <C-f> character-forward command instead.
+vim.keymap.set('i', '<C-f>', function()
+  local virtualtext = require('minuet.virtualtext')
+  if virtualtext.action.is_visible() then
+    virtualtext.action.accept()
+    return ''
+  end
+  return vim.keycode('<C-f>')
+end, { expr = true, desc = '[minuet] accept FIM or move forward' })
+
+
 -- vim.keymap.set('i', '<A-x>', function() vim.lsp.inline_completion.get() end, { desc = 'accept' })
 -- vim.keymap.set('i', '<A-c>', function() vim.lsp.inline_completion.select { count = 1 } end, { desc = 'cycle to next' })
 -- vim.keymap.set('i', '<A-v>', function() vim.lsp.inline_completion.select { count = -1 } end, { desc = 'cycle to prev' })
