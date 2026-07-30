@@ -3,24 +3,15 @@
 set -o errexit -o errtrace -o functrace -o noclobber -o noglob -o nounset -o pipefail
 shopt -qs inherit_errexit lastpipe
 
+# REF:(qa): https://www.ffmpeg.org/ffmpeg-codecs.html#Ratecontrol-Method
+#   For the ICQ modes, global quality range is 1 to 51, with 1 being the best quality.
 qa=23
 ifx=c
 
-while LC_COLLATE=C getopts 'asx-:' o; do
+while LC_COLLATE=C getopts 'ac:sx-:' o; do
 case $o in :|'?') exit 2
-;; a|c)
-  # CURRENT_ARG="${!OPTIND}"
-  # Check if there is text directly attached after "-a"
-  # $OPTIND points to the NEXT argument index, so we look backward
-  # Extract everything after the first two characters (the "-a")
-  _prev_arg_index=$((OPTIND - 1))
-  _full_arg="${!_prev_arg_index}"
-  _argtail="${_full_arg:2}"
-  # OR:(mandatory "a:"): qa=${OPTARG:-25}
-  [[ $o == a ]] && qa="${_argtail:-25}" || qa="${_argtail:-$qa}"
-  # REF:(qa): https://www.ffmpeg.org/ffmpeg-codecs.html#Ratecontrol-Method
-  #   For the ICQ modes, global quality range is 1 to 51, with 1 being the best quality.
-  [[ $o == a ]] && ifx=a && cvargs=( -tune animation )  # BAD: only for intel and software-render
+;; a) ifx=a; qa=25; cvargs=( -tune animation )  # BAD: only for intel and software-render
+;; c) qa=$OPTARG
 ;; s) byserver=1
 ;; x) set -x && xt=${-//[^x]}
 esac; done; shift $((OPTIND-1)); unset o
