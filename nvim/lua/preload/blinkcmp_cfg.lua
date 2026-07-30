@@ -28,8 +28,9 @@
 
 
 -- Ensure blink.cmp is loaded before attempting setup
-local status, blink = pcall(require, "blink.cmp")
-if not status then return end
+-- local status, blink = pcall(require, "blink.cmp")
+-- if not status then return end
+blink = require "blink.cmp"
 
 -- blink.cmp  V2 uses a new build/download system for the native library.
 -- SEE  :h blink-cmp-installation
@@ -37,7 +38,7 @@ if not status then return end
 --   FAIL? latest update to v2 is mostly untagged
 -- require('blink.cmp').download({ force = true, tags = '*' }):pwait()
 -- OR: cd /path/to/blink.cmp && cargo build --release
-require('blink.cmp').build():pwait()
+blink.build():pwait()
 -- require('blink.cmp.native').build()
 -- vim.system(
 --   { 'cargo', 'build', '--release' },
@@ -78,13 +79,20 @@ blink.setup({
     ['<C-e>']     = { 'hide' },
     ['<CR>']      = { 'accept', 'fallback' },
 
+    -- Keep the nvim-cmp navigation muscle memory.
+    ['<Up>']   = { 'select_prev', 'fallback' },
+    ['<Down>'] = { 'select_next', 'fallback' },
+    ['<C-p>']  = { 'select_prev', 'fallback_to_mappings' },
+    ['<C-n>']  = { 'select_next', 'fallback_to_mappings' },
+    ['<C-h>']  = { 'show_signature', 'hide_signature', 'fallback' },
+
     ['<Tab>'] = {
-      function(cmp)
-        if cmp.is_visible() then
-          return cmp.select_next()
-        -- Directly query LuaSnip engine using explicit pathing
-        elseif require('luasnip').expand_or_locally_jumpable() then
-          return require('luasnip').expand_or_jump()
+      -- Accept the selected item; if none is selected, accept the first item.
+      'select_and_accept',
+      function()
+        if require('luasnip').expand_or_locally_jumpable() then
+          require('luasnip').expand_or_jump()
+          return true
         end
       end,
       'fallback',
@@ -109,23 +117,45 @@ blink.setup({
     preset = 'luasnip',
   },
 
-  -- (Default) Only show the documentation popup when manually triggered
-  -- completion = { documentation = { auto_show = false } },
-
-  -- (Default) list of enabled providers defined so that you can extend it
-  -- elsewhere in your config, without redefining it, due to `opts_extend`
-  sources = {
-    default = { 'lsp', 'path', 'snippets', 'buffer' },
-
-    -- Optional but highly recommended: adjust weights so paths don't crowd LSP completions
-    providers = {
-      lsp = { score_offset = 90 },
-      path = { score_offset = 80 },
-      snippets = { score_offset = 70 },
-      buffer = { score_offset = 50 },
+  completion = {
+    list = {
+      -- Match nvim-cmp: navigating highlights an item but does not insert it.
+      selection = { preselect = false, auto_insert = false },
+      max_items = 40,
     },
+    documentation = { auto_show = true, auto_show_delay_ms = 300 },
   },
 
-  -- Enable signature help globally (argument popups inside parentheses)
-  signature = { enabled = true }
+  sources = {
+    default = { 'lsp', 'path', 'snippets', 'buffer' },
+    -- Match the old nvim-cmp Python setup: no buffer/path noise for members.
+    -- per_filetype = { python = { 'lsp', 'snippets' } },
+  },
+
+  -- -- Optional but highly recommended: adjust weights so paths don't crowd LSP completions
+  -- providers = {
+  --   lsp = { score_offset = 90 },
+  --   path = { score_offset = 80 },
+  --   snippets = { score_offset = 70 },
+  --   buffer = { score_offset = 50 },
+  -- },
+
+  fuzzy = {
+    -- `label` makes equal LSP scores deterministic. The prior default stopped
+    -- at `sort_text`, which Python servers often omit for member completions.
+    sorts = { 'exact', 'score', 'sort_text', 'label' },
+    frecency = { enabled = false },
+    use_proximity = false,
+  },
+
+  -- Signature help appears for `(` and `,`, updates while typing arguments,
+  -- and can always be toggled with <C-h>.
+  signature = {
+    enabled = true,
+    trigger = {
+      show_on_keyword = true,
+      show_on_accept = true,
+    },
+    window = { show_documentation = true },
+  },
 })
