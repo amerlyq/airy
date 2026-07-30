@@ -30,7 +30,7 @@
 -- Ensure blink.cmp is loaded before attempting setup
 -- local status, blink = pcall(require, "blink.cmp")
 -- if not status then return end
-blink = require "blink.cmp"
+local blink = require "blink.cmp"
 
 -- blink.cmp  V2 uses a new build/download system for the native library.
 -- SEE  :h blink-cmp-installation
@@ -38,7 +38,12 @@ blink = require "blink.cmp"
 --   FAIL? latest update to v2 is mostly untagged
 -- require('blink.cmp').download({ force = true, tags = '*' }):pwait()
 -- OR: cd /path/to/blink.cmp && cargo build --release
-blink.build():pwait()
+-- OR: require('plug.blinkcmp_build').build_if_needed()
+-- USAGE:(./recache): $ BLINKCMP_REBUILD=1 nvim --headless -c "qa"
+--   OR: nvim --headless -c "lua require('blink.cmp').build():pwait()" -c "qa"
+if vim.env.BLINKCMP_REBUILD == "1" then
+  blink.build():pwait()
+end
 -- require('blink.cmp.native').build()
 -- vim.system(
 --   { 'cargo', 'build', '--release' },
@@ -58,7 +63,7 @@ blink.build():pwait()
 --   https://gist.github.com/mhartington/d2e757e1cdb2ed678ee755de640050a0
 -- blink.cmp vs nvim-cmp · GitHub ⌇⡪⡪⠲⠊
 --   https://gist.github.com/Saghen/e731f6f6e30a4c01f6bc7cdaa389d463
-blink.setup({
+local cfg = {
   -- Keymaps optimized for explicit manual setups with LuaSnip fallback behavior
   keymap = {
     -- 'default' (recommended) for mappings similar to built-in completions (C-y to accept)
@@ -85,8 +90,6 @@ blink.setup({
     ['<C-p>']  = { 'select_prev', 'fallback_to_mappings' },
     ['<C-n>']  = { 'select_next', 'fallback_to_mappings' },
     ['<C-q>']  = { 'show_signature', 'hide_signature', 'fallback' },
-    -- ['<A-y>'] = require('minuet').make_blink_map(),
-    ['<C-h>'] = require('minuet').make_blink_map(),
 
     ['<Tab>'] = {
       -- Accept the selected item; if none is selected, accept the first item.
@@ -127,28 +130,12 @@ blink.setup({
       max_items = 40,
     },
     documentation = { auto_show = true, auto_show_delay_ms = 300 },
-
-    -- Recommended to avoid unnecessary request with minuet
-    trigger = { prefetch_on_insert = false },
   },
 
   sources = {
-    -- Enable minuet for autocomplete
-    default = { 'lsp', 'path', 'snippets', 'buffer', 'minuet' },
+    default = { 'lsp', 'path', 'snippets', 'buffer'},
     -- Match the old nvim-cmp Python setup: no buffer/path noise for members.
     -- per_filetype = { python = { 'lsp', 'snippets' } },
-    -- For manual completion only, remove 'minuet' from default
-    providers = {
-        minuet = {
-            name = 'minuet',
-            module = 'minuet.blink',
-            async = true,
-            -- Should match minuet.config.request_timeout * 1000,
-            -- since minuet.config.request_timeout is in seconds
-            timeout_ms = 10000,
-            score_offset = 50, -- Gives minuet higher priority among suggestions
-        },
-    },
   },
 
   -- -- Optional but highly recommended: adjust weights so paths don't crowd LSP completions
@@ -177,4 +164,30 @@ blink.setup({
     },
     window = { show_documentation = true },
   },
-})
+}
+
+
+local ai_offline = require('plug.ai_offline')
+
+if ai_offline.has.minuet then
+  -- ['<A-y>'] = require('minuet').make_blink_map(),
+  cfg.keymap['<C-h>'] = require('minuet').make_blink_map()
+  -- Recommended to avoid unnecessary request with minuet
+  cfg.completion.trigger = { prefetch_on_insert = false }
+  -- Enable minuet for autocomplete
+  table.insert(cfg.sources.default, 'minuet')
+  -- For manual completion only, remove 'minuet' from default
+  cfg.sources.providers = {
+    minuet = {
+        name = 'minuet',
+        module = 'minuet.blink',
+        async = true,
+        -- Should match minuet.config.request_timeout * 1000,
+        -- since minuet.config.request_timeout is in seconds
+        timeout_ms = 10000,
+        score_offset = 50, -- Gives minuet higher priority among suggestions
+    },
+  }
+end
+
+blink.setup(cfg)
