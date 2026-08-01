@@ -16,4 +16,8 @@ then
   systemctl --no-block --user start xsession.target
 fi
 
+# TRY: blocks until the udev queue is empty
+#   in hope qtile will have access to ACPI battery 'energy_now'
+udevadm settle --timeout=10
+
 exec /usr/bin/qtile start
