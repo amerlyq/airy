@@ -92,6 +92,12 @@ local cfg = {
     ['<C-q>']  = { 'show_signature', 'hide_signature', 'fallback' },
 
     ['<Tab>'] = {
+      -- MAYBE: chain same <Tab> for both FIM and Blink
+      -- function()
+      --   local ok, vact = pcall(function() return require('minuet.virtualtext').action end)
+      --   if ok and vact.is_visible() then vact.accept_line(); return true end
+      -- end,
+
       -- Accept the selected item; if none is selected, accept the first item.
       'select_and_accept',
       function()

@@ -78,17 +78,45 @@
   [X] Qs simplest CFG for offline gpt ⌇⡪⡪⠑⢗
     $ sudo pacman -S ollama-cuda
     $ sudo systemctl enable --now ollama
+    $ ollama pull qwen2.5-coder:14b
+    Connect to #pc
+      [✓] ssh -N -L 11434:localhost:11434 lf
+      ::end_point::
+        http://localhost:11434/v1/completions (Legacy/Text Endpoint):
+          Accepts a single string prompt and returns text continuation. This is
+          required for Fill-in-the-Middle (FIM) code completion because Minuet can
+          format the prefix/suffix prompt tokens manually and send them directly to
+          qwen2.5-coder.
+        http://localhost:11434/v1/chat/completions (Chat Endpoint):
+          Expects structured message objects ([{"role": "user", "content": "..."}]).
+          If you send raw FIM template strings to a chat endpoint, the server tries
+          to format it as a conversation, breaking FIM completion.
+        http://127.0.0.1:11434/api/generate
+          That endpoint expects raw Ollama JSON schema, while openai_fim_compatible
+          expects an OpenAI-styled payload (/v1/completions).
     DEBUG:
       $ journalctl -fu ollama
       $ pgrep -l ollama
-    [•] FIXME: avoid flooding journal
-      # sudo systemctl edit ollama.service
-      # [Service]
-      ## StandardOutput=null
+      $ curl http://localhost:11434/api/tags
+      $ ollama list
+      $ ollama run qwen2.5-coder:14b ""
+      $ ollama ps
+      $ ollama stop qwen2.5-coder:14b
+      $ curl http://localhost:11434/api/tags
+      $ curl -X POST http://localhost:11434/api/generate -d '{"model": "qwen2.5-coder:14b", "prompt": "def add(a, b):\n", "stream": false}'
+      $ curl -X POST http://localhost:11434/v1/chat/completions -H "Content-Type: application/json" \
+        -d '{ "model": "qwen2.5-coder:14b", "messages": [{"role": "user", "content": "say hi"}] }'
+    [X] FIXME: avoid flooding journal
+      $ sudo systemctl edit ollama.service
+      [Service]
+      [✗] (ignored?) Environment="GIN_MODE=release"
+      # StandardOutput=null
       # StandardError=journal
-      # Environment="GIN_MODE=release"
-      # Environment="OLLAMA_KEEP_ALIVE=-1"
+      ## WARN: VRAM stays occupied even when you're not using it, so you can't run anything else on that GPU meanwhile.
+      ## USAGE:(unload manually): ollama stop qwen2.5-coder:14b || systemctl stop ollama
+      Environment="OLLAMA_KEEP_ALIVE=-1"
       # Environment="OLLAMA_KEEP_ALIVE=10m"
+      Environment="OLLAMA_NUM_THREADS=4"
         1. NVENC Uses Independent ASIC Chips, Not VRAM
           - dedicated fixed-function hardware blocks physically separate from the GPU's CUDA cores.
           - unless you run filters / CUDA-accelerated tasks:
@@ -103,7 +131,7 @@
       Pull Qwen 2.5 Coder 14B (Fits 100% in your 11GB VRAM, fast & precise)
         $ ollama pull qwen2.5-coder:14b       # For local chat & buffer editing
     # C. Architecture Planning & Deep Graph Debugging (Heavy Reasoning)The Choice: Qwen2.5-Coder-32B-Instruct (Q4_K_M)
-    [•] A. Inline Fill-In-The-Middle (FIM) Ghost-Text Autocomplete (Low Latency)
+    [✓] A. Inline Fill-In-The-Middle (FIM) Ghost-Text Autocomplete (Low Latency)
       [✗] * The Choice: Qwen2.5-Coder-7B-Instruct or Qwen3.5-9B-MTP (Q4/Q8)
         $ ollama pull qwen2.5-coder:7b        # For instant completion
         Ollama GPU Offloading Tuning: Force Ollama to keep the 7B model
@@ -116,17 +144,14 @@
         Ghost-text autocomplete needs to feel instant. Human perception breaks down like this:
           100 ms to first token: Ideal for single-word typing autocomplete.
           200–300 ms to first token: Perfectly comfortable for multi-line block completions.
-    Connect to #pc
-      [✓] ssh -N -L 11434:localhost:11434 lf
-      [✓] curl http://localhost:11434/api/tags
     ---
-    [•] ALSO? minuet-ai.nvim for standard AI ghost-text completions
+    [✓] ALSO? minuet-ai.nvim for standard AI ghost-text completions
       [$] TRY:ALT:
         [✗] * supermaven-nvim — Lightweight dedicated plugins for fast ghost-text completion.
           ollama: None (Cloud Only), no FIM
         [≈] * copilot.lua
           ollama: Limited / Experimental, no FIM
-        [•] * minuet-ai.nvim — Connects to local or cloud LLMs (Ollama, Claude, OpenAI) specifically for inline/ghost-text completion.
+        [✓] * minuet-ai.nvim — Connects to local or cloud LLMs (Ollama, Claude, OpenAI) specifically for inline/ghost-text completion.
           * Native Fill-In-The-Middle (FIM) Support:
         [?] * Neovim Native Inline LSP (textDocument/inlineCompletion) — Works with LLM LSP servers that support the LSP inline completion specification.
     [_] ALT: !rust (?mostly for online models?)
@@ -175,3 +200,171 @@
       $ aider --model ollama_chat/qwen2.5-coder:14b
     [_] 7 Best Open-Source LLM Orchestration & Routing Tools (2026) ⌇⡪⡪⢊⡁
       https://www.ayautomate.com/blog/open-source-llm-orchestration-tools
+
+
+5h10m 2026-08-01-Sat-W30
+  [;] 20:00 30m Qs reduce number of threads ⌇⡪⡮⢀⡃
+    $ ollama serve --help
+    $ sudo systemctl edit ollama.service
+      [Service]
+      # BUG? still debug mode spam in journalctl
+      Environment="GIN_MODE=release"
+      # StandardOutput=null
+      # StandardError=journal
+      # OR: "=10m" to auto-unload (inof systemctl stop ollama)
+      Environment="OLLAMA_KEEP_ALIVE=-1"
+      # Environment="OLLAMA_KEEP_ALIVE=10m"
+      Environment="OLLAMA_NUM_THREADS=8"
+      Environment="OLLAMA_MAX_LOADED_MODELS=1"
+        - you only have room for one model in 11GB anyway; keeps Ollama from trying to juggle multiple.
+      Environment="OLLAMA_NUM_PARALLEL=1"
+        * new requests queue behind the in-flight one
+        — you're the only user issuing one request at a time; no reason to reserve memory for concurrent request slots. Ensures all VRAM goes to context/model rather than parallel-request overhead.
+      [?] OLLAMA_MAX_QUEUE=512 -> 16 ?
+      [?] OLLAMA_GPU_OVERHEAD=512MiB ?
+      # don't override manual settings
+      Environment="LLAMA_ARG_FIT=off"
+        * use OLLAMA_DEBUG=1 to actually observe whether LLAMA_ARG_FIT is overriding your context/KV settings at runtime
+      Environment="OLLAMA_FLASH_ATTENTION=1
+        — recommended for Nvidia GPUs to improve token generation speed.
+        Free performance win, no real downside on a 2080Ti.
+      Environment="OLLAMA_KV_CACHE_TYPE=q8_0
+        — quantizes the K/V context cache, using roughly half the memory of f16
+          with a very small loss in precision that usually has no noticeable
+          impact on quality — but only works with Flash Attention on.
+          Worth it on 11GB: frees VRAM for longer context (matters for codecompanion's
+          chat/agentic mode where you paste multiple files).
+        * doubles available context
+          OLLAMA_KV_CACHE_TYPE: Halve Ollama's KV Cache Memory — ModelPiper ⌇⡪⡮⠻⠘
+            https://modelpiper.com/blog/ollama-kv-cache-quantization
+      # OR: ctx=8192 for DFL=q16_0
+      Environment="OLLAMA_CONTEXT_LENGTH=12288"
+        # OR per-model via a Modelfile PARAMETER num_ctx 8192
+        # OR per-request if the client supports overriding num_ctx in the API call.
+        ⁘ BAD: can't fit 16k
+           └╼ ollama ps
+           NAME                 ID              SIZE     PROCESSOR          CONTEXT    UNTIL
+           qwen2.5-coder:14b    9ec8897f747e    10 GB    10%/90% CPU/GPU    16384      Forever
+           ALSO: would still need room to fit more ffmpeg/NVENC in parallel
+        * KV cache size per token = 2 (K+V) × num_layers × num_kv_heads × head_dim × bytes_per_element.
+        Qwen2.5-Coder-14B: 48 layers, 8 KV heads, head_dim = hidden_size/num_q_heads = 5120/40 = 128.
+        At f16 (2 bytes): 2 × 48 × 8 × 128 × 2 = 196,608 bytes/token ≈ 192 KB/token.
+        Budget: 11GB card, Q4_K_M weights are ~8.7GB, leave ~0.5-1GB for CUDA runtime/context
+          overhead → roughly 1.3-1.8GB left for KV cache.
+        1.5GB ÷ 192KB/token ≈ ~8,000 tokens of context at f16
+          — so realistically you're looking at ~8K context,
+          not the model's full 32K native window.
+          That's usable but tight for pasting several files into codecompanion chat.
+        Qwen2.5-Coder 14B VRAM Requirements — Q4, Q5, Q8, FP16 Hardware Guide | Will It Run AI Blog ⌇⡪⡮⠺⠆
+          https://willitrunai.com/blog/qwen-2-5-coder-14b-vram-requirements
+    # $ ollama stop qwen2.5-coder:14b
+    $ sudo systemctl daemon-reload && sudo systemctl restart ollama && sleep 3 && ollama run qwen2.5-coder:14b "" && ollama ps
+    $ systemctl show ollama -p Environment
+    ---
+    [$] A Modelfile override only becomes worth it if you want something specific to qwen2.5-coder:14b that differs from those service defaults
+      $ ollama show --modelfile llama3 > Modelfile
+      $ PARAMETER num_thread 4
+      $ PARAMETER num_predict 128
+      $ ollama create nvim-llama -f ./Modelfile
+  [X] 21:10 1h Qs reduce number of threads
+    Adjust context size based on actual VRAM usage
+      $ ollama ps
+      $ nvidia-smi
+    Eagerly start model after restart:
+      [Service]
+      ExecStartPost=/bin/sh -c 'sleep 3 && curl -s http://localhost:11434/api/generate -d "{\"model\":\"qwen2.5-coder:14b\",\"prompt\":\"hi\",\"keep_alive\":-1}" >/dev/null'
+      $ ollama run qwen2.5-coder:14b ""
+        — empty prompt just forces load
+      # $ ollama run qwen2.5-coder:14b --keepalive -1
+      $ curl -s http://localhost:11434/api/generate -d '{"model":"qwen2.5-coder:14b","prompt":"","keep_alive":-1}'
+    Model/inference-level (diminishing returns from here)
+      * num_batch — controls prompt-eval (prefill) parallelism. Raising it
+        (e.g. 512→1024) speeds up how fast the model ingests a large pasted file
+        before it starts generating, at some VRAM cost. Worth trying once your
+        context/KV settings are settled — but only after confirming the model is
+        100% GPU-resident (checking via ollama ps), since spending VRAM on batch
+        size while anything spills to CPU makes things worse.
+        [≫] BAD: only by ./Modelfile
+          * PARAMETER num_batch
+      * Sampling params (temperature, top_p, top_k, repeat_penalty) — for code,
+        lower temperature (0.1-0.3) generally gives more deterministic, less
+        "creative" completions, which is usually what you want for
+        FIM/autocomplete. Chat/agentic tasks can tolerate slightly higher. Worth
+        setting explicitly rather than relying on defaults, since defaults are
+        tuned for general chat, not code.
+      * num_predict — cap generation length. For FIM you want this small (fast,
+        bounded completions); for chat you want it large/unbounded so responses
+        aren't cut off mid-explanation. This is a real reason to split FIM vs
+        chat into two Modelfile-derived models, as discussed.
+  [X] 22:10 30m Qs ENH: fine-tune → !nvim CFG
+    # Modelfile.qwen-14b-12k
+    FROM qwen2.5-coder:14b
+    PARAMETER num_ctx 12288
+    PARAMETER num_predict 256
+    PARAMETER temperature 0.2
+    PARAMETER top_p 0.9
+    $ ollama create qwen2.5-coder:14b-12k -f Modelfile.qwen-14b-12k
+    $ ollama ps  # confirm 100% GPU, no CPU offload — 12k ctx at 14b may spill
+    [$] FIXME: debounce/abort minuet-ai FIM to auto-cancel prev requests
+      ⁘ already covered
+  [X] 22:40 1h Qs benefits? / touters / aggregators
+      I have qwen2.5-coder:14b, 12288 context.
+      I do mostly python coding in neovim with 100+ plugins (currently
+      including minuet-ai and codecompanion), some daily planning/tracking, and
+      heavy investigations for arch/solution/low-level-system decisions.
+      How can I benefit from the model the most?
+    * WARN: prompt template overhead is included in these 12k
+      ~ budget ~8k for actual buffer content
+        INFO: Rule of thumb at 12K:
+          + system prompt (~50-100 tok)
+          + task instruction (~50 tok)
+          = ~11K for code+response.
+      * inline completions, boilerplate, local function-signature-aware suggestions
+        = where surrounding file context beats general knowledge
+      * disable multi-file context gathering in minuet's config
+    * codecompanion: use qwen2.5-coder:14b only for scoped, single-file tasks
+      - [mechanical] refactor this function
+      - write a docstring
+      - quick "what does this do" on snippets on <200 line snippet
+      - generate a test for this exact code block
+      [_] set codecompanion adapter-per-command rather than one global adapter,
+        so you're not manually switching models mid-session.
+    [_] Bake this into the Modelfile via SYSTEM:
+      $ ollama show qwen2.5-coder:14b --system
+        ¦ You are Qwen, created by Alibaba Cloud. You are a helpful assistant.%
+      FROM qwen2.5-coder:14b
+      SYSTEM """You write Python for an experienced systems programmer. Favor minimal abstractions, idiomatic stdlib usage, lazy evaluation, low allocation. No defensive boilerplate unless asked. No explanations unless asked — code only, or a one-line comment max. Assume basedpyright/pylint-clean style, __slots__ where relevant, correctness-first over cleverness."""
+      PARAMETER num_ctx 12288
+    [_] In codecompanion, avoid @files slash-command dumps of whole files. Instead:
+      Use @buffer scoped to visible/nearby lines rather than the full open file
+    [_] CHECK: if Prompt caching (KV reuse) is actually happening:
+      OLLAMA_DEBUG=1 ollama serve
+        = repeated requests with *identical* prefixes should show fast prompt-eval
+        (near-zero eval time on the cached portion) vs full reprocessing.
+  [X] 23:40 1h30m Qs CFG OpenRouter / DEBUG not found
+    $ curl https://openrouter.ai/api/v1/chat/completions -H "Content-Type: application/json" \
+      -H "Authorization: Bearer $(pass fin/svc/openrouter.ai | awk '/apikey/{print\$2;quit}')" \
+      -d '{ "model": "openai/gpt-4o", "messages": [ { "role": "user", "content": "What is the meaning of life?" } ] }'
+    $ curl -s https://openrouter.ai/api/v1/models | python3 -c "
+      import json, sys; data = json.load(sys.stdin)
+      free = [m for m in data['data'] if m['pricing']['prompt'] == '0' and m['pricing']['completion'] == '0']
+      for m in free: print(m['id'])"
+    [X] Web UI: openrouter.ai/models → sort/filter by "Free" — or go straight to the pre-filtered view: openrouter.ai/models?max_price=0
+      https://openrouter.ai/models?input_modalities=text&max_price=0&categories=programming&max_output_price=0
+      https://openrouter.ai/models?max_price=0
+      * default = "poolside/laguna-s-2.1:free",  (primary)
+      -- fallback 1: poolside/laguna-xs-2.1:free  (faster, still beats North Mini Code)
+      -- fallback 2: nvidia/nemotron-3-super:free (untested claim, 1M context if you need it)
+      -- fallback 3: cohere/north-mini-code:free  (weakest verified showing)
+      Skip for coding:
+        - Gemma 4 (26B A4B / 31B) — general multimodal, coding is incidental not a design target.
+        - Nemotron 3 Nano Omni / Nano VL / Nano 9B V2 — multimodal/perception or general-purpose,
+          not agentic-coding-focused.
+        - Nemotron 3.5 Content Safety — a moderation/guardrail model, not usable for coding at all.
+        - gpt-oss-20b — general-purpose OSS model, workable in a pinch but no coding specialization claimed.
+    DEBUG:
+      $ curl https://openrouter.ai/api/v1/chat/completions \
+        -H "Authorization: Bearer $(pass fin/svc/openrouter.ai | awk '/apikey/{print$2;exit}')" \
+        -H "Content-Type: application/json" \
+        -d '{"model":"poolside/laguna-s-2.1:free","messages":[{"role":"user","content":"hi"}]}'
+  [+] 01:45 40m Qs CFG !nvim ollama connectivity

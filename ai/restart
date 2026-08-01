@@ -1,0 +1,5 @@
+#!/bin/bash -eu
+
+sudo systemctl daemon-reload && sudo systemctl restart ollama
+sleep 3
+ollama run qwen2.5-coder:14b "" && ollama ps

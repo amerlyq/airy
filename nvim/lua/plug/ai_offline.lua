@@ -1,63 +1,82 @@
 local M = {}
 
--- Initialize default state immediately so other files can safely read it
-M.has = {
-  ollama = false,
-  codecompanion = false,
-  minuet = false,
-}
+-- ALT: Only initialize if you launch Neovim as: OLLAMA=1 nvim
+-- if vim.env.OLLAMA != "1" then return end
 
--- Fast, completely non-blocking async port check
-function M.check_ollama_port(callback)
+-- ALT: vim.g.ollama_is_running = ...
+M.ollama_reachable = nil  -- unknown until the async check resolves
+
+function M.refresh_ollama_status()
   local uv = vim.uv or vim.loop
   local client = uv.new_tcp()
-  if not client then return false end
+  if not client then
+    M.ollama_reachable = false
+    return
+  end
 
-  local is_open = false
-  client:connect("127.0.0.1", 11434, function(err)
-    if not err then is_open = true end
-    client:close()
+  local done = false
+
+  local function finish(result)
+    if done then return end
+    done = true
+    M.ollama_reachable = result
+    if not client:is_closing() then client:close() end
     -- ALT: Schedule back to Neovim's main thread safely
     -- vim.schedule(function()
     --   callback(is_open)
     -- end)
+    -- -- MAYBE: trigger an event so your statusline or UI updates dynamically
+    -- vim.api.nvim_exec_autocmds("User", { pattern = "OllamaReady" })
+  end
+
+  local ok = client:connect('127.0.0.1', 11434, function(err)
+    if err then
+      finish(false)
+      return
+    end
+    -- TCP connected — could be ssh forward with dead backend, so verify HTTP
+    client:read_start(function(read_err, chunk)
+      if done then return end
+      if read_err or not chunk then
+        finish(false)  -- closed/reset with no response = dead backend
+      elseif chunk:match('^HTTP/') then
+        finish(true)
+      else
+        finish(false)
+      end
+    end)
+    client:write('GET / HTTP/1.0\r\nHost: localhost\r\n\r\n')
   end)
-  -- Wait max 20ms for local loopback connection
-  vim.wait(20, function() return is_open end, 5, false)
-  return is_open
+
+  if not ok then
+    finish(false)
+    return
+  end
+
+  -- ALT: wait max 20ms for local loopback connection
+  -- vim.wait(20, function() return done end, 5, false)
+
+  -- safety timeout in case nothing ever calls back
+  local timer = uv.new_timer()
+  timer:start(300, 0, function()
+    timer:stop()
+    timer:close()
+    finish(false)
+  end)
 end
 
--- -- ALT: Async run the check silently in the background right now
--- M.check_ollama(function(is_running)
---   M.has.ollama = is_running
---   if is_running then
---     -- Safely load plugins only if Ollama responds
---     pcall(require, 'plug.ai_codecompanion_cfg')
---     M.has.codecompanion = true
---     pcall(require, 'plug.ai_minuet_cfg')
---     M.has.minuet = true
---     -- Optional: trigger an event so your statusline or UI updates dynamically
---     vim.api.nvim_exec_autocmds("User", { pattern = "OllamaReady" })
---   end
--- end)
+M.refresh_ollama_status()  -- fire once at startup, async
 
+-- ALT: skip whole plugin
+-- if M.ollama_reachable then
+--   M.has.minuet = require('plug.ai_minuet_cfg')
+-- end
 
--- ALT: vim.g.ollama_is_running = ...
-M.has.ollama = M.check_ollama_port()
-
--- ALT: Only initialize if you launch Neovim as: OLLAMA=1 nvim
--- if vim.env.OLLAMA != "1" then return end
-
--- 3. Graceful fallback instead of 'return' early-exit.
--- This ensures the table structure remains intact for blink.cmp or other configurations.
-if M.has.ollama then
-  -- No pcall used here. If your config files have errors, Neovim will crash
-  -- cleanly and print the exact line number causing the problem.
-  require('plug.ai_codecompanion_cfg')
-  M.has.codecompanion = true
-
-  require('plug.ai_minuet_cfg')
-  M.has.minuet = true
-end
+-- No pcall used here. If your config files have errors, Neovim will crash
+-- cleanly and print the exact line number causing the problem.
+M.has = {
+  codecompanion = require('plug.ai_codecompanion_cfg'),
+  minuet = require('plug.ai_minuet_cfg'),
+}
 
 return M
