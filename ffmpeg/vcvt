@@ -20,6 +20,7 @@ esac; done; shift $((OPTIND-1)); unset o
 # TRY: REMOTE-cvt:
 # ONELINE: $ ssh lf 'ffmpeg ... -i pipe:0 ... -f mp4 pipe:1' < local_input.mp4 > local_output.mp4
 #   [?] BET:DEV: python ThreadPool() watching a dir to parallelize queue of jobs=5 (measure)
+# VIEW: $ mpv sftp://lf/cache/vd_cvt/todo/input_a25.mp4
 if [[ -t 0 ]]; then
   fin=$1
   out="${fin%.*}_${ifx}${qa}.${fin##*.}"
@@ -58,15 +59,29 @@ if [[ -e /dev/nvidia0 ]]; then
   #   -preset p7 -tune hq -rc vbr -cq 25 -b:v 0 -spatial_aq 1 -aq-strength 8 -rc-lookahead 32 \
   #   -preset p7 -tune hq -profile:v main10 -pix_fmt p010le -rc vbr -cq 22 -b:v 0 -spatial_aq 1 -aq-strength 10 -rc-lookahead 32 \
 
+  # BAD:(no compression?): -rc vbr -cq "$qa" -b:v 0
+  #   ALT: -rc constqp -qp 23
+  # nvopts=( -preset p5 -tune hq -rc vbr -cq "$qa" -maxrate 8M -bufsize 16M )
+
+  # INFO:(-rc-lookahead 32): What Does Look-ahead Do in OBS NVENC Settings? - obs-studio ⌇⡪⡮⠗⢐
+  #   https://salivity.github.io/obs-studio/article/what-does-look-ahead-do-in-obs-nvenc-settings
+  # INFO:(supported): $ ffmpeg -h encoder=hevc_nvenc
+  nvopts=(  # <CASE:(amv):
+    -preset p7 -highbitdepth 1 -multipass fullres
+    -rc vbr -cq "$qa" -maxrate 16M -bufsize 32M
+    -rc-lookahead 48 -lookahead_level auto -tf_level 4
+    -spatial_aq 1 -aq-strength 12 -g 60 -bf 4 -b_ref_mode middle
+  )
+
   ## ALT: cuda
   # -hwaccel cuda -hwaccel_device 0 -c:v h264_cuvid ...
   # -vf "scale_cuda=w='min(iw,1920)':h='min(ih,1080)':format=yuv420p" \
+  # FPS: -vf "fps=30,scale_cuda=..." -fps_mode cfr -c:v ...
+  #   BUT: detect VFR first: $ ffprobe -v error -select_streams v:0 -show_entries stream=avg_frame_rate,r_frame_rate -of default=nw=1 "$f"
   exec "${ffmpeg[@]}" \
     -hwaccel cuda -hwaccel_output_format cuda -i "$fin" \
     -vf "scale_cuda=w='if(gt(iw,ih),min(iw,1920),trunc(1920*iw/ih/2)*2)':h='if(gt(ih,iw),min(ih,1920),trunc(1920*ih/iw/2)*2)':format=yuv420p" \
-    -c:v hevc_nvenc -preset p5 -tune hq -rc vbr -cq "$qa" -b:v 0 \
-    -c:a copy \
-    "${out[@]}"
+    -c:v hevc_nvenc "${nvopts[@]}" -c:a copy "${out[@]}"
 
   ## ALT: 3..12 concurrent encoding sessions with NVENC
   #   OR:(re-exec): $ ls *.mp4 | xargs -P4 -I{} vcvt {}

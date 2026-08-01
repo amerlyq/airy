@@ -600,6 +600,26 @@ def audit_focus(w: window.Window) -> None:
 
 
 def _register_x11_hooks():
+    # If selection_notify keeps firing on every copy but selection_change doesn't → confirms it's the
+    # ConvertSelection/CopyQ handshake, not XFixes registration. If neither fires after the first copy → XFixes
+    # registration itself is the problem (more consistent with a libxcb/xcffib ABI issue from the upgrade).
+    #
+    # Then confirm with copyq exit (keep qtile running) and repeat a few copies — if selection_change starts
+    # firing again, CopyQ is confirmed as the blocker.
+    #
+    # Related, lower-priority: check journalctl -b | grep -i qtile for handler exceptions being silently
+    # swallowed by qtile's hook dispatcher (a raised exception in convert_selection itself would also produce
+    # this symptom without CopyQ being at fault)
+
+    # @hook.subscribe.selection_notify
+    # def _n(name, sel):
+    #     logger.warning("NOTIFY %s owner=%s", name, sel.get("owner"))
+    # @hook.subscribe.selection_change
+    # def _c(name, sel):
+    #     logger.warning("CHANGE %s owner=%s", name, sel.get("owner"))
+
+    # WARN: content may still be not available
+    # @hook.subscribe.selection_notify
     @hook.subscribe.selection_change
     def audit_cb(name, selection) -> None:
         # send_notification("qtile", "cb")
