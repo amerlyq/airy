@@ -81,7 +81,7 @@ local cfg = {
     preset = 'none', -- We clear the preset to ensure exact mapping control
 
     ['<C-space>'] = { 'show', 'show_documentation', 'hide_documentation' },
-    ['<C-e>']     = { 'hide' },
+    ['<C-t>']    = { 'hide' },
     ['<CR>']      = { 'accept', 'fallback' },
 
     -- Keep the nvim-cmp navigation muscle memory.

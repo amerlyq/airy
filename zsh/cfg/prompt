@@ -31,7 +31,7 @@ function prompt_elapsed { local var=$1
   ((dt > 60)) && t+=$'%{\a%}'  # <:attention / urgent bell
   ((dt > 120)) && t+=' %F{235}(%F{4}%*%F{235}…)'  # start of cmd
 
-  print "%B%F{240}>>> elapsed time: %F{$color}${t}%f%b"
+  print "%B%F{240}>>> elapsed time: %F{$color}${t}%f%b (%D{%H:%M:%S})"
 
   if ((dt > 90)) && (($+commands[notify-send])); then
     local pcmd="$(fc -l -n -1)"
