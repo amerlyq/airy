@@ -1,19 +1,53 @@
 # vim:ft=zsh
 
-_prompt_color=
+typeset -g _prompt_color= _prompt_saved_prompt _prompt_saved_rprompt
 
-function prompt_pwd {
-  local w=$1 p=${PWD/#$HOME/\~}
-  ## Keep first char '/' or '~' in path
-  if [[ $p != (#m)[/~] ]]; then
-    # CHECK: '/' already filtered by outer match
-    [[ $p == / ]] || p=${${p%/}//\%/%%}
-    (($w && $#p >= $w )) && p=${${(@j:/:M)${(@s:/:)p}##.#?}:h}/${p:t}
-    (($w && $#p >= $w )) && p="%$w>…>…/${p:t}%<<"
+## @me OLD:IMPL
+# if [[ $p != (#m)[/~] ]]; then ## Keep first char '/' or '~' in path
+#   [[ $p == / ]] || p=${${p%/}//\%/%%}  # CHECK: '/' already filtered by outer match
+#   (($w && $#p >= $w )) && p=${${(@j:/:M)${(@s:/:)p}##.#?}:h}/${p:t}
+#   (($w && $#p >= $w )) && p="%$w>…>…/${p:t}%<<"
+# fi
+
+function prompt_pwd_unique {
+  local p=${PWD/#$HOME/\~}
+  [[ $p == / || $p == '~' ]] && { print -P "$p"; return }
+
+  local -a parts; parts=("${(@s:/:)p}")
+  local root=
+  if [[ $parts[1] == '' ]]; then
+    root='/'          # absolute path: swallow the leading empty split element
+    parts=("${parts[@]:1}")
+  elif [[ $parts[1] == '~' ]]; then
+    root='~/'
+    parts=("${parts[@]:1}")
   fi
-  unset MATCH
-  print -P $p  # NEED: to collapse path segments
+
+  local -a out
+  local i seg prefix_path cand sibling ambiguous
+
+  for (( i = 1; i <= $#parts; i++ )); do
+    seg=${parts[i]}
+    if (( i == 1 )) || (( i == $#parts )); then
+      out+=($seg)
+      continue
+    fi
+    prefix_path="${root}${(j:/:)parts[1,i-1]}"
+    for (( l = 1; l <= $#seg; l++ )); do
+      cand=${seg[1,l]}
+      ambiguous=0
+      for sibling in ${prefix_path}/${cand}*(N/D:t); do
+        [[ $sibling == $seg ]] && continue
+        ambiguous=1; break
+      done
+      (( ! ambiguous )) && { seg=$cand; break }
+    done
+    out+=($seg)
+  done
+
+  print -P "${root}${(j:/:)out}"
 }
+
 
 function prompt_elapsed { local var=$1
   local dt=$(( SECONDS - _prompt_elapsed_start ))
@@ -31,7 +65,7 @@ function prompt_elapsed { local var=$1
   ((dt > 60)) && t+=$'%{\a%}'  # <:attention / urgent bell
   ((dt > 120)) && t+=' %F{235}(%F{4}%*%F{235}…)'  # start of cmd
 
-  print "%B%F{240}>>> elapsed time: %F{$color}${t}%f%b (%D{%H:%M:%S})"
+  print "%B%F{240}>>> elapsed time: %F{$color}${t}%f%b %F{238}(%D{%H:%M:%S})%f"
 
   if ((dt > 90)) && (($+commands[notify-send])); then
     local pcmd="$(fc -l -n -1)"
@@ -42,7 +76,25 @@ function prompt_elapsed { local var=$1
   fi
 }
 
+function prompt_submit_rewrite {
+  _prompt_saved_prompt=$PROMPT
+  _prompt_saved_rprompt=$RPROMPT; RPROMPT=''
+  # PROMPT=$'\n'"%F{$_prompt_color}$%f cd %B%F{220}%d%f%b && "
+  # PROMPT=$'\n'"%B[%F{220}%d%f]%b"$'\n'"%F{$_prompt_color}❯%f "
+  PROMPT="%F{$_prompt_color}┌──%f %B%F{220}%d%f%b %F{238}[%D{%H:%M:%S}]%f
+%F{$_prompt_color}└%(!.#.╼)%f "
+
+  zle && zle .reset-prompt
+}
+
 function prompt_precmd {
+  # restore full prompt unconditionally before doing anything else this cycle
+  if [[ -n $_prompt_saved_prompt ]]; then
+    PROMPT=$_prompt_saved_prompt; _prompt_saved_prompt=
+    RPROMPT=$_prompt_saved_rprompt; _prompt_saved_rprompt=
+  fi
+  prompt_git_query
+
   # BAD: any statement before prompt will override "%?"
   #   ALT: local err=$(print -P '%?')
   # BAD: perscent-expansion isn't recursive in PROMPT (and it keeps ANSI as-is)
@@ -59,9 +111,13 @@ function prompt_preexec {
 }
 
 function prompt_setup {
+  prompt_git_init
+
   autoload -Uz add-zsh-hook
   add-zsh-hook preexec prompt_preexec
   add-zsh-hook precmd  prompt_precmd
+  autoload -Uz add-zle-hook-widget
+  add-zle-hook-widget zle-line-finish prompt_submit_rewrite
 
   local color=1
   if [[ $debian_chroot ]]; then color=4
@@ -95,7 +151,10 @@ function prompt_setup {
 
   ## FIXED: disable prompt prefix from <any>/.venv/bin/activate
   VIRTUAL_ENV_DISABLE_PROMPT=1
-  local info=" %F{238}\${\${VIRTUAL_ENV+%B(\$VIRTUAL_ENV)%b}:-%~}%f"
+  # DISABLED:(%~): I mostly don't pay attention to alias hints
+  #   BUT I'm irritated when whole dir path is uselessly repeated
+  # local info=" %F{238}\${\${VIRTUAL_ENV+%B(\$VIRTUAL_ENV)%b}:-%~}%f"
+  local info=" \${_prompt_git_info}%F{238}\${VIRTUAL_ENV+ %B(\$VIRTUAL_ENV)%b}%f"
 
   if [[ $HOST =~ (MINIPC|VD600) ]]; then
     ## NOTE:(disable blinking cursor on WSL2/NUC):
@@ -104,6 +163,15 @@ function prompt_setup {
 
   # FAIL: "%(1V.%F{$color}╸%f%1v.)" prints ANSI escape-sequences literally
   #   ALT:WTF: "${psvar[1]:+%F{$color}╸%f${psvar[1]}}" prints only "}"
+  # PROMPT="%F{$color}┌${nest:-─}%F{$color}─%f %B%F{220}\$(prompt_pwd_unique)%f%b${info}
   PROMPT="%F{$color}┌${nest:-─}%F{$color}─%f %B%F{220}%d%f%b${info}
-%F{$color}└%(!.#.╼)%f "
+%F{$color}└\${_prompt_git_chars}%F{$color}%(!.#.╼)%f "
+
+  # HACK: pre-print prompt on startup to reduce visual delay
+  # NEED:(zshrc/end): print -rn -- $'\e[2F'  # CUP-style: cursor to start of line N-up
+  # print -P -- "$PROMPT"
+
+  ## FAIL: cursor would still jump around before actual prompt
+  #   HACK: save and restore cursor position before printing static content
+  # print -n $'\e[s'"$PROMPT"$'\e[u'$'\e[J'
 }

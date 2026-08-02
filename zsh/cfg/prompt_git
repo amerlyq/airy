@@ -1,0 +1,49 @@
+# vim:ft=zsh
+
+function prompt_git_init {
+  builtin source ${_plugins:?}/gitstatus/gitstatus.plugin.zsh
+  gitstatus_start -s -1 -u -1 -c -1 -d -1 MY  # instance name "MY"; async daemon, one per session
+}
+
+function prompt_git_callback {
+  # called asynchronously by gitstatus when VCS_STATUS_* is ready
+  prompt_git_render
+  zle && zle reset-prompt   # force prompt redraw once data arrives, if mid-edit
+}
+
+# DEBUG:PERF: $ time (gitstatus_query -t -1 MY)
+function prompt_git_query {
+  # fire-and-forget: -t 0 means "don't block, call back later if not ready"
+  gitstatus_query -t 0 -c prompt_git_callback MY
+}
+
+function prompt_git_render {
+  [[ $VCS_STATUS_RESULT == ok-* ]] || { _prompt_git_chars=''; _prompt_git_info=''; return }
+
+  ## one-char status glyphs, in your old order: added, modified, untracked, unmerged, stashed
+  local chars=
+  (( VCS_STATUS_NUM_STAGED     )) && chars+="%B%F{2}+%f%b"  # " +${VCS_STATUS_NUM_STAGED}"
+  (( VCS_STATUS_NUM_UNSTAGED   )) && chars+="%F{220}◯%f"  # " !*${VCS_STATUS_NUM_UNSTAGED}"
+  (( VCS_STATUS_NUM_UNTRACKED  )) && chars+="%F{7}♯%f"    # " ?${VCS_STATUS_NUM_UNTRACKED}"
+  (( VCS_STATUS_NUM_CONFLICTED )) && chars+="%F{5}⚡%f"   # " ~${VCS_STATUS_NUM_CONFLICTED}"
+  (( VCS_STATUS_STASHES        )) && chars+="%F{220}✭%f"  # " *${VCS_STATUS_STASHES}"
+  _prompt_git_chars=$chars
+
+  ## branch/state/ahead-behind/commit info
+  # ALT: local br="${VCS_STATUS_LOCAL_BRANCH:-@${VCS_STATUS_COMMIT[1,8]}}"
+  local info=
+  if [[ -n $VCS_STATUS_LOCAL_BRANCH ]]; then
+    local bcolor=27
+    [[ $VCS_STATUS_LOCAL_BRANCH =~ ^(master|main)$ ]] && bcolor=92
+    info+="%B%F{$bcolor}(${VCS_STATUS_LOCAL_BRANCH//\%/%%})%f%b"
+  else
+    info+="%B%F{15}(%.7${VCS_STATUS_COMMIT})%f%b"
+  fi
+  (( VCS_STATUS_COMMITS_AHEAD  )) && info+="%F{13}▲%f"  # "⇡↑${VCS_STATUS_COMMITS_AHEAD}"
+  (( VCS_STATUS_COMMITS_BEHIND )) && info+="%F{13}▼%f"  # "⇣↓${VCS_STATUS_COMMITS_BEHIND}"
+  # (( VCS_STATUS_PUSH_COMMITS_BEHIND )) && p+=" ⇠${VCS_STATUS_PUSH_COMMITS_BEHIND}"
+  # (( VCS_STATUS_PUSH_COMMITS_AHEAD  )) && p+=" ⇢${VCS_STATUS_PUSH_COMMITS_AHEAD}"
+  [[ -n $VCS_STATUS_ACTION     ]] && info+="%F{7}:%f%B%F{9}${VCS_STATUS_ACTION}%f%b"
+
+  _prompt_git_info=$info
+}

@@ -1,3 +1,5 @@
+# PERF:(startup) $ for i in {1..10}; do time zsh -i -c exit; done
+# PERF:(profiling/beg): zmodload zsh/zprof
 
 [[ ~/.zshrc.zwc -nt ~/.zshrc ]] || zcompile ~/.zshrc
 
@@ -99,6 +101,18 @@ zshaddhistory() { local f
 # if [[ -n $HISTFILE ]] && [[ ! -f $HISTFILE ]] && [[ -d $_audit[d_log] ]]; then
 #   (set +o clobber; <$_audit[d_log]/20??/20??-* > $HISTFILE)
 # fi
+
+
+############################################################
+### Prompt
+_plugins=/d/plugins/zsh
+
+(){ local dcfg=${${(%):-%x}:A:h}
+  # source /d/airy/zsh/arc/prompt.d/path
+  source $dcfg/prompt_git
+  source $dcfg/prompt
+  prompt_setup
+}
 
 ############################################################
 ### TEMP
@@ -213,17 +227,7 @@ bindkey "\e," insert-first-word
 
 
 ############################################################
-### Prompt
-
-(){ local dcfg=${${(%):-%x}:A:h}
-  # source /d/airy/zsh/arc/prompt.d/path
-  source $dcfg/prompt
-  prompt_setup
-}
-
-############################################################
 ### Plugins
-_plugins=/d/plugins/zsh
 
 # DEBUG: $ rm -f ~/.zcompdump; compinit
 fpath=($_plugins/zsh-completions/src $fpath)
@@ -265,3 +269,10 @@ _m=${${:-miur}:c:A:h:h}
 [[ $_m == /usr/* ]] && _m="$_m/share/miur"
 _m=$_m/integ/miur-shell-sync-cwd.zsh
 if [[ -f $_m ]]; then builtin source $_m; fi; unset _m
+
+# HACK: remove pre-printed prompt to replace by actual one
+#   WARN: will overwrite whatever you already typed
+#     and will keep pieces intact if you <CR> in-between prompts
+# print -rn -- $'\e[2F'   # CUP-style: cursor to start of line N-up
+
+# PERF:(profiling/end): zprof

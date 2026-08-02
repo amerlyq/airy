@@ -77,3 +77,20 @@
       zstyle ':completion:*' regular true
     [⡢⣓⣟⠻] Expand aliases with CTRL+SPACE ⌇⡢⣓⣝⣝
       https://gist.github.com/akarzim/557e7b36c538b23dc50fee9f92e09960
+
+
+3h 2026-08-01-Sat-W30
+  [,] 18:40 20m CFG !zsh prompt ⌇⡪⡯⡵⣇
+    * Drop %~ from info — was causing the exact path duplication
+    * Move alias check to precmd — nameddirs match is inherently dynamic, can't be static
+    * [_] Vendor gitstatus.plugin.zsh — daemon avoids per-prompt git forking entirely
+    *   Adopt gitstatusd inotify diffing — incremental status beats repeated git status --porcelain
+    *   Consider zsh-async (mafredri) instead — pure-zsh fallback if avoiding daemon dependency
+    *   Reference sindresorhus/pure — proven async-callback pattern using zsh-async
+    *   Reference agkozak-zsh-prompt — alternate async model, git/venv/vi-mode already integrated
+    * [_] Steal instant-prompt cache hook — hides .zshrc/compinit latency, biggest speed win
+    * [_] Steal transient-prompt zle-line-finish hook — collapses old lines, cleans scrollback/copy-paste
+    * [?] Adopt unique-prefix path truncation — avoids ambiguous identical-looking truncated paths
+    * [$] Test WSL2/inotify fallback — confirm gitstatusd works on MINIPC/VD600 branch
+    * [$] Keep venv/nested logic unchanged — only splice in git/perf pieces, no rewrite
+  [^] 19:50 2h40m Qs CFG !zsh prompt
