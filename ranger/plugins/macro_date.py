@@ -9,13 +9,14 @@
 import time
 
 import ranger.core.actions
+from ranger.core.actions import Actions
 
 # Save the original macro function
 GET_MACROS_OLD = ranger.core.actions.Actions.get_macros
 
 
 # Define a new macro function
-def get_macros_with_date(self):
+def get_macros_with_date(self: Actions) -> dict[str, object]:
     macros = GET_MACROS_OLD(self)
     macros['dt'] = time.strftime('%Y%m%d')
     macros['dT'] = time.strftime('%Y-%m-%d')

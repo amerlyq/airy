@@ -2,9 +2,10 @@
 
 import os
 import re
-from time import strftime, localtime
+from time import localtime, strftime
 
 import ranger.api
+from ranger.container.fsobject import FileSystemObject
 from ranger.core.linemode import LinemodeBase
 
 
@@ -12,10 +13,10 @@ from ranger.core.linemode import LinemodeBase
 class BytesizeLinemode(LinemodeBase):
     name = "bytesize"
 
-    def filetitle(self, f, metadata):
+    def filetitle(self, f: FileSystemObject, metadata: object) -> str:
         return f.relative_path
 
-    def infostring(self, f, metadata):
+    def infostring(self, f: FileSystemObject, metadata: object) -> str:
         if not f.is_directory:
             return str(f.stat.st_size)
         else:
@@ -26,10 +27,10 @@ class BytesizeLinemode(LinemodeBase):
 class HexsizeLinemode(LinemodeBase):
     name = "hexsize"
 
-    def filetitle(self, f, metadata):
+    def filetitle(self, f: FileSystemObject, metadata: object) -> str:
         return f.relative_path
 
-    def infostring(self, f, metadata):
+    def infostring(self, f: FileSystemObject, metadata: object) -> str:
         if not f.is_directory:
             return '%06x' % f.stat.st_size
         else:
@@ -40,7 +41,7 @@ class HexsizeLinemode(LinemodeBase):
 class LinksLinemode(LinemodeBase):
     name = "links"
 
-    def filetitle(self, f, metadata):
+    def filetitle(self, f: FileSystemObject, metadata: object) -> str:
         if not f.is_link:
             return f.relative_path
         try:
@@ -48,17 +49,17 @@ class LinksLinemode(LinemodeBase):
         except:
             dst = '?'
         dst = re.sub('^' + re.escape(os.getenv('HOME')), '~', dst)
-        return '{} → {}'.format(f.relative_path, dst)
+        return f'{f.relative_path} → {dst}'
 
 
 @ranger.api.register_linemode
 class ATimeLinemode(LinemodeBase):
     name = 'atime'
 
-    def filetitle(self, f, metadata):
+    def filetitle(self, f: FileSystemObject, metadata: object) -> str:
         return f.relative_path
 
-    def infostring(self, f, metadata):
+    def infostring(self, f: FileSystemObject, metadata: object) -> str:
         return strftime('%Y-%m-%d %H:%M:%S', localtime(f.stat.st_atime))
 
 
@@ -66,10 +67,10 @@ class ATimeLinemode(LinemodeBase):
 class CTimeLinemode(LinemodeBase):
     name = 'ctime'
 
-    def filetitle(self, f, metadata):
+    def filetitle(self, f: FileSystemObject, metadata: object) -> str:
         return f.relative_path
 
-    def infostring(self, f, metadata):
+    def infostring(self, f: FileSystemObject, metadata: object) -> str:
         return strftime('%Y-%m-%d %H:%M:%S', localtime(f.stat.st_ctime))
 
 
@@ -77,10 +78,10 @@ class CTimeLinemode(LinemodeBase):
 class MTimeLinemode(LinemodeBase):
     name = 'mtime'
 
-    def filetitle(self, f, metadata):
+    def filetitle(self, f: FileSystemObject, metadata: object) -> str:
         return f.relative_path
 
-    def infostring(self, f, metadata):
+    def infostring(self, f: FileSystemObject, metadata: object) -> str:
         return strftime('%Y-%m-%d %H:%M:%S', localtime(f.stat.st_mtime))
 
 
@@ -88,8 +89,8 @@ class MTimeLinemode(LinemodeBase):
 class XPermLinemode(LinemodeBase):
     name = "xperm"
 
-    def filetitle(self, f, metadata):
+    def filetitle(self, f: FileSystemObject, metadata: object) -> str:
         return f.relative_path
 
-    def infostring(self, f, metadata):
+    def infostring(self, f: FileSystemObject, metadata: object) -> str:
         return f.get_permission_string()

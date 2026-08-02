@@ -1,18 +1,18 @@
-# vim: fileencoding=utf-8
 
 import os
 
 import ranger.api
+from ranger.core.fm import FM
 
 old_hook_init = ranger.api.hook_init
 
 
-def get_colorscheme(fm):
+def get_colorscheme(fm: FM) -> str:
     try:
         fpath = os.path.expanduser("~/.config/airy/theme")
         with open(fm.confpath(fpath), "r") as f:
             theme = f.readline()
-    except IOError:
+    except OSError:
         theme = "dark"
 
     theme = {"dark": "solarized", "light": "solarized"}.get(theme, "solarized")
@@ -22,7 +22,7 @@ def get_colorscheme(fm):
     return str(theme)
 
 
-def aura_pathes(fm):
+def aura_pathes(fm: FM) -> None:
     ## Generate key bindings for fast directory jumping
     # fpathes = os.path.expanduser("~/.config/airy/pathes")
     fpathes = "/d/airy/airy/pathes"
@@ -30,7 +30,7 @@ def aura_pathes(fm):
     try:
         with open(fm.confpath(fpathes), "r") as f:
             lst = f.readlines()
-    except IOError:
+    except OSError:
         return fm.notify(fpathes, bad=True)
 
     # FIXME: allow ".#"
@@ -41,7 +41,7 @@ def aura_pathes(fm):
         fm.execute_console("map " + str(e[0]) + " cda " + str(e[1]))
 
 
-def hook_init(fm):
+def hook_init(fm: FM) -> None:
     old_hook_init(fm)
     # fm.execute_console("set colorscheme " + get_colorscheme(fm))
     aura_pathes(fm)

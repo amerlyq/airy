@@ -1,6 +1,9 @@
+import sys
+from collections.abc import Sequence
+
 import ranger.api
 from ranger.api.commands import Command
-import sys
+from ranger.core.fm import FM
 
 old_hook_init = ranger.api.hook_init
 
@@ -12,13 +15,13 @@ class xattr(Command):
     Change file attributes on a Linux file system
     """
 
-    def xattr_set(self, mode, f):
+    def xattr_set(self, mode: str, f: str | Sequence[str]) -> None:
         if not isinstance(f, list):
             f = [f]
         # XXX: chattr != os.setxattr
         self.fm.execute_command(['chattr', mode] + f)
 
-    def xattr_toggle(self, value, files):
+    def xattr_toggle(self, value: str, files: str | Sequence[str]) -> None:
         from ranger.container.fsobject import FileSystemObject
         xattr_get = FileSystemObject.linemode_dict['xattr'].xattr_get
         for f in (files if isinstance(files, list) else [files]):
@@ -30,7 +33,7 @@ class xattr(Command):
                 t = '-' if c in cv else '+'
                 self.xattr_set(t + c, f)
 
-    def execute(self):
+    def execute(self) -> None:
         if not self.arg(1) or not self.arg(1)[1:]:
             return self.fm.notify("Need xattr value: '+-=[...]'", bad=True)
 
@@ -60,7 +63,7 @@ class xattr(Command):
             return self.fm.notify("Wrong xattr modifier", bad=True)
 
 
-def hook_init(fm):
+def hook_init(fm: FM) -> None:
     old_hook_init(fm)
     fm.commands.load_commands_from_module(sys.modules[__name__])
 

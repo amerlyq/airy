@@ -3,6 +3,7 @@
 import os
 
 import ranger.container.directory
+from ranger.container.fsobject import FileSystemObject
 
 old_accept_file = ranger.container.directory.accept_file
 
@@ -30,7 +31,7 @@ HIDE_FILES = [
 
 
 # Define a new one
-def custom_accept_file(file, filters):
+def custom_accept_file(file: FileSystemObject, filters: object) -> bool:
     if not file.fm.settings.show_hidden and file.path in HIDE_FILES:
         return False
     else:

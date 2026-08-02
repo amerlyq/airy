@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 ranger imgfollow for imv — smooth navigation via index (no black blink)
 
@@ -39,12 +38,13 @@ import mimetypes
 import os
 import socket
 import time
+from collections.abc import Sequence
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import TypedDict
 
 import ranger.api  # for hook chaining
 from ranger.core.fm import FM
-from ranger.ext.keybinding_parser import KeyBuffer, parse_keybinding
+from ranger.ext.keybinding_parser import parse_keybinding
 from ranger.ext.signals import Signal
 
 DEBOUNCE_MS = 60
@@ -62,7 +62,14 @@ _last_path = ""
 _orig_i_num = 0
 _orig_i = ""
 _changed_i = False
-_state = {
+class ImvState(TypedDict):
+    sock: str
+    list_hash: int
+    thisdir: str
+    paths: tuple[str, ...]
+
+
+_state: ImvState = {
     "sock": "",  # newest socket path
     "list_hash": 0,  # hash of visible image list
     "thisdir": "",
@@ -97,7 +104,7 @@ def _looks_like_image(path: str) -> bool:
     }
 
 
-def _newest_imv_socket() -> Optional[str]:
+def _newest_imv_socket() -> str | None:
     rt = _xdg_runtime_dir()
     try:
         entries = list(Path(rt).glob(SOCKET_GLOB))
@@ -141,7 +148,7 @@ def _send_line(sock_path: str, line: str) -> bool:
             pass
 
 
-def _hash_paths(paths: List[str]) -> str:
+def _hash_paths(paths: Sequence[str]) -> str:
     h = hashlib.sha1()
     for p in paths:
         h.update(p.encode("utf-8", "surrogateescape"))
@@ -185,7 +192,7 @@ def _hash_paths(paths: List[str]) -> str:
 #     flush(cur)
 
 
-def _sync_playlist(sock: str, paths: List[str]) -> None:
+def _sync_playlist(sock: str, paths: Sequence[str]) -> None:
     """Replace imv playlist with these paths, preserving order (one open per file)."""
     _send_line(sock, "close all")
     if not paths:

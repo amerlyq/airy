@@ -2,9 +2,9 @@
 # ":set sort=random" or create a key binding with ":map oz set sort=random"
 
 import os
-import os.path as fs
 
 from ranger.container.directory import Directory
+from ranger.container.fsobject import FileSystemObject
 
 Directory.sort_dict["from_end"] = lambda x: x.relative_path[::-1]
 Directory.sort_dict["name_len"] = lambda x: (len(x.relative_path), x.relative_path)
@@ -15,7 +15,7 @@ Directory.sort_dict["lctime"] = lambda x: -(os.lstat(x.path).st_ctime or 1)
 #   t = nm(x).rpartition('-');
 
 
-def sort_suffix(x, s, longest=False):
+def sort_suffix(x: FileSystemObject, s: str, longest: bool = False) -> str:
     nm = x.relative_path
     t = nm.partition(s) if longest else nm.rpartition(s)
     return t[2] if t[1] else ""
@@ -67,10 +67,10 @@ else:
     class DurationLinemode(LinemodeBase):
         name = "duration"
 
-        def filetitle(self, f, metadata):
+        def filetitle(self, f: FileSystemObject, metadata: object) -> str:
             return f.relative_path
 
-        def infostring(self, f, metadata):
+        def infostring(self, f: FileSystemObject, metadata: object) -> str:
             if not f.is_file or not (f.video or f.audio):
                 return self._get_default_infostring(f, metadata)
 
@@ -87,7 +87,9 @@ else:
             m, s = divmod(s, 60)
             return (f"{m}:" if m else "") + f"{s:02d}.{ms:03d}"
 
-        def _get_default_infostring(self, f, metadata):
+        def _get_default_infostring(
+            self, f: FileSystemObject, metadata: object
+        ) -> str:
             # OR: return DefaultLinemode().infostring(f, metadata)
 
             # 1. Fetch default mode string (usually "filename" or whatever DEFAULT_LINEMODE is)

@@ -3,6 +3,7 @@ from enum import Enum, auto
 
 import ranger.gui.context as ctx
 import ranger.gui.widgets.browsercolumn as B
+from ranger.container.fsobject import FileSystemObject
 
 
 class CustomKeys(Enum):
@@ -26,7 +27,9 @@ for key in CustomKeys:
 OLD_HOOK_BEFORE_DRAWING = B.hook_before_drawing
 
 
-def new_hook_before_drawing(fsobj, color_list):
+def new_hook_before_drawing(
+    fsobj: FileSystemObject, color_list: list[str]
+) -> list[str]:
     nm = fsobj.basename
     if fsobj.is_link:
         try:

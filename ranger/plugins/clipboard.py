@@ -8,15 +8,16 @@ import os
 from subprocess import PIPE, CalledProcessError, run
 
 import ranger.api
+from ranger.core.fm import FM
 from ranger.ext.shell_escape import shell_quote
 
 old_hook_init = ranger.api.hook_init
 
 
-def hook_init(fm):
+def hook_init(fm: FM) -> None:
     old_hook_init(fm)
 
-    def _xc(**kw):
+    def _xc(**kw: object) -> str:
         kw.setdefault("check", True)
         kw.setdefault("stdout", PIPE)
         try:
