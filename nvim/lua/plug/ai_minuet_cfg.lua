@@ -136,19 +136,19 @@ vim.keymap.set('n', '<leader>ct', '<cmd>Minuet virtualtext toggle<cr>', { desc =
 -- returns the normal insert-mode <C-f> character-forward command instead.
 local vact = require('minuet.virtualtext').action
 
-vim.keymap.set('i', '<C-c>', function()
+vim.keymap.set('i', '<C-[>', function()
   if vact.is_visible() then vact.dismiss(); return '' end
-  return vim.keycode('<C-c>')
+  return vim.keycode('<C-[>')
 end, { expr = true, desc = '[minuet] dismiss FIM or escape' })
 
-vim.keymap.set('i', '<C-e>', function()
+vim.keymap.set('i', '<C-]>', function()
   if vact.is_visible() then vact.accept(); return '' end
-  return vim.keycode('<C-e>')
+  return vim.keycode('<C-]>')
 end, { expr = true, desc = '[minuet] accept whole FIM or move to end' })
 
-vim.keymap.set('i', '<C-f>', function()
+vim.keymap.set('i', '<C-;>', function()
   if vact.is_visible() then vact.accept_line(); return '' end
-  return vim.keycode('<C-f>')
+  return vim.keycode('<C-;>')
 end, { expr = true, desc = '[minuet] accept line FIM or move forward' })
 
 

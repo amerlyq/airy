@@ -17,6 +17,7 @@ case $o in :|'?') exit 2
 esac; done; shift $((OPTIND-1)); unset o
 
 
+# BET? $ mkdir -p /t/vd_cvt && sshfs lf:/cache/vd_cvt /t/vd_cvt -o kernel_cache -o compression=no
 # TRY: REMOTE-cvt:
 # ONELINE: $ ssh lf 'ffmpeg ... -i pipe:0 ... -f mp4 pipe:1' < local_input.mp4 > local_output.mp4
 #   [?] BET:DEV: python ThreadPool() watching a dir to parallelize queue of jobs=5 (measure)
