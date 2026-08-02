@@ -32,3 +32,96 @@ TODO
       $ sudo netctl-auto switch-to wifi_dir620
     networking - netctl not auto-connecting consistently - Unix & Linux Stack Exchange ⌇⡦⣗⢉⢀
       https://unix.stackexchange.com/questions/189282/netctl-not-auto-connecting-consistently
+
+
+2h35m 2026-08-01-Sat-W30
+  [^] 05:15 2h35m <env> FIND: WTF why my wifi is only 24MiB/s ⌇⡪⡮⣌⠇
+    INFO: Intel AX201 is a 2x2 (2-stream) WiFi 6 adapter — max theoretical 5GHz
+    link rate ~1200 Mbps (MCS11, 2SS, 80MHz, 1024-QAM), but that's negotiated
+    with a WiFi 6 AP. Against your RT-AC68U (WiFi 5/AC only, no 802.11ax),
+    it'll connect at up to 866 Mbps PHY rate (AC, 2SS, 80MHz).
+    :Practical throughput: expect roughly 400-550 Mbps real-world on a good link.
+      $ lspci -k | grep -A3 -i network
+      $ sudo lspci -vvv -s 0000:00:14.3
+      $ iw phy
+      $ iw dev wlan0 link
+      $ ethtool enp67s0
+    PERF
+      #fra $ iperf3 -s
+      #hpx $ iperf3 -c 192.168.1.4 -t 30 -i 5 --bidir
+    INFO: Connected to 10:c3:7b:55:63:94 (on wlan0)
+      SSID: home5
+      freq: 5500.0
+      RX: 7396145 bytes (14503 packets)
+      TX: 1500859 bytes (12520 packets)
+      signal: -47 dBm
+      rx bitrate: 433.3 MBit/s VHT-MCS 9 80MHz short GI VHT-NSS 1
+      tx bitrate: 234.0 MBit/s VHT-MCS 3 80MHz VHT-NSS 2
+      bss flags: short-slot-time
+      dtim period: 3
+      beacon int: 100
+      ---
+        Now you're on 5GHz, and this is informative: RX is NSS 1 (single
+        stream, 433.3 Mbit/s) but TX is NSS 2 (dual stream, but only MCS3 = 234
+        Mbit/s). That asymmetry means the link isn't running at full 2x2
+        quality in both directions — likely a weaker path or interference on
+        the router's RX side, despite your strong -47 dBm signal.
+         Max you should be seeing with a clean 2x2 link at 80MHz/short-GI is
+         866.7 Mbit/s (VHT-MCS9, NSS2) — you're getting roughly half that on RX,
+         and TX is stuck at a low MCS despite using both streams.
+        Worth checking: watch -n1 'iw dev wlan0 link' to see if rates fluctuate —
+        could indicate intermittent interference (2.4GHz/microwave/neighbors)
+        rather than a hard ceiling.
+         Related if relevant: forcing/checking 80MHz channel isn't overlapping
+         with neighbors (iw dev wlan0 scan for co-channel APs), driver
+         power-save (iw dev wlan0 get power_save) throttling iwlwifi, physical
+         obstruction/angle to router antennas.
+    [✓] TODO: plug pc into LAN
+      [✗] INFO: (b) Transfer through both simultaneously (link aggregation/bonding) —
+        not possible here. Bonding/LACP requires the switch/router to support 802.3ad on its ports;
+        the RT-AC68U's switch doesn't support LACP. Without router-side support,
+        you can't combine WiFi + Ethernet bandwidth for a single transfer to one peer.
+      $ sudo ethtool enp67s0 | grep -iE "speed|duplex"
+        Speed: 1000Mb/s
+        Duplex: Full
+      $ ip -s link show enp67s0
+      $ ethtool -S enp67s0 | grep -iE "error|crc|drop|discard|fifo|frame" Gv '0$'
+       rx_crc_errors: 2431
+       rx_errors: 2885
+    [≈] switch wifi off when on LAN
+      ⁘ MAYBE: profile crashes due to *Post hooks, picking a fallback?
+      $ cat /usr/lib/systemd/system/netctl-ifplugd@.service
+      $ ls /etc/netctl/interfaces/
+      $ systemctl enable netctl-ifplugd@enp67s0.service
+      # $ systemctl enable netctl-ifplugd@enp69s0.service
+      #   << NEED: profile
+      $ dhcpcd --help | grep -i metric
+    [*] Disable ASUS QoS: Turn off Quality of Service (QoS) or Traffic Analyzer
+      settings in the ASUSWRT firmware dashboard, as the router's older CPU can
+      bottleneck local high-speed transfers when these are active.
+    [!] WTF: Bad/damaged/marginal cable
+      * Bad/damaged/marginal cable — most common cause by far. Even a cable that "looks fine" can have a kinked or crushed section, a bad crimp on the connector, or be borderline for Cat5e/Cat6 spec.
+      * Cable run too long or routed alongside power lines/other interference sources (fluorescent ballasts, motors, etc.)
+      * Bad port on either end (NIC or router LAN port) — connector wear, oxidation, etc.
+      * Wrong/degraded category cable for sustained Gigabit — Cat5 can technically link at 1000Mb/s but is out-of-spec and prone to exactly this under load
+
+
+2h30m 2026-08-02-Sun-W30
+  g82 [X] 16:10 2h30m FIND: другой LAN кабель для #fra ※⡪⡮⣌⠇ ⌇⡪⡯⡶⠖
+    ⁘ ок, наконец хотя бы 50MiB/s
+    [✓] #hpx FIND: другой HDMI-only кабель (на случаи когда ноут слишком разряжается)
+    [X] route through LAN by default BUT which do I run -- dhcp or not ?
+      $ ps aux | grep -E 'dhcpcd|dhclient'
+        dhcpcd      2397  0.0  0.0  12512  2620 ?        Ss   16:19   0:00 dhcpcd: enp67s0 [ip4]
+      $ ip route show | grep proto
+        default via 192.168.1.1 dev enp67s0 proto dhcp src 192.168.1.4 metric 1002
+        192.168.1.0/24 dev wlo2 proto kernel scope link src 192.168.1.14
+        192.168.1.0/24 dev enp67s0 proto dhcp scope link src 192.168.1.4 metric 1002
+    [✓] CHECK: tx/rx errors
+      ⁘ нужен был короче кабель
+    [✓] how to make ifplugd use static eth profile
+    [≈] how to make it work for static eth too
+    [✗] TRY:AGAIN: switch wifi off when on LAN
+      ⁘ no sense, doesn't interfere
+    [≈] CHECK: how to eth errors in long cable bw dir620 and mediaconverter for optics
+      [>] WAIT: накопить статистику в web-ui dir620 и посмотреть пару дней спустя
