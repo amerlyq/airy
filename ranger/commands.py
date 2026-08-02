@@ -1,11 +1,35 @@
+from __future__ import annotations
+
 import os
 import re
+from collections.abc import Callable, Iterable, Sequence
 from os import path as fs
-from typing import cast
+from re import Pattern
+from typing import ClassVar, Protocol, TypeAlias, cast
 
 from ranger.api.commands import Command
 from ranger.core.fm import FM
 from ranger.ext.shell_escape import shell_quote
+
+CommandLine: TypeAlias = str | list[str]
+CommandSpec: TypeAlias = tuple[CommandLine, str]
+CompletionResult: TypeAlias = str | Iterable[str] | None
+
+
+class DirectoryEntry(Protocol):
+    """The filesystem-object surface needed by recursive filtering."""
+
+    is_directory: bool
+
+
+class FilterableDirectory(Protocol):
+    """The directory surface used by ``ag._filter`` and ``unfilter``."""
+
+    filter: object | None
+    temporary_filter: Pattern[str] | None
+    files_all: Sequence[DirectoryEntry] | None
+
+    def refilter(self) -> None: ...
 
 # HACK:FIXME: wide icons (OR: narrow font)
 # os.environ["RANGER_DEVICONS_SEPARATOR"]="  "
@@ -20,16 +44,19 @@ from ranger.ext.shell_escape import shell_quote
 
 
 # NOTE: jump to next day only at 7:00AM
-def today_date(delta=7):
+def today_date(delta: int = 7) -> str:
     import datetime
 
-    return (datetime.datetime.now() - datetime.timedelta(hours=delta)).strftime(
+    return (
+        datetime.datetime.now(datetime.timezone.utc).astimezone()
+        - datetime.timedelta(hours=delta)
+    ).strftime(
         "%Y-%m-%d"
     )
 
 
 # BAD: ranger crash on exit if '--choosedir' path was deleted by 3rd party
-def tmpfile(nm):
+def tmpfile(nm: str) -> str:
     ge = os.getenv
     tmp = ge(
         "RANGER_TMPDIR",
@@ -47,13 +74,13 @@ class ag(Command):
     Looks for a string in all marked paths or current dir
     """
 
-    editor = os.getenv("EDITOR") or "vim"
-    acmd = "rg --pcre2 --smart-case --color always --hidden"  # --search-zip
-    qarg = re.compile(r"""^(".*"|'.*')$""")
-    patterns = []
+    editor: ClassVar[str] = os.getenv("EDITOR") or "vim"
+    acmd: ClassVar[str] = "rg --pcre2 --smart-case --color always --hidden"  # --search-zip
+    qarg: ClassVar[Pattern[str]] = re.compile(r"""^(".*"|'.*')$""")
+    patterns: ClassVar[list[str]] = []
     # THINK:USE: set_clipboard on each direct ':ag' search? So I could find in vim easily
 
-    def _sel(self):
+    def _sel(self) -> list[str]:
         d = self.fm.thisdir
         if d.marked_items:
             return [f.relative_path for f in d.marked_items]
@@ -63,30 +90,30 @@ class ag(Command):
             return [f.relative_path for f in d.files]
         return []
 
-    def _arg(self, i=1):
+    def _arg(self, i: int = 1) -> str:
         if self.rest(i):
             ag.patterns.append(self.rest(i))
         return ag.patterns[-1] if ag.patterns else ""
 
-    def _quot(self, patt):
+    def _quot(self, patt: str) -> str:
         return patt if ag.qarg.match(patt) else shell_quote(patt)
 
-    def _bare(self, patt):
+    def _bare(self, patt: str) -> str:
         return patt[1:-1] if ag.qarg.match(patt) else patt
 
-    def _aug_vim(self, iarg, comm="Ag"):
+    def _aug_vim(self, iarg: int, comm: str = "Ag") -> CommandSpec:
         if self.arg(iarg) == "-Q":
             self.shift()
             comm = "sil AgSet def.e.literal 1|" + comm
         # patt = self._quot(self._arg(iarg))
         patt = self._arg(iarg)  # No need to quote in new ag.vim
         # FIXME:(add support)  'AgPaths' + self._sel()
-        cmd = " ".join([comm, patt])
+        cmd = f"{comm} {patt}"
         cmdl = [ag.editor, "-c", cmd, "-c", "only"]
         return (cmdl, "")
 
-    def _aug_nvr(self, iarg, group=None):
-        cmdl = "rg --pcre2 --smart-case --hidden".split()
+    def _aug_nvr(self, iarg: int, group: bool | None = None) -> CommandSpec:
+        cmdl = ["rg", "--pcre2", "--smart-case", "--hidden"]
         if group:
             cmdl += ["--column"]
         else:
@@ -128,8 +155,8 @@ class ag(Command):
             ]
         return (" ".join(cmdl), "")
 
-    def _aug_sh(self, iarg, flags=[]):
-        cmdl = ag.acmd.split() + flags
+    def _aug_sh(self, iarg: int, flags: Sequence[str] = ()) -> CommandSpec:
+        cmdl = ag.acmd.split() + list(flags)
         if iarg == 1:
             import shlex
 
@@ -151,7 +178,7 @@ class ag(Command):
             cmdl += self._sel()
         return (cmdl, "-p")
 
-    def _choose(self):
+    def _choose(self) -> CommandSpec:
         if self.arg(1) == "-v":
             return self._aug_nvr(2, False)
         elif self.arg(1) == "-g":
@@ -169,7 +196,7 @@ class ag(Command):
         else:
             return self._aug_sh(1)
 
-    def _catch(self, cmd):
+    def _catch(self, cmd: CommandLine) -> list[str] | None:
         from subprocess import CalledProcessError, check_output
 
         try:
@@ -182,19 +209,30 @@ class ag(Command):
     # DEV
     # NOTE: regex becomes very big for big dirs
     # BAD: flat ignores 'filter' for nested dirs
-    def _filter(self, lst, thisdir):
+    def _filter(
+        self, lst: Sequence[str] | None, thisdir: FilterableDirectory | None = None
+    ) -> None:
         # filter /^rel_dir/ on lst
         # get leftmost path elements
         # make regex '^' + '|'.join(re.escape(nm)) + '$'
+        if not lst:
+            return
+        if thisdir is None:
+            thisdir = cast(FilterableDirectory | None, self.fm.thisdir)
+        if thisdir is None:
+            return
+        file_with_matches = r"^(?:" + "|".join(map(re.escape, lst)) + r")$"
         thisdir.temporary_filter = re.compile(file_with_matches)
         thisdir.refilter()
 
+        if thisdir.files_all is None:
+            return
         for f in thisdir.files_all:
             if f.is_directory:
                 # DEV: each time filter-out one level of files from lst
-                self._filter(lst, f)
+                self._filter(lst, cast(FilterableDirectory, cast(object, f)))
 
-    def execute(self):
+    def execute(self) -> None:
         cmd, flags = self._choose()
         # self.fm.notify(cmd)
         # TODO:ENH: cmd may be [..] -- no need to shell_escape
@@ -203,18 +241,18 @@ class ag(Command):
         else:
             self._filter(self._catch(cmd))
 
-    def tab(self):
+    def tab(self, tabnum: int) -> list[str]:  # pyright: ignore[reportIncompatibleMethodOverride]
         # BAD:(:ag <prev_patt>) when input alias ':agv' and then <Tab>
         #   <= EXPL: aliases expanded before parsing cmdline
         cmd = self.arg(0)
         flg = self.arg(1)
         if flg[0] == "-" and flg[1] in "flvgprw":
             cmd += " " + flg
-        return ["{} {}".format(cmd, p) for p in reversed(ag.patterns)]
+        return [f"{cmd} {p}" for p in reversed(ag.patterns)]
 
 
 class doc(Command):
-    lst = {
+    lst: ClassVar[dict[str, str]] = {
         "a": "ARCH",
         "b": "DEBUG",
         "c": "CHGLOG",
@@ -237,8 +275,8 @@ class doc(Command):
         "z": "SEIZE",
         ".": ".",
     }
-    ext = [".nou", ".rst", ".otl", ".md", ".txt", ""]
-    loci = ["doc", "docs", "_doc", "todo", ""]
+    ext: ClassVar[list[str]] = [".nou", ".rst", ".otl", ".md", ".txt", ""]
+    loci: ClassVar[list[str]] = ["doc", "docs", "_doc", "todo", ""]
     """:doc [<name>]
     Search and open appropriate metafile in one of choosen directories
     """
@@ -246,14 +284,14 @@ class doc(Command):
     # TODO: find existing file with any extension.
     # NEED: priority if exists multiple files with same extension
     # -- Though ext=.nou is preferred and default when creating new file.
-    def _nearest(self, pwd, nm, fvalidate):
+    def _nearest(self, pwd: str, nm: str, fvalidate: Callable[[str], bool]) -> str | None:
         for d in doc.loci:
             for e in doc.ext:
                 path = fs.join(pwd, d, nm + e)
                 if fvalidate(path):
                     return path
 
-    def execute(self):
+    def execute(self) -> None:
         nm = self.arg(1) if self.arg(1) else doc.lst["t"]
         if nm == ".":
             # NEED: copy "_tmpl/worklog" instead of using empty file
@@ -262,7 +300,7 @@ class doc(Command):
             #   => relative symlink will be commited in GIT containing date of commit -- nice historical bisect
             nm = today_date()
         if self.quantifier is not None:
-            nm = "{}_{:02d}".format(nm, self.quantifier)
+            nm = f"{nm}_{self.quantifier:02d}"
         pwd = self.fm.thisdir.path
         path = self._nearest(pwd, nm, fs.isfile)
         # WARNING: opens nested editor if file don't exists!
@@ -276,25 +314,25 @@ class doc(Command):
             path = self._nearest(pwd, nm, lambda x: fs.isdir(fs.dirname(x)))
             self.fm.edit_file(path)
 
-    def tab(self):
+    def tab(self, tabnum: int) -> list[str]:  # pyright: ignore[reportIncompatibleMethodOverride]
         return ["doc " + nm for nm in doc.lst.values()]
 
 
 # NOTE:NEED: in ~/.bashrc or ~/.zshrc save $PWD (not pwd) on trap EXIT
 class cd_shelldir(Command):
-    lastdir = tmpfile("cwd")
+    lastdir: ClassVar[str] = tmpfile("cwd")
     """:cd_shelldir
     Goes to path from /tmp/<username>/ranger/cwd
     """
 
-    def execute(self):
+    def execute(self) -> None:
         try:
             fname = self.fm.confpath(cd_shelldir.lastdir)
             with open(fname, "r+") as f:
                 path = f.readline().rstrip()
                 f.seek(0)
                 f.truncate()
-        except IOError:
+        except OSError:
             return self.fm.notify(cd_shelldir.lastdir, bad=True)
 
         # FIXED: expanded pwd symlink teleporting
@@ -303,19 +341,20 @@ class cd_shelldir(Command):
         if path != fs.realpath(self.fm.thisdir.path) and fs.exists(path):
             self.fm.cd(path)
 
-    def tab(self):
-        return self._tab_directory_content()  # Generic function
+    def tab(self, tabnum: int) -> CompletionResult:  # pyright: ignore[reportIncompatibleMethodOverride]
+        return cast(CompletionResult, self._tab_directory_content())  # Generic function
 
 
 class cd_gitroot(Command):
-    def execute(self):
+    def execute(self) -> None:
         from subprocess import CalledProcessError, check_output
 
         try:
             # cd fm.thisdir.path
             out = check_output(["git", "rev-parse", "--show-toplevel"])
-        except CalledProcessError:
-            return self.fm.notify("cd_gitroot: " + out, bad=True)
+        except CalledProcessError as error:
+            self.fm.notify(f"cd_gitroot: {error}", bad=True)
+            return
         else:
             path = out[:-1].decode("utf-8")
 
@@ -325,7 +364,7 @@ class cd_gitroot(Command):
 
 # Auto cd
 class cda(Command):
-    def execute(self):
+    def execute(self) -> None:
         if self.arg(1) and self.arg(1)[0] == "-":
             flags = self.arg(1)[1:]
             path = self.rest(2)
@@ -373,16 +412,14 @@ class cda(Command):
 
         if fs.isdir(path):
             self.fm.cd(path)
-        elif fs.isfile(path):
-            self.fm.select_file(path)
-        elif fs.islink(path):
+        elif fs.isfile(path) or fs.islink(path):
             self.fm.select_file(path)
         else:
             self.fm.select_file(path)
 
 
 class df(Command):
-    def execute(self):
+    def execute(self) -> int | None:  # pyright: ignore[reportIncompatibleMethodOverride]
         fls = None
         flags = ""
         if self.arg(1) and self.arg(1)[0] == "-":
@@ -443,9 +480,9 @@ class df(Command):
 
 
 class nrenum(Command):
-    bmrk = re.compile(r"(.*)\{(\d+)([^}]+?)(\d+)\}$")
+    bmrk: ClassVar[Pattern[str]] = re.compile(r"(.*)\{(\d+)([^}]+?)(\d+)\}$")
 
-    def execute(self):
+    def execute(self) -> None:
         istotal = self.arg(1)[0:2] == "-t"
         if istotal:
             self.shift()
@@ -463,7 +500,7 @@ class nrenum(Command):
         if ready == total:
             if state.startswith("@"):
                 ready += chg if not istotal else 0
-                total += chg if chg > 0 else 0
+                total += max(0, chg)
         elif ready > total:
             if state.startswith("@"):
                 total = ready if chg > 0 else total
@@ -473,32 +510,29 @@ class nrenum(Command):
             else:
                 ready += chg
 
-        if ready < 0:
-            ready = 0
-        if total < 0:
-            total = 0
+        ready = max(ready, 0)
+        total = max(total, 0)
 
         if state.endswith("#") and ready == total:
             state = state[:-1] + "$"
         elif state.endswith("$") and ready < total:
             state = state[:-1] + "#"
 
-        nm = "{:s}{{{:d}{:s}{:d}}}".format(name, total, state, ready)
-        return self.fm.execute_console("rename " + nm)
+        nm = f"{name:s}{{{total:d}{state:s}{ready:d}}}"
+        self.fm.execute_console("rename " + nm)
 
 
 class actualee(Command):
-    FLST = tmpfile("buffer")
+    FLST: ClassVar[str] = tmpfile("buffer")
     """:actualee
     Use '~/.local/bin/actually' to apply secondary action to file/list
     """
 
-    def execute(self):
+    def execute(self) -> None:
         cur = self.fm.thisfile
-        if cur.is_file:
-            if "x" in cur.get_permission_string():
-                self.fm.execute_command(cur.path)
-                return
+        if cur.is_file and "x" in cur.get_permission_string():
+            self.fm.execute_command(cur.path)
+            return
 
         cmd = ["actualee"]
 
@@ -522,8 +556,8 @@ class actualee(Command):
         else:
             self.fm.move(right=1)
 
-    def tab(self):
-        return self._tab_directory_content()
+    def tab(self, tabnum: int) -> CompletionResult:  # pyright: ignore[reportIncompatibleMethodOverride]
+        return cast(CompletionResult, self._tab_directory_content())
 
 
 class console(Command):
@@ -532,14 +566,14 @@ class console(Command):
     Open the console with the given command.
     """
 
-    def execute(self):
+    def execute(self) -> None:
         pos = None
         if self.arg(1)[0:2] == "-p":
             try:
                 pos = int(self.arg(1)[2:])
                 self.shift()
-            except:
-                pass
+            except ValueError:
+                pos = None
 
         command = self.rest(1)
         # if pos is None or int(pos) > len(command):
@@ -555,7 +589,7 @@ class mvsel(Command):
     Move files from current selection to dir on cmdline (OR one of bookmarks)
     """
 
-    def execute(self):
+    def execute(self) -> None:
         dest = self.rest(1)
         self.fm.cut()
         self.fm.paste(dest=dest)
@@ -569,7 +603,7 @@ class flat_inode(Command):
         <quantifier> augments missing argument: level or [fdl] bitmask
     """
 
-    def q_inode_mask(self, q):
+    def q_inode_mask(self, q: int | None) -> str:
         return (
             ""
             if q is None
@@ -578,10 +612,10 @@ class flat_inode(Command):
             + ("l" if q & 0x4 else "")
         )
 
-    def q_flat(self, q):
+    def q_flat(self, q: int | None) -> int:
         return -1 if self.quantifier is None else self.quantifier
 
-    def execute(self):
+    def execute(self) -> None:
         toggle = self.arg(1) == "-t"
         if toggle:
             self.shift()
@@ -600,7 +634,7 @@ class flat_inode(Command):
         cmd = "chain filter_inode_type " + t + "; flat " + str(q)
         self.fm.execute_console(cmd)
 
-    def tab(self):
+    def tab(self, tabnum: int) -> list[str]:  # pyright: ignore[reportIncompatibleMethodOverride]
         return ["flat_inode " + t for t in "dfl"]
 
 
@@ -610,7 +644,7 @@ class edit(Command):
     Opens the specified file in vim
     """
 
-    def execute(self):
+    def execute(self) -> None:
         if not self.arg(1):
             self.fm.edit_file(self.fm.thisfile.path)
         # BAD: don't work
@@ -619,14 +653,14 @@ class edit(Command):
         else:
             self.fm.edit_file(self.rest(1))
 
-    def tab(self):
-        return self._tab_directory_content()
+    def tab(self, tabnum: int) -> CompletionResult:  # pyright: ignore[reportIncompatibleMethodOverride]
+        return cast(CompletionResult, self._tab_directory_content())
 
 
 class mkdircd(Command):
     """:md <dirname> OR :mkdircd <dirname>"""
 
-    def execute(self):
+    def execute(self) -> None:
         nm = self.rest(1)
         self.fm.mkdir(nm)
         # BAD: cursor isn't moved to new dir
@@ -634,12 +668,12 @@ class mkdircd(Command):
         # self.fm.select_file(fs.join(self.fm.thisdir.path, nm))
         # self.fm.move(right=1)
 
-    def tab(self, tabnum):
-        return self._tab_directory_content()
+    def tab(self, tabnum: int) -> CompletionResult:  # pyright: ignore[reportIncompatibleMethodOverride]
+        return cast(CompletionResult, self._tab_directory_content())
 
 
 class unfilter(Command):
-    def unfilter(self, d):
+    def unfilter(self, d: FilterableDirectory) -> None:
         # BAD: d.files_all == None ???
         # [self.unfilter(f) for f in d.files_all if f.is_directory]
         d.filter = None
@@ -648,8 +682,8 @@ class unfilter(Command):
         #     if f.is_directory:
         #         self.unfilter(f)
 
-    def execute(self):
-        self.unfilter(self.fm.thisdir)
+    def execute(self) -> None:
+        self.unfilter(cast(FilterableDirectory, self.fm.thisdir))
 
 
 class cd_symlink1(Command):
@@ -685,7 +719,11 @@ class cd_symlink1(Command):
         )
 
         # 3. Truncate forward history if we moved back with 'H'
-        history = fm.thistab.history
+        tab = fm.thistab
+        if tab is None:
+            fm.notify("No active tab!", bad=True)
+            return
+        history = tab.history
         if history and history.index < len(history) - 1:
             # history.container = history.container[: history.index + 1]
             # history._list = history._list[: history.index + 1]
