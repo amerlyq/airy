@@ -2,10 +2,13 @@ from airy.api import Pkg, cp
 
 Pkg("dictd")
 
+# For nvim https://github.com/Kaiser-Yang/blink-cmp-dictionary
+Pkg("words")
+Aur("dict-moby-thesaurus")
+
 ## OR:
 # Aur("goldendict-webengine-git")
 # Aur("goldendict-enruen-content")
-
 
 
 cp("cfg/colorit.conf", under="/etc/dict")

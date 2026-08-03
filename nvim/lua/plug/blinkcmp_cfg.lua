@@ -139,18 +139,46 @@ local cfg = {
   },
 
   sources = {
-    default = { 'lsp', 'path', 'snippets', 'buffer'},
+    default = { 'lsp', 'path', 'snippets', 'buffer', 'dictionary'}, --
     -- Match the old nvim-cmp Python setup: no buffer/path noise for members.
     -- per_filetype = { python = { 'lsp', 'snippets' } },
-  },
+    providers = {
+    -- Optional but highly recommended: adjust weights so paths don't crowd LSP completions
+    --   lsp = { score_offset = 90 },
+    --   path = { score_offset = 80 },
+    --   snippets = { score_offset = 70 },
+    --   buffer = { score_offset = 50 },
 
-  -- -- Optional but highly recommended: adjust weights so paths don't crowd LSP completions
-  -- providers = {
-  --   lsp = { score_offset = 90 },
-  --   path = { score_offset = 80 },
-  --   snippets = { score_offset = 70 },
-  --   buffer = { score_offset = 50 },
-  -- },
+      -- DEBUG: :lua print(vim.inspect(require('blink.cmp.config').sources.providers))
+      dictionary = {
+        -- SRC:※⡪⡰⣂⡗ https://github.com/Kaiser-Yang/blink-cmp-dictionary
+        module = 'blink-cmp-dictionary',
+        name = 'Dict',
+        min_keyword_length = 1,  -- NEED: >=3 for (rg/grep) PERF
+        -- max_items = 8, -- blink-cmp-dictionary will inherit this, the default is 100
+        opts = {
+          force_fallback = false,  -- Try rg/grep instead of fallback when fzf is not found
+          -- WARN: No dedup, so avoid overlapping wordlists.
+          dictionary_files = {
+            -- ALT? https://github.com/dwyl/english-words
+            -- DEP:(!wn): $ auri wordnet-common
+            -- DEBUG:
+            --   wn idea -over
+            --   :checkhealth blink-cmp-dictionary   " in nvim, confirms wn is detected
+            -- DEP: $ paci words
+            '/usr/share/dict/words',
+            -- DEP: $ auri dict-moby-thesaurus
+            --   NEED: $ zcat /usr/share/dictd/moby-thesaurus.dict.dz | grep -oP '^\S+' > ~/.local/share/dict/moby-thesaurus.txt
+            -- vim.fn.expand('~/.local/share/dict/moby-thesaurus.txt'),
+            -- vim.fn.expand('~/.local/share/dict/collins-cobuild.txt'),
+          },
+          -- dictionary_directories = {
+          --   vim.fn.expand('~/.local/share/dict/extra'),  -- all *.txt in here, auto-included
+          -- },
+        },
+      },
+    },
+  },
 
   fuzzy = {
     -- `label` makes equal LSP scores deterministic. The prior default stopped
@@ -184,17 +212,75 @@ if ai_offline.has.minuet then
   -- Enable minuet for autocomplete
   table.insert(cfg.sources.default, 'minuet')
   -- For manual completion only, remove 'minuet' from default
-  cfg.sources.providers = {
-    minuet = {
-        name = 'minuet',
-        module = 'minuet.blink',
-        async = true,
-        -- Should match minuet.config.request_timeout * 1000,
-        -- since minuet.config.request_timeout is in seconds
-        timeout_ms = 3000,
-        score_offset = 50, -- Gives minuet higher priority among suggestions
-    },
+  cfg.sources.providers.minuet = {
+    name = 'minuet',
+    module = 'minuet.blink',
+    async = true,
+    -- Should match minuet.config.request_timeout * 1000,
+    -- since minuet.config.request_timeout is in seconds
+    timeout_ms = 3000,
+    score_offset = 50, -- Gives minuet higher priority among suggestions
   }
 end
 
 blink.setup(cfg)
+
+
+-- -- Use this function to check if the cursor is inside a comment block
+-- local function inside_comment_block()
+--     if vim.api.nvim_get_mode().mode ~= 'i' then
+--         return false
+--     end
+--     local node_under_cursor = vim.treesitter.get_node()
+--     local parser = vim.treesitter.get_parser(nil, nil, { error = false })
+--     local query = vim.treesitter.query.get(vim.bo.filetype, 'highlights')
+--     if not parser or not node_under_cursor or not query then
+--         return false
+--     end
+--     local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+--     row = row - 1
+--     for id, node, _ in query:iter_captures(node_under_cursor, 0, row, row + 1) do
+--         if query.captures[id]:find('comment') then
+--             local start_row, start_col, end_row, end_col = node:range()
+--             if start_row <= row and row <= end_row then
+--                 if start_row == row and end_row == row then
+--                     if start_col <= col and col <= end_col then
+--                         return true
+--                     end
+--                 elseif start_row == row then
+--                     if start_col <= col then
+--                         return true
+--                     end
+--                 elseif end_row == row then
+--                     if col <= end_col then
+--                         return true
+--                     end
+--                 else
+--                     return true
+--                 end
+--             end
+--         end
+--     end
+--     return false
+-- end
+--
+-- -- this is the opts for blink.cmp
+-- ---@module 'blink.cmp'
+-- ---@type blink.cmp.Config
+-- opts = {
+--     sources = {
+--         default = function()
+--             -- put those which will be shown always
+--             local result = {'lsp', 'path', 'luasnip', 'buffer' }
+--             if
+--                 -- turn on dictionary in markdown or text file
+--                 vim.tbl_contains({ 'markdown', 'text' }, vim.bo.filetype) or
+--                 -- or turn on dictionary if cursor is in the comment block
+--                 inside_comment_block()
+--             then
+--                 table.insert(result, 'dictionary')
+--             end
+--             return result
+--         end,
+--     }
+-- }
