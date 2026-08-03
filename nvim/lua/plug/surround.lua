@@ -53,7 +53,7 @@ KS("x", "qq", 'q"',    { desc = 'w|ord -> |"word"', remap = true })
 
 KS("n", "qQ", 'ysiwQ', { desc = 'w|ord -> |“word”', remap = true })
 KS("n", "qA", 'ysiwA', { desc = 'w|ord -> |«word»', remap = true })
-KS("n", "q1", 'ysiwa', { desc = 'w|ord -> |‹word›', remap = true })
+KS("n", "q1", 'ysiw1', { desc = 'w|ord -> |‹word›', remap = true })
 KS("n", "q<", 'ysiw<', { desc = 'w|ord -> |<word>', remap = true })
 KS("n", "q>", 'ysiw>', { desc = 'w|ord -> |>word<', remap = true })
 
@@ -68,7 +68,7 @@ KS("n", "q@", 'ysiw@', { desc = 'w|ord -> |${word[@]}', remap = true })
 
 require("nvim-surround").setup {
   move_cursor = "sticky",  -- VIZ=false|"begin"|"sticky"
-  highlight = { duration = 20 },  -- flash b4 ins/chg surr
+  highlight = { duration = 40 },  -- flash b4 ins/chg surr
   surrounds = {
     -- STD::INFO:(invalid_key_behavior): any other single char repeats /[ *_~·].../
     -- ["'"] = { "'", "'" },
@@ -105,9 +105,9 @@ require("nvim-surround").setup {
     ["3"] = { add = { '"$(', ')"' } },
     ["2"] = { add = { '"${', '[@]}"' } },
 
-    ["Q"] = { '“', '”' },
-    ["A"] = { '«', '»' },
-    ["a"] = { '‹', '›' },
+    ["“"] = { '“', '”' },
+    ["«"] = { '«', '»' },
+    ["‹"] = { '‹', '›' },
 
     ["x"] = { '⦅', '⦆' },
     ["E"] = { '⸢', '⸥' },
@@ -134,15 +134,16 @@ require("nvim-surround").setup {
     -- ["t"] = '`',
     -- ["d"] = '"',
     ["o"] = '·',
-    ["Q"] = '«',
+    ["Q"] = '“',
+    ["A"] = '«',
+    ["a"] = '‹',
 
     -- Table aliases only apply for changes/deletions
-    ["q"] = { '"', "'", "`" }, -- Any quote character
-    ["p"] = { ")", "]", "}", ">" }, -- Any bracket character
+    ["q"] = { '"', "'", "`", "*", "_", "“", "«", "‹", }, -- Any quote character
+    ["p"] = { ")", "]", "}", ">", '⦆' }, -- Any bracket character
     ["s"] = { ")", "]", "}", ">", "'", '"', "`" }, -- Any surrounding delimiter
   },
 }
-
 
 -- FUT: language-specific
 -- require("nvim-surround").buffer_setup({

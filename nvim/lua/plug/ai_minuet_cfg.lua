@@ -79,29 +79,29 @@ require('minuet').setup({
   virtualtext = {
     -- ALT: avoid errors when ollama isn't running
     --   FAIL: still triggered, presumably by blink
-    -- auto_trigger_ft = {},
+    auto_trigger_ft = {},
     -- Note that you can still invoke manual completion even if the filetype is not on your auto_trigger_ft list.
     -- auto_trigger_ft = { 'python', 'c', 'cpp', 'lua' }, -- Enable ghost text for python/systems code
-    auto_trigger_ft = { '*' },
+    -- auto_trigger_ft = { '*' },
     -- useful when auto-completion is enabled for all file types i.e., when auto_trigger_ft = { '*' }
     auto_trigger_ignore_ft = {},
     -- Blink normally opens its menu while typing; keep the FIM ghost text
     -- visible instead of suppressing it whenever that menu is present.
     show_on_completion_menu = true,
-    keymap = {
-      -- ALT: accept = '<A-a>',     -- Alt+a to accept ghost text
-      -- ALT: accept_line = '<A-l>',-- Alt+l to accept just one line
-      accept = '<A-A>', -- accept whole completion
-      accept_line = '<A-a>', -- accept one line
-      accept_n_lines = '<A-z>', -- accept n lines (prompts for number) e.g. "A-z 2 CR" will accept 2 lines
-      prev = '<A-[>', -- Cycle to prev completion item, or manually invoke completion
-      next = '<A-]>', -- Cycle to next completion item, or manually invoke completion
-      dismiss = '<A-e>',
-      -- ALT:
-      -- vim.keymap.set('i', '<A-x>', function() vim.lsp.inline_completion.get() end, { desc = 'accept' })
-      -- vim.keymap.set('i', '<A-c>', function() vim.lsp.inline_completion.select { count = 1 } end, { desc = 'cycle to next' })
-      -- vim.keymap.set('i', '<A-v>', function() vim.lsp.inline_completion.select { count = -1 } end, { desc = 'cycle to prev' })
-    },
+    -- keymap = {
+    --   -- ALT: accept = '<A-a>',     -- Alt+a to accept ghost text
+    --   -- ALT: accept_line = '<A-l>',-- Alt+l to accept just one line
+    --   accept = '<A-A>', -- accept whole completion
+    --   accept_line = '<A-a>', -- accept one line
+    --   accept_n_lines = '<A-z>', -- accept n lines (prompts for number) e.g. "A-z 2 CR" will accept 2 lines
+    --   prev = '<A-[>', -- Cycle to prev completion item, or manually invoke completion
+    --   next = '<A-]>', -- Cycle to next completion item, or manually invoke completion
+    --   dismiss = '<A-e>',
+    --   -- ALT:
+    --   -- vim.keymap.set('i', '<A-x>', function() vim.lsp.inline_completion.get() end, { desc = 'accept' })
+    --   -- vim.keymap.set('i', '<A-c>', function() vim.lsp.inline_completion.select { count = 1 } end, { desc = 'cycle to next' })
+    --   -- vim.keymap.set('i', '<A-v>', function() vim.lsp.inline_completion.select { count = -1 } end, { desc = 'cycle to prev' })
+    -- },
   },
   -- WARN: For users of blink-cmp and nvim-cmp, it is recommended to use the
   --   native source rather than through LSP for two main reasons:

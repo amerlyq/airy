@@ -1,5 +1,11 @@
-# PERF:(startup) $ for i in {1..10}; do time zsh -i -c exit; done
+# PERF:(startup): =100ms= $ for i in {1..10}; do time zsh -i -c exit; done
 # PERF:(profiling/beg): zmodload zsh/zprof
+# 1)   11          47.53     4.32   50.98%     31.23     2.84   33.50%  source  (autopair + zsh_highlight)
+# 2)    1          21.46    21.46   23.02%     21.07    21.07   22.60%  (anon) [/home/user/.zshrc:597] (gitstatus_start)
+# 3)    1          12.04    12.04   12.91%     12.04    12.04   12.91%  compinit
+# 4)    2          11.96     5.98   12.83%     11.96     5.98   12.83%  autopair-init
+# 5)    1           8.01     8.01    8.60%      7.81     7.81    8.38%  _zsh_highlight_load_highlighters
+# 6)    1          24.98    24.98   26.80%      3.18     3.18    3.41%  prompt_git_init
 
 [[ ~/.zshrc.zwc -nt ~/.zshrc ]] || zcompile ~/.zshrc
 
@@ -104,7 +110,7 @@ zshaddhistory() { local f
 
 
 ############################################################
-### Prompt
+### Prompt (+30ms due git)
 _plugins=/d/plugins/zsh
 
 (){ local dcfg=${${(%):-%x}:A:h}
@@ -115,7 +121,7 @@ _plugins=/d/plugins/zsh
 }
 
 ############################################################
-### TEMP
+### TEMP (+20ms for all my old cfgs)
 
 ## DISABLED: takes too much time when I mistype command
 ##   ~~ suggested pkgs are interesting, but I almost never use them,
@@ -227,7 +233,7 @@ bindkey "\e," insert-first-word
 
 
 ############################################################
-### Plugins
+### Plugins (+45ms)
 
 # DEBUG: $ rm -f ~/.zcompdump; compinit
 fpath=($_plugins/zsh-completions/src $fpath)
@@ -246,6 +252,9 @@ autopair-init
 # ATT: should be at the end of ZSHRC
 source $_plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
+
+############################################################
+### completions (+12ms)
 
 autoload -Uz compinit
 # -C (skip function check) implies -i (skip security check).

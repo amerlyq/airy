@@ -30,8 +30,8 @@ bindkey '^A' beginning-of-line
 bindkey '^E' end-of-line
 bindkey '^F' forward-char
 bindkey '^B' backward-char
-bindkey '^T' forward-word
-bindkey '^Q' vi-backward-word-end
+bindkey '^T' my-forward-word-after-end
+bindkey '^Q' my-backward-word-after-end
 
 
 ## Editing

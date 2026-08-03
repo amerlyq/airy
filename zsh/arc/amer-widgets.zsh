@@ -100,3 +100,16 @@ function TRAPINT() {
         return 1
     fi
 }
+
+function my-forward-word-after-end {
+  zle vi-forward-word-end
+  zle forward-char
+}
+zle -N my-forward-word-after-end
+
+function my-backward-word-after-end {
+  zle backward-char
+  zle vi-backward-word-end
+  zle forward-char
+}
+zle -N my-backward-word-after-end
