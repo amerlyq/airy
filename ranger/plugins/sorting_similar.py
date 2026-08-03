@@ -32,6 +32,8 @@ Directory.sort_dict["suffix_"] = lambda x: sort_suffix(x, "_", longest=False)
 #     return check_output(cmd).decode('utf-8').rstrip().split()[1]
 # Directory.sort_dict['dir_size'] = sort_dir_size
 
+# MOVE: sep plugin
+# ALT:(ffproe):https://github.com/zd4y/ranger-vidlength
 try:
     from functools import cache
     from typing import cast
@@ -87,9 +89,7 @@ else:
             m, s = divmod(s, 60)
             return (f"{m}:" if m else "") + f"{s:02d}.{ms:03d}"
 
-        def _get_default_infostring(
-            self, f: FileSystemObject, metadata: object
-        ) -> str:
+        def _get_default_infostring(self, f: FileSystemObject, metadata: object) -> str:
             # OR: return DefaultLinemode().infostring(f, metadata)
 
             # 1. Fetch default mode string (usually "filename" or whatever DEFAULT_LINEMODE is)

@@ -8,6 +8,8 @@ import ranger.api
 from ranger.container.fsobject import FileSystemObject
 from ranger.core.linemode import LinemodeBase
 
+# IDEA: line-count with cached !wc -l results
+
 
 @ranger.api.register_linemode
 class BytesizeLinemode(LinemodeBase):
@@ -32,7 +34,7 @@ class HexsizeLinemode(LinemodeBase):
 
     def infostring(self, f: FileSystemObject, metadata: object) -> str:
         if not f.is_directory:
-            return '%06x' % f.stat.st_size
+            return "%06x" % f.stat.st_size
         else:
             raise NotImplementedError
 
@@ -47,42 +49,42 @@ class LinksLinemode(LinemodeBase):
         try:
             dst = os.readlink(f.path)
         except:
-            dst = '?'
-        dst = re.sub('^' + re.escape(os.getenv('HOME')), '~', dst)
-        return f'{f.relative_path} → {dst}'
+            dst = "?"
+        dst = re.sub("^" + re.escape(os.getenv("HOME")), "~", dst)
+        return f"{f.relative_path} → {dst}"
 
 
 @ranger.api.register_linemode
 class ATimeLinemode(LinemodeBase):
-    name = 'atime'
+    name = "atime"
 
     def filetitle(self, f: FileSystemObject, metadata: object) -> str:
         return f.relative_path
 
     def infostring(self, f: FileSystemObject, metadata: object) -> str:
-        return strftime('%Y-%m-%d %H:%M:%S', localtime(f.stat.st_atime))
+        return strftime("%Y-%m-%d %H:%M:%S", localtime(f.stat.st_atime))
 
 
 @ranger.api.register_linemode
 class CTimeLinemode(LinemodeBase):
-    name = 'ctime'
+    name = "ctime"
 
     def filetitle(self, f: FileSystemObject, metadata: object) -> str:
         return f.relative_path
 
     def infostring(self, f: FileSystemObject, metadata: object) -> str:
-        return strftime('%Y-%m-%d %H:%M:%S', localtime(f.stat.st_ctime))
+        return strftime("%Y-%m-%d %H:%M:%S", localtime(f.stat.st_ctime))
 
 
 @ranger.api.register_linemode
 class MTimeLinemode(LinemodeBase):
-    name = 'mtime'
+    name = "mtime"
 
     def filetitle(self, f: FileSystemObject, metadata: object) -> str:
         return f.relative_path
 
     def infostring(self, f: FileSystemObject, metadata: object) -> str:
-        return strftime('%Y-%m-%d %H:%M:%S', localtime(f.stat.st_mtime))
+        return strftime("%Y-%m-%d %H:%M:%S", localtime(f.stat.st_mtime))
 
 
 @ranger.api.register_linemode
