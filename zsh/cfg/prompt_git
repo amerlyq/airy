@@ -13,7 +13,9 @@ function prompt_git_callback {
 
 # DEBUG:PERF: $ time (gitstatus_query -t -1 MY)
 function prompt_git_query {
+  (( $+functions[gitstatus_query] )) || return 0
   # fire-and-forget: -t 0 means "don't block, call back later if not ready"
+  # MAYBE? zsh-defer ...
   gitstatus_query -t 0 -c prompt_git_callback MY
 }
 

@@ -111,13 +111,16 @@ function prompt_preexec {
 }
 
 function prompt_setup {
-  prompt_git_init
+  zsh-defer -c '
+    autoload -Uz add-zle-hook-widget
+    add-zle-hook-widget zle-line-finish prompt_submit_rewrite
 
-  autoload -Uz add-zsh-hook
-  add-zsh-hook preexec prompt_preexec
-  add-zsh-hook precmd  prompt_precmd
-  autoload -Uz add-zle-hook-widget
-  add-zle-hook-widget zle-line-finish prompt_submit_rewrite
+    autoload -Uz add-zsh-hook
+    add-zsh-hook preexec prompt_preexec
+    add-zsh-hook precmd  prompt_precmd
+
+    prompt_git_init
+  '
 
   local color=1
   if [[ $debian_chroot ]]; then color=4

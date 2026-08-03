@@ -1,5 +1,6 @@
 # PERF:(startup): =100ms= $ for i in {1..10}; do time zsh -i -c exit; done
-# PERF:(profiling/beg): zmodload zsh/zprof
+# PERF:(profiling/beg):
+# zmodload zsh/zprof
 # 1)   11          47.53     4.32   50.98%     31.23     2.84   33.50%  source  (autopair + zsh_highlight)
 # 2)    1          21.46    21.46   23.02%     21.07    21.07   22.60%  (anon) [/home/user/.zshrc:597] (gitstatus_start)
 # 3)    1          12.04    12.04   12.91%     12.04    12.04   12.91%  compinit
@@ -112,6 +113,7 @@ zshaddhistory() { local f
 ############################################################
 ### Prompt (+30ms due git)
 _plugins=/d/plugins/zsh
+source $_plugins/zsh-defer/zsh-defer.plugin.zsh
 
 (){ local dcfg=${${(%):-%x}:A:h}
   # source /d/airy/zsh/arc/prompt.d/path
@@ -134,7 +136,8 @@ source() {
   builtin source $@
 }
 
-_airy="${${(%):-%x}:A:h:h:h}"  # =${BASH_SOURCE[0]:-...}
+function _usercli { local _airy="${${(%):-%x}:A:h:h:h}"  # =${BASH_SOURCE[0]:-...}
+
 source $_airy/zsh/arc/amer-widgets.zsh
 source $_airy/zsh/arc/amer-key-mix.zsh
 source $_airy/zsh/arc/alias/aliases
@@ -171,6 +174,7 @@ zshexit(){  # _ranger_cwd
   (set +C && print -n -- "$PWD" > "$tmp/cwd")  # Disable clobbering
 }
 
+}; zsh-defer -c '_usercli && unset -f _usercli'
 
 # Allow command line editing in an external editor.
 autoload -Uz edit-command-line
@@ -238,27 +242,31 @@ bindkey "\e," insert-first-word
 # DEBUG: $ rm -f ~/.zcompdump; compinit
 fpath=($_plugins/zsh-completions/src $fpath)
 
-source $_plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+zsh-defer source $_plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 ## BAD: conflicts with forward-char
 # bindkey -M viins "^F" vi-forward-word
 bindkey -M viins "^E" vi-add-eol
 
-source $_plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
+zsh-defer source $_plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
 # source $_plugins/alias-tips/alias-tips.plugin.zsh
 
-source $_plugins/zsh-autopair/autopair.zsh
-autopair-init
+zsh-defer -c '
+  source $_plugins/zsh-autopair/autopair.zsh
+  autopair-init
+'
 
 # ATT: should be at the end of ZSHRC
-source $_plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+zsh-defer source $_plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 
 ############################################################
 ### completions (+12ms)
 
-autoload -Uz compinit
-# -C (skip function check) implies -i (skip security check).
-compinit -C -d "$_comp_path"
+zsh-defer -c '
+  autoload -Uz compinit
+  # -C (skip function check) implies -i (skip security check).
+  compinit -C -d "$_comp_path"
+'
 zstyle ':completion::complete:*' use-cache on
 zstyle ':completion::complete:*' cache-path ~/.zcompcache
 zstyle ':completion:*' completer _expand _complete _files _correct _approximate
@@ -284,4 +292,9 @@ if [[ -f $_m ]]; then builtin source $_m; fi; unset _m
 #     and will keep pieces intact if you <CR> in-between prompts
 # print -rn -- $'\e[2F'   # CUP-style: cursor to start of line N-up
 
-# PERF:(profiling/end): zprof
+# EXPL: we redefine "source()" with recompile only to speed up next startup
+#   >> sourcing in interactive session shouldn't create *.zwc everywhere!
+zsh-defer unset -f source
+
+# PERF:(profiling/end):
+# zprof
