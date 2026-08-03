@@ -136,16 +136,19 @@ vim.keymap.set('n', '<leader>ct', '<cmd>Minuet virtualtext toggle<cr>', { desc =
 -- returns the normal insert-mode <C-f> character-forward command instead.
 local vact = require('minuet.virtualtext').action
 
-vim.keymap.set('i', '<C-[>', function()
+-- BAD=<i_CTRL-[> -- will break :iabbr
+vim.keymap.set('i', '<C-c>', function()
   if vact.is_visible() then vact.dismiss(); return '' end
-  return vim.keycode('<C-[>')
+  return vim.keycode('<C-c>')
 end, { expr = true, desc = '[minuet] dismiss FIM or escape' })
 
+-- DFL=<i_CTRL-]> : Trigger abbreviation, without inserting a character.
 vim.keymap.set('i', '<C-]>', function()
   if vact.is_visible() then vact.accept(); return '' end
   return vim.keycode('<C-]>')
 end, { expr = true, desc = '[minuet] accept whole FIM or move to end' })
 
+-- CHECK: may not even work
 vim.keymap.set('i', '<C-;>', function()
   if vact.is_visible() then vact.accept_line(); return '' end
   return vim.keycode('<C-;>')

@@ -15,6 +15,15 @@ require("codecompanion").setup({
   -- opts = {
   --   log_level = "TRACE",  -- DEBUG may not capture full curl invocation; TRACE does
   -- },
+
+  -- interactions = {
+  --   chat = {
+  --     keymaps = {
+  --       send = false,  -- DFL=<C-s>
+  --       close = false  -- DFL=<C-c>
+  --     }
+  --   }
+  -- },
   strategies = {
     chat = {
       -- adapter = "ollama",

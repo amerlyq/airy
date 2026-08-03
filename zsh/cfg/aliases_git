@@ -62,6 +62,7 @@ alias gdfsm='gdf --stat --diff-filter=mr'
 alias gdfsM='gdf --stat --diff-filter=MR'
 alias gdw='gdf -w --ignore-blank-lines'
 alias gdc='gdf --cached'
+alias gds='gdf --submodule=diff'
 
 alias gdf.d='gdf | delta'  # DEP=git-delta
 alias gdf.s='GIT_EXTERNAL_DIFF=difft git diff'  # DEP=difftastic
@@ -116,12 +117,17 @@ alias grc='git rebase --continue'
 alias gra='git rebase --abort'
 alias grom='git rebase --onto "@{u}" "$(git merge-base HEAD "@{u}@{1}")"'
 
-alias gss='git stash save'
-alias gsp='git stash pop'
-alias gds='gdf "stash@{0}"'
-alias gdS='git stash show -p'
+alias gSl='git stash list'
+alias gSs='git stash save'
+alias gSp='git stash pop'
+alias gS0='gdf "stash@{0}"'
+alias gSd='git stash show -p'
 
 alias gs='git status -sb --show-stash'
+# alias gss='git submodule foreach git status -sb --show-stash'
+alias gss='git status -sb --show-stash && git -c status.submodulesummary=1 status --ignore-submodules=none --porcelain=v1 |
+  awk "/^ M /{print\$2}" | while read -r sm; do printf "\\n\e[1;4;34m%s\e[m\\n" "$sm"; git -C "$sm" status -sb --show-stash; done'
+
 alias gsa='gs --untracked-files=all'
 alias gsi='gs --ignored'
 alias gso='git ls-files --others --ignored --exclude-standard'

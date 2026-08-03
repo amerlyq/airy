@@ -177,6 +177,7 @@ local ai_offline = require('plug.ai_offline')
 
 if ai_offline.has.minuet then
   -- ['<A-y>'] = require('minuet').make_blink_map(),
+  -- OR? <C-_>
   cfg.keymap['<C-?>'] = require('minuet').make_blink_map()
   -- Recommended to avoid unnecessary request with minuet
   cfg.completion.trigger = { prefetch_on_insert = false }
