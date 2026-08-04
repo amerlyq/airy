@@ -165,7 +165,7 @@ local cfg = {
             -- DEBUG:
             --   wn idea -over
             --   :checkhealth blink-cmp-dictionary   " in nvim, confirms wn is detected
-            -- DEP: $ paci words
+            -- DEP: $ paci words  -- OR:(ubuntu): $ apti wamerican
             '/usr/share/dict/words',
             -- DEP: $ auri dict-moby-thesaurus
             --   NEED: $ zcat /usr/share/dictd/moby-thesaurus.dict.dz | grep -oP '^\S+' > ~/.local/share/dict/moby-thesaurus.txt

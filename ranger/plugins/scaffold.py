@@ -21,8 +21,8 @@ import ranger.gui.widgets.browsercolumn
 from ranger.api.commands import Command
 from ranger.container.directory import Directory
 
-TARGET_PATH = os.path.expanduser("~/.config/ranger/scaffolds")
-TARGET_PATH2 = os.path.expanduser("~/.config/ranger/scaffolds2")
+TARGET_PATH = os.path.expanduser("~/.local/share/ranger/scaffolds")
+TARGET_PATH2 = os.path.expanduser("~/.local/share/ranger/scaffolds2")
 
 
 def set_scaffold_paths():
