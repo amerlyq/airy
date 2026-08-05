@@ -162,14 +162,14 @@ local function copy_matching_lines(is_visual)
   end
 end
 
-vim.keymap.set('n', '<leader>m', function() copy_matches(false) end,
+vim.keymap.set('n', '<leader>M', function() copy_matches(false) end,
   { desc = "Extract exact text matching last search (buffer)" })
-vim.keymap.set('v', '<leader>m', function() copy_matches(true) end,
+vim.keymap.set('v', '<leader>M', function() copy_matches(true) end,
   { desc = "Extract exact text matching last search (selection)" })
 
-vim.keymap.set('n', '<leader>M', function() copy_matching_lines(false) end,
+vim.keymap.set('n', '<leader>m', function() copy_matching_lines(false) end,
   { desc = "Copy whole lines matching last search (buffer)" })
-vim.keymap.set('v', '<leader>M', function() copy_matching_lines(true) end,
+vim.keymap.set('v', '<leader>m', function() copy_matching_lines(true) end,
   { desc = "Copy whole lines matching last search (selection)" })
 
 --- OR: resolve visual-mark correctly

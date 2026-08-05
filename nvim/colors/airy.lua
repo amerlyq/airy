@@ -191,6 +191,9 @@ local highlights = {
   LeapBackdrop = { link = "Comment" },
   LeapMatch = { fg = 'white', bold = true, nocombine = true },
 
+  -- BlinkCmpLabelMatch = { link = "Special" },  -- '#cb4b16'
+  BlinkCmpLabelMatch = { fg = '#d57900' },
+
   ["@variable"] = { link = "Normal" },
 
   -- Highlight all variations of 'true/false' across languages

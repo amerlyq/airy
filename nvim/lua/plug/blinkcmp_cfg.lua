@@ -84,6 +84,21 @@ local cfg = {
     ['<C-t>']    = { 'hide' },
     ['<CR>']      = { 'accept', 'fallback' },
 
+    ['<Space>'] = {  -- "Magical space"
+      function(cmp)
+        if cmp.is_visible() then
+          cmp.accept()
+          vim.api.nvim_feedkeys(
+            vim.api.nvim_replace_termcodes("<Space>", true, false, true),
+            "n", false
+          )
+          return true
+        end
+        return false
+      end,
+      "fallback",
+    },
+
     -- Keep the nvim-cmp navigation muscle memory.
     ['<Up>']   = { 'select_prev', 'fallback' },
     ['<Down>'] = { 'select_next', 'fallback' },
@@ -98,8 +113,7 @@ local cfg = {
       --   if ok and vact.is_visible() then vact.accept_line(); return true end
       -- end,
 
-      -- Accept the selected item; if none is selected, accept the first item.
-      'select_and_accept',
+      'select_next',  -- 'select_and_accept', -- <ALT: accept 1st (if none selected)
       function()
         if require('luasnip').expand_or_locally_jumpable() then
           require('luasnip').expand_or_jump()
@@ -132,6 +146,7 @@ local cfg = {
   completion = {
     list = {
       -- Match nvim-cmp: navigating highlights an item but does not insert it.
+      --   SEE? -- completion.list.selection.preselect
       selection = { preselect = false, auto_insert = false },
       max_items = 40,
     },
@@ -139,15 +154,23 @@ local cfg = {
   },
 
   sources = {
-    default = { 'lsp', 'path', 'snippets', 'buffer', 'dictionary'}, --
+    default = { 'lsp', 'path', 'snippets', 'buffer', 'notches', 'dictionary'}, --
     -- Match the old nvim-cmp Python setup: no buffer/path noise for members.
     -- per_filetype = { python = { 'lsp', 'snippets' } },
     providers = {
-    -- Optional but highly recommended: adjust weights so paths don't crowd LSP completions
-    --   lsp = { score_offset = 90 },
-    --   path = { score_offset = 80 },
-    --   snippets = { score_offset = 70 },
-    --   buffer = { score_offset = 50 },
+      -- -- Optional but highly recommended: adjust weights so paths don't crowd LSP completions
+      -- lsp = { score_offset = 90 },
+      -- path = { score_offset = 80 },
+      -- snippets = { score_offset = 70 },
+      -- buffer = { score_offset = 50 },
+
+      notches = {
+        name = "Notches", -- @me
+        module = "notches.complet",
+        -- enabled = true,
+        -- score_offset = 100, -- Give your keywords higher priority over buffer words
+        -- async = true,
+      },
 
       -- DEBUG: :lua print(vim.inspect(require('blink.cmp.config').sources.providers))
       dictionary = {
