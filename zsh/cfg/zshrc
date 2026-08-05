@@ -4,12 +4,8 @@
 # 1)   11          47.53     4.32   50.98%     31.23     2.84   33.50%  source  (autopair + zsh_highlight)
 # 2)    1          21.46    21.46   23.02%     21.07    21.07   22.60%  (anon) [/home/user/.zshrc:597] (gitstatus_start)
 # 3)    1          12.04    12.04   12.91%     12.04    12.04   12.91%  compinit
-# 4)    2          11.96     5.98   12.83%     11.96     5.98   12.83%  autopair-init
-# 5)    1           8.01     8.01    8.60%      7.81     7.81    8.38%  _zsh_highlight_load_highlighters
+# 5)    1           8.01     8.01    8.60%      7.81     7.81    8.38%  _zsh_highlight_load_highlighters 4)    2          11.96     5.98   12.83%     11.96     5.98   12.83%  autopair-init
 # 6)    1          24.98    24.98   26.80%      3.18     3.18    3.41%  prompt_git_init
-
-[[ ~/.zshrc.zwc -nt ~/.zshrc ]] || zcompile ~/.zshrc
-
 
 if [[ $HOST =~ (MINIPC|VD600) ]]; then
   # TEMP: for WSL2 and NUC
@@ -123,38 +119,71 @@ source $_plugins/zsh-defer/zsh-defer.plugin.zsh
 }
 
 ############################################################
+### completions (+12ms)
+
+# DEBUG: $ rm -f ~/.zcompdump; compinit
+fpath=($_plugins/zsh-completions/src $fpath)
+
+zstyle ':completion::complete:*' use-cache on
+zstyle ':completion::complete:*' cache-path ~/.zcompcache
+zstyle ':completion:*' completer _expand _complete _files _correct _approximate
+# zstyle ':completion:*' completer _complete _match _approximate
+
+## NOTE: completion for "kill nvim<TAB>"
+zstyle ':completion:*:*:kill:*' menu yes select
+zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
+zstyle ':completion:*:*:kill:*:processes' command 'ps xo pid,user:10,cmd |tac| grep -Ev "(ps xo|firefox|/bin/zsh|-zsh|runsv)"'
+
+# WARN:(order): should be loaded b4 oth plugins, but *after* fpath and 'zstyle :completion:' options
+# WARN:(no zsh-defer): defer breaks live complet for first prompt (zle-line-init/widgets need to be hooked)
+#   PERF: +10ms (out of my 9ms)
+# WARN:(keymap): overrides ^R, Tab, and up/down-history behavior by default
+# source $_plugins/zsh-autocomplete/zsh-autocomplete.plugin.zsh
+
+# ATT:(zsh-autocomplete): comment-out my own compinit -- dont run it twice
+zsh-defer -c '
+  # WARN:USAGE: should run "$ compinit" after editing my own completions!
+  # INFO: -C (skip function check) implies -i (skip security check).
+  autoload -Uz compinit; compinit -C
+'
+
+############################################################
 ### TEMP (+20ms for all my old cfgs)
-
-## DISABLED: takes too much time when I mistype command
-##   ~~ suggested pkgs are interesting, but I almost never use them,
-##     as I have pkgfile and other pac*/aur* cmds
-# source /usr/share/doc/pkgfile/command-not-found.zsh
-
-source() {
-  # NOTE: don't compile anything inside /usr/*
-  [[ ! -w ${1:h} ]] || [[ $1.zwc -nt $1 ]] || zcompile $1
-  builtin source $@
-}
 
 function _usercli { local _airy="${${(%):-%x}:A:h:h:h}"  # =${BASH_SOURCE[0]:-...}
 
-source $_airy/zsh/arc/amer-widgets.zsh
-source $_airy/zsh/arc/amer-key-mix.zsh
-source $_airy/zsh/arc/alias/aliases
-source $_airy/zsh/cfg/aliases_git
-source $_airy/zsh/cfg/aliases
+  ## FAIL:DISABLED: somehow breaks fzf-tab due to .zwc mismatch
+  # ALT: zsh-defer -c 'autoload -Uz zrecompile; zrecompile -q $_plugins/**/*.zsh(N) &!'
+  #   BET? add to /d/plugins/recache or git-hook
+  # function source {
+  #   # NOTE: don't compile anything inside /usr/*
+  #   [[ ! -w ${1:h} ]] || [[ $1.zwc -nt $1 ]] || zcompile $1
+  #   builtin source $@
+  # }
 
-source $_airy/ssh/alias
+  source $_airy/zsh/arc/amer-widgets.zsh
+  source $_airy/zsh/arc/amer-key-mix.zsh
+  source $_airy/zsh/arc/alias/aliases
+  source $_airy/zsh/cfg/aliases_git
+  source $_airy/zsh/cfg/aliases
 
-# TEMP: cdauto paths (OLD-style)
-# TODO:CHG:(cdauto): cd /path/to/somefile(:h)
-source $_airy/sh/alias/cd
-while read -r k p; do
-  # SEE: https://vincent.bernat.ch/en/blog/2015-zsh-directory-bookmarks
-  # USAGE: cd ~.a
-  [[ ${k:0:1} == "." && -z ${${k:1}//[a-zA-Z0-9.]} ]] && hash -d -- "${k:1}"="${p#-l }"
-  alias "$k"="cdauto $p"
-done < <(sed -r 's/(^|\s+)#.*$//; /^\s*$/d' /d/airy/airy/pathes)
+  source $_airy/ssh/alias
+
+  # TEMP: cdauto paths (OLD-style)
+  # TODO:CHG:(cdauto): cd /path/to/somefile(:h)
+  source $_airy/sh/alias/cd
+  while read -r k p; do
+    # SEE: https://vincent.bernat.ch/en/blog/2015-zsh-directory-bookmarks
+    # USAGE: cd ~.a
+    [[ ${k:0:1} == "." && -z ${${k:1}//[a-zA-Z0-9.]} ]] && hash -d -- "${k:1}"="${p#-l }"
+    alias "$k"="cdauto $p"
+  done < <(sed -r 's/(^|\s+)#.*$//; /^\s*$/d' /d/airy/airy/pathes)
+
+  # EXPL: we redefine "source()" with recompile only to speed up next startup
+  #   >> sourcing in interactive session shouldn't create *.zwc everywhere!
+  #   == and plugins should be recompiled by ./recache after git-pull
+  zsh-defer unset -f source
+
 
 # TODO: replace "fm()/zshexit()" by "source =miur/sync-cwd"
 fm(){ local d f=${XDG_RUNTIME_DIR:?}/ranger/cwd
@@ -239,8 +268,19 @@ bindkey "\e," insert-first-word
 ############################################################
 ### Plugins (+45ms)
 
-# DEBUG: $ rm -f ~/.zcompdump; compinit
-fpath=($_plugins/zsh-completions/src $fpath)
+## DISABLED: takes too much time when I mistype command
+##   ~~ suggested pkgs are interesting, but I almost never use them,
+##     as I have pkgfile and other pac*/aur* cmds
+# source /usr/share/doc/pkgfile/command-not-found.zsh
+
+source ${${(%):-%x}:A:h}/fzf-tab-cfg
+# FIXED? run 'build-fzf-tab-module' aft sourcing the plugin
+#   ERR:(<Tab>): wc: 'J:=__': No such file or directory, wc: ...
+#   ? source <(fzf --zsh)
+zsh-defer -c '
+  # ATT:(redefines): bindkey "^I" fzf-tab-complete
+  source "$_plugins/fzf-tab/fzf-tab.plugin.zsh"  # <PERF=7ms
+'
 
 zsh-defer source $_plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 ## BAD: conflicts with forward-char
@@ -260,25 +300,6 @@ zsh-defer source $_plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 
 ############################################################
-### completions (+12ms)
-
-zsh-defer -c '
-  autoload -Uz compinit
-  # -C (skip function check) implies -i (skip security check).
-  compinit -C -d "$_comp_path"
-'
-zstyle ':completion::complete:*' use-cache on
-zstyle ':completion::complete:*' cache-path ~/.zcompcache
-zstyle ':completion:*' completer _expand _complete _files _correct _approximate
-# zstyle ':completion:*' completer _complete _match _approximate
-
-## NOTE: completion for "kill nvim<TAB>"
-zstyle ':completion:*:*:kill:*' menu yes select
-zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
-zstyle ':completion:*:*:kill:*:processes' command 'ps xo pid,user:10,cmd |tac| grep -Ev "(ps xo|firefox|/bin/zsh|-zsh|runsv)"'
-
-
-############################################################
 # DEP=mcfly NICE: fzf-like Ctrl-R history by frecency/timestamp
 # eval "$(mcfly init zsh)"
 # eval "$(thefuck --alias '!' --enable-experimental-instant-mode)"
@@ -291,10 +312,6 @@ if [[ -f $_m ]]; then builtin source $_m; fi; unset _m
 #   WARN: will overwrite whatever you already typed
 #     and will keep pieces intact if you <CR> in-between prompts
 # print -rn -- $'\e[2F'   # CUP-style: cursor to start of line N-up
-
-# EXPL: we redefine "source()" with recompile only to speed up next startup
-#   >> sourcing in interactive session shouldn't create *.zwc everywhere!
-zsh-defer unset -f source
 
 # PERF:(profiling/end):
 # zprof

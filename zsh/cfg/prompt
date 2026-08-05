@@ -140,9 +140,9 @@ function prompt_setup {
   [[ ${RANGER_LEVEL:+x} ]] && nest+=R
   [[ ${VIM:+x} ]] && nest+=V
   [[ ${NVIM:+x} ]] && nest+=V
+  ## DISABLED: we have (.venv) aft path *and* it breaks fallback "${nest:-─}"
   ## FIXED: should affect prompt even after it was initially assigned
-  nest+="\${VIRTUAL_ENV:+E}"  # [[ ${VIRTUAL_ENV:+x} ]] && nest+=E
-  [[ -n $nest ]] && nest="%F{60}%B$nest%b"
+  # nest+="\${VIRTUAL_ENV:+E}"  # [[ ${VIRTUAL_ENV:+x} ]] && nest+=E
 
   # local parts
   # [[ $UID -eq 0 ]] && parts="╔═╚╣╼┇" || parts="┌─└╢╼┇"
@@ -164,10 +164,11 @@ function prompt_setup {
     info+="%{"$'\e[2 q'"%}"
   fi
 
+  [[ -n $nest ]] && nest="%F{60}%B$nest%b%F{$color}" || nest="─"
   # FAIL: "%(1V.%F{$color}╸%f%1v.)" prints ANSI escape-sequences literally
   #   ALT:WTF: "${psvar[1]:+%F{$color}╸%f${psvar[1]}}" prints only "}"
   # PROMPT="%F{$color}┌${nest:-─}%F{$color}─%f %B%F{220}\$(prompt_pwd_unique)%f%b${info}
-  PROMPT="%F{$color}┌${nest:-─}%F{$color}─%f %B%F{220}%d%f%b${info}
+  PROMPT="%F{$color}┌${nest}─%f %B%F{220}%d%f%b${info}
 %F{$color}└\${_prompt_git_chars}%F{$color}%(!.#.╼)%f "
 
   # HACK: pre-print prompt on startup to reduce visual delay

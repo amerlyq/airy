@@ -1,6 +1,23 @@
 
 {
-  [[ ~/.zcompdump.zwc -nt ~/.zcompdump ]] || zcompile ~/.zcompdump
+  _airy="${${(%):-%x}:A:h:h:h}"
+  _plugins=/d/plugins/zsh
+
+  # DEBUG: $ ls **/*.zsh~*/[#_]*/*(N)
+  #    OR: $ ls **/*.zsh(Ne:'[[ ! $REPLY =~ "/[#_][^/]*/" ]]':)
+  setopt extendedglob
+  srcs=( {$_airy,$_plugins}/zsh/**/*.zsh~*/[#_]*/*(N) )
+
+  autoload -Uz zrecompile
+  for f in $srcs; do
+    zrecompile -q -p $f --
+  done
+
+  autoload -Uz compinit
+  compinit -d "${ZDOTDIR:-$HOME}/.zcompdump"  # no -C: full fpath scan + rebuild if stale
+
+  zrecompile -q -p ${ZDOTDIR:-$HOME}/.zshrc --
+  zrecompile -q -p ${ZDOTDIR:-$HOME}/.zcompdump --
 } &!
 
 if [[ -z $DISPLAY && $XDG_VTNR = 1 ]]; then

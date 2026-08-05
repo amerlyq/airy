@@ -48,3 +48,19 @@ exec fzf --extended --ansi --multi --disabled --wrap \
   --bind "f3:execute(bat --paging=always --pager=\"less -j4 -R -F +/{q}\" --color=always {1} < /dev/tty > /dev/tty)" \
   --bind "f4:execute(v {1..3})" \
   | ifne vq
+
+
+# # Standalone:
+# export FZF_DEFAULT_OPTS="
+#   --exit-0
+#   --tabstop=4
+#   --inline-info
+#   --no-hscroll
+#   --bind=\
+# esc:toggle,\
+# ctrl-s:toggle-all,\
+# ctrl-c:cancel,\
+# ctrl-o:jump,\
+# ctrl-x:toggle-preview,\
+# alt-s:deselect-all
+# "

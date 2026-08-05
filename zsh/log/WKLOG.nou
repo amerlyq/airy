@@ -112,25 +112,34 @@
       https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins
     VIZ zsh-users ⌇⡪⡰⢯⠲
       https://github.com/zsh-users/
-    [!] Aloxaf/fzf-tab: Replace zsh's default completion selection menu with fzf! ⌇⡪⡰⢕⡂
+    [✓] Aloxaf/fzf-tab: Replace zsh's default completion selection menu with fzf! ⌇⡪⡰⢕⡂
       https://github.com/aloxaf/fzf-tab
       [?] CHECK: does fzf makes in-term menu
         [?] Qs how it does that -- and how to repeat that for miur
+      [≈] OR? marlonrichert/zsh-autocomplete: 🤖 Real-time type-ahead completion for Zsh. Asynchronous find-as-you-type autocompletion. ⌇⡪⡰⢯⣠
+        https://github.com/marlonrichert/zsh-autocomplete
+        = BAD:PERF: adds lag to each keypress; conflicts with fzf-tab
     [!] wfxr/forgit: :zzz: A utility tool powered by fzf for using git interactively. ⌇⡪⡰⢖⢰
       https://github.com/wfxr/forgit
-    [@] zsh-users/zsh-completions: Additional completion definitions for Zsh. ⌇⡪⡰⢯⢜
+    [✓] zsh-users/zsh-completions: Additional completion definitions for Zsh. ⌇⡪⡰⢯⢜
       https://github.com/zsh-users/zsh-completions
-    [?] marlonrichert/zsh-autocomplete: 🤖 Real-time type-ahead completion for Zsh. Asynchronous find-as-you-type autocompletion. ⌇⡪⡰⢯⣠
-      https://github.com/marlonrichert/zsh-autocomplete
-    [?] romkatv/zsh-no-ps2 # Proper multi-line commands
-    [?] MichaelAquilina/zsh-autoswitch-virtualenv: 🐍 ZSH plugin to automatically switch python virtualenvs (including pipenv and poetry) as you move between directories ⌇⡪⡰⢖⣁
+    [≈] romkatv/zsh-no-ps2 # Proper multi-line commands
+    [✗] MichaelAquilina/zsh-autoswitch-virtualenv: 🐍 ZSH plugin to automatically switch python virtualenvs (including pipenv and poetry) as you move between directories ⌇⡪⡰⢖⣁
       https://github.com/MichaelAquilina/zsh-autoswitch-virtualenv
+      ~~ questionable/opinionated
+        [_] BET: re-IMPL only for !uv and /wo suggestions
     [?] direnv (not a zsh plugin per se, but has zsh hook) — per-directory env vars, very common pairing with the virtualenv plugin above.
     [?] unixorn/tumult.plugin.zsh and similar single-purpose oh-my-zsh style plugins exist by the hundreds in the list but skew low-value/thin wrappers — I'd skip browsing those unless you have a specific tool in mind.
-    [?] Atuin - replaces flat-file shell history with a local SQLite database: per-command exit code, cwd, host, duration
+    [~] Atuin - replaces flat-file shell history with a local SQLite database: per-command exit code, cwd, host, duration
       + optional sync service
   [,] 17:55 20m Qs !zsh plugins
     [≫] FUT:PERF: mattmc3/antidote: https://antidote.sh - the cure to slow zsh plugin management ⌇⡪⡰⢯⡬
       https://github.com/mattmc3/antidote
       WHY: precompile zshrc with *some* plugins
         : ~/.zsh_plugins.txt: /d/plugins/zsh/zsh-autosuggestions
+
+
+5h 2026-08-04-Tue-W31
+  g83 [X] 00:50 20m TRY:CFG !zsh ✓zsh-completions※⡪⡰⢯⢜
+  g83 [^] 02:35 3h TRY:CFG !zsh fzf-tab※⡪⡰⢕⡂
+  [↯] 05:35 1h40m FIXME !zsh fzf-tab ERR wc: ++ DEBUG .zwc stale cache

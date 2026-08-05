@@ -1,0 +1,58 @@
+# vim:ft=zsh
+
+# disable sort when completing `git checkout`
+zstyle ':completion:*:git-checkout:*' sort false
+
+# # set descriptions format to enable group support
+# # NOTE: don't use escape sequences (like '%F{red}%d%f') here, fzf-tab will ignore them
+# zstyle ':completion:*:descriptions' format '[%d]'
+# # set list-colors to enable filename colorizing
+# zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+
+# force zsh not to show completion menu, which allows fzf-tab to capture the unambiguous prefix
+zstyle ':completion:*' menu no
+
+# Preview directory contents on cd
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always --icons $realpath 2>/dev/null || ls -1 --color=always $realpath'
+
+# Preview file contents for anything that completes a path (cat/vim/nvim/bat etc)
+zstyle ':fzf-tab:complete:(nvim|vim|v|bat|cat):*' fzf-preview \
+  '[[ -d $realpath ]] && eza -1 --color=always $realpath || bat --style=numbers --color=always --theme="Solarized (light)" --line-range=:200 $realpath'
+
+# Preview man pages
+zstyle ':fzf-tab:complete:man:*' fzf-preview 'man $word 2>/dev/null | col -bx | bat --style=plain --color=always --theme="Solarized (light)" -l man'
+
+# CHECK:(kill may need override):
+# Preview process info for kill (you already have a custom `command` for this;
+# fzf-preview adds a right-pane detail view on top of it)
+zstyle ':fzf-tab:complete:kill:*' fzf-preview 'ps -p $word -o pid,user,%cpu,%mem,cmd'
+
+# Preview git diffs/logs
+zstyle ':fzf-tab:complete:git-log:*' fzf-preview 'git log --color=always $word'
+zstyle ':fzf-tab:complete:git-(add|diff|restore):*' fzf-preview \
+  'git diff --color=always $word | delta 2>/dev/null || git diff --color=always $word'
+
+# Preview env var values
+zstyle ':fzf-tab:complete:(-command-|-parameter-|-brace-parameter-|export|unset|typeset):*-value-' fzf-preview 'echo ${(P)word}'
+
+## ALT: make fzf-tab follow FZF_DEFAULT_OPTS (DFL=ignored)
+##   WARN: This may lead to unexpected behavior since some flags break this plugin. See Aloxaf/fzf-tab#455.
+# zstyle ':fzf-tab:*' use-fzf-default-opts yes
+# --color=fg:1,fg+:2 --bind=tab:accept  # --height=40%
+zstyle ':fzf-tab:*' fzf-flags \
+  --preview-window='right,60%,border-left,wrap' \
+  --bind='ctrl-x:toggle-preview,ctrl-o:jump,ctrl-s:toggle-sort'
+
+# Continuous trigger: hitting Tab shows results progressively (fzf-tab's own "live" filter,
+# separate from the earlier zsh-autocomplete discussion — this narrows *within* one completion pass)
+zstyle ':fzf-tab:*' continuous-trigger '/'
+
+# # switch group using `<` and `>`
+zstyle ':fzf-tab:*' switch-group '<' '>'
+
+## tmux popup NEED: !tmux>=3.2
+#   DEBUG: $ ls | ftb-tmux-popup
+#   ALSO: $ build-fzf-tab-module
+# DFL: zstyle ':fzf-tab:*' fzf-command fzf
+zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
+zstyle ':fzf-tab:*' popup-min-size 80 20  # keep wide previews in small panes

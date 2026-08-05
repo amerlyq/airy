@@ -1,6 +1,7 @@
 from airy.api import Pkg, ln
 
 Pkg("zsh")
+Pkg("eza")  # DEPR=ls
 # Pkg("mcfly")
 # Pkg("thefuck")
 # Pkg("fzf")
