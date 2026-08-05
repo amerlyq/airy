@@ -74,3 +74,23 @@ Scan
         'password="passwd"'
     )
   $ netctl enable wifi_dhcp
+
+
+TODO
+  2017-09-10 [X] setup guest wifi
+  [_] test all wifi on cert enforcing
+
+
+%%% wifi-ap
+  For 'NATed' or 'None' Internet sharing method
+    apt_noprompt dnsmasq
+    git_install 'oblique/create_ap'
+    alias wifi="netctl-auto switch-to"
+  # Check 'wlan0' and 'ieee...' from iwconfig
+  With internet
+    # create_ap -m nat -w WPA2 --hidden --ieee80211n wlan0 ap_test terrified
+    sudo create_ap --hidden --ieee80211n -c 5 -n wlan0 ap_test terrified
+  ALT:REF: https://w1.fi/hostapd/
+    #   * haveged (optional) -- entropy for randomness
+    #   * iwconfig (you only need this if 'iw' can not recognize your adapter)
+    # pkg_inst hostapd iw haveged

@@ -1,0 +1,33 @@
+2026-08-05-Wed-W31 ⌇⡪⡳⢌⢈
+  Preps
+    $ sudo ip link set wlan0 down
+    $ iw list | grep -A8 "Supported interface modes"
+    $ pacman -S hostapd dnsmasq
+    $ iw reg get
+      channel=36
+    $ iw list | grep -A2 "5180 MHz"
+  AP Up
+    $ sudo systemctl stop netctl-auto@wlan0
+    $ sudo ip addr add 192.168.4.1/24 dev wlan0
+    $ sudo ip link set wlan0 up
+    $ sudo systemctl start hostapd dnsmasq
+    $ sudo sysctl -w net.ipv4.ip_forward=1
+      # OR: $ echo 'net.ipv4.ip_forward=1' | sudo tee /etc/sysctl.d/99-ip-forward.conf
+    $ sudo nft add table ip nat
+    $ sudo nft add chain ip nat postrouting '{ type nat hook postrouting priority 100 ; }'
+    $ sudo nft add rule ip nat postrouting oifname "enp0s20f0u1" masquerade
+    $ sudo nft list ruleset
+      * priority srcnat is just nft's symbolic name for 100
+  AP Down
+    $ sudo systemctl stop hostapd dnsmasq
+    $ ip addr flush dev wlan0
+    $ sudo systemctl start netctl-auto@wlan0
+  DEBUG
+    Verbose manually run
+      $ sudo hostapd -dd /etc/hostapd/hostapd.conf
+    PERF
+      $ iw dev wlan0 station dump
+      $ iperf3 -s  $ # use android iperf3 app
+    Dynamic IP
+      $ systemctl status dnsmasq  $
+      $ journalctl -xeu dnsmasq -n 30 --no-pager

@@ -654,11 +654,11 @@ def _register_x11_hooks():
         audit_log(f"{oid} {nl}/{cnt}\t{sel}", "cb")
 
 
-@hook.subscribe.startup_complete
-def _late_init() -> None:
-    send_notification("qtile", "startup")
-    # if qtile.core and qtile.core.name == "x11":
-    _register_x11_hooks()
+# @hook.subscribe.startup_complete
+# def _late_init() -> None:
+#     send_notification("qtile", "startup")
+#     # if qtile.core and qtile.core.name == "x11":
+#     _register_x11_hooks()
 
 
 # def toggle_focus_floating():

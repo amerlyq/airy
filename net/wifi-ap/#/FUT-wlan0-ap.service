@@ -1,0 +1,26 @@
+# /etc/systemd/system/wlan0-ap.service
+systemctl start hostapd dnsmasq
+
+## USAGE:
+# $ sudo systemctl stop netctl-auto@wlan0
+# $ sudo systemctl start wlan0-ap hostapd dnsmasq
+# ---
+# $ sudo systemctl stop hostapd dnsmasq wlan0-ap
+# $ sudo systemctl start netctl-auto@wlan0
+
+
+[Unit]
+Description=Static IP for wlan0 AP mode
+Before=hostapd.service dnsmasq.service
+BindsTo=sys-subsystem-net-devices-wlan0.device
+After=sys-subsystem-net-devices-wlan0.device
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/ip addr add 192.168.4.1/24 dev wlan0
+ExecStart=/usr/bin/ip link set wlan0 up
+ExecStop=/usr/bin/ip addr flush dev wlan0
+
+[Install]
+WantedBy=multi-user.target
