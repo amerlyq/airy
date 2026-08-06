@@ -167,3 +167,37 @@ alias Gt.='just world dash -C . modified --files'
 alias Gu='just world dash unsynced'
 alias Gu.='just world dash -C . unsynced'
 alias gz1='/d/airy/git/ctl/snapshot'
+
+
+## NOTE: I intentionally don't source its plugin mess
+#   as it exports everything and clutters my !env
+_forgit=/d/plugins/zsh/forgit/bin/git-forgit
+alias gaj="$_forgit add"
+alias gbj="$_forgit switch_branch"
+alias gdj="$_forgit diff"
+alias glj="$_forgit log"
+alias grj="$_forgit rebase"
+alias gsj="$_forgit show"
+alias gvj="$_forgit blame"
+alias gxj="$_forgit clean"
+unset _forgit
+# forgit_reflog=grl
+# forgit_reset_head=grh
+# forgit_restore=grs
+# forgit_ignore=gi
+# forgit_attributes=gat
+# forgit_checkout_file=gcf
+# forgit_checkout_file_from_commit=gcff
+# forgit_branch_delete=gbd
+# forgit_checkout_tag=gct
+# forgit_checkout_commit=gco
+# forgit_revert_commit=grc
+# forgit_stash_show=gss
+# forgit_stash_push=gsp
+# forgit_cherry_pick=gcp
+# forgit_fixup=gfu
+# forgit_squash=gsq
+# forgit_reword=grw
+# forgit_worktree=gwt
+# forgit_worktree_add=gwa
+# forgit_worktree_delete=gwd
