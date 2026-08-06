@@ -78,10 +78,11 @@ if [[ -e /dev/nvidia0 ]]; then
   # -hwaccel cuda -hwaccel_device 0 -c:v h264_cuvid ...
   # -vf "scale_cuda=w='min(iw,1920)':h='min(ih,1080)':format=yuv420p" \
   # FPS: -vf "fps=30,scale_cuda=..." -fps_mode cfr -c:v ...
+  # -vf "scale_cuda=w='if(gt(iw,ih),min(iw,1920),trunc(1920*iw/ih/2)*2)':h='if(gt(ih,iw),min(ih,1920),trunc(1920*ih/iw/2)*2)':format=yuv420p" \
   #   BUT: detect VFR first: $ ffprobe -v error -select_streams v:0 -show_entries stream=avg_frame_rate,r_frame_rate -of default=nw=1 "$f"
   exec "${ffmpeg[@]}" \
     -hwaccel cuda -hwaccel_output_format cuda -i "$fin" \
-    -vf "scale_cuda=w='if(gt(iw,ih),min(iw,1920),trunc(1920*iw/ih/2)*2)':h='if(gt(ih,iw),min(ih,1920),trunc(1920*ih/iw/2)*2)':format=yuv420p" \
+    -vf "scale_cuda=w='trunc(iw*min(1,if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih)/2)*2':h='trunc(ih*min(1,if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih)/2)*2':format=yuv420p" \
     -c:v hevc_nvenc "${nvopts[@]}" -c:a copy "${out[@]}"
 
   ## ALT: 3..12 concurrent encoding sessions with NVENC
@@ -105,9 +106,10 @@ if [[ -d /sys/module/i915 ]] || [[ -d /sys/module/xe ]]; then
   # "scale_qsv=w='min(iw,1920)':h='min(ih,1080)',format=qsv"
   # "scale=w=1920:h=1920:force_original_aspect_ratio=decrease,format=qsv" \
   # "scale_qsv=w='if(gt(iw,ih),1920,round(1920*a/2)*2)':h='if(gt(ih,iw),1920,round(1920/a/2)*2)',format=qsv" \
+  # "scale_qsv=w='if(gt(iw,ih),min(iw,1920),trunc(1920*a/2)*2)':h='if(gt(ih,iw),min(ih,1920),trunc(1920/a/2)*2)',format=qsv" \
   exec "${ffmpeg[@]}" \
     -init_hw_device qsv=qsv:hw -hwaccel qsv -hwaccel_output_format qsv \
-    -i "$fin" -vf "scale_qsv=w='if(gt(iw,ih),min(iw,1920),trunc(1920*a/2)*2)':h='if(gt(ih,iw),min(ih,1920),trunc(1920/a/2)*2)',format=qsv" \
+    -i "$fin" -vf "scale_qsv=w='trunc(iw*min(1,if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih)/2)*2':h='trunc(ih*min(1,if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih)/2)*2',format=qsv" \
     -c:v hevc_qsv "${cvargs[@]}" -preset slow -global_quality "$qa" "${out[@]}"
 
 fi
