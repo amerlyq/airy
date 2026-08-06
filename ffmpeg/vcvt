@@ -3,14 +3,18 @@
 set -o errexit -o errtrace -o functrace -o noclobber -o noglob -o nounset -o pipefail
 shopt -qs inherit_errexit lastpipe
 
+use=
+if [[ -e /dev/nvidia0 ]]; then use=nv
+elif [[ -d /sys/module/i915 ]] || [[ -d /sys/module/xe ]]; then use=qsv
+else >&2 echo "MAYBE: Fallback to Software Encoding"; exit 1; fi
+
 # REF:(qa): https://www.ffmpeg.org/ffmpeg-codecs.html#Ratecontrol-Method
 #   For the ICQ modes, global quality range is 1 to 51, with 1 being the best quality.
-qa=23
-ifx=c
+[[ $use == qsv ]] && { qa=23; ifx=c; } || { qa=28; ifx=nv; }
 
 while LC_COLLATE=C getopts 'ac:sx-:' o; do
 case $o in :|'?') exit 2
-;; a) ifx=a; qa=25; cvargs=( -tune animation )  # BAD: only for intel and software-render
+;; a) ifx=a
 ;; c) qa=$OPTARG
 ;; s) byserver=1
 ;; x) set -x && xt=${-//[^x]}
@@ -46,7 +50,7 @@ ffmpeg=(ffmpeg -hide_banner)  # -v error | -v verbose
 
 [[ $out == "pipe:1" ]] && out=(-f mp4 "pipe:1") || out=(-y "$out")
 
-if [[ -e /dev/nvidia0 ]]; then
+if [[ $use == nv ]]; then
   # PC with Dedicated NVIDIA (Always active, no integrated graphics)
   #   OR: [[ -e /etc/bumblebee/bumblebee.conf ]] && ffmpeg=(optirun "${ffmpeg[@]}")
 
@@ -67,11 +71,17 @@ if [[ -e /dev/nvidia0 ]]; then
   # INFO:(-rc-lookahead 32): What Does Look-ahead Do in OBS NVENC Settings? - obs-studio ⌇⡪⡮⠗⢐
   #   https://salivity.github.io/obs-studio/article/what-does-look-ahead-do-in-obs-nvenc-settings
   # INFO:(supported): $ ffmpeg -h encoder=hevc_nvenc
+  # nvopts=(  # <CASE:(amv):
+  #   -preset p7 -highbitdepth 1 -multipass fullres
+  #   -rc vbr -cq 23 -maxrate 16M -bufsize 32M
+  #   -rc-lookahead 48 -lookahead_level auto -tf_level 4
+  #   -spatial_aq 1 -aq-strength 12 -g 60 -bf 4 -b_ref_mode middle
+  # )
   nvopts=(  # <CASE:(amv):
-    -preset p7 -highbitdepth 1 -multipass fullres
-    -rc vbr -cq "$qa" -maxrate 16M -bufsize 32M
-    -rc-lookahead 48 -lookahead_level auto -tf_level 4
-    -spatial_aq 1 -aq-strength 12 -g 60 -bf 4 -b_ref_mode middle
+    -preset p7 -highbitdepth 1 -multipass qres
+    -rc vbr -cq "$qa" -maxrate 8M -bufsize 16M
+    -rc-lookahead 48 -lookahead_level auto
+    -spatial_aq 1 -aq-strength 8 -g 30 -bf 4 -b_ref_mode middle
   )
 
   ## ALT: cuda
@@ -82,7 +92,7 @@ if [[ -e /dev/nvidia0 ]]; then
   #   BUT: detect VFR first: $ ffprobe -v error -select_streams v:0 -show_entries stream=avg_frame_rate,r_frame_rate -of default=nw=1 "$f"
   exec "${ffmpeg[@]}" \
     -hwaccel cuda -hwaccel_output_format cuda -i "$fin" \
-    -vf "scale_cuda=w='trunc(iw*min(1,if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih)/2)*2':h='trunc(ih*min(1,if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih)/2)*2':format=yuv420p" \
+    -vf "scale_cuda=w='trunc(iw*min(1,min(if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih))/2)*2':h='trunc(ih*min(1,min(if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih))/2)*2':format=yuv420p" \
     -c:v hevc_nvenc "${nvopts[@]}" -c:a copy "${out[@]}"
 
   ## ALT: 3..12 concurrent encoding sessions with NVENC
@@ -93,9 +103,11 @@ if [[ -e /dev/nvidia0 ]]; then
   # ls *.mp4 | xargs -P "$PARALLEL" -I{} bash -c 'convert_one "$@"' _ {}
 fi
 
-if [[ -d /sys/module/i915 ]] || [[ -d /sys/module/xe ]]; then
+if [[ $use == qsv ]]; then
   # elif [ -d /sys/class/drm/card0/device/intel-guc ] || [ -e /dev/dri/by-path/*-pci-*-intel-* ] || [ -d /sys/module/i915 ];
   # Laptop with Intel QSV (Intel driver loaded, no active NVIDIA)
+  # BAD: no "-tune animation" -- only for software-render
+  qsvopts=( )
 
   ## ALT: qsv variants
   # -c:v h264_qsv|av1_qsv|hevc_qsv OR:(auto): -init_hw_device qsv=qsv:hw
@@ -108,9 +120,9 @@ if [[ -d /sys/module/i915 ]] || [[ -d /sys/module/xe ]]; then
   # "scale_qsv=w='if(gt(iw,ih),1920,round(1920*a/2)*2)':h='if(gt(ih,iw),1920,round(1920/a/2)*2)',format=qsv" \
   # "scale_qsv=w='if(gt(iw,ih),min(iw,1920),trunc(1920*a/2)*2)':h='if(gt(ih,iw),min(ih,1920),trunc(1920/a/2)*2)',format=qsv" \
   exec "${ffmpeg[@]}" \
-    -init_hw_device qsv=qsv:hw -hwaccel qsv -hwaccel_output_format qsv \
-    -i "$fin" -vf "scale_qsv=w='trunc(iw*min(1,if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih)/2)*2':h='trunc(ih*min(1,if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih)/2)*2',format=qsv" \
-    -c:v hevc_qsv "${cvargs[@]}" -preset slow -global_quality "$qa" "${out[@]}"
+    -init_hw_device qsv=qsv:hw -hwaccel qsv -hwaccel_output_format qsv -i "$fin" \
+    -vf "scale_qsv=w='trunc(iw*min(1,min(if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih))/2)*2':h='trunc(ih*min(1,min(if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih))/2)*2',format=qsv" \
+    -c:v hevc_qsv "${qsvopts[@]}" -preset slow -global_quality "$qa" "${out[@]}"
 
 fi
 
