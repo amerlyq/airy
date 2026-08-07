@@ -18,12 +18,16 @@ CC.setup({
   -- },
 
   interactions = {
-    -- chat = {
-    --   keymaps = {
-    --     send = false,  -- DFL=<C-s>
-    --     close = false  -- DFL=<C-c>
-    --   }
-    -- },
+    chat = {
+      -- adapter = {
+      --   name = "codex_docker",
+      --   -- model = "gpt-5.6-sol",
+      -- },
+      -- keymaps = {
+      --   send = false,  -- DFL=<C-s>
+      --   close = false  -- DFL=<C-c>
+      -- }
+    },
     -- cli = {
     --   agent = "codex_docker",
     --   agents = {
@@ -128,6 +132,9 @@ CC.setup({
       end,
     },
     acp = {
+      opts = {
+        show_presets = false,
+      },
       codex_docker = function()
         return require("codecompanion.adapters").extend("codex", {
           name = "codex_docker",
@@ -138,10 +145,20 @@ CC.setup({
             --   $ cd ./codex-acp && docker run --rm --init --ulimit memlock=-1:-1 -v "$PWD:$PWD" -w "$PWD" oven/bun:slim \
             --     sh -c "bun install && bun build src/index.ts --minify --sourcemap --compile --target=bun-linux-x64-baseline --outfile dist/bin/codex-acp"
             --   $ /d/airy/ai/run --name=codex_docker --mnt=/t/codex-acp/dist/bin/codex-acp:/b/codex-acp [--codex] --wkdir="$PWD" -- "$PWD" CODEX_PATH=/b/codex
-            default = { "docker", "exec", "-i", "codex_docker", "codex-acp", },
+            default = { "docker", "exec", "-i",
+              -- "-e", [[CODEX_CONFIG={"model":"gpt-5.6-terra","model_reasoning_effort":"low"}]],
+              "codex_docker", "codex-acp", },
           },
           defaults = {
             auth_method = "chat-gpt",
+            session_config_options = {
+              -- ga → choose/switch model
+              -- /acp_session_options → choose reasoning effort (thought_level) and other ACP session options
+              -- gd → debug window; shows current model/session config
+              model = "gpt-5.6-luna",
+              -- model = function(self) return "gpt-5.6-luna" end,
+              thought_level = "low",
+            },
           },
         })
       end,
