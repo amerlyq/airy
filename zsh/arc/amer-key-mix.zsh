@@ -164,7 +164,9 @@ if [[ -r /usr/share/zsh/site-functions/abyss.zsh ]]; then
   source /usr/share/zsh/site-functions/abyss.zsh
 else
   # make -- save and re-run last cmd by [,m]
-  set_fast_exec_cmd 'miur'  # 'abyss'
+  # OR: set_fast_exec_cmd 'miur'  # 'abyss'
+  bindkey  -s ',m' "^U miur\n"
+  bindkey -as ',m' "S miur\n"
   bindkey    '\C-x\C-m' set-fast-exec-cmd
   bindkey -a '\C-x\C-m' set-fast-exec-cmd
 fi
@@ -213,3 +215,46 @@ bindkey -M menuselect '^M' .accept-line
 # FAIL: bindkey  '\C-.' insert-last-word
 # bindkey '^\' character-search               # <C-4>, <C-\>
 # bindkey '^]' character-search-backward      # <C-5>, <C-]>
+
+
+##################################################
+# Allow command line editing in an external editor.
+autoload -Uz edit-command-line
+zle -N edit-command-line
+
+
+# SRC: https://unix.stackexchange.com/questions/76227/how-to-make-cd-dir-filename-take-me-to-dir
+autoload -Uz select-word-style
+zle -N select-word-style
+bindkey -M viins "\ew" select-word-style
+# bindkey -M viins '\M-w' select-word-style
+
+
+# SRC: https://stackoverflow.com/questions/8344699/how-to-repeat-the-last-part-of-a-previous-command
+# USAGE: M-2 M-.
+# SRC: https://stackoverflow.com/questions/34571398/altnumberdot-and-altcomma-in-zsh-and-bash
+# USAGE: M-. M-. M-m -- go back in history and get last word
+autoload -Uz copy-earlier-word
+zle -N copy-earlier-word
+bindkey "\em" copy-earlier-word
+
+# FIXME: check why I don't have these by DFL
+bindkey "^[0" digit-argument
+bindkey "^[1" digit-argument
+bindkey "^[2" digit-argument
+bindkey "^[3" digit-argument
+bindkey "^[4" digit-argument
+bindkey "^[5" digit-argument
+bindkey "^[6" digit-argument
+bindkey "^[7" digit-argument
+bindkey "^[8" digit-argument
+bindkey "^[9" digit-argument
+
+
+# SRC: https://stackoverflow.com/questions/48229336/insert-first-word-of-previous-command-in-zsh-command-line
+bindkey "\e." insert-last-word
+bindkey "\e_" insert-last-word
+
+zle -N insert-first-word
+## WTF: bindkey "^[," _history-complete-newer
+bindkey "\e," insert-first-word

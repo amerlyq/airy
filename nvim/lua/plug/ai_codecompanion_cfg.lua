@@ -62,6 +62,7 @@ CC.setup({
       adapter = "openrouter",
       -- FAIL: ACP adapters are NOT supported for inline interaction.
       --   Keep an HTTP adapter here if you use :CodeCompanion.
+      --   ERR: [adapters::http::extend] Adapter not found: codex
       -- adapter = "codex_docker",
     },
   },
@@ -145,6 +146,9 @@ CC.setup({
             --   $ cd ./codex-acp && docker run --rm --init --ulimit memlock=-1:-1 -v "$PWD:$PWD" -w "$PWD" oven/bun:slim \
             --     sh -c "bun install && bun build src/index.ts --minify --sourcemap --compile --target=bun-linux-x64-baseline --outfile dist/bin/codex-acp"
             --   $ /d/airy/ai/run --name=codex_docker --mnt=/t/codex-acp/dist/bin/codex-acp:/b/codex-acp [--codex] --wkdir="$PWD" -- "$PWD" CODEX_PATH=/b/codex
+            -- DEBUG
+            --   $ docker exec -it codex_docer -- codex exec 'say OK'
+            --   $ docker exec -it codex_docer -- codex login status
             default = { "docker", "exec", "-i",
               -- "-e", [[CODEX_CONFIG={"model":"gpt-5.6-terra","model_reasoning_effort":"low"}]],
               "codex_docker", "codex-acp", },
@@ -166,37 +170,55 @@ CC.setup({
   },
 })
 
--- Register keymaps only when loaded
-local map = vim.keymap.set
-map({ "n", "v" }, "<Space>c", "<Cmd>CodeCompanionChat Toggle<CR>", { noremap = true, silent = true, desc = "AI Chat" })
-map({ "n", "v" }, "<Space>i", "<Cmd>CodeCompanion<CR>", { desc = "AI Inline Prompt" })
-map({ "n", "v" }, "<Space>a", "<Cmd>CodeCompanionActions<CR>", { noremap = true, silent = true, desc = "AI Actions" })
-map("v", "<Space>e", ":CodeCompanion /fix<CR>", { desc = "AI Fix Selected Code" })
-map("v", "<Space>v", ":CodeCompanionChat Add<CR>", { noremap = true, silent = true, desc = "AI Send selection to ACP" })
--- map({ "n", "v" }, "<Space>v", function() return CC.cli("#{this}", { focus = false }) end, { desc = "Add context to the CLI agent" })
-map({ "n", "v" }, "<Space>l", function() return CC.cli({ prompt = true }) end, { desc = "Prompt the CLI agent" })
+vim.api.nvim_create_autocmd("FileType", {
+  callback = function(args)
+    local excluded_filetypes = {
+      "nou",
+      -- "help",
+      -- "terminal",
+      -- "toggleterm",
+      -- "NvimTree",
+      -- "neo-tree",
+      -- "lazy",
+      -- "mason",
+    }
+    local ft = vim.bo[args.buf].filetype
 
-map("n", "<Space>d", function()
-  return CC.cli("#{diagnostics} Can you fix these?", { focus = false, submit = true })
-end, { desc = "Send diagnostics to CLI agent" })
+    if vim.tbl_contains(excluded_filetypes, ft) then
+      return
+    end
 
-map("n", "<Space>t", function()
-  return CC.cli("#{terminal} Sharing the output from the terminal. Can you fix it?", { focus = false, submit = true })
-end, { desc = "Send terminal output to CLI agent" })
+    local function map(mode, lhs, rhs, desc)
+      vim.keymap.set(mode, lhs, rhs, { buffer = args.buf, noremap = true, silent = true, desc = desc })
+    end
 
-map("n", "<Space>i", function() CC.prompt("docs") end, { noremap = true, silent = true })
+    map({ "n", "v" }, "<Space>c", "<Cmd>CodeCompanionChat Toggle<CR>", "AI Chat")
+    map({ "n", "v" }, "<Space>i", "<Cmd>CodeCompanion<CR>", "AI Inline Prompt")
+    map({ "n", "v" }, "<Space>a", "<Cmd>CodeCompanionActions<CR>", "AI Actions")
+    map("v", "<Space>e", ":CodeCompanion /fix<CR>", "AI Fix Selected Code")
+    map("v", "<Space>v", ":CodeCompanionChat Add<CR>", "AI Send selection to ACP")
+    -- map({ "n", "v" }, "<Space>v", function() return CC.cli("#{this}", { focus = false }) end, "Add context to the CLI agent")
+    map({ "n", "v" }, "<Space>l", function() return CC.cli({ prompt = true }) end, "Prompt the CLI agent")
+
+    map("n", "<Space>d", function()
+      return CC.cli("#{diagnostics} Can you fix these?", { focus = false, submit = true })
+    end, "Send diagnostics to CLI agent")
+
+    map("n", "<Space>t", function()
+      return CC.cli("#{terminal} Sharing the output from the terminal. Can you fix it?", { focus = false, submit = true })
+    end, "Send terminal output to CLI agent")
+
+    map("n", "<Space>i", function() CC.prompt("docs") end, "AI 'docs'")
+
+    -- USAGE:(switch): :CodeCompanionChat Adapter [ollama|openrouter|gemini]
+    -- map("n", "<Space>ao", function() CC.adapters.set("openrouter") end, "CC: OpenRouter" })
+    -- map("n", "<Space>al", function() CC.adapters.set("ollama") end, "CC: Ollama (local)" })
+    -- map("n", "<Space>ag", function() CC.adapters.set("gemini") end, "CC: Gemini" })
+  end,
+})
 
 -- Expand 'C' into 'CodeCompanion' in the command line
 vim.cmd([[cab C CodeCompanion]])
-
--- USAGE: switch
--- :CodeCompanionChat Adapter ollama
--- :CodeCompanionChat Adapter openrouter
--- :CodeCompanionChat Adapter gemini
--- map("n", "<leader>ao", function() CC.adapters.set("openrouter") end, { desc = "CC: OpenRouter" })
--- map("n", "<leader>al", function() CC.adapters.set("ollama") end, { desc = "CC: Ollama (local)" })
--- map("n", "<leader>ag", function() CC.adapters.set("gemini") end, { desc = "CC: Gemini" })
-
 
 -- Override SYSTEM prompt
 --   interactions = {

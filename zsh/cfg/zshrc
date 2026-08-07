@@ -1,4 +1,5 @@
 # PERF:(startup): =100ms= $ for i in {1..10}; do time zsh -i -c exit; done
+#   sync=~120ms lazy=15ms WSL2=30m (mostly delayed by git-status)
 # PERF:(profiling/beg):
 # zmodload zsh/zprof
 # 1)   11          47.53     4.32   50.98%     31.23     2.84   33.50%  source  (autopair + zsh_highlight)
@@ -152,38 +153,20 @@ zsh-defer -c '
 
 function _usercli { local _airy="${${(%):-%x}:A:h:h:h}"  # =${BASH_SOURCE[0]:-...}
 
-  ## FAIL:DISABLED: somehow breaks fzf-tab due to .zwc mismatch
-  # ALT: zsh-defer -c 'autoload -Uz zrecompile; zrecompile -q $_plugins/**/*.zsh(N) &!'
-  #   BET? add to /d/plugins/recache or git-hook
-  # function source {
-  #   # NOTE: don't compile anything inside /usr/*
-  #   [[ ! -w ${1:h} ]] || [[ $1.zwc -nt $1 ]] || zcompile $1
-  #   builtin source $@
-  # }
-
   source $_airy/zsh/arc/amer-widgets.zsh
-  source $_airy/zsh/arc/amer-key-mix.zsh
-  source $_airy/zsh/arc/alias/aliases
-  source $_airy/zsh/cfg/aliases_git
-  source $_airy/zsh/cfg/aliases
-
-  source $_airy/ssh/alias
 
   # TEMP: cdauto paths (OLD-style)
   # TODO:CHG:(cdauto): cd /path/to/somefile(:h)
   source $_airy/sh/alias/cd
+
+  # PERF=+10ms
   while read -r k p; do
     # SEE: https://vincent.bernat.ch/en/blog/2015-zsh-directory-bookmarks
     # USAGE: cd ~.a
     [[ ${k:0:1} == "." && -z ${${k:1}//[a-zA-Z0-9.]} ]] && hash -d -- "${k:1}"="${p#-l }"
     alias "$k"="cdauto $p"
   done < <(sed -r 's/(^|\s+)#.*$//; /^\s*$/d' /d/airy/airy/pathes)
-
-  # EXPL: we redefine "source()" with recompile only to speed up next startup
-  #   >> sourcing in interactive session shouldn't create *.zwc everywhere!
-  #   == and plugins should be recompiled by ./recache after git-pull
-  zsh-defer unset -f source
-
+}
 
 # TODO: replace "fm()/zshexit()" by "source =miur/sync-cwd"
 fm(){ local d f=${XDG_RUNTIME_DIR:?}/ranger/cwd
@@ -203,11 +186,32 @@ zshexit(){  # _ranger_cwd
   (set +C && print -n -- "$PWD" > "$tmp/cwd")  # Disable clobbering
 }
 
-}; zsh-defer -c '_usercli && unset -f _usercli'
+## FAIL:DISABLED:#1: somehow breaks fzf-tab due to .zwc mismatch
+# ALT: zsh-defer -c 'autoload -Uz zrecompile; zrecompile -q $_plugins/**/*.zsh(N) &!'
+#   BET? add to /d/plugins/recache or git-hook
+# function source {
+#   # NOTE: don't compile anything inside /usr/*
+#   [[ ! -w ${1:h} ]] || [[ $1.zwc -nt $1 ]] || zcompile $1
+#   builtin source $@
+# }
 
-# Allow command line editing in an external editor.
-autoload -Uz edit-command-line
-zle -N edit-command-line
+zsh-defer -c '_usercli && unset -f _usercli'
+
+## FIXED: don't use !zsh-defer for aliases -- startup is too slow on WSL2,
+##   and I may execute first command before they load
+local _airy="${${(%):-%x}:A:h:h:h}"
+source $_airy/zsh/arc/amer-key-mix.zsh
+source $_airy/zsh/arc/alias/aliases  # PERF=5ms
+source $_airy/zsh/cfg/aliases_git
+source $_airy/zsh/cfg/aliases
+source $_airy/ssh/alias
+
+## FAIL:DISABLED:#2: somehow breaks fzf-tab due to .zwc mismatch
+# EXPL: we redefine "source()" with recompile only to speed up next startup
+#   >> sourcing in interactive session shouldn't create *.zwc everywhere!
+#   == and plugins should be recompiled by ./recache after git-pull
+# zsh-defer unset -f source
+
 
 # Expand aliases
 function glob-alias {
@@ -216,7 +220,6 @@ function glob-alias {
   zle magic-space
 }
 zle -N glob-alias
-
 # control-space expands all aliases, including global
 bindkey -M viins "^ " glob-alias
 
@@ -227,42 +230,6 @@ WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
 ## DISABLED: long running
 # TIMEFMT='e=%*E u=%U s=%S memsh=%XkB memun=%DkB memmax=%MkB nswap=%W nmajflt=%F nmnrflt=%R nrecv=%r nsent=%s nctxyield=%w nctxforce=%c nm=%J'
 TIMEFMT='%mE %P(%mU+%mS) | ram=%D+%XkB,%MkB fault=%F/%R ios=%I/%O/%k ctx=%w/%c'
-
-# SRC: https://unix.stackexchange.com/questions/76227/how-to-make-cd-dir-filename-take-me-to-dir
-autoload -Uz select-word-style
-zle -N select-word-style
-bindkey -M viins "\ew" select-word-style
-# bindkey -M viins '\M-w' select-word-style
-
-
-# SRC: https://stackoverflow.com/questions/8344699/how-to-repeat-the-last-part-of-a-previous-command
-# USAGE: M-2 M-.
-# SRC: https://stackoverflow.com/questions/34571398/altnumberdot-and-altcomma-in-zsh-and-bash
-# USAGE: M-. M-. M-m -- go back in history and get last word
-autoload -Uz copy-earlier-word
-zle -N copy-earlier-word
-bindkey "\em" copy-earlier-word
-
-# FIXME: check why I don't have these by DFL
-bindkey "^[0" digit-argument
-bindkey "^[1" digit-argument
-bindkey "^[2" digit-argument
-bindkey "^[3" digit-argument
-bindkey "^[4" digit-argument
-bindkey "^[5" digit-argument
-bindkey "^[6" digit-argument
-bindkey "^[7" digit-argument
-bindkey "^[8" digit-argument
-bindkey "^[9" digit-argument
-
-
-# SRC: https://stackoverflow.com/questions/48229336/insert-first-word-of-previous-command-in-zsh-command-line
-bindkey "\e." insert-last-word
-bindkey "\e_" insert-last-word
-
-zle -N insert-first-word
-## WTF: bindkey "^[," _history-complete-newer
-bindkey "\e," insert-first-word
 
 
 ############################################################
