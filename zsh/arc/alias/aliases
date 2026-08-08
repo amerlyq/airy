@@ -57,6 +57,7 @@ if (($+commands[$EDITOR])); then
   # ALSO: -c "fencs= fenc=utf8 nobinary nobomb"
   alias -g V='| $EDITOR - -c "setl noro ma bt=nofile nowrap"'
   alias -g VL='| xargs $EDITOR'
+  alias -g VD='V -c "setf diff"'
   alias -g VN='V -c "setl ft=nou fdl=99"'
   alias -g VQ='V -c "au User LazyPluginsLoaded cgetb|copen"'
     # ALT: ag --vimgrep ... |sort| nvim -q/dev/stdin

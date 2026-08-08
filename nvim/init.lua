@@ -43,6 +43,7 @@ require 'airy.autocmds'
 require 'keys.lead'
 require 'keys.escape'
 
+require 'keys.diff'
 require 'keys.edit'
 require 'keys.integ'
 require 'keys.move'

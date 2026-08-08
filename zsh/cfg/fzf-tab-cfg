@@ -10,6 +10,10 @@ zstyle ':completion:*git-commit*' sort false
 # zstyle ':completion:*:*:git-*:*' sort false
 # zstyle ':completion:*:*:git-*:*:commits' sort false
 
+# BAD: • The 20-sha limit is hardcoded in zsh __git_recent_commits
+#   * There is no zstyle setting for that limit.
+# WKRND:(edit yourself): $ cp /usr/share/zsh/functions/Completion/Unix/_git "$ZDOTDIR/completion.d/_git"
+
 
 # # set descriptions format to enable group support
 # # NOTE: don't use escape sequences (like '%F{red}%d%f') here, fzf-tab will ignore them

@@ -41,7 +41,7 @@ alias gcf='git commit --amend --reuse-message HEAD'
 alias gcf-='gcf --no-verify'
 alias gcF='git commit --amend'  # --verbose
 # alias gcm='git commit -m "wip" -m- -m"Issue: $(git branch --show-current|sed -r "s/^([A-Z]+-[0-9]+).*/\\1/")"'
-gcm(){ git commit -m "${*:-wip}" -m- -m"Issue: $(git branch --show-current|sed -r 's/^([A-Z]+-[0-9]+).*/\1/')" }
+gcm(){ git commit -m "${*:-wip}" -m- --trailer="Issue: $(git branch --show-current|sed -r 's/^([A-Z]+-[0-9]+).*/\1/')" }
 alias gcm='noglob gcm'
 alias gcM='git commit'
 alias gcn='git commit --no-verify --message '
@@ -53,6 +53,7 @@ alias gcss='git show --stat'
 alias gcsd='git show --diff-filter=d --pretty=short --show-signature'
 alias gcsl='git --no-pager show --name-status --format=""'
 alias gcst='git --no-pager show --no-patch --pretty=tformat:%ad%n%cd'
+alias gcu='git commit --no-verify --fixup'
 
 alias gdf='git diff -M --color-moved'
 alias gdf.='gdf .'
