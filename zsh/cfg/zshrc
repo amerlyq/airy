@@ -35,7 +35,7 @@ fi
 # OBSOL(due !su whitelist=DISPLAY): [[ -z ${DISPLAY-} && ... ]]
 [[ -n ${SSH_CONNECTION+x} && $PATH != */b/xc-ssh:* && -d /b/xc-ssh ]] && PATH=/b/xc-ssh:$PATH
 
-export SSH_AUTH_SOCK=${XDG_RUNTIME_DIR:?}/gnupg/S.gpg-agent.ssh
+[[ -n $XDG_RUNTIME_DIR ]] && export SSH_AUTH_SOCK=${XDG_RUNTIME_DIR:?}/gnupg/S.gpg-agent.ssh
 [[ -n $SSH_CONNECTION ]] && export PINENTRY_USER_DATA='USE_CURSES=1'
 # autoload -Uz add-zsh-hook
 # function _gpg-agent-update-tty {
@@ -77,6 +77,9 @@ setopt histsavenodups
 # setopt histverify
 setopt incappendhistorytime
 
+# DISABLED: it's more annoying than useful for me
+setopt nobanghist
+
 
 ## FIXED: trim trailing newline from confl-triple-click
 # SRC: https://unix.stackexchange.com/questions/693118/trim-trailing-newline-from-pasted-text-in-zsh
@@ -107,6 +110,14 @@ zshaddhistory() { local f
 # fi
 
 
+# FIXED: Save the unfinished editing line when the terminal sends SIGINT on <C-c>.
+# `print -s` puts it in the current interactive history list immediately.
+TRAPINT() {
+  zle && [[ -n $BUFFER ]] && print -s -r -- "$BUFFER"
+  return $1  # <OLD~~ return "1" or don't return anything if no zle
+}
+
+
 ############################################################
 ### Prompt (+30ms due git)
 _plugins=/d/plugins/zsh
@@ -134,6 +145,22 @@ zstyle ':completion:*' completer _expand _complete _files _correct _approximate
 zstyle ':completion:*:*:kill:*' menu yes select
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
 zstyle ':completion:*:*:kill:*:processes' command 'ps xo pid,user:10,cmd |tac| grep -Ev "(ps xo|firefox|/bin/zsh|-zsh|runsv)"'
+
+
+# IDEA:CHECK: if it works
+#   Caveat: this toggles for the next completion invocation, not mid-menu
+#     -- no live re-sort of an already-open completion list at the zsh level
+toggle-comp-sort() {
+  local cur=$(zstyle -L ':completion:*' sort)
+  if [[ -z "$cur" ]]; then
+    zstyle ':completion:*' sort false
+  else
+    zstyle -d ':completion:*' sort
+  fi
+}
+zle -N toggle-comp-sort
+bindkey '^X^S' toggle-comp-sort
+
 
 # WARN:(order): should be loaded b4 oth plugins, but *after* fpath and 'zstyle :completion:' options
 # WARN:(no zsh-defer): defer breaks live complet for first prompt (zle-line-init/widgets need to be hooked)
@@ -166,10 +193,11 @@ function _usercli { local _airy="${${(%):-%x}:A:h:h:h}"  # =${BASH_SOURCE[0]:-..
     [[ ${k:0:1} == "." && -z ${${k:1}//[a-zA-Z0-9.]} ]] && hash -d -- "${k:1}"="${p#-l }"
     alias "$k"="cdauto $p"
   done < <(sed -r 's/(^|\s+)#.*$//; /^\s*$/d' /d/airy/airy/pathes)
-}
+}; zsh-defer -c '_usercli && unset -f _usercli'
+
 
 # TODO: replace "fm()/zshexit()" by "source =miur/sync-cwd"
-fm(){ local d f=${XDG_RUNTIME_DIR:?}/ranger/cwd
+fm(){ local d f=${XDG_RUNTIME_DIR:-/tmp}/ranger/cwd
   # NOTE: exit ranger-nested shell && sync last PWD (inof ZSHEXIT)
   [[ -n ${RANGER_LEVEL-} ]] && exit  # && (set +C && pwd > "$f")
   [[ -d ${f%/*} ]] || command mkdir -p "${f%/*}"
@@ -180,7 +208,7 @@ fm(){ local d f=${XDG_RUNTIME_DIR:?}/ranger/cwd
 
 # FIXED:(<C-d>): should sync PWD even when exiting on <C-D> inof <,s>
 zshexit(){  # _ranger_cwd
-  local tmp=${XDG_RUNTIME_DIR:?}/ranger
+  local tmp=${XDG_RUNTIME_DIR:-/tmp}/ranger
   [[ -d $tmp && $RANGER_LEVEL ]] || return 0
   [[ -d $tmp ]] || command mkdir -p "$tmp"
   (set +C && print -n -- "$PWD" > "$tmp/cwd")  # Disable clobbering
@@ -194,8 +222,6 @@ zshexit(){  # _ranger_cwd
 #   [[ ! -w ${1:h} ]] || [[ $1.zwc -nt $1 ]] || zcompile $1
 #   builtin source $@
 # }
-
-zsh-defer -c '_usercli && unset -f _usercli'
 
 ## FIXED: don't use !zsh-defer for aliases -- startup is too slow on WSL2,
 ##   and I may execute first command before they load

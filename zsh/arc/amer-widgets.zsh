@@ -90,16 +90,6 @@ function store_tmux_pane {
     zle reset-prompt
 }
 
-### TRAPS ###
-
-# Save to history on <C-c> alongside interrupt
-function TRAPINT() {
-    if [[ -n "$BUFFER" ]]; then
-        zle && print -s -r -- $BUFFER && return $1  # Default
-    else
-        return 1
-    fi
-}
 
 function my-forward-word-after-end {
   zle vi-forward-word-end

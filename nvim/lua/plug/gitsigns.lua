@@ -38,5 +38,6 @@ M.setup {
 -- config.signcolumn = false and config.numhl == false and config.linehl == false
 -- and vim.wo.signcolumn == 'number'
 
+-- BAD: doesn't work for arbitrary unified ft=diff from stdin
 K('n', ']c', M.next_hunk, "(gitsigns) next_hunk")
 K('n', '[c', M.prev_hunk, "(gitsigns) prev_hunk")

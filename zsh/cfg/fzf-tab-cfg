@@ -1,7 +1,15 @@
 # vim:ft=zsh
 
-# disable sort when completing `git checkout`
+# ALT: disable ALL zsh *own* candidate sort (so fzf-tab won't sort either)
+# zstyle ':completion:*' sort false
+# NOTE: disable sort only for git-log related commands (e.g. "git commit --fixup=<Tab>")
+#   DEBUG: $ zstyle -L ':completion:*git-commit*' sort
 zstyle ':completion:*:git-checkout:*' sort false
+zstyle ':completion:*git-commit*' sort false
+# FAIL: preserve whatever order _git command emits
+# zstyle ':completion:*:*:git-*:*' sort false
+# zstyle ':completion:*:*:git-*:*:commits' sort false
+
 
 # # set descriptions format to enable group support
 # # NOTE: don't use escape sequences (like '%F{red}%d%f') here, fzf-tab will ignore them
@@ -40,6 +48,7 @@ zstyle ':fzf-tab:complete:(-command-|-parameter-|-brace-parameter-|export|unset|
 # zstyle ':fzf-tab:*' use-fzf-default-opts yes
 # --color=fg:1,fg+:2 --bind=tab:accept  # --height=40%
 zstyle ':fzf-tab:*' fzf-flags \
+  --no-sort \
   --preview-window='right,60%,border-left,wrap' \
   --bind='ctrl-x:toggle-preview,ctrl-o:jump,ctrl-s:toggle-sort'
 

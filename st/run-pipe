@@ -9,6 +9,8 @@ in --url) xurls | awk -vi=1 '{printf "%02d %s\n",i++,$0}' |
 # BUG: when r.tf uses tmux --> <(cat) pipe isn't available
 #   TRY: opening stdin directly in tmux
 #   SEE: http://serverfault.com/questions/178457/can-i-send-some-text-to-the-stdin-of-an-active-process-running-in-a-screen-sessi
-;; --vim) exec r.tf -M -e $EDITOR -u ~/.vim/rc/basic \
-    -c 'StripLines|set nowrap nonu nornu nofen bt=nofile|norm!G0' -c 'syntax on' <(cat)
+;; --vim)
+  # exec r.tf -M -e $EDITOR -u ~/.vim/rc/basic \
+  #   -c 'StripLines|set nowrap nonu nornu nofen bt=nofile|norm!G0' -c 'syntax on' <(cat)
+  exec st -M -e $EDITOR - -c "setl nowrap nonu nornu nofen noro ma bt=nofile nowrap|norm!G0" -c 'syntax on' <(cat)
 esac
