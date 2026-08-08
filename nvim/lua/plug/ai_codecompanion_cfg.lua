@@ -133,9 +133,10 @@ CC.setup({
       end,
     },
     acp = {
-      opts = {
-        show_presets = false,
-      },
+      -- FAIL: "codex" not found -- if presents are hidden
+      -- opts = {
+      --   show_presets = false,
+      -- },
       codex_docker = function()
         return require("codecompanion.adapters").extend("codex", {
           name = "codex_docker",
@@ -168,6 +169,21 @@ CC.setup({
       end,
     },
   },
+})
+
+-- FIXED:AGAIN: Force filetype detection for all buffers
+vim.api.nvim_create_autocmd("User", {
+    pattern = "LazyPluginsLoaded",
+    callback = function()
+        for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+            if vim.api.nvim_buf_is_loaded(buf) then
+                local ft = vim.bo[buf].filetype
+                if ft then
+                    vim.api.nvim_buf_set_option(buf, "filetype", ft)
+                end
+            end
+        end
+    end
 })
 
 vim.api.nvim_create_autocmd("FileType", {
