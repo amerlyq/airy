@@ -32,12 +32,49 @@ M.setup {
     topdelete = { text = '‾' },
     changedelete = { text = '~' },
   },
+  on_attach = function(bufnr)
+    -- if vim.api.nvim_buf_get_name(bufnr):match(<PATTERN>) then
+    --   -- Don't attach to specific buffers whose name matches a pattern
+    --   return false
+    -- end
+
+    vim.keymap.set('n', ']c', function()
+      if vim.wo.diff then
+        vim.cmd.normal({ ']c', bang = true })
+      else
+        -- BAD: doesn't work for arbitrary unified ft=diff from stdin
+        -- OR:(M): local M = package.loaded.gitsigns
+        M.nav_hunk('next')  -- , { wrap = false, preview = true }
+      end
+    end, { buffer = bufnr, desc = "hunk↓ (gitsigns → :vimdiff)" })
+
+    vim.keymap.set('n', '[c', function()
+      if vim.wo.diff then
+        vim.cmd.normal({ '[c', bang = true })
+      else
+        M.nav_hunk('prev')
+      end
+    end, { buffer = bufnr, desc = "hunk↑ (gitsigns → :vimdiff)" })
+
+    vim.keymap.set('n', '[C', function()
+      if vim.wo.diff then
+        vim.cmd.normal({ '9999[c', bang = true })
+      else
+        gs.nav_hunk('first')
+      end
+    end, { buffer = bufnr, desc = "hunk1 (gitsigns → :vimdiff)" })
+
+    vim.keymap.set('n', ']C', function()
+      if vim.wo.diff then
+        vim.cmd.normal({ '9999]c', bang = true })
+      else
+        gs.nav_hunk('last')
+      end
+    end, { buffer = bufnr, desc = "hunk$ (gitsigns → :vimdiff)" })
+
+  end,
 }
 
 -- DISABLE: [{'name': 'GitSignsAdd', 'numhl': 'false', 'texthl': 'GitSignsAdd', 'linehl': 'false'}]
 -- config.signcolumn = false and config.numhl == false and config.linehl == false
 -- and vim.wo.signcolumn == 'number'
-
--- BAD: doesn't work for arbitrary unified ft=diff from stdin
-K('n', ']c', M.next_hunk, "(gitsigns) next_hunk")
-K('n', '[c', M.prev_hunk, "(gitsigns) prev_hunk")
