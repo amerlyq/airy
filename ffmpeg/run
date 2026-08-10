@@ -5,7 +5,7 @@ set -euo pipefail
 fname=$1
 beg=$2
 end=$3
-fmt=${4-}
+fmt=$4
 ddst=${5-}
 
 path=$fname
@@ -69,16 +69,26 @@ elif [[ $fmt == copy ]]; then
   # ::: FAIL: "-c:v copy" will have 1-2sec frame-skip on copied clip, which will be skipped in !mpv
   #   BUT if not discarded it will become a frozen 1st frame for 1-2sec after cropping/reencoding
 
+
   # BAD: inexact position
+  #   IDEA: cvt small clips in beg/end and preview in !mpv
   # -loglevel info
   # -avoid_negative_ts make_zero \
-  ffmpeg -hide_banner -nostats -nostdin \
+  exec ffmpeg -hide_banner -nostats -nostdin \
     -ss "${beg:-00:00}" -to "${end:--00:00}" \
     -i "$fname" \
     -codec:v copy -codec:a copy -codec:d copy \
     "$path"
 
 elif [[ $fmt == fast ]]; then
+
+  # SRC: https://superuser.com/questions/459313/how-to-cut-at-exact-frames-using-ffmpeg
+  # ALT ffmpeg -y -nostdin -ss $BEGIN -i "$SRC" -t $DURATION "$DST"
+  # OR ffmpeg -ss $BEGIN -i $SRC -to $END -strict -2 ${DST}.mp4
+  # ffmpeg -y -nostats -nostdin -i "$fname" \
+  #   -ss "${beg:-00:00}" -to "${end:--00:00}" \
+  #   -c:v libx264 -c:a aac -codec:d copy \
+  #   "$path"
 
   ## -crf 24 -codec:v libx264
   # ffmpeg -hide_banner -nostats -nostdin \
@@ -102,11 +112,11 @@ elif [[ $fmt == fast ]]; then
   #   -codec:a copy -codec:d copy \
   #   "$path"
   #
-  ffmpeg -hide_banner -nostats -nostdin \
-    -hwaccel qsv -hwaccel_output_format qsv \
-    -i "$fname" \
-    ${beg:+-ss "$beg"} ${end:+to "$end"} \
-    -vf 'hwdownload,format=nv12' \
+
+  exec ffmpeg -hide_banner -nostats -nostdin \
+    -init_hw_device qsv=qsv:hw -hwaccel qsv -hwaccel_output_format qsv \
+    -i "$fname" ${beg:+-ss "$beg"} ${end:+to "$end"} \
+    -vf "scale_qsv=w='trunc(iw*min(1,min(if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih))/2)*2':h='trunc(ih*min(1,min(if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih))/2)*2',format=qsv" \
     -c:v hevc_qsv -preset slow -global_quality 23 \
     -c:a aac -codec:d copy \
     "$path"
@@ -119,14 +129,261 @@ elif [[ $fmt == fast ]]; then
   # Merge ※⡧⠋⢖⡗
   # $ ffmpeg -f concat -safe 0 -i <(printf "file '$PWD/%s'\n" ./*.wav) -c copy output.wav
 
+elif [[ $fmt == smart ]]; then
+
+  # Smart cut: keyframe-bounded stream-copy middle + re-encoded boundary
+  # segments matched to source params, joined via concat demuxer.
+  #
+  #   A(mark) ... ka_next[K] ......copy...... kb[K] ... B(mark)
+  #   |--seg1 reenc--|                              |--seg3 reenc--|
+  #
+  # seg1: A -> ka_next   (re-encode, tiny, ends exactly at a keyframe)
+  # seg2: ka_next -> kb  (stream copy, both bounds are keyframes)
+  # seg3: kb -> B        (re-encode, tiny)
+  #
+  # NOTE: only implemented for beg/end given as plain seconds (S[.m]),
+  # matching the existing mkdur() constraint (no HH:MM:SS here).
+  [[ $beg =~ : || $end =~ : ]] && { echo "smart-cut: HH:MM:SS not supported, use float seconds" >&2; exit 1; }
+
+  work=$(mktemp -d)
+  trap 'rm -rf "$work"' EXIT
+
+  # 1. Probe ALL source stream params via one JSON dump (needed to match
+  #    boundary re-encodes for concat demuxer's bit-identical requirement,
+  #    plus VFR detection and HDR mastering-display/CLL side data).
+  ffprobe -v error -show_streams -show_entries \
+    stream=codec_name,codec_type,profile,pix_fmt,r_frame_rate,avg_frame_rate,\
+sample_rate,channels,channel_layout,color_range,color_space,color_transfer,color_primaries \
+    -show_entries stream_side_data=side_data_type,red_x,red_y,green_x,green_y,blue_x,blue_y,\
+white_point_x,white_point_y,min_luminance,max_luminance,max_content,max_average \
+    -of json "$fname" > "$work/probe.json"
+
+  jget(){ jq -r "$1 // empty" "$work/probe.json"; }
+
+  v_codec=$(jget '.streams[]|select(.codec_type=="video")|.codec_name')
+  v_profile=$(jget '.streams[]|select(.codec_type=="video")|.profile')
+  v_pixfmt=$(jget '.streams[]|select(.codec_type=="video")|.pix_fmt')
+  v_rfps=$(jget '.streams[]|select(.codec_type=="video")|.r_frame_rate')
+  v_afps=$(jget '.streams[]|select(.codec_type=="video")|.avg_frame_rate')
+  v_range=$(jget '.streams[]|select(.codec_type=="video")|.color_range')
+  v_space=$(jget '.streams[]|select(.codec_type=="video")|.color_space')
+  v_trc=$(jget '.streams[]|select(.codec_type=="video")|.color_transfer')
+  v_prim=$(jget '.streams[]|select(.codec_type=="video")|.color_primaries')
+
+  has_audio=$(jget '.streams[]|select(.codec_type=="audio")|.codec_name')
+  if [[ -n $has_audio ]]; then
+    a_codec=$has_audio
+    a_rate=$(jget '.streams[]|select(.codec_type=="audio")|.sample_rate')
+    a_ch=$(jget '.streams[]|select(.codec_type=="audio")|.channels')
+    a_layout=$(jget '.streams[]|select(.codec_type=="audio")|.channel_layout')
+    a_profile=$(jget '.streams[]|select(.codec_type=="audio")|.profile')
+    a_bitrate=$(jget '.streams[]|select(.codec_type=="audio")|.bit_rate')
+    # bit_rate is often absent on the stream itself (esp. in mp4/mov); fall
+    # back to format-level bit_rate only as a last resort estimate note --
+    # prefer tags.BPS / stream bit_rate when present.
+    if [[ -z $a_bitrate ]]; then
+      a_bitrate=$(jget '.streams[]|select(.codec_type=="audio")|.tags.BPS')
+    fi
+    # ffprobe's codec_name is the format name, not necessarily an installed
+    # encoder name (e.g. probe says "opus", ffmpeg's usable encoder is
+    # "libopus" -- the native "opus" encoder is experimental/inferior).
+    case "$a_codec" in
+      opus) aenc=libopus ;;
+      vorbis) aenc=libvorbis ;;
+      mp3) aenc=libmp3lame ;;
+      *) aenc=$a_codec ;;
+    esac
+  fi
+
+  # VFR check: r_frame_rate (container-declared) vs avg_frame_rate (measured).
+  # If they differ, forcing -r on boundary re-encodes would itself introduce
+  # drift; use -fps_mode vfr instead of a fixed -r there.
+  is_vfr=0
+  if [[ -n $v_rfps && -n $v_afps && $v_rfps != "$v_afps" ]]; then
+    is_vfr=1
+    echo "smart-cut: source is VFR (r=$v_rfps avg=$v_afps), using -fps_mode vfr on boundary segments" >&2
+  fi
+  v_fps=$v_rfps  # used for expected-frame-count math later; nominal rate
+
+  # Encoder library picked to match the SOURCE's actual encoder where it
+  # matters for speed, not just codec family -- e.g. AV1 sources are often
+  # svt-av1 (fast) rather than aom (slow, higher quality-per-bit but far
+  # slower); probe the encoder tag and prefer svt-av1 when the source used it.
+  v_encoder_tag=$(jget '.streams[]|select(.codec_type=="video")|.tags.encoder')
+  case "$v_codec" in
+    h264) venc=libx264 ;;
+    hevc) venc=libx265 ;;
+    vp9)  venc=libvpx-vp9 ;;
+    av1)
+      if [[ $v_encoder_tag == *svt* || $v_encoder_tag == *SVT* ]]; then
+        venc=libsvtav1
+      else
+        venc=libaom-av1
+      fi
+      ;;
+    *) echo "smart-cut: unhandled codec '$v_codec', falling back to plain copy" >&2
+       ffmpeg -hide_banner -nostats -nostdin \
+         -ss "${beg:-00:00}" -to "${end:--00:00}" \
+         -i "$fname" -codec:v copy -codec:a copy -codec:d copy "$path"
+       exit 0 ;;
+  esac
+
+  # -profile:v value conventions differ per encoder: x264/x265 take strings
+  # ("high"/"main"), libaom-av1 wants a bare int (0=Main,1=High,2=Professional),
+  # libvpx-vp9 also wants an int (0-3). Map probed profile string accordingly;
+  # if unrecognized, drop -profile:v entirely rather than pass a bad value.
+  venc_profile_flag=()
+  case "$venc" in
+    libx264|libx265)
+      [[ -n $v_profile ]] && venc_profile_flag=(-profile:v "${v_profile,,}")
+      ;;
+    libaom-av1|libsvtav1)
+      case "$v_profile" in
+        Main) venc_profile_flag=(-profile:v 0) ;;
+        High) venc_profile_flag=(-profile:v 1) ;;
+        Professional) venc_profile_flag=(-profile:v 2) ;;
+        *) echo "smart-cut: unrecognized AV1 profile '$v_profile', omitting -profile:v" >&2 ;;
+      esac
+      ;;
+    libvpx-vp9)
+      case "$v_profile" in
+        Profile\ 0|0) venc_profile_flag=(-profile:v 0) ;;
+        Profile\ 1|1) venc_profile_flag=(-profile:v 1) ;;
+        Profile\ 2|2) venc_profile_flag=(-profile:v 2) ;;
+        Profile\ 3|3) venc_profile_flag=(-profile:v 3) ;;
+        *) echo "smart-cut: unrecognized VP9 profile '$v_profile', omitting -profile:v" >&2 ;;
+      esac
+      ;;
+  esac
+
+  # HDR: mastering display + content light level side data, if present.
+  hdr_master=$(jget '.streams[]|select(.codec_type=="video")|.side_data_list[]?|select(.side_data_type=="Mastering display metadata")')
+  hdr_cll=$(jget '.streams[]|select(.codec_type=="video")|.side_data_list[]?|select(.side_data_type=="Content light level metadata")')
+  x265_hdr_params=""
+  if [[ -n $hdr_master && $venc == libx265 ]]; then
+    # Build x265 master-display / max-cll strings from probed primaries+luminance.
+    rx=$(jget '.streams[]|select(.codec_type=="video")|.side_data_list[]?|select(.side_data_type=="Mastering display metadata")|.red_x')
+    ry=$(jget '.streams[]|select(.codec_type=="video")|.side_data_list[]?|select(.side_data_type=="Mastering display metadata")|.red_y')
+    gx=$(jget '.streams[]|select(.codec_type=="video")|.side_data_list[]?|select(.side_data_type=="Mastering display metadata")|.green_x')
+    gy=$(jget '.streams[]|select(.codec_type=="video")|.side_data_list[]?|select(.side_data_type=="Mastering display metadata")|.green_y')
+    bx=$(jget '.streams[]|select(.codec_type=="video")|.side_data_list[]?|select(.side_data_type=="Mastering display metadata")|.blue_x')
+    by=$(jget '.streams[]|select(.codec_type=="video")|.side_data_list[]?|select(.side_data_type=="Mastering display metadata")|.blue_y')
+    wx=$(jget '.streams[]|select(.codec_type=="video")|.side_data_list[]?|select(.side_data_type=="Mastering display metadata")|.white_point_x')
+    wy=$(jget '.streams[]|select(.codec_type=="video")|.side_data_list[]?|select(.side_data_type=="Mastering display metadata")|.white_point_y')
+    lmin=$(jget '.streams[]|select(.codec_type=="video")|.side_data_list[]?|select(.side_data_type=="Mastering display metadata")|.min_luminance')
+    lmax=$(jget '.streams[]|select(.codec_type=="video")|.side_data_list[]?|select(.side_data_type=="Mastering display metadata")|.max_luminance')
+    x265_hdr_params="master-display=G(${gx},${gy})B(${bx},${by})R(${rx},${ry})WP(${wx},${wy})L(${lmax},${lmin})"
+    if [[ -n $hdr_cll ]]; then
+      cmax=$(jget '.streams[]|select(.codec_type=="video")|.side_data_list[]?|select(.side_data_type=="Content light level metadata")|.max_content')
+      cavg=$(jget '.streams[]|select(.codec_type=="video")|.side_data_list[]?|select(.side_data_type=="Content light level metadata")|.max_average')
+      x265_hdr_params+=":max-cll=${cmax},${cavg}"
+    fi
+    echo "smart-cut: HDR source, applying x265-params $x265_hdr_params" >&2
+  elif [[ -n $hdr_master && $venc != libx265 ]]; then
+    echo "smart-cut WARNING: HDR side data present but codec is $venc, not libx265 -- HDR metadata will NOT be preserved on boundary segments" >&2
+  fi
+
+  # 2. Find keyframe timestamps.
+  mapfile -t kf_times < <(
+    ffprobe -v error -select_streams v:0 -skip_frame nokey \
+      -show_entries frame=pts_time -of csv=p=0 "$fname"
+  )
+
+  # nearest keyframe <= t
+  kf_at_or_before(){ local t=$1 best=""
+    for k in "${kf_times[@]}"; do
+      awk -vk="$k" -vt="$t" 'BEGIN{exit !(k<=t)}' && best=$k || break
+    done
+    echo "$best"
+  }
+  # nearest keyframe >= t
+  kf_at_or_after(){ local t=$1
+    for k in "${kf_times[@]}"; do
+      awk -vk="$k" -vt="$t" 'BEGIN{exit !(k>=t)}' && { echo "$k"; return; }
+    done
+    echo ""  # none found (t past last keyframe)
+  }
+
+  ka_next=$(kf_at_or_after "$beg")
+  kb=$(kf_at_or_before "$end")
+
+  # Common boundary-encode flags, shared by degenerate-case and normal path.
+  vflags=(-c:v "$venc" "${venc_profile_flag[@]}" -pix_fmt "$v_pixfmt")
+  if [[ $is_vfr == 1 ]]; then
+    vflags+=(-fps_mode vfr)
+  else
+    vflags+=(-r "$v_fps")
+  fi
+  vflags+=(${v_range:+-color_range "$v_range"} ${v_space:+-colorspace "$v_space"}
+            ${v_trc:+-color_trc "$v_trc"} ${v_prim:+-color_primaries "$v_prim"}
+            -crf 16)
+  [[ -n $x265_hdr_params ]] && vflags+=(-x265-params "$x265_hdr_params")
+
+  aflags=()
+  if [[ -n $has_audio ]]; then
+    aflags=(-c:a "$aenc" -ar "$a_rate" -ac "$a_ch")
+    [[ -n $a_layout ]] && aflags+=(-channel_layout "$a_layout")
+    # Without an explicit bitrate, encoders fall back to low defaults
+    # (e.g. libopus defaults to 96k regardless of source bitrate).
+    if [[ -n $a_bitrate ]]; then
+      aflags+=(-b:a "${a_bitrate}")
+    else
+      echo "smart-cut: source audio bitrate not probed, encoder default will apply (may be lower than source)" >&2
+    fi
+    # -profile:a is meaningful for AAC-family encoders; opus/vorbis/mp3 don't
+    # take it and will error on an unrecognized profile string.
+    if [[ -n $a_profile && $aenc == aac ]]; then
+      aflags+=(-profile:a "$a_profile")
+    fi
+  else
+    aflags=(-an)
+  fi
+
+  # Degenerate case: clip shorter than one GOP, or no keyframe fits between
+  # marks -> just re-encode the whole thing, no copy segment possible.
+  if [[ -z $ka_next || -z $kb ]] || awk -vka="$ka_next" -vkb="$kb" 'BEGIN{exit !(ka>=kb)}'; then
+    echo "smart-cut: no usable keyframe span, re-encoding whole clip" >&2
+    ffmpeg -hide_banner -nostats -nostdin -i "$fname" \
+      -ss "$beg" -to "$end" \
+      "${vflags[@]}" "${aflags[@]}" \
+      "$path"
+    exit 0
+  fi
+
+  seg1="$work/seg1.mp4"
+  seg2="$work/seg2.mp4"
+  seg3="$work/seg3.mp4"
+
+  # seg1: A -> ka_next (re-encode)
+  ffmpeg -hide_banner -nostats -nostdin -i "$fname" \
+    -ss "$beg" -to "$ka_next" \
+    "${vflags[@]}" "${aflags[@]}" "$seg1"
+
+  # seg2: ka_next -> kb (copy, both bounds are keyframes)
+  ffmpeg -hide_banner -nostats -nostdin \
+    -ss "$ka_next" -to "$kb" -i "$fname" \
+    -codec:v copy -codec:a copy -codec:d copy "$seg2"
+
+  # seg3: kb -> B (re-encode)
+  ffmpeg -hide_banner -nostats -nostdin -i "$fname" \
+    -ss "$kb" -to "$end" \
+    "${vflags[@]}" "${aflags[@]}" "$seg3"
+
+  # 3. Concat via demuxer (stream copy, no further re-encode).
+  printf "file '%s'\nfile '%s'\nfile '%s'\n" "$seg1" "$seg2" "$seg3" > "$work/list.txt"
+  ffmpeg -hide_banner -nostats -nostdin -f concat -safe 0 -i "$work/list.txt" \
+    -codec:v copy -codec:a copy -codec:d copy "$path"
+
+  # 4. Verify frame count vs expected duration; warn only, never block.
+  got_frames=$(ffprobe -v error -select_streams v:0 -count_frames \
+    -show_entries stream=nb_read_frames -of csv=p=0 "$path" 2>/dev/null || echo "?")
+  exp_frames=$(awk -vb="$beg" -ve="$end" -vf="$v_fps" \
+    'BEGIN{split(f,a,"/"); fps=a[2]?a[1]/a[2]:a[1]; printf "%.0f", (e-b)*fps}')
+  if [[ $got_frames != "$exp_frames" ]]; then
+    echo "smart-cut WARNING: frame count mismatch (got=$got_frames expected~=$exp_frames) for $path" >&2
+  fi
+
 else
-  # SRC: https://superuser.com/questions/459313/how-to-cut-at-exact-frames-using-ffmpeg
-  ffmpeg -y -nostats -nostdin -i "$fname" \
-    -ss "${beg:-00:00}" -to "${end:--00:00}" \
-    -c:v libx264 -c:a aac -codec:d copy \
-    "$path"
+  >&2 echo "unsupported fmt=$fmt"
+  exit 2
 fi
-
-
-# ALT ffmpeg -y -nostdin -ss $BEGIN -i "$SRC" -t $DURATION "$DST"
-# OR ffmpeg -ss $BEGIN -i $SRC -to $END -strict -2 ${DST}.mp4
