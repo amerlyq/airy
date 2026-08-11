@@ -8,6 +8,26 @@
 -- export OPENROUTER_API_KEY="sk-or-v1-..."
 -- export GEMINI_API_KEY="AIza..."
 
+
+-- USAGE:WF:(agentic-like): open :CodeCompanionChat
+--   @full_stack_dev Scan the repo, find the bug causing <test/error>.
+--   Edit files with insert_edit_into_file, then run the test suite with run_command.
+--   If it fails, read the output and fix again. Repeat until it passes.
+--
+-- * LLM decides scan→edit→run→analyze→repeat on its own turn-by-turn, using tool calls.
+--   State = the chat buffer (full conversation + tool results persist there).
+--     : For large repos approaching context limits,
+--     opts.memory/context-compaction settings in config (trigger, keep_cycles,
+--     min_token_savings) auto-summarize older tool cycles rather than dropping them
+-- * Autonomous YOLO mode (no manual "continue" after each tool call)
+--   require("codecompanion.interactions.chat.tools.approvals"):toggle_yolo_mode()
+-- * Automated retry loop — use the built-in Edit<->Test workflow
+--    (ships with the plugin, :CodeCompanionActions → workflow),
+--    or define your own: 'opts = { prompt_library = { ["Bugfix Loop"] = { ...'
+--   : The workflow mechanism auto-resubmits the prompt on tool-result events
+--   (subscription-based), so it re-triggers edit→test until the LLM reports
+--   pass — that's your repeat loop, no external harness.
+
 -- local ok, codecompanion = pcall(require, "codecompanion")
 -- if not ok then return end
 
@@ -91,6 +111,7 @@ CC.setup({
           },
           schema = {
             model = {
+              -- default = "anthropic/claude-sonnet-4.6"
               default = "poolside/laguna-s-2.1:free",
               -- default = "qwen/qwen-2.5-coder-32b-instruct:free",
               -- swap for any :free-tagged model on openrouter.ai/models
@@ -320,6 +341,39 @@ vim.cmd([[cab C CodeCompanion]])
 --       {
 --         role = 'user',
 --         content = '#buffer\n\nPlease review the code in the file and make the fixes if any.',
+--       },
+--     },
+--   },
+-- }
+
+
+-- opts = {
+--   prompt_library = {
+--     ["Bugfix Loop"] = {
+--       strategy = "workflow",
+--       description = "Scan, fix, test, repeat until green",
+--       opts = { index = 10, is_default = true, short_name = "bugfix" },
+--       prompts = {
+--         {
+--           {
+--             name = "Setup",
+--             role = "user",
+--             opts = { auto_submit = false },
+--             content = function()
+--               require("codecompanion.interactions.chat.tools.approvals"):toggle_yolo_mode()
+--               return [[
+-- ### Instructions
+-- Find and fix the bug in this repo (context: <describe symptom/test>).
+--
+-- ### Steps
+-- 1. Search the codebase to locate the fault using @{file_search}/@{grep_search}.
+-- 2. Apply a fix using @{insert_edit_into_file}.
+-- 3. Run the test suite with @{run_command} (`<your test cmd>`).
+-- 4. If failing, analyze output and go to step 2. If passing, stop and summarize the fix.
+-- ]]
+--             end,
+--           },
+--         },
 --       },
 --     },
 --   },

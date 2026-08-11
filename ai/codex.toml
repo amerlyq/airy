@@ -1,74 +1,99 @@
-## SEE:
-#  * https://developers.openai.com/codex/config-basic
-#  * https://developers.openai.com/codex/config-advanced
+## REF:
+#  * https://learn.chatgpt.com/docs/config-file/config-basic
+#  * https://learn.chatgpt.com/docs/config-file/config-advanced
+#  * https://learn.chatgpt.com/docs/config-file/config-reference
+#
+# This is the user-level configuration mounted by `wf` at
+# ~/.codex/config.toml inside the Silver container.
 
-model = "gpt-5.5"
+# Optimized for:
+# - Codex running inside Docker
+# - a non-root user
+# - one trusted, mounted workspace at /w
+# - trusted container boundary
+# - low-friction, sandboxed execution
+#
+# Default behavior:
+# - normal work inside /w should run without routine prompts
+# - approval prompts are still allowed when Codex decides a command
+#   needs escalation beyond ordinary workspace work
+
+model = "gpt-5.6-luna"
 model_provider = "openai"
-
-# sandbox_mode = "danger-full-access"
-sandbox_mode = "workspace-write"
-approval_policy = "on-request"
-
-model_reasoning_effort = "medium"
-plan_mode_reasoning_effort = "high"
-model_reasoning_summary = "auto"
+personality = "pragmatic"
+review_model = "gpt-5.6-terra"
+service_tier = "default"
+# Reasoning effort: minimal | low | medium | high | xhigh
+model_reasoning_effort = "low"
+plan_mode_reasoning_effort = "medium"
+# Reasoning summary: auto | concise | detailed | none
+model_reasoning_summary = "concise"
 model_verbosity = "low"
 
-hide_agent_reasoning = true
-show_raw_agent_reasoning = false
-# notify = false
+# Keep Codex constrained to the mounted workspace.
+sandbox_mode = "workspace-write"
 
-check_for_update_on_startup = false
-disable_paste_burst = true
-hide_full_access_warning = true
-hide_world_writable_warning = true
-hide_rate_limit_model_nudge = true
-hide_gpt5_1_migration_prompt = true
-hide_gpt-5.1-codex-max_migration_prompt = true
+# Tradeoff:
+# - "on-request" keeps escalation prompts available.
+# - It should not ask for every normal shell command in a trusted workspace,
+#   but it may still ask more often than you want in some sessions.
+# If that happens, use profile "docker_autonomous" below.
+#   ALT:NOT:SECU!(suppress promprts):USAGE: $ codex -p docker_autonomous
+approval_policy = "on-request"
 
+allow_login_shell = false
+
+# Find the workspace root even when a scenario is not itself a Git checkout.
 project_root_markers = [
   ".git",
   "pyproject.toml",
   "Makefile",
 ]
 
+# Use the documented top-level mode rather than deprecated feature toggles.
+web_search = "cached"
+
+# Keep the terminal concise and avoid unsolicited container-side updates.
+hide_agent_reasoning = true
+show_raw_agent_reasoning = false
+disable_paste_burst = true
+check_for_update_on_startup = false
+
+[sandbox_workspace_write]
+# Keep the usual temporary directories writable, but require an explicit
+# opt-in before sandboxed commands receive outbound network access.
+exclude_tmpdir_env_var = false
+exclude_slash_tmp = false
+network_access = false
+
+# Codex strips common secret-bearing variables by default; the complete
+# inherited environment is otherwise needed by the container toolchain.
 [shell_environment_policy]
 inherit = "all"
 
-[profiles.docker]
-model = "gpt-5.5"
-model_provider = "openai"
-sandbox_mode = "workspace-write"
-approval_policy = "on-request"
-model_reasoning_effort = "medium"
-plan_mode_reasoning_effort = "high"
-model_reasoning_summary = "auto"
-model_verbosity = "low"
-hide_agent_reasoning = true
-show_raw_agent_reasoning = false
-# notify = false
-check_for_update_on_startup = false
-disable_paste_burst = true
-
-
-# ALT:NOT:SECU!(suppress promprts):USAGE: $ codex -p docker_autonomous
-[profiles.docker_autonomous]
-model = "gpt-5.5"
-model_provider = "openai"
-sandbox_mode = "workspace-write"
-approval_policy = "never"
-model_reasoning_effort = "medium"
-plan_mode_reasoning_effort = "high"
-model_reasoning_summary = "auto"
-model_verbosity = "low"
-hide_agent_reasoning = true
-show_raw_agent_reasoning = false
-notify = false
-check_for_update_on_startup = false
-disable_paste_burst = true
-
-[projects."/d/g"]
+[projects."/data/g"]
 trust_level = "trusted"
 
-[projects."/d/miur/src/miur"]
+[projects."/d/miur"]
 trust_level = "trusted"
+
+[tui]
+notifications = false
+status_line = ["model-with-reasoning", "current-dir", "run-state", "context-used", "context-window-size", "used-tokens", "total-input-tokens", "total-output-tokens"]
+status_line_use_colors = true
+
+[analytics]
+enabled = false
+
+[feedback]
+enabled = false
+
+[notice]
+hide_full_access_warning = true
+hide_world_writable_warning = true
+hide_rate_limit_model_nudge = true
+hide_gpt5_1_migration_prompt = true
+"hide_gpt-5.1-codex-max_migration_prompt" = true
+
+[otel]
+log_user_prompt = false

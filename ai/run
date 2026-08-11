@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # MAYBE: create "/b/opencode"::
 # #!/bin/sh: exec env --chdir=/g/my_gen /d/airy/ai/run -- exec opencode "$@"
+# ATTACH: $ docker exec -it airydev /bin/bash
 
 if (return 0 2>/dev/null); then
   [[ -v __app ]] && return 2
@@ -105,10 +106,11 @@ fi
 
 
 cd "${1:-$PWD}"
-pjdir="/d/${PWD##*/}"
+# pjdir="/d/${PWD##*/}"
+pjdir="$PWD"
 (($#)) && shift
 # (($#)) || set -- opencode  # bash -l
-(($#)) || set -- codex
+(($#)) || set -- bash -c 'sudo chmod 666 /var/run/docker.sock && exec codex'
 # codex --sandbox danger-full-access
 # codex --dangerously-bypass-approvals-and-sandbox
 
@@ -125,7 +127,6 @@ rargs=(\
   # OR: --env=TZ="EET-2EEST,M3.5.0/3,M10.5.0/4"
   --env=TZ="$(realpath /etc/localtime | sed 's@.*zoneinfo/@@')"
 
-  # --privileged
   --rm
   --read-only=true
   --interactive=true
@@ -146,13 +147,17 @@ rargs=(\
   --log-opt=mode=non-blocking
   --log-opt=max-buffer-size=16MiB
 
-  --mount=type=bind,"src=.,dst=$pjdir,ro=false,bind-propagation=rshared"
+  --mount=type=bind,"src=.,dst=$pjdir,ro=false,bind-propagation=rslave"
   --mount=type=volume,"src=$vnm,dst=/home/user,ro=false"
   # --mount=type=tmpfs,"dst=/tmp,tmpfs-mode=1777,tmpfs-noexec=false"
   --tmpfs=/tmp:exec,mode=1777
   # --mount=type=bind,src=$HOME/.gitconfig,dst=/home/user/.gitconfig,ro=true
 
-  # --mount=type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock,ro=false
+  ## DEV: with android container inside of ai container
+  # --privileged
+  # --device=/dev/kvm --group-add="$(stat -c '%g' /dev/kvm)"
+  --mount=type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock,ro=false
+
   # --mount=type=bind,src=$out/bash_history,dst=/home/user/.bash_history,ro=false
   # --mount=type=bind,src=$HOME/.netrc,dst=/home/user/.netrc,ro=true
   # --mount=type=bind,src=$HOME/.docker/config.json,dst=/home/user/.docker/config.json,ro=true

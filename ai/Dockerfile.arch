@@ -18,7 +18,10 @@ RUN --mount=type=cache,id=pacman-cache,target=/var/cache/pacman/pkg,sharing=lock
   # pacman-key --init
   # pacman-key --populate archlinux
   pacman -Syu --noconfirm --needed -- \
-    base-devel sudo zsh git  # base  man neovim tzdata ca-certificates curl
+    base-devel sudo zsh git ripgrep fd # base  man neovim tzdata ca-certificates curl
+
+  pacman -S --noconfirm --needed -- \
+    docker docker-buildx
 
   # # mymirror="http://localhost:8080"
   # myarchive="https://archive.archlinux.org/repos"
@@ -40,7 +43,7 @@ ARG mygid=1000
 RUN --network=none <<"EOF"
   groupadd --gid "${mygid:?}" "${myuser:?}"
   useradd --create-home --home-dir "${myhome:?}" --shell "/usr/bin/zsh" --no-log-init \
-    --uid "${myuid:?}" --gid "$myuser" --groups "users,wheel" --comment "$myuser@host" -- "$myuser"
+    --uid "${myuid:?}" --gid "$myuser" --groups "users,wheel,docker" --comment "$myuser@host" -- "$myuser"
 
   printf "%s\n" "$myuser:$myuser" | chpasswd
   install --directory --mode=750 -- /etc/sudoers.d
