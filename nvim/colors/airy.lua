@@ -75,6 +75,7 @@ local highlights = {
   Added = { link = "DiffAdd" },
   Changed = { link = "DiffChange" },
   Removed = { link = "DiffDelete" },
+  diffLine = { link = "DiffText" },
 
   GitSignsAddNr = { link = "DiffAdd" },
   GitSignsChangeNr = { link = "DiffChange" },

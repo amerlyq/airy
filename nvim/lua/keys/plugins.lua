@@ -17,7 +17,7 @@ local K = require 'keys.bind'.K
 K('n', '<F3>', function()
   -- vim.cmd 'packadd playground | TSHighlightCapturesUnderCursor'
   vim.cmd 'packadd xterm-color-table.vim'
-  K('nx', '<F3>', '<Cmd>TSHighlightCapturesUnderCursor<CR>', "Show :hl group under cursor")
+  K('nx', '<F3>', '<Cmd>Inspect<CR>', "Show :hl group under cursor")
 end, "Show :hl group under cursor")
 
 
