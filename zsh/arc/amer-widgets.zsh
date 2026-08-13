@@ -6,7 +6,17 @@
 # If empty cmd line, copy last line from history
 # NOTE: '<<<' always adds newline => MAYBE copy commands w/o \n to past in vim ?
 zle -N amer-yank-current _yank_current
-function _yank_current() { xci <<< "${BUFFER:-$(fc -ln -1)}"; }
+# function _yank_current() { xci <<< "${BUFFER:-$(fc -ln -1)}"; }
+function _yank_current() {
+  [[ -f /tmp/xci.lock ]] && { zle -M "yank busy"; return }
+  : >! /tmp/xci.lock
+  {
+    # DEBUG:(busy): sleep 1
+    xci <<< "${BUFFER:-$(fc -ln -1)}"
+    echo $? >! /tmp/xci.status
+    rm -f /tmp/xci.lock
+  } &!
+}
 
 # NOTE: \C-o -- always re-run previous command and copy its output -- so you able to insert it inside new currently created command. (But it could check if BUFFER not empty and execute/insert current command)
 # We can't simply '|tee' output of each command, as we has 'vim' and 'less'

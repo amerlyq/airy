@@ -61,10 +61,29 @@ CFG:(persistent)
     $ sudo cp /usr/lib/systemd/system/dhcpd4.service /etc/systemd/system/dhcpd4@.service
     $ v /etc/systemd/system/dhcpd4@.service
       ADD(%I): ExecStart=/usr/bin/dhcpd -4 -q -cf /etc/dhcpd.conf -pf /run/dhcpd4/dhcpd.pid %I
-    $ S.r dhcpd4@enp69s0.service
-    $ S.s dhcpd4@enp69s0.service
-      # fractal dhcpd[323496]: DHCPOFFER on 192.168.2.150 to 00:11:22:33:44:55 (MyCloud) via enp69s0
+    /etc/dhcpd.conf
+      # Subnet declaration for the direct peer-to-peer cable connection
+      subnet 192.168.2.0 netmask 255.255.255.0 {
+        range 192.168.2.10 192.168.2.20;           # Range of IPs to hand out to the NAS
+        option routers 192.168.2.3;                # Your laptop's interface IP
+        option subnet-mask 255.255.255.0;
+        default-lease-time 600;
+        max-lease-time 7200;
+      }
+    $ sudo systemctl daemon-reload
+    $ sudo systemctl start dhcpd4@enp0s13f0u2u3u3
+    $ sudo systemctl status dhcpd4@enp0s13f0u2u3u3
+      # hpx dhcpd[228247]: DHCPACK on 192.168.2.10 to 00:90:a9:ed:c8:99 (MyCloudEX2Ultra) via enp0s13f0u2u3u3
+    # $ sudo systemctl start dhcpd4@enp69s0.service
+    # $ sudo systemctl status dhcpd4@enp69s0.service
+    #   # fractal dhcpd[323496]: DHCPOFFER on 192.168.2.150 to 00:11:22:33:44:55 (MyCloud) via enp69s0
     $ sshp lc 'cd /mnt/HD/HD_a2/_cfg && ./setup'
+      # NEED: edit ssh cfg: HostName 192.168.2.10
+    $ ssh lc 'df -h'
+    $ sudo mount -t cifs //192.168.2.10/share /net/share -o ro,credentials=/root/samba.netshare,vers=3.1.1,mfsymlinks,uid=1000,gid=users,iocharset=utf8
+      # //192.168.2.10/share  /net/share  cifs  ro,noauto,x-systemd.automount,credentials=/root/samba.netshare,vers=3.1.1,mfsymlinks,uid=1000,gid=users,iocharset=utf8 0 0
+
+
 
 
 TODO

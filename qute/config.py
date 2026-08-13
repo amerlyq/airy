@@ -2296,6 +2296,7 @@ c.url.searchengines = {
     "ga": "https://google.com/search?q=arch%20linux%20{}",
     "gb": "https://google.com/search?q=bash%20{}",
     "gh": "https://github.com/search?q={}",
+    "gi": "https://google.com/search?udm=50&aep=11&atvm=2&q={}",  # OR: google.com/ai
     "gj": "https://google.com/search?q=%22jsoftware%22%20{}",
     "gk": "http://localhost:1248/source/search?q=&defs={}&refs=&path=&hist=&type=&project=linux-3.10.28",
     "gm": "https://www.google.com/maps/place/{}",

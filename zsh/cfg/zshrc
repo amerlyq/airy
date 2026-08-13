@@ -113,9 +113,28 @@ zshaddhistory() { local f
 # FIXED: Save the unfinished editing line when the terminal sends SIGINT on <C-c>.
 # `print -s` puts it in the current interactive history list immediately.
 TRAPINT() {
-  zle && [[ -n $BUFFER ]] && print -s -r -- "$BUFFER"
-  return $1  # <OLD~~ return "1" or don't return anything if no zle
+  ## ERR:(sometimes) TRAPINT:2: command not found: g
+  # zle && [[ -n $BUFFER ]] && print -s -r -- "$BUFFER"
+  # return $1
+  ## OLD~~ return "1" or don't return anything if no zle
+  # if [[ -n "$BUFFER" ]]
+  # then zle && print -s -r -- $BUFFER && return $1  # Default
+  # else return 1; fi
+
+  ## safe test for "am I in a context where zle exists as a widget-capable function", no side effect, no error.
+  if (( ${+builtins[zle]} )) && [[ -n $BUFFER ]]; then
+    print -s -r -- "$BUFFER"
+  fi
+  return $(( 128 + $1 ))
 }
+
+## ALT:BUG?
+# save-buffer-on-interrupt() {
+#   [[ -n $BUFFER ]] && print -s -r -- "$BUFFER"
+#   zle kill-whole-line   # or: zle send-break
+# }
+# zle -N save-buffer-on-interrupt
+# bindkey '^C' save-buffer-on-interrupt
 
 
 ############################################################

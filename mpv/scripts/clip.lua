@@ -24,7 +24,7 @@ local function dbg(fmt, ...)
 end
 
 local PREVIEW_WINDOW_S  = 2.0   -- seconds of copy-cut around each mark to sample
-local PREVIEW_FRACTION  = 0.50 -- previews must reach this fraction of orig video size
+local PREVIEW_FRACTION  = 0.20 -- previews must reach this fraction of orig video size
 local PAD               = 10
 local SHRINK_STEP       = 0.05 -- how much to shrink video-margin-ratio per attempt
 local MAX_SHRINK        = 0.5  -- don't reserve more than 50% of a dimension

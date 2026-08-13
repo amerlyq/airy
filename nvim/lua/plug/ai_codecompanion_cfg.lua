@@ -254,8 +254,9 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
+-- DISABLED:WTF: expanded even in "/" menu
 -- Expand 'C' into 'CodeCompanion' in the command line
-vim.cmd([[cab C CodeCompanion]])
+-- vim.cmd([[cab C CodeCompanion]])
 
 -- Override SYSTEM prompt
 --   interactions = {

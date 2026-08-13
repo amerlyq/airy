@@ -86,12 +86,21 @@ local cfg = {
 
     ['<Space>'] = {  -- "Magical space"
       function(cmp)
-        if cmp.is_visible() then
+        if cmp.is_visible() and cmp.get_selected_item() then
           cmp.accept()
-          vim.api.nvim_feedkeys(
-            vim.api.nvim_replace_termcodes("<Space>", true, false, true),
-            "n", false
-          )
+          -- "sync" BAD: still eats up spaces on macro-replay DEBUG: :lua print(vim.inspect(vim.fn.getreg('q')))
+          --   SEE! how neocomplete.vim solved this years ago
+          local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+          local line = vim.api.nvim_get_current_line()
+          vim.api.nvim_set_current_line(line:sub(1, col) .. " " .. line:sub(col + 1))
+          vim.api.nvim_win_set_cursor(0, { row, col + 1 })
+          -- ALT:BAD: "async" works for typing, but eats spaces on macro-repeat
+          -- vim.schedule(function()
+          --   vim.api.nvim_feedkeys(
+          --     vim.api.nvim_replace_termcodes("<Space>", true, false, true),
+          --     "n", false
+          --   )
+          -- end)
           return true
         end
         return false

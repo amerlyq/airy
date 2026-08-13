@@ -15,6 +15,11 @@ CASE
     - FAIL: can not remove dangling/folder symlinks -- due to NAS RecycleBin
     - BAD:PERF: small buffer limits speed :: write=128KiB read=4MiB
     ::: FAIL: patch samba to disable RecycleBin OR:SECU: delete symlinks by !ssh (ranger aliases)
+      /etc/samba/smb.conf
+        # vfs objects = recycle ...
+        vfs objects = ...
+        recycle:enable = no
+      /etc/init.d/samba restart
 
   * use SMB3 vers=3.1.1. "mfsymlinks" to emulate symlinks
     CASE: completely removed support for symlinks due to security implications
@@ -31,8 +36,32 @@ CASE
       => looks like there is no FOSS NFSv4 support on #android
         BUT:MAYBE: some paid apps has one ?
 
-  * use NFSv3 instead of Samba
-    FAIL:SECU: no authentication -- only IP-addr matching
+  * use NFSv3 instead of Samba (WARN:SECU: only for /etc/netctl/eth_direct) ⌇⡪⡻⣄⢠
+    <<COS:FAIL:SECU: no authentication -- only IP-addr matching
+    [✓⡪⡻⣅⠒] TRY
+      WebUI: activate it
+        ⁘ WTF nfs://192.168.2.10/nfs/share
+      MyCloud:
+        $ id amer
+          uid=1003(amer) gid=2003(shared) groups=2003(shared),1000(share),501(allaccount),2000(cloudholders)
+        $ cat /etc/exports
+          OLD: "/nfs/share" 192.168.2.3(rw,all_squash,sync,no_wdelay,insecure,insecure_locks,no_subtree_check,anonuid=501,anongid=1000)
+          NEW: /mnt/HD/HD_a2/share  192.168.2.3(rw,all_squash,sync,no_wdelay,insecure,no_subtree_check,anonuid=1003,anongid=2003)
+        $ exportfs -ra
+        $ exportfs -v
+      #hpx
+        $ paci rpcbind
+        $ rpcinfo -p 192.168.2.10
+        # tcpdump -i any port 38215 -n
+        # tcpdump -i any port 38215 -n -vv -X
+        #   => and then try connecting
+        # $ sudo mount -t nfs -o vers=3,addr=192.168.2.10 192.168.2.10:/nfs/share /net/nfs
+        # $ sudo mount -t nfs -o vers=3,tcp,addr=192.168.2.10,mountport=38215,mountproto=tcp,rsize=1048576,wsize=1048576 192.168.2.10:/nfs/share /net/nfs
+        #   FAIL: should use realpath from "showmount" inof symlink :/nfs/share from webui
+        $ paci nfs-utils
+        $ showmount -e 192.168.2.10
+        $ sudo mount -t nfs -o vers=3,tcp,addr=192.168.2.10,rsize=1048576,wsize=1048576 192.168.2.10:/mnt/HD/HD_a2/share /net/nfs
+          # 192.168.2.10:/mnt/HD/HD_a2/share  /net/nfs  nfs  rw,noauto,async,noatime,vers=3,tcp,addr=192.168.2.10,rsize=1048576,wsize=1048576  0  0
 
   * use NFSv3 over SSH ※⡟⠟⡎⠅
     FAIL:PERF: unusably slow (save file = multi-seconds) like SSHFS ※⡟⠟⠺⢅
