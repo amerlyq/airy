@@ -86,7 +86,7 @@ require('minuet').setup({
       name = "Codex",
       model = "gpt-5.6-luna",
       end_point = "http://127.0.0.1:18080/v1/chat/completions",
-      api_key = "dummy-key",
+      api_key = 'TERM', -- api_key = "dummy-key",
       stream = true,
       optional = {
         max_completion_tokens = 64,
