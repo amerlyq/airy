@@ -20,8 +20,9 @@ require('minuet').setup({
     end,
   },
 
-  -- provider = 'gemini'
+  -- provider = 'gemini',
   provider = 'openai_fim_compatible',
+  -- provider = 'openai_compatible',
   -- FUT:
   -- -- I recommend beginning with a small context window size and incrementally
   -- -- expanding it, depending on your local computing power. A context window
@@ -73,6 +74,24 @@ require('minuet').setup({
       --   prompt = '{{{prompt}}}',
       --   suffix = '{{{suffix}}}',
       -- },
+    },
+    -- openai = {
+    --   model = "gpt-5.4-nano",
+    --   optional = {
+    --     max_completion_tokens = 64,
+    --     reasoning_effort = "none",
+    --   },
+    -- },
+    openai_compatible = {
+      name = "Codex",
+      model = "gpt-5.6-luna",
+      end_point = "http://127.0.0.1:18080/v1/chat/completions",
+      api_key = "dummy-key",
+      stream = true,
+      optional = {
+        max_completion_tokens = 64,
+        reasoning_effort = "none",
+      },
     },
   },
 

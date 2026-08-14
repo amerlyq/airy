@@ -31,6 +31,48 @@
 -- local ok, codecompanion = pcall(require, "codecompanion")
 -- if not ok then return end
 
+local function find_codex_container(fallback)
+  local file = vim.api.nvim_buf_get_name(0)
+  if file == "" then
+    return fallback
+  end
+
+  local dir = vim.fs.dirname(vim.fs.normalize(file))
+
+  local out = vim.system(
+    { "docker", "ps", "--format", "{{.Names}}" },
+    { text = true }
+  ):wait()
+
+  if out.code ~= 0 then
+    return fallback
+  end
+
+  local running = {}
+  for name in out.stdout:gmatch("[^\r\n]+") do
+    running[name] = true
+  end
+
+  local function container_for(path)
+    local name = "W" .. path:gsub("[^A-Za-z0-9]", "")
+    return running[name] and name or nil
+  end
+
+  local container = container_for(dir)
+  if container then
+    return container
+  end
+
+  for parent in vim.fs.parents(dir) do
+    container = container_for(parent)
+    if container then
+      return container
+    end
+  end
+
+  return fallback
+end
+
 local CC = require("codecompanion")
 CC.setup({
   -- opts = {
@@ -38,11 +80,30 @@ CC.setup({
   -- },
 
   interactions = {
+    inline = {
+      -- adapter = "ollama",
+      adapter = "openrouter",
+      -- adapter = "openai_responses_inline",
+      -- FAIL: ACP adapters are NOT supported for inline interaction.
+      --   Keep an HTTP adapter here if you use :CodeCompanion.
+      --   ERR: [adapters::http::extend] Adapter not found: codex
+      -- adapter = "codex_docker",
+    },
     chat = {
+      -- adapter = "ollama",
+      adapter = "openrouter",
+      -- adapter = "codex_docker",
       -- adapter = {
       --   name = "codex_docker",
       --   -- model = "gpt-5.6-sol",
       -- },
+      -- opts = {
+      --   system_prompt = function(opts)
+      --     return "python3.14+typehints, no boilerplate, no explanations, only correct code and comments"
+      --     -- USAGE:(per tasks series): :lua vim.g.cc_system_prompt = "..."
+      --     -- return vim.g.cc_system_prompt or "default terse python prompt"
+      --   end,
+      -- }
       -- keymaps = {
       --   send = false,  -- DFL=<C-s>
       --   close = false  -- DFL=<C-c>
@@ -64,28 +125,7 @@ CC.setup({
     --   },
     -- },
   },
-  strategies = {
-    chat = {
-      -- adapter = "ollama",
-      adapter = "openrouter",
-      -- adapter = "codex_docker",
-      -- opts = {
-      --   system_prompt = function(opts)
-      --     return "python3.14+typehints, no boilerplate, no explanations, only correct code and comments"
-      --     -- USAGE:(per tasks series): :lua vim.g.cc_system_prompt = "..."
-      --     -- return vim.g.cc_system_prompt or "default terse python prompt"
-      --   end,
-      -- }
-    },
-    inline = {
-      -- adapter = "ollama",
-      adapter = "openrouter",
-      -- FAIL: ACP adapters are NOT supported for inline interaction.
-      --   Keep an HTTP adapter here if you use :CodeCompanion.
-      --   ERR: [adapters::http::extend] Adapter not found: codex
-      -- adapter = "codex_docker",
-    },
-  },
+
   adapters = {
     http = {
       ollama = function()
@@ -152,7 +192,47 @@ CC.setup({
           },
         })
       end,
+      openai_responses_inline = function()
+        return require("codecompanion.adapters").extend("openai_responses", {
+          -- DEBUG: $ curl https://api.openai.com/v1/models -H "Authorization: Bearer $OPENAI_API_KEY"
+          -- NEED: export OPENAI_API_KEY="st-...your-key"
+          -- DISABLED:FAIL: separate costs billed to project
+          --   env = { api_key = "OPENAI_API_KEY", },
+          -- ALT: local server (/v1/responses + /v1/chat/completions), reuses ~/.codex/auth.json
+          -- NEED: uvx openai-api-server-via-codex
+          --   OR: codex-proxy, openai-oauth, opencodex
+          env = {
+            url = "http://127.0.0.1:18080/v1",
+            api_key = "dummy-key",  -- intentional
+          },
+          schema = {
+            model = {
+              default = "gpt-5.6-luna",
+            },
+            ["reasoning.effort"] = {
+              default = "low",
+            },
+          },
+        })
+      end,
+      openai_responses_chat = function()
+        return require("codecompanion.adapters").extend("openai_responses", {
+          env = {
+            url = "http://127.0.0.1:18080/v1",
+            api_key = "dummy-key",
+          },
+          schema = {
+            model = {
+              default = "gpt-5.6-terra",
+            },
+            ["reasoning.effort"] = {
+              default = "low",
+            },
+          },
+        })
+      end,
     },
+
     acp = {
       -- FAIL: "codex" not found -- if presents are hidden
       -- opts = {
@@ -173,7 +253,9 @@ CC.setup({
             --   $ docker exec -it codex_docer -- codex login status
             default = { "docker", "exec", "-i",
               -- "-e", [[CODEX_CONFIG={"model":"gpt-5.6-terra","model_reasoning_effort":"low"}]],
-              "codex_docker", "codex-acp", },
+              find_codex_container("codex_docker"),
+              "codex-acp",
+            },
           },
           defaults = {
             auth_method = "chat-gpt",
