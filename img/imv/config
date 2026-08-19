@@ -6,20 +6,27 @@
 <apostrophe> = quit
 
 ; BAD: only absolute, not percentage
-<Shift+J> = pan 0  10
-<Shift+K> = pan 0 -10
-<Shift+H> = pan -10 0
-<Shift+L> = pan  10 0
+<Shift+Down> = pan 0 -10
+<Shift+Up> = pan 0  10
+<Shift+Left> = pan  10 0
+<Shift+Right> = pan -10 0
 
 # HACK: force screen refresh when holding "next" (with some delay)
 #   BAD: still doesn't block
 # j = next; exec sleep 0.05
 j = next; flip horizontal; flip horizontal
 k = prev; rotate by 0
+h = prev 5
+l = next 5
+<Shift+K> = prev 21
+<Shift+J> = next 21
+# TODO: remap [ / ] to +55/-55
+<Ctrl+k> = prev 100
+<Ctrl+j> = next 100
 # j = next 1
 # k = prev 1
 
 ; ALT: "p" prints to stdout
-l = exec bash -c 'printf "%s\\n" "$imv_pid $imv_current_index $imv_current_file" >> /t/imv_sel'
+; l = exec bash -c 'printf "%s\\n" "$imv_pid $imv_current_index $imv_current_file" >> /t/imv_sel'
 m = exec bash -c 'printf "%s\\n" "$imv_pid $imv_current_index $imv_current_file" >> /t/imv_sel'
 <Return> = exec bash -c 'printf "%s\\n" "$imv_pid $imv_current_index $imv_current_file" >> /t/imv_sel'

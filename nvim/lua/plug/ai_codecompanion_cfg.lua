@@ -289,7 +289,10 @@ vim.api.nvim_create_autocmd("User", {
     end
 })
 
+local codecompanion_filetype_group = vim.api.nvim_create_augroup("codecompanion_filetype", { clear = true })
+
 vim.api.nvim_create_autocmd("FileType", {
+  group = codecompanion_filetype_group,
   callback = function(args)
     local excluded_filetypes = {
       "nou",
@@ -302,10 +305,20 @@ vim.api.nvim_create_autocmd("FileType", {
       -- "mason",
     }
     local ft = vim.bo[args.buf].filetype
+    local name = vim.api.nvim_buf_get_name(args.buf)
 
-    if vim.tbl_contains(excluded_filetypes, ft) then
+    -- During :e! the FileType event can run while `&filetype` is empty.
+    -- Check the filename too, so excluded filetypes stay excluded.
+    if vim.tbl_contains(excluded_filetypes, ft) or name:match("%.nou$") then
       return
     end
+
+    -- FileType may be emitted more than once for a buffer (for example on
+    -- :e!).  Keep this callback idempotent.
+    if vim.b[args.buf].codecompanion_filetype_mappings then
+      return
+    end
+    vim.b[args.buf].codecompanion_filetype_mappings = true
 
     local function map(mode, lhs, rhs, desc)
       vim.keymap.set(mode, lhs, rhs, { buffer = args.buf, noremap = true, silent = true, desc = desc })

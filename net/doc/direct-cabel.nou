@@ -69,6 +69,10 @@ CFG:(persistent)
         option subnet-mask 255.255.255.0;
         default-lease-time 600;
         max-lease-time 7200;
+        host my-nas-device {
+          hardware ethernet 00:90:a9:ed:c8:99;  # = get it from dhcpd logs
+          fixed-address 192.168.2.2;  # Safe IP outside .10-.20
+        }
       }
     $ sudo systemctl daemon-reload
     $ sudo systemctl start dhcpd4@enp0s13f0u2u3u3
@@ -82,6 +86,8 @@ CFG:(persistent)
     $ ssh lc 'df -h'
     $ sudo mount -t cifs //192.168.2.10/share /net/share -o ro,credentials=/root/samba.netshare,vers=3.1.1,mfsymlinks,uid=1000,gid=users,iocharset=utf8
       # //192.168.2.10/share  /net/share  cifs  ro,noauto,x-systemd.automount,credentials=/root/samba.netshare,vers=3.1.1,mfsymlinks,uid=1000,gid=users,iocharset=utf8 0 0
+  Wake-on-Lan
+    $ wol -i 192.168.2.255 00:90:a9:ed:c8:99
 
 
 
