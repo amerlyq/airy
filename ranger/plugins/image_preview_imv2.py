@@ -37,6 +37,7 @@ import hashlib
 import mimetypes
 import os
 import socket
+import tempfile
 import time
 from collections.abc import Sequence
 from pathlib import Path
@@ -48,6 +49,7 @@ from ranger.ext.keybinding_parser import parse_keybinding
 from ranger.ext.signals import Signal
 
 DEBOUNCE_MS = 60
+IMV_POLL_MS = 300
 SOCKET_GLOB = "imv-*.sock"
 
 # If your build expects NUL-terminated commands instead of newline, set True:
@@ -62,6 +64,11 @@ _last_path = ""
 _orig_i_num = 0
 _orig_i = ""
 _changed_i = False
+_changed_m = False
+_orig_m = ""
+_orig_handle_input = None
+_wrapped_handle_input = False
+_last_imv_poll_mono = 0.0
 class ImvState(TypedDict):
     sock: str
     list_hash: int
@@ -125,6 +132,11 @@ def _quote_imv(s: str) -> str:
 
 
 def _send_line(sock_path: str, line: str) -> bool:
+    return _request(sock_path, line) is not None
+
+
+def _request(sock_path: str, line: str) -> bytes | None:
+    """Send an IPC command and return imv's reply, if any."""
     data = line.encode("utf-8", "surrogateescape")
     data += b"\x00" if SEND_NUL_TERMINATOR else b"\n"
 
@@ -133,19 +145,109 @@ def _send_line(sock_path: str, line: str) -> bool:
         s.settimeout(0.10)
         s.connect(sock_path)
         s.sendall(data)
-        # imv may or may not reply; don't block.
+        reply = b""
         try:
-            s.recv(4096)
+            while True:
+                chunk = s.recv(4096)
+                if not chunk:
+                    break
+                reply += chunk
         except Exception:
+            # A command which has no reply commonly times out here.
             pass
-        return True
+        return reply
     except Exception:
-        return False
+        return None
     finally:
         try:
             s.close()
         except Exception:
             pass
+
+
+def _current_imv_path(sock: str) -> str | None:
+    """Ask imv which file is selected, using a temp file for the result."""
+    fd, result_path = tempfile.mkstemp(prefix="ranger-imv-", suffix=".path")
+    os.close(fd)
+    try:
+        # imv's exec command runs inside imv; its stdout is not the IPC reply.
+        command = f'exec echo "$imv_current_file" > {_quote_imv(result_path)}'
+        if _request(sock, command) is None:
+            return None
+
+        # The exec is asynchronous, so allow a short handoff/write window.
+        for _ in range(10):
+            try:
+                path = Path(result_path).read_text(
+                    encoding="utf-8", errors="surrogateescape"
+                ).strip()
+            except OSError:
+                path = ""
+            if path:
+                return path.splitlines()[-1].strip()
+            time.sleep(0.02)
+        return None
+    finally:
+        try:
+            os.unlink(result_path)
+        except OSError:
+            pass
+
+
+def _sync_from_imv_fm(fm: FM) -> None:
+    """Follow imv's selected image in ranger."""
+    # The compositor/tmux handoff can make the first request arrive too early.
+    for delay in (0.0, 0.08, 0.20):
+        if delay:
+            time.sleep(delay)
+        sock = _newest_imv_socket()
+        if not sock:
+            continue
+        path = _current_imv_path(sock)
+        if path and os.path.exists(path):
+            fm.select_file(path)
+            global _last_path
+            _last_path = path
+            return
+
+
+def _poll_imv_before_input(fm: FM) -> None:
+    global _last_imv_poll_mono
+    now = time.monotonic()
+    if (now - _last_imv_poll_mono) * 1000.0 < IMV_POLL_MS:
+        return
+    _last_imv_poll_mono = now
+    _sync_from_imv_fm(fm)
+
+
+def _set_imv_input_hooks(fm: FM, enabled: bool) -> None:
+    """Temporarily follow imv while it exists, restoring ranger afterwards."""
+    global _changed_m, _wrapped_handle_input
+    if enabled and not _wrapped_handle_input:
+        original = _orig_handle_input
+
+        def handle_input_with_imv_sync():
+            if _newest_imv_socket():
+                _poll_imv_before_input(fm)
+            else:
+                _set_imv_input_hooks(fm, False)
+            original()
+
+        fm.ui.handle_input = handle_input_with_imv_sync
+        _wrapped_handle_input = True
+    elif not enabled and _wrapped_handle_input:
+        fm.ui.handle_input = _orig_handle_input
+        _wrapped_handle_input = False
+
+    if enabled and not _changed_m:
+        fm.ui.keymaps.bind("browser", "m", "sync_imv_position")
+        _changed_m = True
+    elif not enabled and _changed_m:
+        if _orig_m is None:
+            fm.ui.keymaps.unbind("browser", "m")
+        else:
+            fm.ui.keymaps.bind("browser", "m", _orig_m)
+        _changed_m = False
 
 
 def _hash_paths(paths: Sequence[str]) -> str:
@@ -270,10 +372,13 @@ def _on_move(signal: Signal) -> None:
 
     sock = _newest_imv_socket()
     if not sock:
+        _set_imv_input_hooks(fm, False)
         if _changed_i and km.get(_orig_i_num) != _orig_i:
             fm.ui.keymaps.bind("browser", "i", _orig_i)
             _changed_i = False
         return
+
+    _set_imv_input_hooks(fm, True)
 
     idx = _ensure_synced(sock, fm)
     if idx is None:
@@ -297,20 +402,30 @@ _HOOK_READY_OLD = ranger.api.hook_ready
 
 
 def hook_ready(fm: FM) -> None:
-    global _orig_i
+    global _orig_i, _orig_m, _orig_handle_input
     _orig_i_num = tuple(parse_keybinding("i"))[0]
     _orig_i = fm.ui.keymaps["browser"].get(_orig_i_num)
+    _orig_m = fm.ui.keymaps["browser"].get("m")
+    _orig_handle_input = fm.ui.handle_input
     # fm.notify(_orig_i)
 
     # bind selection-change signal
     fm.signal_bind("move", _on_move, priority=0, weak=False)
 
-    fm.signal_bind(
-        "runner.execute.before",
-        lambda s: __import__("sys").stdout.write("---\n"),
-        priority=0,
-        weak=False,
-    )
+    # Focus notifications are unreliable when ranger is nested in tmux/st.
+    # Expose the same operation as :m while imv is active for manual testing.
+    fm.sync_imv_position = lambda: _sync_from_imv_fm(fm)
+    fm.commands.load_commands_from_object(fm, ["sync_imv_position"])
+
+    # Also activate the input hook when ranger launches imv through rifle.
+    old_rifle_after = fm.rifle.hook_after_executing
+
+    def rifle_after(*args, **kwargs):
+        if old_rifle_after:
+            old_rifle_after(*args, **kwargs)
+        _set_imv_input_hooks(fm, _newest_imv_socket() is not None)
+
+    fm.rifle.hook_after_executing = rifle_after
 
     if _HOOK_READY_OLD:
         _HOOK_READY_OLD(fm)

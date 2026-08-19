@@ -31,6 +31,7 @@ class FilterableDirectory(Protocol):
 
     def refilter(self) -> None: ...
 
+
 # HACK:FIXME: wide icons (OR: narrow font)
 # os.environ["RANGER_DEVICONS_SEPARATOR"]="  "
 
@@ -50,9 +51,7 @@ def today_date(delta: int = 7) -> str:
     return (
         datetime.datetime.now(datetime.timezone.utc).astimezone()
         - datetime.timedelta(hours=delta)
-    ).strftime(
-        "%Y-%m-%d"
-    )
+    ).strftime("%Y-%m-%d")
 
 
 # BAD: ranger crash on exit if '--choosedir' path was deleted by 3rd party
@@ -75,7 +74,9 @@ class ag(Command):
     """
 
     editor: ClassVar[str] = os.getenv("EDITOR") or "vim"
-    acmd: ClassVar[str] = "rg --pcre2 --smart-case --color always --hidden"  # --search-zip
+    acmd: ClassVar[str] = (
+        "rg --pcre2 --smart-case --color always --hidden"  # --search-zip
+    )
     qarg: ClassVar[Pattern[str]] = re.compile(r"""^(".*"|'.*')$""")
     patterns: ClassVar[list[str]] = []
     # THINK:USE: set_clipboard on each direct ':ag' search? So I could find in vim easily
@@ -284,7 +285,9 @@ class doc(Command):
     # TODO: find existing file with any extension.
     # NEED: priority if exists multiple files with same extension
     # -- Though ext=.nou is preferred and default when creating new file.
-    def _nearest(self, pwd: str, nm: str, fvalidate: Callable[[str], bool]) -> str | None:
+    def _nearest(
+        self, pwd: str, nm: str, fvalidate: Callable[[str], bool]
+    ) -> str | None:
         for d in doc.loci:
             for e in doc.ext:
                 path = fs.join(pwd, d, nm + e)
@@ -760,3 +763,38 @@ class cd_symlink1(Command):
             fm.cd(str(target_dir))
         else:
             fm.notify("Link target and parent directories do not exist!", bad=True)
+
+
+class link_orig(Command):
+    def execute(self) -> None:
+        d: str = self.fm.get_macros()["D"]
+
+        def linkedpath(p: str) -> str:
+            if fs.islink(p):
+                return fs.abspath(fs.join(fs.dirname(p), os.readlink(p)))
+            parent: str = fs.dirname(p)
+            if fs.islink(parent):
+                # OR:(one level only):
+                # parent = fs.abspath(fs.join(fs.dirname(parent), os.readlink(parent))) if fs.islink(parent) else parent
+                parent = fs.realpath(parent)
+                return fs.join(parent, fs.basename(p))
+            return fs.abspath(p)
+
+        def optrelpath(c: str) -> str:
+            return fs.relpath(c, d) if fs.commonpath([d, c]) == fs.abspath(d) else c
+
+        failed = 0
+        for f in self.fm.thistab.get_selection():
+            src: str = linkedpath(f.path)
+            target: str = fs.join(d, fs.basename(src))
+            if fs.abspath(src) == fs.abspath(target):
+                continue
+            self.fm.execute_command(
+                f'ln -svt "{d}" --backup=numbered -- "{optrelpath(src)}"'
+            )
+            # MAYBE: notify user if some links had failed (e.g. wrong relative path)
+            if not fs.exists(target):
+                failed += 1
+
+        self.fm.mark_files(all=True, val=False)
+        self.fm.notify("Copied to -> " + d, bad=bool(failed))
