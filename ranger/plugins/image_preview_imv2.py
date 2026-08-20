@@ -69,6 +69,7 @@ _orig_m = ""
 _orig_handle_input = None
 _wrapped_handle_input = False
 _last_imv_poll_mono = 0.0
+_imv_sync_pending = False
 class ImvState(TypedDict):
     sock: str
     list_hash: int
@@ -205,32 +206,45 @@ def _sync_from_imv_fm(fm: FM) -> None:
             continue
         path = _current_imv_path(sock)
         if path and os.path.exists(path):
-            fm.select_file(path)
+            # imv reports the canonical path even when it was opened through a
+            # symlink.  Select the visible Ranger entry that points to it,
+            # otherwise Ranger jumps from e.g. /view into the source folder.
+            selected = path
+            try:
+                real_path = os.path.realpath(path)
+                for entry in fm.thisdir.files:
+                    if os.path.realpath(entry.path) == real_path:
+                        selected = entry.path
+                        break
+            except OSError:
+                pass
+            if getattr(fm.thisfile, "path", None) != selected:
+                fm.select_file(selected)
             global _last_path
-            _last_path = path
+            _last_path = selected
             return
 
 
 def _poll_imv_before_input(fm: FM) -> None:
-    global _last_imv_poll_mono
+    global _last_imv_poll_mono, _imv_sync_pending
     now = time.monotonic()
     if (now - _last_imv_poll_mono) * 1000.0 < IMV_POLL_MS:
         return
     _last_imv_poll_mono = now
     _sync_from_imv_fm(fm)
+    _imv_sync_pending = False
 
 
 def _set_imv_input_hooks(fm: FM, enabled: bool) -> None:
     """Temporarily follow imv while it exists, restoring ranger afterwards."""
-    global _changed_m, _wrapped_handle_input
+    global _changed_m, _wrapped_handle_input, _imv_sync_pending
     if enabled and not _wrapped_handle_input:
         original = _orig_handle_input
+        _imv_sync_pending = True
 
         def handle_input_with_imv_sync():
             if _newest_imv_socket():
                 _poll_imv_before_input(fm)
-            else:
-                _set_imv_input_hooks(fm, False)
             original()
 
         fm.ui.handle_input = handle_input_with_imv_sync
@@ -238,6 +252,7 @@ def _set_imv_input_hooks(fm: FM, enabled: bool) -> None:
     elif not enabled and _wrapped_handle_input:
         fm.ui.handle_input = _orig_handle_input
         _wrapped_handle_input = False
+        _imv_sync_pending = False
 
     if enabled and not _changed_m:
         fm.ui.keymaps.bind("browser", "m", "sync_imv_position")
@@ -351,6 +366,12 @@ def _on_move(signal: Signal) -> None:
     except Exception:
         return
 
+    sock = _newest_imv_socket()
+    if sock and not _wrapped_handle_input:
+        # This also covers returning to Ranger on the same file: in that
+        # case there may be no useful move signal after focus changes.
+        _set_imv_input_hooks(fm, True)
+
     # fm.notify("sljdslfjsdf", bad=True)
 
     # Debounce
@@ -370,15 +391,11 @@ def _on_move(signal: Signal) -> None:
     # >OK
     # fm.notify(sel_path, bad=True)
 
-    sock = _newest_imv_socket()
     if not sock:
-        _set_imv_input_hooks(fm, False)
         if _changed_i and km.get(_orig_i_num) != _orig_i:
             fm.ui.keymaps.bind("browser", "i", _orig_i)
             _changed_i = False
         return
-
-    _set_imv_input_hooks(fm, True)
 
     idx = _ensure_synced(sock, fm)
     if idx is None:
@@ -407,6 +424,9 @@ def hook_ready(fm: FM) -> None:
     _orig_i = fm.ui.keymaps["browser"].get(_orig_i_num)
     _orig_m = fm.ui.keymaps["browser"].get("m")
     _orig_handle_input = fm.ui.handle_input
+    # Keep a lightweight input hook installed so focus changes from imv back
+    # to Ranger are observable even when Ranger emits no move signal.
+    _set_imv_input_hooks(fm, True)
     # fm.notify(_orig_i)
 
     # bind selection-change signal
