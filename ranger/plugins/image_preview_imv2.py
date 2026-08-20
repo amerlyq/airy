@@ -49,7 +49,7 @@ from ranger.ext.keybinding_parser import parse_keybinding
 from ranger.ext.signals import Signal
 
 DEBOUNCE_MS = 60
-IMV_POLL_MS = 300
+IMV_POLL_MS = 60
 SOCKET_GLOB = "imv-*.sock"
 
 # If your build expects NUL-terminated commands instead of newline, set True:
@@ -61,15 +61,22 @@ OPEN_CMD_MAX_BYTES = 24 * 1024
 # -------- internal state --------
 _last_send_mono = 0.0
 _last_path = ""
+_last_imv_sent_path = ""
+_last_imv_sent_dir = ""
 _orig_i_num = 0
 _orig_i = ""
 _changed_i = False
 _changed_m = False
 _orig_m = ""
+_orig_M = ""
+_active_fm = None
 _orig_handle_input = None
 _wrapped_handle_input = False
 _last_imv_poll_mono = 0.0
 _imv_sync_pending = False
+_owned_imv_sockets: set[str] = set()
+_ignored_imv_sockets: set[str] = set()
+_socket_baseline: set[str] = set()
 class ImvState(TypedDict):
     sock: str
     list_hash: int
@@ -115,7 +122,11 @@ def _looks_like_image(path: str) -> bool:
 def _newest_imv_socket() -> str | None:
     rt = _xdg_runtime_dir()
     try:
-        entries = list(Path(rt).glob(SOCKET_GLOB))
+        entries = [
+            p for p in Path(rt).glob(SOCKET_GLOB)
+            if str(p) in _owned_imv_sockets
+            and str(p) not in _ignored_imv_sockets
+        ]
     except Exception:
         return None
     if not entries:
@@ -123,6 +134,29 @@ def _newest_imv_socket() -> str | None:
     # newest by mtime
     entries.sort(key=lambda p: p.stat().st_mtime if p.exists() else 0.0)
     return str(entries[-1])
+
+
+def _remember_new_imv_sockets() -> None:
+    """Adopt sockets created by this Ranger's rifle invocation."""
+    global _socket_baseline
+    rt = _xdg_runtime_dir()
+    try:
+        current = {str(p) for p in Path(rt).glob(SOCKET_GLOB)}
+    except Exception:
+        return
+    new_sockets = current - _socket_baseline
+    _owned_imv_sockets.update(new_sockets)
+    # A freshly launched instance is always eligible, including after M.
+    # (Normally imv uses a new PID/socket name, but this also handles socket
+    # names being reused.)
+    _ignored_imv_sockets.difference_update(new_sockets)
+    _socket_baseline = current
+
+
+def _stop_imv_tracking() -> None:
+    """Forget all currently owned imv instances until a new one is opened."""
+    _ignored_imv_sockets.update(_owned_imv_sockets)
+    _set_imv_input_hooks(_active_fm, False)
 
 
 def _quote_imv(s: str) -> str:
@@ -197,6 +231,7 @@ def _current_imv_path(sock: str) -> str | None:
 
 def _sync_from_imv_fm(fm: FM) -> None:
     """Follow imv's selected image in ranger."""
+    global _last_imv_sent_path, _last_imv_sent_dir
     # The compositor/tmux handoff can make the first request arrive too early.
     for delay in (0.0, 0.08, 0.20):
         if delay:
@@ -218,15 +253,28 @@ def _sync_from_imv_fm(fm: FM) -> None:
                         break
             except OSError:
                 pass
+            # If imv still shows the image Ranger sent when it was opened (or
+            # when Ranger last moved), it is not a handoff change.  Let the
+            # user's current Ranger navigation win instead of jumping back.
+            if (
+                _last_imv_sent_path
+                and os.path.realpath(path) == os.path.realpath(_last_imv_sent_path)
+            ):
+                return
+            if _last_imv_sent_dir and getattr(fm.thisdir, "path", "") != _last_imv_sent_dir:
+                return
             if getattr(fm.thisfile, "path", None) != selected:
                 fm.select_file(selected)
             global _last_path
             _last_path = selected
+            _last_imv_sent_path = selected
+            _last_imv_sent_dir = getattr(fm.thisdir, "path", "")
             return
 
 
 def _poll_imv_before_input(fm: FM) -> None:
     global _last_imv_poll_mono, _imv_sync_pending
+    _remember_new_imv_sockets()
     now = time.monotonic()
     if (now - _last_imv_poll_mono) * 1000.0 < IMV_POLL_MS:
         return
@@ -256,12 +304,17 @@ def _set_imv_input_hooks(fm: FM, enabled: bool) -> None:
 
     if enabled and not _changed_m:
         fm.ui.keymaps.bind("browser", "m", "sync_imv_position")
+        fm.ui.keymaps.bind("browser", "M", "stop_imv_tracking")
         _changed_m = True
     elif not enabled and _changed_m:
         if _orig_m is None:
             fm.ui.keymaps.unbind("browser", "m")
         else:
             fm.ui.keymaps.bind("browser", "m", _orig_m)
+        if _orig_M is None:
+            fm.ui.keymaps.unbind("browser", "M")
+        else:
+            fm.ui.keymaps.bind("browser", "M", _orig_M)
         _changed_m = False
 
 
@@ -360,12 +413,16 @@ def _ensure_synced(sock: str, fm: FM) -> int | None:
 
 def _on_move(signal: Signal) -> None:
     global _last_send_mono, _last_path, _changed_i
+    global _last_imv_sent_path, _last_imv_sent_dir
 
     try:
         fm: FM = signal.origin
     except Exception:
         return
 
+    # Some rifle paths do not invoke hook_after_executing. Discover sockets
+    # here as a fallback, while excluding sockets present at startup.
+    _remember_new_imv_sockets()
     sock = _newest_imv_socket()
     if sock and not _wrapped_handle_input:
         # This also covers returning to Ranger on the same file: in that
@@ -402,6 +459,8 @@ def _on_move(signal: Signal) -> None:
         return
 
     _send_line(sock, f"goto {idx}")
+    _last_imv_sent_path = sel_path
+    _last_imv_sent_dir = getattr(fm.thisdir, "path", "")
 
     if km.get("i") != "tag_toggle":
         fm.ui.keymaps.bind("browser", "i", "tag_toggle")
@@ -419,11 +478,18 @@ _HOOK_READY_OLD = ranger.api.hook_ready
 
 
 def hook_ready(fm: FM) -> None:
-    global _orig_i, _orig_m, _orig_handle_input
+    global _orig_i, _orig_m, _orig_M, _orig_handle_input
     _orig_i_num = tuple(parse_keybinding("i"))[0]
     _orig_i = fm.ui.keymaps["browser"].get(_orig_i_num)
     _orig_m = fm.ui.keymaps["browser"].get("m")
+    _orig_M = fm.ui.keymaps["browser"].get("M")
     _orig_handle_input = fm.ui.handle_input
+    global _active_fm, _socket_baseline
+    _active_fm = fm
+    try:
+        _socket_baseline = {str(p) for p in Path(_xdg_runtime_dir()).glob(SOCKET_GLOB)}
+    except Exception:
+        _socket_baseline = set()
     # Keep a lightweight input hook installed so focus changes from imv back
     # to Ranger are observable even when Ranger emits no move signal.
     _set_imv_input_hooks(fm, True)
@@ -435,7 +501,9 @@ def hook_ready(fm: FM) -> None:
     # Focus notifications are unreliable when ranger is nested in tmux/st.
     # Expose the same operation as :m while imv is active for manual testing.
     fm.sync_imv_position = lambda: _sync_from_imv_fm(fm)
+    fm.stop_imv_tracking = _stop_imv_tracking
     fm.commands.load_commands_from_object(fm, ["sync_imv_position"])
+    fm.commands.load_commands_from_object(fm, ["stop_imv_tracking"])
 
     # Also activate the input hook when ranger launches imv through rifle.
     old_rifle_after = fm.rifle.hook_after_executing
@@ -443,6 +511,7 @@ def hook_ready(fm: FM) -> None:
     def rifle_after(*args, **kwargs):
         if old_rifle_after:
             old_rifle_after(*args, **kwargs)
+        _remember_new_imv_sockets()
         _set_imv_input_hooks(fm, _newest_imv_socket() is not None)
 
     fm.rifle.hook_after_executing = rifle_after
