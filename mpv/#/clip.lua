@@ -1,85 +1,6 @@
--- vim:ft=lua:ts=2:sw=2:sts=2
--- Clip video from between two marks '[' and ']'
--- Seek to placed marks 'S-[' and 'S-]'
--- Convert by 'r.ffmpeg <path> <beg> <end>' on 'y'
-
 -- Package incapsulation
 local P = {}
 clip = P
-local mp = require 'mp'
-local utils = require 'mp.utils'
-setfenv(1, P)
-
-utils = require 'mp.utils'
-
-clip_begin = 0.0
-clip_end   = mp.get_property_native("length") or 0.0
-
-
--- Options
-mp.set_property("hr-seek-framedrop", "no")
-mp.set_property("options/keep-open", "always")
--- alas, the following setting seems to not take effect - needs
--- to be specified on the command line of mpv, instead:
-mp.set_property("options/script-opts", "osc-layout=bottombar,osc-hidetimeout=-1")
-
-
--- Behaviour
-function clip_on_eof()
-    -- pause upon reaching the end of the file
-    mp.msg.log("info", "playback reached end of file")
-    mp.set_property("pause", "yes")
-    mp.commandv("seek", 100, "absolute-percent", "exact")
-end
-mp.register_event("eof-reached", clip_on_eof)
-
-
--- Implementation
-function clip_rangemessage()
-    local duration = clip_end - clip_begin
-    local message = ""
-    message = message .. "begin=" .. string.format("%4.3f", clip_begin) .. "s "
-    message = message .. "end=" .. string.format("%4.3f", clip_end) .. "s "
-    message = message .. "duration=" .. string.format("% 4.3f", duration) .. "s "
-    return message
-end
-
-function clip_rangeinfo()
-    local message = clip_rangemessage()
-    mp.msg.log("info", message)
-    mp.osd_message(message, 5)
-end
-
-function clip_mark_begin_handler()
-    pt = mp.get_property_native("playback-time")
-
-    -- at some later time, setting a/b markers might be used to visualize begin/end
-    -- mp.set_property("ab-loop-a", pt)
-    -- mp.set_property("loop", 999)
-
-    clip_begin = pt
-    if clip_begin > clip_end then
-        clip_end = clip_begin
-    end
-
-    clip_rangeinfo()
-end
-
-function clip_mark_end_handler()
-    pt = mp.get_property_native("playback-time")
-
-    -- at some later time, setting a/b markers might be used to visualize begin/end
-    -- mp.set_property("ab-loop-b", pt)
-    -- mp.set_property("loop", 999)
-
-    clip_end = pt
-    if clip_end < clip_begin then
-        clip_begin = clip_end
-    end
-
-    clip_rangeinfo()
-end
-
 
 function clip_write_handler()
     fname = "clip_13444.mp4"
@@ -383,12 +304,6 @@ end
 
 --
 
-mp.add_key_binding("i", "clip_mark_begin", clip_mark_begin_handler)
-mp.add_key_binding("shift+i", "clip_seek_begin", clip_seek_begin_handler)
-mp.add_key_binding("o", "clip_mark_end", clip_mark_end_handler)
-mp.add_key_binding("shift+o", "clip_seek_end", clip_seek_end_handler)
-mp.add_key_binding("x", "clip_write", clip_write_handler)
-
 mp.add_key_binding("shift+right", "clip_keyframe_forward", clip_keyframe_forward, { repeatable = true; complex = true })
 mp.add_key_binding("shift+left", "clip_keyframe_back", clip_keyframe_back, { repeatable = true; complex = true })
 mp.add_key_binding("right", "clip_frame_forward", clip_frame_forward, { repeatable = true; complex = true })
@@ -398,6 +313,5 @@ mp.add_key_binding("left", "clip_frame_back", clip_frame_back, { repeatable = tr
 -- mp.add_key_binding("shift+mouse_btn4", "clip_test", clip_test, { repeatable = false; complex = true })
 -- mp.add_key_binding("y", "clip_test", clip_test, { repeatable = false; complex = true })
 
-clip_rangeinfo()
 
 return clip

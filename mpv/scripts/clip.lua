@@ -337,8 +337,16 @@ local function preview_cut(which)
   local cut_args
   if which == 'A' then
     local ss = math.max(0, g.A)
-    cut_args = { "-ss", tostring(ss), "-i", path,
-                 "-t", tostring(PREVIEW_WINDOW_S), "-codec", "copy", tmp.clip }
+    -- DISABLED: imprecise beginning of clip, often goes back by 2-3 frames
+    -- cut_args = { "-ss", tostring(ss), "-i", path,
+    --              "-t", tostring(PREVIEW_WINDOW_S), "-codec", "copy", tmp.clip }
+    -- A stream-copy seek before -i can only begin at the preceding keyframe.
+    -- Decode from the input and re-encode this tiny preview so its first
+    -- frame is the actual mark, even when g.A is between keyframes.
+    cut_args = { "-i", path, "-ss", tostring(ss),
+                 "-t", tostring(PREVIEW_WINDOW_S), "-an",
+                 "-c:v", "libx264", "-preset", "ultrafast", "-crf", "18",
+                 tmp.clip }
   else
     local ss = math.max(0, g.B - PREVIEW_WINDOW_S)
     cut_args = { "-ss", tostring(ss), "-i", path,
@@ -384,10 +392,23 @@ local function preview_cut(which)
       frame_flag = { "-sseof", "-0.05" }
     end
 
+    local label
+    if which == 'A' then
+      label = to_ffmpeg_sfx(g.A)
+    else
+      label = string.format("%s (%s)", to_ffmpeg_sfx(g.B),
+        to_ffmpeg_sfx(math.max(0, g.B - g.A)))
+    end
+    -- Colons are option separators in the drawtext filter, so escape them.
+    local drawtext_label = label:gsub(":", "\\:")
+    local preview_filter = string.format(
+      "scale=%d:%d,drawtext=text='%s':x=10:y=h-th-10:fontsize=%d:fontcolor=white:borderw=2:bordercolor=black",
+      w, h, drawtext_label, math.max(12, math.floor(h * 0.14)))
+
     local stride = w * 4
     local decode_args = { "ffmpeg", "-y", "-hide_banner", "-loglevel", "error",
       frame_flag[1], frame_flag[2], "-i", tmp.clip,
-      "-vframes", "1", "-vf", "scale=" .. w .. ":" .. h,
+      "-vframes", "1", "-vf", preview_filter,
       "-pix_fmt", "bgra", "-f", "rawvideo", tmp.raw }
 
     dbg("preview_cut(%s): decode cmd = %s", which, table.concat(decode_args, " "))
@@ -558,7 +579,7 @@ end)
 -- Options
 -- mp.set_property("hr-seek-framedrop", "no")
 -- mp.set_property("options/keep-open", "always")
--- NOTE: always show OSD
+-- NOTE: always show OSD / BAD: no effect? - should use mpv cmdline of mpv instead?
 -- mp.set_property("options/script-opts", "osc-layout=bottombar,osc-hidetimeout=-1")
 
 
@@ -566,7 +587,11 @@ end)
 -- Pause on open and eof
 function on_loaded()
   -- mp.set_property("pause", "yes")
-  g.B = mp.get_property_number("duration/full")
+  -- watch-later restores ab-loop-a/b before file-loaded, so use those
+  -- values when reopening a video.  Fall back to the full file range when
+  -- no loop was saved for this file.
+  g.A = mp.get_property_number("ab-loop-a") or 0.0
+  g.B = mp.get_property_number("ab-loop-b") or mp.get_property_number("duration/full")
 end
 function on_eof()
     mp.msg.log("info", "playback reached end of file")
@@ -680,18 +705,18 @@ function h_move()
   end
 end
 
-mp.add_key_binding("", "clip_write_copy", (function() return h_write('copy') end))  -- y
+mp.add_key_binding("", "clip_write_copy", (function() return h_write('copy') end))  -- y  # OLD=x
 mp.add_key_binding("", "clip_write_fast", (function() return h_write('fast') end))  -- Y
 mp.add_key_binding("", "clip_write_smart", (function() return h_write('smart') end))  -- C-y
 mp.add_key_binding("", "clip_clear_preview", preview_clear)                             -- C-l
 mp.add_key_binding("", "clip_moving",   h_move)       -- m
-mp.add_key_binding("", "clip_mark_beg", h_mark_beg)   -- [
-mp.add_key_binding("", "clip_mark_end", h_mark_end)   -- ]
+mp.add_key_binding("", "clip_mark_beg", h_mark_beg)   -- [  # OLD=i
+mp.add_key_binding("", "clip_mark_end", h_mark_end)   -- ]  # OLD=o
 -- ALT: jump and mark to keyframe
-mp.add_key_binding("", "clip_seek_beg", (function() return h_seek(0,1) end))  -- {
-mp.add_key_binding("", "clip_seek_end", (function() return h_seek(1,1) end))  -- }
-mp.add_key_binding("", "clip_seek_kfb", (function() return h_seek(0,0) end))  -- <
-mp.add_key_binding("", "clip_seek_kfe", (function() return h_seek(1,0) end))  -- >
+mp.add_key_binding("", "clip_seek_beg", (function() return h_seek(0,1) end))  -- {  # OLD=S-i
+mp.add_key_binding("", "clip_seek_end", (function() return h_seek(1,1) end))  -- }  # OLD=S-o
+mp.add_key_binding("", "clip_seek_kfb", (function() return h_seek(0,0) end))  -- <  # OLD=S-Left
+mp.add_key_binding("", "clip_seek_kfe", (function() return h_seek(1,0) end))  -- >  # OLD=S-Right
 
 
 -- mp.osd_message("loaded", 3)

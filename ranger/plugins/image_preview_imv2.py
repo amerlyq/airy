@@ -49,7 +49,7 @@ from ranger.ext.keybinding_parser import parse_keybinding
 from ranger.ext.signals import Signal
 
 DEBOUNCE_MS = 60
-IMV_POLL_MS = 60
+IMV_POLL_MS = 300
 SOCKET_GLOB = "imv-*.sock"
 
 # If your build expects NUL-terminated commands instead of newline, set True:
@@ -211,7 +211,7 @@ def _current_imv_path(sock: str) -> str | None:
             return None
 
         # The exec is asynchronous, so allow a short handoff/write window.
-        for _ in range(10):
+        for _ in range(5):
             try:
                 path = Path(result_path).read_text(
                     encoding="utf-8", errors="surrogateescape"
@@ -233,7 +233,7 @@ def _sync_from_imv_fm(fm: FM) -> None:
     """Follow imv's selected image in ranger."""
     global _last_imv_sent_path, _last_imv_sent_dir
     # The compositor/tmux handoff can make the first request arrive too early.
-    for delay in (0.0, 0.08, 0.20):
+    for delay in (0.0, 0.03, 0.08):
         if delay:
             time.sleep(delay)
         sock = _newest_imv_socket()
@@ -247,7 +247,7 @@ def _sync_from_imv_fm(fm: FM) -> None:
             selected = path
             try:
                 real_path = os.path.realpath(path)
-                for entry in fm.thisdir.files:
+                for entry in (getattr(fm.thisdir, "files", None) or ()):
                     if os.path.realpath(entry.path) == real_path:
                         selected = entry.path
                         break
