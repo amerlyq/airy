@@ -336,17 +336,8 @@ local function preview_cut(which)
   local tmp = TMP[which]
   local cut_args
   if which == 'A' then
-    local ss = math.max(0, g.A)
-    -- DISABLED: imprecise beginning of clip, often goes back by 2-3 frames
-    -- cut_args = { "-ss", tostring(ss), "-i", path,
-    --              "-t", tostring(PREVIEW_WINDOW_S), "-codec", "copy", tmp.clip }
-    -- A stream-copy seek before -i can only begin at the preceding keyframe.
-    -- Decode from the input and re-encode this tiny preview so its first
-    -- frame is the actual mark, even when g.A is between keyframes.
-    cut_args = { "-i", path, "-ss", tostring(ss),
-                 "-t", tostring(PREVIEW_WINDOW_S), "-an",
-                 "-c:v", "libx264", "-preset", "ultrafast", "-crf", "18",
-                 tmp.clip }
+    -- A is decoded directly below; no temporary clip or re-encode is needed.
+    cut_args = {}
   else
     local ss = math.max(0, g.B - PREVIEW_WINDOW_S)
     cut_args = { "-ss", tostring(ss), "-i", path,
@@ -356,14 +347,20 @@ local function preview_cut(which)
     -- always "duration from this -ss point," which is what we want here.
   end
 
-  local full_cut_args = { "-y", "-hide_banner", "-loglevel", "error" }
-  for _, v in ipairs(cut_args) do table.insert(full_cut_args, v) end
-
-  local cut_full = (function()
-    local a = { "ffmpeg" }
-    for _, v in ipairs(full_cut_args) do table.insert(a, v) end
-    return a
-  end)()
+  local cut_full
+  if which == 'A' then
+    -- Use a cheap FFmpeg probe as the async handoff; the actual A frame is
+    -- decoded directly from the source below.
+    cut_full = { "ffmpeg", "-hide_banner", "-version" }
+  else
+    local full_cut_args = { "-y", "-hide_banner", "-loglevel", "error" }
+    for _, v in ipairs(cut_args) do table.insert(full_cut_args, v) end
+    cut_full = (function()
+      local a = { "ffmpeg" }
+      for _, v in ipairs(full_cut_args) do table.insert(a, v) end
+      return a
+    end)()
+  end
   dbg("preview_cut(%s): cut cmd = %s", which, table.concat(cut_full, " "))
 
   mp.command_native_async({
@@ -386,8 +383,13 @@ local function preview_cut(which)
 
     -- which frame within the short clip: 'A' -> first frame, 'B' -> last frame
     local frame_flag
+    local decode_input = tmp.clip
     if which == 'A' then
-      frame_flag = { "-ss", "0" }
+      -- The stream-copied temporary file can contain packets before g.A.
+      -- Decode the original at the selected timestamp so the preview matches
+      -- the first frame mpv displays after opening the copied clip.
+      frame_flag = { "-ss", tostring(math.max(0, g.A)) }
+      decode_input = path
     else
       frame_flag = { "-sseof", "-0.05" }
     end
@@ -396,8 +398,7 @@ local function preview_cut(which)
     if which == 'A' then
       label = to_ffmpeg_sfx(g.A)
     else
-      label = string.format("%s (%s)", to_ffmpeg_sfx(g.B),
-        to_ffmpeg_sfx(math.max(0, g.B - g.A)))
+      label = to_ffmpeg_sfx(g.B)
     end
     -- Colons are option separators in the drawtext filter, so escape them.
     local drawtext_label = label:gsub(":", "\\:")
@@ -406,10 +407,28 @@ local function preview_cut(which)
       w, h, drawtext_label, math.max(12, math.floor(h * 0.14)))
 
     local stride = w * 4
-    local decode_args = { "ffmpeg", "-y", "-hide_banner", "-loglevel", "error",
-      frame_flag[1], frame_flag[2], "-i", tmp.clip,
-      "-vframes", "1", "-vf", preview_filter,
-      "-pix_fmt", "bgra", "-f", "rawvideo", tmp.raw }
+    local decode_args = { "ffmpeg", "-y", "-hide_banner", "-loglevel", "error" }
+    if which == 'A' then
+      -- Output-side seek makes this decoded frame timestamp-accurate.
+      table.insert(decode_args, "-i")
+      table.insert(decode_args, decode_input)
+      table.insert(decode_args, frame_flag[1])
+      table.insert(decode_args, frame_flag[2])
+    else
+      table.insert(decode_args, frame_flag[1])
+      table.insert(decode_args, frame_flag[2])
+      table.insert(decode_args, "-i")
+      table.insert(decode_args, decode_input)
+    end
+    table.insert(decode_args, "-vframes")
+    table.insert(decode_args, "1")
+    table.insert(decode_args, "-vf")
+    table.insert(decode_args, preview_filter)
+    table.insert(decode_args, "-pix_fmt")
+    table.insert(decode_args, "bgra")
+    table.insert(decode_args, "-f")
+    table.insert(decode_args, "rawvideo")
+    table.insert(decode_args, tmp.raw)
 
     dbg("preview_cut(%s): decode cmd = %s", which, table.concat(decode_args, " "))
 
@@ -619,6 +638,11 @@ function to_ffmpeg_sfx(t)
   -- ALT: os.date("%M:%S", g.A)
   return string.format("%02d:%02d.%d", math.floor(t/60), math.floor(t%60), math.floor((t-math.floor(t))*10))
 end
+function update_duration_overlay()
+  mp.set_property("osd-align-x", "left")
+  mp.set_property("osd-align-y", "top")
+  mp.osd_message(string.format("duration: %s", to_ffmpeg_sfx(math.max(0, g.B - g.A))), 999999)
+end
 function mark_update(m)
   show_status("info", string.format("[%s] dt=%4.3f  (%s - %s)",
     m, g.B - g.A, to_ffmpeg_sfx(g.A), to_ffmpeg_sfx(g.B)))
@@ -632,6 +656,7 @@ function h_mark_beg()
   mp.set_property("ab-loop-b", g.B)
   mark_update('<')
   mark_set.A = true
+  update_duration_overlay()
   preview_cut_debounced('A')
 end
 function h_mark_end()
@@ -642,6 +667,7 @@ function h_mark_end()
   mp.set_property("ab-loop-b", g.B)
   mark_update('>')
   mark_set.B = true
+  update_duration_overlay()
   preview_cut_debounced('B')
 end
 
