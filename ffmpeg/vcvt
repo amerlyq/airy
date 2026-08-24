@@ -1,16 +1,19 @@
 #!/usr/bin/env bash
 # DEBUG: $ ffprobe input.mp4
+# USAGE: $ print -l {22..30} |xargs -t -n1 -P0 sh -c 'time /b/vcvt -c"$0" input.mp4 &>"$0".log'
+
 set -o errexit -o errtrace -o functrace -o noclobber -o noglob -o nounset -o pipefail
 shopt -qs inherit_errexit lastpipe
 
-use=
-if [[ -e /dev/nvidia0 ]]; then use=nv
-elif [[ -d /sys/module/i915 ]] || [[ -d /sys/module/xe ]]; then use=qsv
-else >&2 echo "MAYBE: Fallback to Software Encoding"; exit 1; fi
+declare use=cpu qa=32 ifx=va
+# if [[ -e /dev/nvidia0 ]]; then
+  # declare use=nv qa=28 ifx=nv
+# elif [[ -d /sys/module/i915 ]] || [[ -d /sys/module/xe ]]; then
+#   # REF:(qa): https://www.ffmpeg.org/ffmpeg-codecs.html#Ratecontrol-Method
+#   #   For the ICQ modes, global quality range is 1 to 51, with 1 being the best quality.
+#   declare use=qsv qa=23 ifx=q
+# else >&2 echo "MAYBE: Fallback to Software Encoding"; exit 1; fi
 
-# REF:(qa): https://www.ffmpeg.org/ffmpeg-codecs.html#Ratecontrol-Method
-#   For the ICQ modes, global quality range is 1 to 51, with 1 being the best quality.
-[[ $use == qsv ]] && { qa=23; ifx=c; } || { qa=28; ifx=nv; }
 
 while LC_COLLATE=C getopts 'ac:sx-:' o; do
 case $o in :|'?') exit 2
@@ -20,20 +23,22 @@ case $o in :|'?') exit 2
 ;; x) set -x && xt=${-//[^x]}
 esac; done; shift $((OPTIND-1)); unset o
 
+fin=$1
+out="${fin%.*}_${ifx}${qa}.${fin##*.}"
 
 # BET? $ mkdir -p /t/vd_cvt && sshfs lf:/cache/vd_cvt /t/vd_cvt -o kernel_cache -o compression=no
 # TRY: REMOTE-cvt:
 # ONELINE: $ ssh lf 'ffmpeg ... -i pipe:0 ... -f mp4 pipe:1' < local_input.mp4 > local_output.mp4
 #   [?] BET:DEV: python ThreadPool() watching a dir to parallelize queue of jobs=5 (measure)
 # VIEW: $ mpv sftp://lf/cache/vd_cvt/todo/input_a25.mp4
-if [[ -t 0 ]]; then
-  fin=$1
-  out="${fin%.*}_${ifx}${qa}.${fin##*.}"
-else
-  fin='pipe:0'
-  [[ -t 1 ]] && exit 2
-  out="pipe:1"
-fi
+# if [[ -t 0 ]]; then
+#   fin=$1
+#   out="${fin%.*}_${ifx}${qa}.${fin##*.}"
+# else
+#   fin='pipe:0'
+#   [[ -t 1 ]] && exit 2
+#   out="pipe:1"
+# fi
 
 if [[ -e $out ]]; then
   # FIXME: use mtime?
@@ -123,6 +128,42 @@ if [[ $use == qsv ]]; then
     -init_hw_device qsv=qsv:hw -hwaccel qsv -hwaccel_output_format qsv -i "$fin" \
     -vf "scale_qsv=w='trunc(iw*min(1,min(if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih))/2)*2':h='trunc(ih*min(1,min(if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih))/2)*2',format=qsv" \
     -c:v hevc_qsv "${qsvopts[@]}" -preset slow -global_quality "$qa" "${out[@]}"
+
+fi
+
+if [[ $use == cpu ]]; then
+
+  # # 2013/Hevc
+  # #   NICE: x265 (previous): --scenecut is on by default and quite mature; if scene-cut handling specifically matters most,
+  # #     x265 arguably has the best-tested implementation of the three despite the codec being older.
+  # exec "${ffmpeg[@]}" -i "$fin" \
+  #   -vf "scale=w='if(gt(iw,ih),min(iw,1920),min(iw,1080))':h='if(gt(iw,ih),min(ih,1080),min(ih,1920))':force_original_aspect_ratio=decrease:force_divisible_by=2:flags=lanczos,format=yuv420p10le" \
+  #   -c:v libx265 -preset slower -crf 18 -pix_fmt yuv420p10le \
+  #   -x265-params "aq-mode=3:aq-strength=0.8:psy-rd=2.0:psy-rdoq=1.0:rdoq-level=2:bframes=8:ref=6:deblock=-1,-1:rc-lookahead=60" \
+  #   -c:a copy "${out[@]}"
+
+  # NOTE: 2018 AV1 (svt-av1) at equivalent quality typically runs 20-30% smaller than x265, at higher encode cost
+  #   BAD: no hardware decode on 2080Ti
+  #   * lower GOP keyint=5s to 2s if transitions are extremely frequent
+  # exec "${ffmpeg[@]}" -i "$fin" \
+  #   -vf "scale=w='if(gt(iw,ih),min(iw,1920),min(iw,1080))':h='if(gt(iw,ih),min(ih,1080),min(ih,1920))':force_original_aspect_ratio=decrease:force_divisible_by=2:flags=lanczos,format=yuv420p10le" \
+  #   -c:v libsvtav1 -preset 4 -crf 24 -pix_fmt yuv420p10le \
+  #   -svtav1-params "tune=0:film-grain=0:scd=1:keyint=5s:lookahead=120:enable-qm=1:qm-min=0:qm-max=15" \
+  #   -c:a copy "${out[@]}"
+  exec "${ffmpeg[@]}" -i "$fin" \
+    -vf "scale=w='if(gt(iw,ih),min(iw,1920),min(iw,1080))':h='if(gt(iw,ih),min(ih,1080),min(ih,1920))':force_original_aspect_ratio=decrease:force_divisible_by=2:flags=lanczos,format=yuv420p10le" \
+    -c:v libsvtav1 -preset 4 -crf "$qa" -pix_fmt yuv420p10le \
+    -svtav1-params "tune=1:scd=1:keyint=5s:lookahead=120:enable-qm=1:qm-min=0:qm-max=15:enable-overlays=1:sharpness=1" \
+    -c:a copy "${out[@]}"
+
+  ## DISABLED: not supported yet in ffmpeg=8.1.2 (unless manually rebuilt)
+  # # VVC/H.266 (2020 spec)
+  # #   BAD: * GOP/refresh period is closer to fixed (-period); it's weaker here than svt-av1 for irregular cut patterns.
+  # exec "${ffmpeg[@]}" -i "$fin" \
+  #   -vf "scale=w='if(gt(iw,ih),min(iw,1920),min(iw,1080))':h='if(gt(iw,ih),min(ih,1080),min(ih,1920))':force_original_aspect_ratio=decrease:force_divisible_by=2:flags=lanczos,format=yuv420p10le" \
+  #   -c:v libvvenc -preset slower -qp 26 \
+  #   -vvenc-params "qpa=1:scc=0" \
+  #   -c:a copy "${out[@]}"
 
 fi
 

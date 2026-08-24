@@ -80,3 +80,53 @@ end)
 mp.add_forced_key_binding("b", "smart_hstack_toggle", function()
     apply_smart_hstack(false)
 end)
+
+
+
+-----------------------------------------------------------------
+
+local offsets = {}       -- [slot] = offset_ms, slot is 1 or 2
+local current_slot = 1
+
+local function apply_offset()
+    local ms = offsets[current_slot] or 0
+    if ms == 0 then
+        pcall(function() mp.commandv("vf", "remove", "@v_offset") end)
+    else
+        -- slow: local expr = string.format("(PTS-STARTPTS)%+.6f/TB", ms / 1000)
+        -- WTF: progresses on toggle
+        local expr = string.format("PTS%+.6f/TB", ms / 1000)
+        mp.commandv("vf", "add", "@v_offset:lavfi=[setpts='" .. expr .. "']")
+    end
+end
+
+local function nudge(delta_ms)
+    offsets[current_slot] = (offsets[current_slot] or 0) + delta_ms
+    apply_offset()
+    mp.osd_message(string.format("slot %d offset = %+d ms", current_slot, offsets[current_slot]))
+end
+
+mp.add_key_binding("-", "offset-minus", function() nudge(-1) end)
+mp.add_key_binding("=", "offset-plus", function() nudge(1) end)
+-- mp.add_key_binding("+", "offset-plus", function() nudge(1) end)
+mp.add_key_binding("0", "offset-clear", function()
+    offsets[current_slot] = 0
+    apply_offset()
+    mp.osd_message("slot " .. current_slot .. " offset cleared")
+end)
+
+mp.add_key_binding("v", "toggle-slot-and-offset", function()
+    mp.command('cycle-values lavfi-complex "[vid2] copy [vo]; [aid2] anull [ao]" "[vid1] copy [vo]; [aid1] anull [ao]"')
+    mp.command('cycle-values force-media-title "(2) ${track-list/2/title}" "(1) ${filename}"')
+    -- mp.command('frame-back-step')
+    -- mp.command('frame-step')
+    -- mp.command('cycle-values vid 2 1')
+    -- mp.command('seek 0 relative+exact')
+    current_slot = (current_slot == 1) and 2 or 1
+    -- local off = (offsets[current_slot] or 0) / 1000
+    -- if off ~= 0 then
+    --     mp.commandv("seek", tostring(off), "relative+exact")
+    -- end
+    -- mp.osd_message(string.format("slot %d, offset %+dms", current_slot, offsets[current_slot] or 0))
+    apply_offset()
+end)

@@ -69,6 +69,12 @@ mod_open = [
     Key([], "n", lazy.spawn(["st", "-e", "ncmpcpp"]), desc="Launch ncmpcpp"),
     Key([], "t", lazy.spawn(terminal + ["-M"]), desc="Launch terminal w/o tmux"),
     Key([], "v", lazy.spawn(["st", "-e", "v"]), desc="Launch vim"),
+    Key(
+        [],
+        "w",
+        lazy.spawn(["st", "-e", "v", "/d/audit/!today/wm"]),
+        desc="Open WM eventlog",
+    ),
     Key([], "x", lazy.spawn(["/d/airy/xournalpp/run"]), desc="Launch xournal"),
 ] + [
     Key(

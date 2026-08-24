@@ -51,3 +51,31 @@ DEV
       u script-message unload-script script_internal_name
       $ echo 'load-script /path/to/your-plugin.lua' | socat - /tmp/mpvsocket
   [≈] 03:30 15m #vd CFG mpv/ffmpeg
+
+
+4h 2026-08-24-Mon-W34
+  [X] 00:00 🔚 4h CONT #vd:cvt TRY on #fra : CMP sw-av1 vs nv-hevc ⌇⡪⢌⣞⣎
+    [✗] 00:00 1h TRY: comparable quality nv-hevc to a25
+      ‼ nv=23 -- somewhat better quality, BUT sz=200%*c23
+      ~ nv=26 ~~ comparable though different quality, BUT sz=130%*c23
+    [≈] 01:10 50m TRY: smaller size for sw-av1 than a25
+      ‼ va32 ~~ slightly more blurry/worse then original, but sz=93%*c23
+        ✓ OK, va32 with tune=1;sharpness=1; is comparable to a25 but sz=114%*a25
+      ~ va28 ~~ acceptable, though still blurry, sz=105% vs qsv
+    [X] 02:05 1h CMP: much faster speed vs cvt multiple files in parallel
+      orig=273MiB (4m39s) -> 3m27s (x3) -> 3m2s (x1 load=13 cpu=1624% ram=6.85GiB)
+      va28=90.1MiB=33% va30=82.2MiB=30% va32=73.1MiB=26.7% va36=59.7MiB=22% va40=50MiB=18.3%
+    [≈] 03:05 1h10m DEV offset ±1ms for <v> toggle
+    ---
+    [_] IDEA: queue by ctime -- so I code mv/ln files into /cache/vd_cvt/todo/
+    [≫] FUT: plugins OSC/OSD
+      tomasklaen/uosc: Feature-rich minimalist proximity-based UI for MPV player. ⌇⡪⢌⣞⡳
+        https://github.com/tomasklaen/uosc
+      maoiscat/mpv-osc-modern: Another mpv osc script ⌇⡪⢌⣞⡷
+        https://github.com/maoiscat/mpv-osc-modern
+      cyl0/ModernX: A modern OSC UI replacement for MPV that retains the functionality of the default OSC. ⌇⡪⢌⣞⡹
+        https://github.com/cyl0/ModernX
+      Samillion/ModernZ: A sleek and modern OSC for mpv. This project is a fork of ModernX that enhances functionality by adding more features while preserving the core standards of mpv' ⌇⡪⢌⣞⡻
+        https://github.com/Samillion/ModernZ
+      [!] po5/thumbfast: High-performance on-the-fly thumbnailer script for mpv ⌇⡪⢌⣞⡽
+        https://github.com/po5/thumbfast
