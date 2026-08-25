@@ -15,13 +15,27 @@ declare use=cpu qa=32 ifx=va
 # else >&2 echo "MAYBE: Fallback to Software Encoding"; exit 1; fi
 
 
-while LC_COLLATE=C getopts 'ac:sx-:' o; do
+while LC_COLLATE=C getopts 'ac:swx-:' o; do
 case $o in :|'?') exit 2
 ;; a) ifx=a
 ;; c) qa=$OPTARG
 ;; s) byserver=1
+;; w) watch=1
 ;; x) set -x && xt=${-//[^x]}
 esac; done; shift $((OPTIND-1)); unset o
+
+
+if [[ ${watch-} ]]; then
+  njobs=1  # 1..4
+  cd "${1:-/cache/vd_cvt/todo}"
+  inotifywait -m -e close_write --format '%f' . | while read -r f; do
+    echo "[detected] $f"
+    mv -vt ../done/ -- "$f"
+    realpath -e "../done/$f"
+  done | xargs -P"$njobs" -I{} sh -c 'echo "[convert] {}"; vcvt "{}"'
+  exit
+fi
+
 
 fin=$1
 out="${fin%.*}_${ifx}${qa}.${fin##*.}"
