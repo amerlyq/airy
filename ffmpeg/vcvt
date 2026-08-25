@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # DEBUG: $ ffprobe input.mp4
+# USAGE:(watcher): $ tmux new-session -s cvt && vcvt -w
 # USAGE: $ print -l {22..30} |xargs -t -n1 -P0 sh -c 'time /b/vcvt -c"$0" input.mp4 &>"$0".log'
 
 set -o errexit -o errtrace -o functrace -o noclobber -o noglob -o nounset -o pipefail
@@ -28,28 +29,95 @@ else >&2 echo "MAYBE: Fallback to Software Encoding"; exit 1; fi
 
 
 if ((!$#)) || [[ ${watch-} ]]; then
-  my_converter() {
-      echo "[convert] $1"
-      # ALT:(&pg): vcvt ... 2>&1 | pv -N "$(basename "$0" | cut -c1-15)" -l -q > /dev/null
-      vcvt "$1"
-      mv -vt ../done/ -- "$1" "${1%.*}_"[acnqv][0-9][0-9]".${1##*.}"
-      echo "---"
-  }; export -f my_converter
-
   set -x
-  njobs=3  # 1..4
+  njobs=4  # workers=(1..4) x16 threads per each AV1
   cd "${1:-/cache/vd_cvt/todo}"  # RENAME? ./watch
   echo "Watching: $PWD"
+
+  # ─────────────────────────────────────────────────────────
+  # tmux-aware pipeline: each worker runs in its own pane
+  # On failure, pane contents are captured to ../done/<file>_err_<pid>.log
+  # ─────────────────────────────────────────────────────────
+  if command -v tmux &>/dev/null; then
+    # OR: only run when: [[ -n "${TMUX-}" ]]
+    if [[ -z "${TMUX-}" ]]; then
+      exec tmux new-session "$0" "$@"
+    fi
+
+    # Worker: runs conversion in a traced subshell; dumps pane on error
+    exec_and_monitor_status() {
+      local file="$1" rc=
+      bash -xec '
+        echo "[convert] $0"
+        vcvt "$0"
+        mv -vt ../done/ -- "$0" "${0%.*}_"[acnqv][0-9][0-9]".${0##*.}"
+        echo "---"
+      ' "$file" || rc=$?
+      if ((rc)); then
+        mkdir -p ../done
+        local log_path
+        log_path="../done/$(basename "${file%.*}")_err_$$.log"
+        tmux capture-pane -pt "$TMUX_PANE" -S - > "$log_path"
+        printf '\n\n\033[1;31m[ERROR] Conversion failed!\033[0m\n'
+        printf '\033[1;33m[ERROR] Pane output dumped to: %s\033[0m\n' "$log_path"
+        # TEMP:
+        printf '\033[1;36m[ERROR] Press ENTER to close this pane...\033[0m\n'
+        read -r
+        exit "$rc"
+      fi
+    }
+    export -f exec_and_monitor_status
+
+    # Spawns a vertical tmux pane, runs the job, blocks until pane exits
+    run_job_in_pane() {
+      local file="$1" pane_id
+
+      # Limit concurrent panes using tmux if-statements
+      while (( $(tmux list-panes | wc -l) >= njobs + 1 )); do  # +1 for the shell pane
+        sleep 0.5
+      done
+
+      # Try split-window first
+      pane_id=$(tmux split-window -v -P -F "#{pane_id}" -- "
+        $(typeset -f exec_and_monitor_status)
+        exec_and_monitor_status \"$file\"
+      " 2>/dev/null) || {
+        # If split fails (small screen), create a new tab/window
+        pane_id=$(tmux new-window -P -F "#{pane_id}" -- "
+          $(typeset -f exec_and_monitor_status)
+          exec_and_monitor_status \"$file\"
+        " 2>/dev/null) || {
+          echo "[tmux] split-window and new-window both failed for: $file" >&2
+          return 1
+        }
+      }
+      tmux select-layout even-vertical 2>/dev/null ||:
+    }
+  else
+    echo "Err: run inside tmux"
+    exit 2
+    run_job_in_pane() {
+        echo "[convert] $1"
+        # ALT:(&pg): vcvt ... 2>&1 | pv -N "$(basename "$0" | cut -c1-15)" -l -q > /dev/null
+        vcvt "$1"
+        mv -vt ../done/ -- "$1" "${1%.*}_"[acnqv][0-9][0-9]".${1##*.}"
+        echo "---"
+    }
+  fi
+  export -f run_job_in_pane
+
   {
-    find ../queue -regextype egrep -type f -name '*.mp4' -not -regex '.*_(va|[acnqv])[0-9]{2}\.mp4$' -print
+    find ../queue -regextype egrep -type f -name '*.mp4' \
+      -not -regex '.*_(va|[acnqv])[0-9]{2}\.mp4$' -print
     inotifywait -m -e close_write --format '%f' . | while read -r f; do
       [[ ${f:0:1} == "." ]] && continue  # <CASE: skip rsync temp files
       echo "[detected] $f"
       mv -vt ../queue/ -- "./$f"
       realpath -e "../queue/$f"
     done
-  } | parallel -j "$njobs" --bar 'echo' {}  # <CASE: !parallel progress dashboard
-  # xargs -rn1 -d\\n -P"$njobs" bash -xc 'my_converter "$0"'
+  } | while read -r f; do run_job_in_pane "$f"; done
+  # | xargs -rn1 -d\\n -P"$njobs" bash -c 'run_job_in_pane "$0"'
+  # ALT:FAIL:(progress dashboard): | parallel -j "$njobs" --bar 'my_converter' {}
   exit
 fi
 
