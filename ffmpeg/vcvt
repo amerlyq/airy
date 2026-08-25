@@ -5,34 +5,51 @@
 set -o errexit -o errtrace -o functrace -o noclobber -o noglob -o nounset -o pipefail
 shopt -qs inherit_errexit lastpipe
 
-declare use=cpu qa=32 ifx=va
-# if [[ -e /dev/nvidia0 ]]; then
-  # declare use=nv qa=28 ifx=nv
-# elif [[ -d /sys/module/i915 ]] || [[ -d /sys/module/xe ]]; then
-#   # REF:(qa): https://www.ffmpeg.org/ffmpeg-codecs.html#Ratecontrol-Method
-#   #   For the ICQ modes, global quality range is 1 to 51, with 1 being the best quality.
-#   declare use=qsv qa=23 ifx=q
-# else >&2 echo "MAYBE: Fallback to Software Encoding"; exit 1; fi
-
-
-while LC_COLLATE=C getopts 'ac:swx-:' o; do
+while LC_COLLATE=C getopts 'ac:gswx-:' o; do
 case $o in :|'?') exit 2
 ;; a) ifx=a
 ;; c) qa=$OPTARG
+;; g) gpu=1
 ;; s) byserver=1
 ;; w) watch=1
 ;; x) set -x && xt=${-//[^x]}
 esac; done; shift $((OPTIND-1)); unset o
 
+if [[ -z ${gpu:+x} ]]; then
+  # declare use=cpu qa=32 ifx=va
+  : ${use:=cpu} ${qa:=32} ${ifx:=v}
+elif [[ -e /dev/nvidia0 ]]; then
+  : ${use:=nv} ${qa:=28} ${ifx:=n}
+elif [[ -d /sys/module/i915 ]] || [[ -d /sys/module/xe ]]; then
+  # REF:(qa): https://www.ffmpeg.org/ffmpeg-codecs.html#Ratecontrol-Method
+  #   For the ICQ modes, global quality range is 1 to 51, with 1 being the best quality.
+  : ${use:=nv} ${qa:=28} ${ifx:=n}
+else >&2 echo "MAYBE: Fallback to Software Encoding"; exit 1; fi
 
-if [[ ${watch-} ]]; then
-  njobs=1  # 1..4
-  cd "${1:-/cache/vd_cvt/todo}"
-  inotifywait -m -e close_write --format '%f' . | while read -r f; do
-    echo "[detected] $f"
-    mv -vt ../done/ -- "$f"
-    realpath -e "../done/$f"
-  done | xargs -P"$njobs" -I{} sh -c 'echo "[convert] {}"; vcvt "{}"'
+
+if ((!$#)) || [[ ${watch-} ]]; then
+  my_converter() {
+      echo "[convert] $1"
+      # ALT:(&pg): vcvt ... 2>&1 | pv -N "$(basename "$0" | cut -c1-15)" -l -q > /dev/null
+      vcvt "$1"
+      mv -vt ../done/ -- "$1" "${1%.*}_"[acnqv][0-9][0-9]".${1##*.}"
+      echo "---"
+  }; export -f my_converter
+
+  set -x
+  njobs=3  # 1..4
+  cd "${1:-/cache/vd_cvt/todo}"  # RENAME? ./watch
+  echo "Watching: $PWD"
+  {
+    find ../queue -regextype egrep -type f -name '*.mp4' -not -regex '.*_(va|[acnqv])[0-9]{2}\.mp4$' -print
+    inotifywait -m -e close_write --format '%f' . | while read -r f; do
+      [[ ${f:0:1} == "." ]] && continue  # <CASE: skip rsync temp files
+      echo "[detected] $f"
+      mv -vt ../queue/ -- "./$f"
+      realpath -e "../queue/$f"
+    done
+  } | parallel -j "$njobs" --bar 'echo' {}  # <CASE: !parallel progress dashboard
+  # xargs -rn1 -d\\n -P"$njobs" bash -xc 'my_converter "$0"'
   exit
 fi
 
