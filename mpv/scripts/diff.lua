@@ -46,18 +46,18 @@ local function apply_smart_hstack(force_enable)
 
     -- Toggle logic (unless force_enable is true for startup)
     if not force_enable and current_filter:find("hstack") then
-        mp.set_property("lavfi-complex", "[vid1] copy [vo]")
+        mp.set_property("lavfi-complex", "[vid1] copy [vo]; [aid1] anull [ao]")
         mp.osd_message("Stitch Disabled (Showing Video 1)")
     else
         if native_h1 == native_h2 then
             -- Zero Performance Cost: Perfect native height match
-            mp.set_property("lavfi-complex", "[vid1][vid2]hstack[vo]")
+            mp.set_property("lavfi-complex", "[vid1][vid2]hstack[vo]; [aid1] anull [ao]")
         elseif native_h1 > native_h2 then
             -- Pad smaller Video 2 up to Video 1 height with zero per-frame cost
-            mp.set_property("lavfi-complex", string.format("[vid2]pad=eval=init:w=iw:h=%d:x=0:y=0[v2_p]; [vid1][v2_p]hstack[vo]", native_h1))
+            mp.set_property("lavfi-complex", string.format("[vid2]pad=eval=init:w=iw:h=%d:x=0:y=0[v2_p]; [vid1][v2_p]hstack[vo]; [aid1] anull [ao]", native_h1))
         else
             -- Pad smaller Video 1 up to Video 2 height with zero per-frame cost
-            mp.set_property("lavfi-complex", string.format("[vid1]pad=eval=init:w=iw:h=%d:x=0:y=0[v1_p]; [v1_p][vid2]hstack[vo]", native_h2))
+            mp.set_property("lavfi-complex", string.format("[vid1]pad=eval=init:w=iw:h=%d:x=0:y=0[v1_p]; [v1_p][vid2]hstack[vo]; [aid1] anull [ao]", native_h2))
         end
     end
     return true
@@ -79,6 +79,9 @@ end)
 -- Bind manual toggle to the 'b' key (always works when 2 tracks exist)
 mp.add_forced_key_binding("b", "smart_hstack_toggle", function()
     apply_smart_hstack(false)
+end)
+mp.add_forced_key_binding("N", "smart_hstack_toggle", function()
+    apply_smart_hstack(true)
 end)
 
 
@@ -115,7 +118,7 @@ mp.add_key_binding("0", "offset-clear", function()
     mp.osd_message("slot " .. current_slot .. " offset cleared")
 end)
 
-mp.add_key_binding("v", "toggle-slot-and-offset", function()
+local function switch()
     mp.command('cycle-values lavfi-complex "[vid2] copy [vo]; [aid2] anull [ao]" "[vid1] copy [vo]; [aid1] anull [ao]"')
     mp.command('cycle-values force-media-title "(2) ${track-list/2/title}" "(1) ${filename}"')
     -- mp.command('frame-back-step')
@@ -129,4 +132,7 @@ mp.add_key_binding("v", "toggle-slot-and-offset", function()
     -- end
     -- mp.osd_message(string.format("slot %d, offset %+dms", current_slot, offsets[current_slot] or 0))
     apply_offset()
-end)
+end
+
+mp.add_key_binding("v", "toggle-slot-and-offset", switch)
+mp.add_key_binding("n", "toggle-slot-and-offset", switch)
