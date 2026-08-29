@@ -611,6 +611,13 @@ function on_loaded()
   -- no loop was saved for this file.
   g.A = mp.get_property_number("ab-loop-a") or 0.0
   g.B = mp.get_property_number("ab-loop-b") or mp.get_property_number("duration/full")
+
+  local duration = mp.get_property_number("duration")
+  if duration and duration < 40 and duration > 0 then
+      mp.set_property("loop-file", "inf")
+  else
+      mp.set_property("loop-file", "no")
+  end
 end
 function on_eof()
     mp.msg.log("info", "playback reached end of file")
