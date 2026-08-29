@@ -58,7 +58,8 @@ fi
 
 if DockerActive "$cnm"; then
   docker ps
-  exit
+  exec docker exec -it "$nm" /bin/bash
+  exit 13
 fi
 
 
