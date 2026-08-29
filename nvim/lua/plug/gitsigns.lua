@@ -72,6 +72,26 @@ M.setup {
       end
     end, { buffer = bufnr, desc = "hunk$ (gitsigns → :vimdiff)" })
 
+    -- Helper: only map if lhs is not already mapped in normal mode
+    local map_unless_defined = function(lhs, callback, opts)
+      if vim.fn.mapcheck(lhs, 'n') == '' then
+        vim.keymap.set('n', lhs, callback, opts)
+      end
+    end
+
+    map_unless_defined('n', ']g', function()
+        M.nav_hunk('next', { target = "staged" })  -- "unstaged"|"all"
+    end, { buffer = bufnr, desc = "ihunk↓ (gitsigns/staged-index)" })
+    map_unless_defined('n', '[g', function()
+        M.nav_hunk('prev', { target = "staged" })  -- "unstaged"|"all"
+    end, { buffer = bufnr, desc = "ihunk↑ (gitsigns/staged-index)" })
+    map_unless_defined('n', '[G', function()
+        M.nav_hunk('first', { target = "staged" })  -- "unstaged"|"all"
+    end, { buffer = bufnr, desc = "ihunk1 (gitsigns/staged-index)" })
+    map_unless_defined('n', ']G', function()
+        M.nav_hunk('last', { target = "staged" })  -- "unstaged"|"all"
+    end, { buffer = bufnr, desc = "ihunk$ (gitsigns/staged-index)" })
+
   end,
 }
 
