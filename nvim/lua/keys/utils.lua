@@ -26,3 +26,10 @@ K('n', '\\Q', "<Cmd>lopen<CR>")
 -- \.'> trans<'.synIDattr(synID(line('.'), col('.'), 0), 'name').'> lo<'
 -- \.synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name').'>'<CR>
 -- ]])
+
+vim.cmd [[
+com! -bang -bar -complete=file -nargs=? Wunix
+  \| set nobomb
+  \| write<bang> ++enc=utf8 ++ff=unix ++nobin <args>
+  \| edit <args>
+]]
