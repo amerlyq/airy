@@ -122,10 +122,26 @@ TRAPINT() {
   # else return 1; fi
 
   ## safe test for "am I in a context where zle exists as a widget-capable function", no side effect, no error.
-  if (( ${+builtins[zle]} )) && [[ -n $BUFFER ]]; then
-    print -s -r -- "$BUFFER"
+  #  BAD: builtins[zle] only says the builtin exists. It is true outside ZLE.
+  # if (( ${+builtins[zle]} )) && [[ -n $BUFFER ]]; then
+  #   print -s -r -- "$BUFFER"
+  # fi
+  # return $(( 128 + $1 ))
+
+  emulate -L zsh
+  local sig=${1-2}
+  [[ $sig == <-> ]] || sig=2
+  # INFO: Zsh explicitly documents builtin zle with no arguments as the “ZLE currently active” test.
+  if builtin zle 2>/dev/null; then
+    local buf=${BUFFER-}
+    if [[ -n $buf ]]; then
+      builtin print -s -r -- "$buf"
+    fi
   fi
-  return $(( 128 + $1 ))
+  # WARN: The invalid math came from trusting $1 after trap/ZLE state had become corrupted.
+  #   If you only handle SIGINT, this is also valid:
+  #     return 130
+  return $((128 + sig))
 }
 
 ## ALT:BUG?
