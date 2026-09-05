@@ -7,10 +7,11 @@
 
 set -o errexit -o errtrace -o functrace -o noclobber -o noglob -o nounset -o pipefail
 shopt -qs inherit_errexit lastpipe
+PS4='+[$BASHPID] ${BASH_SOURCE[0]##*/}:$LINENO:  '
 
 njobs=4  # workers=(1..4) x16 threads per each AV1
 
-
+readonly _app_orig_argv=("$@")
 while LC_COLLATE=C getopts 'ac:bgwx-:' o; do
 case $o in :|'?') exit 2
 ;; a) ifx=a
@@ -31,7 +32,7 @@ esac; done; flags=("${@:1:OPTIND-1}"); shift $((OPTIND-1)); unset o
 #     $ echo $?
 #     0
 #   Directories are expanded recursively to non-AV1 mp4 files
-#   Files are passed through as-is (must exist)
+#   Files and symlinked files are passed through as-is (must exist)
 _collect_paths() {
   # Reads stdin (one path per line), echoes \0-separated existing paths
   local f
@@ -56,7 +57,9 @@ _expand_to_mp4s() {
     [[ -e $p ]] || { >&2 echo "Err: not found: $p"; return 1; }
     [[ -r $p || -d $p ]] || { >&2 echo "Err: not readable: $p"; return 1; }
     printf '%s\0' "$p"
-  done | find -H -type f -name '*.mp4' -print0
+  # Include symlinked files explicitly. Do not use realpath: ffmpeg must see
+  # the submitted symlink path so its output is created beside the symlink.
+  done | find -H \( -type f -o -type l \) -iname '*.mp4' -print0
 }
 
 _filter_non_av1() {
@@ -65,46 +68,76 @@ _filter_non_av1() {
     | awk -vC="AV1" 'NF&&$1!=C{print substr($0,index($0," ")+1)}'
 }
 
+# REFACTOR: single input-resolver. Replaces the 3 copies of the
+#   _collect_paths | _expand_to_mp4s | _filter_non_av1 chain.
+#   Args come from "$@"; empty $# means read paths from stdin.
+#   Emits NUL-separated non-AV1 mp4 paths on stdout.
+#   Errors (missing/unreadable paths) are reported on stderr and propagate
+#   via the pipe's last command's exit status (preserved by lastpipe +
+#   inherit_errexit set at top).
+_resolve_inputs() {
+  { (($#)) && printf '%s\0' "$@" || _collect_paths
+  } | _expand_to_mp4s | _filter_non_av1
+}
+
 input_files=()
 if (($#)); then
-  # NOTE: lastpipe + inherit_errexit (set at top) lets this while loop run in
-  #   the current shell, so errors from _expand_to_mp4s / _filter_non_av1
-  #   propagate. Using <(...) would swallow their exit status.
-  for f in "$@"; do printf '%s\0' "$f"; done \
-    | _expand_to_mp4s \
-    | _filter_non_av1 \
-    | while IFS= read -r -d '' f; do
-        input_files+=("$f")
-      done
+  # NOTE: lastpipe (set at top) runs readarray in the current shell as the
+  #   last command of the pipeline, so inherit_errexit propagates failures
+  #   from _expand_to_mp4s / _filter_non_av1. <(...) would fork a subshell
+  #   and break that.
+  _resolve_inputs "$@" | readarray -d '' -t input_files
 elif [[ ! -t 0 ]]; then
   # Stream-mode stdin path: dispatch each resolved mp4 immediately. We avoid
   #   buffering into input_files here because that would block on EOF before
-  #   any conversion runs. For batch mode (finite stdin list), the downstream
-  #   -b handler iterates synchronously; for streaming watcher use, the
-  #   stdin-watcher branch below handles dispatch directly.
-  _collect_paths \
-    | _expand_to_mp4s \
-    | _filter_non_av1 \
-    | while IFS= read -r -d '' f; do
-        input_files+=("$f")
-      done
+  #   any conversion runs.
+  #
+  #   Dispatcher precedence:
+  #     -b  → buffered batch (handled below; this branch falls through)
+  #     -w  → ignored here; -w owns the watched dir, not stdin (its branch
+  #            is mutually exclusive with -b and runs from the inotify source
+  #            below). If -w is set with piped stdin, we still buffer so the
+  #            -w branch can iterate synchronously.
+#     else (default) → tmux pane per file, mirroring the stdin-watcher
+  #         branch. Falls back to local runner if tmux is unavailable.
+  if [[ ${batch-} || ${watch-} ]]; then
+    # Batch/watcher paths expect input_files populated; buffer as before.
+    _resolve_inputs | readarray -d '' -t input_files
+  else
+    # Default stream mode: spawn a tmux pane per resolved mp4 as soon as
+    #   each one arrives. Mirrors the stdin-watcher branch below so
+    #   behavior is consistent across the two stdin-driven entry points.
+    _bootstrap_tmux
+    command -v tmux &>/dev/null && runner=run_job_in_pane || runner=run_job_local
+    _resolve_inputs \
+      | while IFS= read -r -d '' f; do
+          [[ -f $f ]] && "$runner" "$f"
+        done
+    exit
+  fi
 fi
 ((${batch:-0} + ${watch:-0} > 1)) && { >&2 echo "Err: -b and -w are mutually exclusive"; exit 2; }
 
 # If a path was supplied (args or stdin) but produced no non-AV1 mp4 files,
-#   exit cleanly here. Otherwise the script falls through to the single-file
-#   conversion path below with `fin=$1` still set to the original arg (e.g.
-#   a directory like `.`), and ffmpeg errors out with "Is a directory".
+#   exit cleanly here. Directory and multi-file arguments must use the batch
+#   dispatcher: otherwise the resolved list gets collapsed to its first item
+#   and `vcvt .` either converts only one file or passes the directory itself
+#   to ffmpeg.
 if (($#)) || [[ ! -t 0 ]]; then
   if ((!${batch:-0} && !${watch:-0})); then
     if ((${#input_files[@]} == 0)); then
       >&2 echo "Err: no non-AV1 mp4 files found in input"
       exit 2
     fi
-    # Single-file mode: pick the first resolved file and run the ffmpeg
-    # pipeline directly. This replaces the original `fin=$1` behavior so
-    # directory args get expanded correctly.
-    set -- "${input_files[0]}"
+    # A directory (even one containing only one matching file), or multiple
+    # resolved files, is a batch request. Leave input_files intact so the
+    # tmux dispatcher below receives one file per job.
+    if (( ${#input_files[@]} > 1 )) || [[ -d $1 ]]; then
+      batch=1
+    else
+      # Preserve the fast/direct path for one explicit file.
+      set -- "${input_files[0]}"
+    fi
   fi
 fi
 
@@ -185,7 +218,10 @@ export -f run_job_local
 # Callers (watch / batch / stdin-watcher) all need the same bootstrap.
 _bootstrap_tmux() {
   command -v tmux &>/dev/null || { echo "Err: run inside tmux" >&2; exit 2; }
-  [[ -z "${TMUX-}" ]] && exec tmux new-session "$0" "${flags[@]}" --
+  # An existing tmux server can have a different default directory. Keep the
+  # child in the caller's directory so relative inputs such as `.` resolve to
+  # the same files after re-exec.
+  [[ -n "${TMUX-}" ]] || exec tmux new-session -c "$PWD" "$0" "${_app_orig_argv[@]}"
 }
 
 if [[ -z ${gpu:+x} ]]; then
@@ -220,7 +256,9 @@ if [[ ${watch-} ]]; then
       [[ ${f:0:1} == "." ]] && continue  # <CASE: skip rsync temp files
       echo "[detected] $f"
       mv -vt ../queue/ -- "./$f"
-      realpath -e "../queue/$f"
+      # Preserve symlink paths; ffmpeg uses this path to place the output
+      # alongside the symlink rather than alongside its target.
+      printf '%s\n' "../queue/$f"
     done
   }
 
@@ -254,7 +292,7 @@ fi
 # -b : batch mode -- dispatch resolved input list to tmux panes
 # ─────────────────────────────────────────────────────────
 if [[ ${batch-} ]]; then
-((${#input_files[@]} == 0)) && { >&2 echo "Err: -b requires files as args or stdin"; exit 2; }
+  ((${#input_files[@]} == 0)) && { >&2 echo "Err: -b requires files as args or stdin"; exit 2; }
   set -x
 
   if command -v tmux &>/dev/null; then
