@@ -41,29 +41,30 @@ local function lsp_mappings(client, bufnr)
   --   { close_events = {"CursorMoved", "BufHidden", "InsertLeave"} }
   -- )
 
-  if client and client.name == "basilisk" then
-    -- Basilisk-specific keymaps with configurable prefix.
-    local map = function(mode, lhs, rhs, desc)
-      vim.keymap.set(mode, lhs, rhs, { buffer = buf, desc = desc })
-    end
-    local prefix = "<Leader>b"
-    map("n", prefix .. "r", "<cmd>BasiliskRestart<CR>", "Restart server")
-    map("n", prefix .. "o", "<cmd>BasiliskOrganizeImports<CR>", "Organize imports")
-    map("n", prefix .. "p", "<cmd>BasiliskProfile<CR>", "Start profiling")
-    map("n", prefix .. "P", "<cmd>BasiliskProfileStop<CR>", "Stop profiling")
-    map("n", prefix .. "m", "<cmd>BasiliskMemLeak<CR>", "Start memory tracking")
-    map("n", prefix .. "M", "<cmd>BasiliskMemStop<CR>", "Stop memory tracking")
-    map("n", prefix .. "t", "<cmd>BasiliskTestToggle<CR>", "Toggle test explorer")
-    map("n", prefix .. "d", "<cmd>BasiliskDebugFile<CR>", "Debug current file")
-    map("n", prefix .. "R", "<cmd>BasiliskTestRun<CR>", "Run test at cursor")
-    map("n", prefix .. "D", "<cmd>BasiliskTestDebug<CR>", "Debug test at cursor")
-    -- Refactoring keymaps.
-    map("v", prefix .. "ev", "<cmd>BasiliskExtractVariable<CR>", "Extract variable")
-    map("v", prefix .. "ec", "<cmd>BasiliskExtractConstant<CR>", "Extract constant")
-    map("n", prefix .. "cu", "<cmd>BasiliskConvertUnion<CR>", "Convert Union/Optional")
-    map("n", prefix .. "im", "<cmd>BasiliskImplementMethods<CR>", "Implement abstract methods")
-    map("n", prefix .. "fa", "<cmd>BasiliskFixFile<CR>", "Fix all in file")
-  end
+  -- DISABLED:WHY: https://www.christianfindlay.com/blog/basilisk-conformance-apology
+  -- if client and client.name == "basilisk" then
+  --   -- Basilisk-specific keymaps with configurable prefix.
+  --   local map = function(mode, lhs, rhs, desc)
+  --     vim.keymap.set(mode, lhs, rhs, { buffer = buf, desc = desc })
+  --   end
+  --   local prefix = "<Leader>b"
+  --   map("n", prefix .. "r", "<cmd>BasiliskRestart<CR>", "Restart server")
+  --   map("n", prefix .. "o", "<cmd>BasiliskOrganizeImports<CR>", "Organize imports")
+  --   map("n", prefix .. "p", "<cmd>BasiliskProfile<CR>", "Start profiling")
+  --   map("n", prefix .. "P", "<cmd>BasiliskProfileStop<CR>", "Stop profiling")
+  --   map("n", prefix .. "m", "<cmd>BasiliskMemLeak<CR>", "Start memory tracking")
+  --   map("n", prefix .. "M", "<cmd>BasiliskMemStop<CR>", "Stop memory tracking")
+  --   map("n", prefix .. "t", "<cmd>BasiliskTestToggle<CR>", "Toggle test explorer")
+  --   map("n", prefix .. "d", "<cmd>BasiliskDebugFile<CR>", "Debug current file")
+  --   map("n", prefix .. "R", "<cmd>BasiliskTestRun<CR>", "Run test at cursor")
+  --   map("n", prefix .. "D", "<cmd>BasiliskTestDebug<CR>", "Debug test at cursor")
+  --   -- Refactoring keymaps.
+  --   map("v", prefix .. "ev", "<cmd>BasiliskExtractVariable<CR>", "Extract variable")
+  --   map("v", prefix .. "ec", "<cmd>BasiliskExtractConstant<CR>", "Extract constant")
+  --   map("n", prefix .. "cu", "<cmd>BasiliskConvertUnion<CR>", "Convert Union/Optional")
+  --   map("n", prefix .. "im", "<cmd>BasiliskImplementMethods<CR>", "Implement abstract methods")
+  --   map("n", prefix .. "fa", "<cmd>BasiliskFixFile<CR>", "Fix all in file")
+  -- end
 
   -- KBn('<leader>wa', B.add_workspace_folder)
   -- KBn('<leader>wr', B.remove_workspace_folder)

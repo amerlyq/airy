@@ -151,9 +151,12 @@ CC.setup({
           },
           schema = {
             model = {
-              -- default = "anthropic/claude-sonnet-4.6"
-              default = "poolside/laguna-s-2.1:free",
+              default = "thinkingmachines/inkling:free",
+              -- default = "minimax/minimax-m3:free",
+              -- default = "nvidia/nemotron-3-ultra-550b-a55b:free",
+              -- default = "poolside/laguna-s-2.1:free",
               -- default = "qwen/qwen-2.5-coder-32b-instruct:free",
+              -- default = "anthropic/claude-sonnet-4.6"
               -- swap for any :free-tagged model on openrouter.ai/models
               --   (fallback within openrouter if rate-limited:)
               -- "inclusionai/ling-3.0-flash:free"

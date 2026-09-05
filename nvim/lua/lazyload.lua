@@ -20,17 +20,18 @@ local function ft_python()
   --   cargo install --git https://github.com/Nimblesite/Basilisk --bin basilisk-cli [--force] basilisk-cli
   -- vim.env.BASILISK_PATH = "/path/to/basilisk"
   -- ERR:(misuse/binary-not-found): /d/plugins/nvim/lazy/pack/ide/start/basilisk.nvim/after/lsp/basilisk.lua: not a table
-  require("basilisk").setup({
-    -- binary_path = nil,               -- auto-detect, download
-    -- /d/xdg_share/nvim/basilisk/v0.32.0/basilisk
-    -- binary_path = "/home/user/.cargo/bin/basilisk",
-    keymaps = {
-      enabled = false,
-      prefix = "<leader>b",
-    },
-    -- analysis_mode = "wholeModule",
-    -- formatter = "ruff",
-  })
+  -- DISABLED:WHY: https://www.christianfindlay.com/blog/basilisk-conformance-apology
+  -- require("basilisk").setup({
+  --   -- binary_path = nil,               -- auto-detect, download
+  --   -- /d/xdg_share/nvim/basilisk/v0.32.0/basilisk
+  --   -- binary_path = "/home/user/.cargo/bin/basilisk",
+  --   keymaps = {
+  --     enabled = false,
+  --     prefix = "<leader>b",
+  --   },
+  --   -- analysis_mode = "wholeModule",
+  --   -- formatter = "ruff",
+  -- })
   -- DISABLED: may conflict with plugin itself
   -- vim.lsp.enable("basilisk")
 
