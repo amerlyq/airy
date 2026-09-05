@@ -137,6 +137,13 @@ run_job_local() {
 }
 export -f run_job_local
 
+# Re-exec self into a fresh tmux session if not already inside one.
+# Callers (watch / batch / stdin-watcher) all need the same bootstrap.
+_bootstrap_tmux() {
+  command -v tmux &>/dev/null || { echo "Err: run inside tmux" >&2; exit 2; }
+  [[ -z "${TMUX-}" ]] && exec tmux new-session "$0" "${flags[@]}" --
+}
+
 if [[ -z ${gpu:+x} ]]; then
   # declare use=cpu qa=32 ifx=va
   : ${use:=cpu} ${qa:=32} ${ifx:=v}
@@ -158,17 +165,12 @@ if [[ ${watch-} ]]; then
   cd "${1:-/cache/vd_cvt/todo}"  # RENAME? ./watch
   echo "Watching: $PWD"
 
-  if command -v tmux &>/dev/null; then
-    # OR: only run when: [[ -n "${TMUX-}" ]]
-    if [[ -z "${TMUX-}" ]]; then
-      exec tmux new-session "$0" "${flags[@]}" --
-    fi
-  else
-    echo "Err: run inside tmux" >&2
-    exit 2
-  fi
+  _bootstrap_tmux
 
-  {
+  # inotify pipeline: emits paths as they're close_write'd in $PWD.
+  # `-w` owns its input source (the watched dir); stdin is not consumed
+  # here -- the stdin-watcher path is the alternative for piped input.
+  inotify_src() {
     find ../queue -regextype egrep -type f -name '*.mp4' \
       -not -regex '.*_(va|[acnqv])[0-9]{2}\.mp4$' -print
     inotifywait -m -e close_write --format '%f' . | while read -r f; do
@@ -177,9 +179,32 @@ if [[ ${watch-} ]]; then
       mv -vt ../queue/ -- "./$f"
       realpath -e "../queue/$f"
     done
-  } | while read -r f; do run_job_in_pane "$f"; done
-  # | xargs -rn1 -d\\n -P"$njobs" bash -c 'run_job_in_pane "$0"'
-  # ALT:FAIL:(progress dashboard): | parallel -j "$njobs" --bar 'my_converter' {}
+  }
+
+  inotify_src | while read -r f; do
+    run_job_in_pane "$f"
+  done
+  exit
+fi
+
+# ─────────────────────────────────────────────────────────
+# stdin-watcher: when invoked with no args and stdin is a pipe,
+#   read paths forever and dispatch each to a tmux pane.
+#   External watcher app pipes paths; we spawn a cvt job per line.
+# ─────────────────────────────────────────────────────────
+if [[ ! -t 0 ]] && (($# == 0)); then
+  _bootstrap_tmux
+
+  # Stream stdin: each line is a path (file or dir). Reuse the same
+  # find+mediainfo AV1 filter as the batch path, then dispatch each
+  # resulting mp4 to a tmux pane as soon as it appears.
+  while IFS= read -r f || [[ -n $f ]]; do
+    [[ -z $f ]] && continue
+    [[ -e $f ]] || { >&2 echo "Err: not found: $f"; continue; }
+    printf '%s\0' "$f"
+  done | _resolve_to_mp4s | while IFS= read -r -d '' mp4; do
+    [[ -f $mp4 ]] && run_job_in_pane "$mp4"
+  done
   exit
 fi
 
@@ -187,24 +212,19 @@ fi
 # -b : batch mode -- dispatch resolved input list to tmux panes
 # ─────────────────────────────────────────────────────────
 if [[ ${batch-} ]]; then
-  ((${#input_files[@]} == 0)) && { >&2 echo "Err: -b requires files as args or stdin"; exit 2; }
+((${#input_files[@]} == 0)) && { >&2 echo "Err: -b requires files as args or stdin"; exit 2; }
   set -x
 
   if command -v tmux &>/dev/null; then
-    # OR: only run when: [[ -n "${TMUX-}" ]]
-    if [[ -z "${TMUX-}" ]]; then
-      exec tmux new-session "$0" "${flags[@]}" --
-    fi
-    echo "Batch: $PWD (${#input_files[@]} files)"
-    for f in "${input_files[@]}"; do
-      run_job_in_pane "$f"
-    done
+    _bootstrap_tmux
+    runner=run_job_in_pane
   else
-    echo "Err: run inside tmux" >&2
-    for f in "${input_files[@]}"; do
-      run_job_local "$f"
-    done
+    runner=run_job_local
   fi
+  echo "Batch: $PWD (${#input_files[@]} files -> $runner)"
+  for f in "${input_files[@]}"; do
+    "$runner" "$f"
+  done
   exit
 fi
 
