@@ -163,15 +163,25 @@ local cfg = {
   },
 
   sources = {
-    default = { 'lsp', 'path', 'snippets', 'buffer', 'notches', 'dictionary'}, --
-    -- Match the old nvim-cmp Python setup: no buffer/path noise for members.
-    -- per_filetype = { python = { 'lsp', 'snippets' } },
+    default = { 'lsp', 'path', 'snippets', 'buffer', 'notches' }, -- , 'dictionary'
+    per_filetype = {
+      codecompanion = { 'codecompanion' },
+      -- ALT: Match the old nvim-cmp Python setup: no buffer/path noise for members.
+      -- python = { 'lsp', 'snippets' },
+    },
+
     providers = {
       -- -- Optional but highly recommended: adjust weights so paths don't crowd LSP completions
       -- lsp = { score_offset = 90 },
       -- path = { score_offset = 80 },
       -- snippets = { score_offset = 70 },
       -- buffer = { score_offset = 50 },
+
+      codecompanion = {
+        name = "CodeCompanion",
+        module = "codecompanion.providers.completion.blink",
+        enabled = true,
+      },
 
       notches = {
         name = "Notches", -- @me

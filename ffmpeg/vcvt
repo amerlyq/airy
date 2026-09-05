@@ -14,7 +14,17 @@ case $o in :|'?') exit 2
 ;; s) byserver=1
 ;; w) watch=1
 ;; x) set -x && xt=${-//[^x]}
-esac; done; shift $((OPTIND-1)); unset o
+esac; done; flags=("${@:1:OPTIND-1}"); shift $((OPTIND-1)); unset o
+
+# ALT: only OPT=b(batch)
+if [[ -d ${1-} ]]; then
+  find -H "$@" -type f -name '*.mp4' -print0 \
+    | xargs -0r -P4 -L10 mediainfo --Inform="General;%Video_Codec_List% %CompleteName%\n" -- \
+    | awk -vC="AV1" 'NF&&$1!=C{print substr($0,index($0," ")+1)}' \
+    | LC_ALL=C sort \
+    | xargs -r "$0" "${flags[@]}" --
+  exit
+fi
 
 if [[ -z ${gpu:+x} ]]; then
   # declare use=cpu qa=32 ifx=va
@@ -71,6 +81,8 @@ if ((!$#)) || [[ ${watch-} ]]; then
     # Spawns a vertical tmux pane, runs the job, blocks until pane exits
     run_job_in_pane() {
       local file="$1" pane_id
+
+      ## FAIL: spawns +4 panels per each new window too
 
       # Limit concurrent panes using tmux if-statements
       while (( $(tmux list-panes | wc -l) >= njobs + 1 )); do  # +1 for the shell pane
