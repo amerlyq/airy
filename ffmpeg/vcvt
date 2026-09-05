@@ -19,32 +19,50 @@ case $o in :|'?') exit 2
 ;; x) set -x && xt=${-//[^x]}
 esac; done; flags=("${@:1:OPTIND-1}"); shift $((OPTIND-1)); unset o
 
-# Resolve input list: explicit args (must be files), else stdin
+# NOTE: find -H with a missing path silently emits nothing for that path
+#   and continues with the rest. No error, no non-zero exit. So pre-checking
+#   with [[ -e ]] is the only way to surface "Err: not found: ..." cleanly.
+#   Verified:
+#     $ printf 'exists/\nmissing/\n' | find -H - -type f -name '*.mp4' -print
+#     exists/a.mp4
+#     $ echo $?
+#     0
+#   Directories are expanded recursively to non-AV1 mp4 files
+#   Files are passed through as-is (must exist)
 input_files=()
-if (($#)); then
-  for f in "$@"; do
-    [[ -f $f ]] || { >&2 echo "Err: not a file: $f"; exit 2; }
-    input_files+=("$f")
-  done
-elif [[ ! -t 0 ]]; then
-  while IFS= read -r f; do
+_collect_paths() {
+  # Reads stdin (one path per line), echoes \0-separated existing paths
+  local f
+  while IFS= read -r f || [[ -n $f ]]; do
     [[ -z $f ]] && continue
+    [[ -e $f ]] || { >&2 echo "Err: not found: $f"; return 1; }
+    printf '%s\0' "$f"
+  done
+}
+
+_resolve_to_mp4s() {
+  # Reads \0-separated paths on stdin, emits \0-separated non-AV1 mp4 paths
+  local p
+  while IFS= read -r -d '' p; do
+    [[ -e $p ]] || { >&2 echo "Err: not found: $p"; return 1; }
+    printf '%s\0' "$p"
+  done | find -H - -type f -name '*.mp4' -print0 \
+    | xargs -0r -P4 -L10 mediainfo --Inform="General;%Video_Codec_List% %CompleteName%\n" -- \
+    | awk -vC="AV1" 'NF&&$1!=C{print substr($0,index($0," ")+1)}'
+}
+
+if (($#)); then
+  while IFS= read -r -d '' f; do
     [[ -f $f ]] || { >&2 echo "Err: not a file: $f"; exit 2; }
     input_files+=("$f")
-  done
+  done < <(for f in "$@"; do printf '%s\0' "$f"; done | _resolve_to_mp4s)
+elif [[ ! -t 0 ]]; then
+  while IFS= read -r -d '' f; do
+    [[ -f $f ]] || { >&2 echo "Err: not a file: $f"; exit 2; }
+    input_files+=("$f")
+  done < <(_collect_paths | _resolve_to_mp4s)
 fi
 ((${batch:-0} + ${watch:-0} > 1)) && { >&2 echo "Err: -b and -w are mutually exclusive"; exit 2; }
-
-
-# Original recursive directory scan: find non-AV1 mp4s and recurse
-if [[ -d ${1-} ]] && [[ -z ${batch-} ]] && [[ -z ${watch-} ]]; then
-  find -H "$@" -type f -name '*.mp4' -print0 \
-    | xargs -0r -P4 -L10 mediainfo --Inform="General;%Video_Codec_List% %CompleteName%\n" -- \
-    | awk -vC="AV1" 'NF&&$1!=C{print substr($0,index($0," ")+1)}' \
-    | LC_ALL=C sort \
-    | xargs -r "$0" "${flags[@]}" --
-  exit
-fi
 
 
 # ─────────────────────────────────────────────────────────
