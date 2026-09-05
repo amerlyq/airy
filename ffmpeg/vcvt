@@ -40,27 +40,37 @@ _collect_paths() {
   done
 }
 
-_resolve_to_mp4s() {
-  # Reads \0-separated paths on stdin, emits \0-separated non-AV1 mp4 paths
+_expand_to_mp4s() {
+  # Reads \0-separated paths on stdin, emits \0-separated existing mp4 files
+  # (recursively expanded if a path is a directory). Paths that don't exist
+  # are reported on stderr and cause a non-zero exit.
+  #
+  # NOTE: `find -H` silently skips missing paths (no error, exit 0). To surface
+  #   typos/missing args cleanly, we pre-validate with [[ -e ]] before passing
+  #   anything to find. Without this, `vcvt bad.mp4 good.mp4` would silently
+  #   process only good.mp4 with no indication that bad.mp4 was dropped.
   local p
   while IFS= read -r -d '' p; do
     [[ -e $p ]] || { >&2 echo "Err: not found: $p"; return 1; }
+    [[ -r $p || -d $p ]] || { >&2 echo "Err: not readable: $p"; return 1; }
     printf '%s\0' "$p"
-  done | find -H - -type f -name '*.mp4' -print0 \
-    | xargs -0r -P4 -L10 mediainfo --Inform="General;%Video_Codec_List% %CompleteName%\n" -- \
+  done | find -H -type f -name '*.mp4' -print0
+}
+
+_filter_non_av1() {
+  # Reads \0-separated mp4 paths, emits \0-separated non-AV1 ones.
+  xargs -0r -P4 -L10 mediainfo --Inform="General;%Video_Codec_List% %CompleteName%\n" -- \
     | awk -vC="AV1" 'NF&&$1!=C{print substr($0,index($0," ")+1)}'
 }
 
 if (($#)); then
   while IFS= read -r -d '' f; do
-    [[ -f $f ]] || { >&2 echo "Err: not a file: $f"; exit 2; }
     input_files+=("$f")
-  done < <(for f in "$@"; do printf '%s\0' "$f"; done | _resolve_to_mp4s)
+  done < <(for f in "$@"; do printf '%s\0' "$f"; done | _expand_to_mp4s | _filter_non_av1)
 elif [[ ! -t 0 ]]; then
   while IFS= read -r -d '' f; do
-    [[ -f $f ]] || { >&2 echo "Err: not a file: $f"; exit 2; }
     input_files+=("$f")
-  done < <(_collect_paths | _resolve_to_mp4s)
+  done < <(_collect_paths | _expand_to_mp4s | _filter_non_av1)
 fi
 ((${batch:-0} + ${watch:-0} > 1)) && { >&2 echo "Err: -b and -w are mutually exclusive"; exit 2; }
 
@@ -200,9 +210,8 @@ if [[ ! -t 0 ]] && (($# == 0)); then
   # resulting mp4 to a tmux pane as soon as it appears.
   while IFS= read -r f || [[ -n $f ]]; do
     [[ -z $f ]] && continue
-    [[ -e $f ]] || { >&2 echo "Err: not found: $f"; continue; }
     printf '%s\0' "$f"
-  done | _resolve_to_mp4s | while IFS= read -r -d '' mp4; do
+  done | _expand_to_mp4s | _filter_non_av1 | while IFS= read -r -d '' mp4; do
     [[ -f $mp4 ]] && run_job_in_pane "$mp4"
   done
   exit
