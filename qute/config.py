@@ -1279,7 +1279,7 @@ c.editor.command = [
     "nvim",
     "{file}",
     "-c",
-    "normal {line}G{column0}|",
+    "normal! {line}G{column0}|",
 ]
 
 ## Encoding to use for the editor.

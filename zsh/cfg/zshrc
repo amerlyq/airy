@@ -94,12 +94,16 @@ zle -N bracketed-paste
 # SEE: INC_APPEND_HISTORY or SHARE_HISTORY
 zshaddhistory() { local f
   [[ ${1:0:1} == " " ]] && return 2  # [[ -o hist_ignore_space ]] &&
-  print -sr -- ${1%%$'\n'}  # BAD: no dur and "-n" does not help to strip
-  print -v f -P -- '%D{%Y/%Y-%m-%d}'
-  f=/d/audit/$HOST/zsh/$f
+  print -v f -P -- '/d/audit/%m/zsh/%D{%Y/%Y-%m-%d}'
   # BAD:PERF: checks directory existence on each command
-  [[ -d $f:h ]] || mkdir -p $f:h
-  fc -p $f  # BAD:(no ts/dur): print -rn -- $1 >> $f
+  [[ -d $f:h ]] || mkdir -p -- "$f:h"
+  print -sr -- ${1%%$'\n'}  # BAD: no dur and "-n" does not help to strip
+  fc -p "$f"  # BAD:(no ts/dur): print -rn -- $1 >> $f
+  # { fc -p "$f"  # BAD:(no ts/dur): print -rn -- $1 >> $f
+  #   print -sr -- ${1%%$'\n'}  # BAD: no dur and "-n" does not help to strip
+  # } always {
+  #   fc -P
+  # }
 }
 
 # HACK:(split): cvt ZSH histfile to audit logs ⌇⡟⢔⣳⡀
@@ -117,9 +121,9 @@ TRAPINT() {
   # zle && [[ -n $BUFFER ]] && print -s -r -- "$BUFFER"
   # return $1
   ## OLD~~ return "1" or don't return anything if no zle
-  # if [[ -n "$BUFFER" ]]
-  # then zle && print -s -r -- $BUFFER && return $1  # Default
-  # else return 1; fi
+  if [[ -n "$BUFFER" ]]
+  then zle && print -s -r -- $BUFFER && return $1  # Default
+  else return 1; fi
 
   ## safe test for "am I in a context where zle exists as a widget-capable function", no side effect, no error.
   #  BAD: builtins[zle] only says the builtin exists. It is true outside ZLE.
@@ -128,29 +132,41 @@ TRAPINT() {
   # fi
   # return $(( 128 + $1 ))
 
-  emulate -L zsh
-  local sig=${1-2}
-  [[ $sig == <-> ]] || sig=2
-  # INFO: Zsh explicitly documents builtin zle with no arguments as the “ZLE currently active” test.
-  if builtin zle 2>/dev/null; then
-    local buf=${BUFFER-}
-    if [[ -n $buf ]]; then
-      builtin print -s -r -- "$buf"
-    fi
-  fi
-  # WARN: The invalid math came from trusting $1 after trap/ZLE state had become corrupted.
-  #   If you only handle SIGINT, this is also valid:
-  #     return 130
-  return $((128 + sig))
+  # emulate -L zsh
+  # local sig=${1-2}
+  # [[ $sig == <-> ]] || sig=2
+  # # INFO: Zsh explicitly documents builtin zle with no arguments as the “ZLE currently active” test.
+  # if builtin zle 2>/dev/null; then
+  #   local buf=${BUFFER-}
+  #   if [[ -n $buf ]]; then
+  #     builtin print -s -r -- "$buf"
+  #   fi
+  # fi
+  # # WARN: The invalid math came from trusting $1 after trap/ZLE state had become corrupted.
+  # #   If you only handle SIGINT, this is also valid:
+  # #     return 130
+  # return $((128 + sig))
 }
 
 ## ALT:BUG?
 # save-buffer-on-interrupt() {
-#   [[ -n $BUFFER ]] && print -s -r -- "$BUFFER"
-#   zle kill-whole-line   # or: zle send-break
+#   if [[ -n $BUFFER ]]; then
+#     print -sr -- "$BUFFER"
+#     zle end-of-history
+#   fi
+#   zle send-break  # OR: zle kill-whole-line (BAD: no interrupt then)
 # }
 # zle -N save-buffer-on-interrupt
 # bindkey '^C' save-buffer-on-interrupt
+
+# ALT:HACK:
+# zle-line-init() {
+#   if [[ -n $ZLE_LINE_ABORTED ]]; then
+#     print -sr -- "$ZLE_LINE_ABORTED"
+#     ZLE_LINE_ABORTED=
+#   fi
+# }
+# zle -N zle-line-init
 
 
 ############################################################
