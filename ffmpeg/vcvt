@@ -8,6 +8,9 @@
 set -o errexit -o errtrace -o functrace -o noclobber -o noglob -o nounset -o pipefail
 shopt -qs inherit_errexit lastpipe
 
+njobs=4  # workers=(1..4) x16 threads per each AV1
+
+
 while LC_COLLATE=C getopts 'ac:bgwx-:' o; do
 case $o in :|'?') exit 2
 ;; a) ifx=a
@@ -29,7 +32,6 @@ esac; done; flags=("${@:1:OPTIND-1}"); shift $((OPTIND-1)); unset o
 #     0
 #   Directories are expanded recursively to non-AV1 mp4 files
 #   Files are passed through as-is (must exist)
-input_files=()
 _collect_paths() {
   # Reads stdin (one path per line), echoes \0-separated existing paths
   local f
@@ -63,16 +65,48 @@ _filter_non_av1() {
     | awk -vC="AV1" 'NF&&$1!=C{print substr($0,index($0," ")+1)}'
 }
 
+input_files=()
 if (($#)); then
-  while IFS= read -r -d '' f; do
-    input_files+=("$f")
-  done < <(for f in "$@"; do printf '%s\0' "$f"; done | _expand_to_mp4s | _filter_non_av1)
+  # NOTE: lastpipe + inherit_errexit (set at top) lets this while loop run in
+  #   the current shell, so errors from _expand_to_mp4s / _filter_non_av1
+  #   propagate. Using <(...) would swallow their exit status.
+  for f in "$@"; do printf '%s\0' "$f"; done \
+    | _expand_to_mp4s \
+    | _filter_non_av1 \
+    | while IFS= read -r -d '' f; do
+        input_files+=("$f")
+      done
 elif [[ ! -t 0 ]]; then
-  while IFS= read -r -d '' f; do
-    input_files+=("$f")
-  done < <(_collect_paths | _expand_to_mp4s | _filter_non_av1)
+  # Stream-mode stdin path: dispatch each resolved mp4 immediately. We avoid
+  #   buffering into input_files here because that would block on EOF before
+  #   any conversion runs. For batch mode (finite stdin list), the downstream
+  #   -b handler iterates synchronously; for streaming watcher use, the
+  #   stdin-watcher branch below handles dispatch directly.
+  _collect_paths \
+    | _expand_to_mp4s \
+    | _filter_non_av1 \
+    | while IFS= read -r -d '' f; do
+        input_files+=("$f")
+      done
 fi
 ((${batch:-0} + ${watch:-0} > 1)) && { >&2 echo "Err: -b and -w are mutually exclusive"; exit 2; }
+
+# If a path was supplied (args or stdin) but produced no non-AV1 mp4 files,
+#   exit cleanly here. Otherwise the script falls through to the single-file
+#   conversion path below with `fin=$1` still set to the original arg (e.g.
+#   a directory like `.`), and ffmpeg errors out with "Is a directory".
+if (($#)) || [[ ! -t 0 ]]; then
+  if ((!${batch:-0} && !${watch:-0})); then
+    if ((${#input_files[@]} == 0)); then
+      >&2 echo "Err: no non-AV1 mp4 files found in input"
+      exit 2
+    fi
+    # Single-file mode: pick the first resolved file and run the ffmpeg
+    # pipeline directly. This replaces the original `fin=$1` behavior so
+    # directory args get expanded correctly.
+    set -- "${input_files[0]}"
+  fi
+fi
 
 
 # ─────────────────────────────────────────────────────────
@@ -165,7 +199,6 @@ elif [[ -d /sys/module/i915 ]] || [[ -d /sys/module/xe ]]; then
   : ${use:=nv} ${qa:=28} ${ifx:=n}
 else >&2 echo "MAYBE: Fallback to Software Encoding"; exit 1; fi
 
-njobs=4  # workers=(1..4) x16 threads per each AV1
 
 # ─────────────────────────────────────────────────────────
 # -w : inotify-based watcher
