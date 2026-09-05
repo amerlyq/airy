@@ -82,19 +82,19 @@ if ((!$#)) || [[ ${watch-} ]]; then
     run_job_in_pane() {
       local file="$1" pane_id
 
-      ## FAIL: spawns +4 panels per each new window too
-
-      # Limit concurrent panes using tmux if-statements
-      while (( $(tmux list-panes | wc -l) >= njobs + 1 )); do  # +1 for the shell pane
+      # Limit concurrent panes across ALL windows (not just current one)
+      #   tmux list-panes -a counts panes in every window; +1 for the
+      #   controlling shell pane that runs the watcher loop.
+      while (( $(tmux list-panes -a | wc -l) >= njobs + 1 )); do
         sleep 0.5
       done
 
-      # Try split-window first
-      pane_id=$(tmux split-window -v -P -F "#{pane_id}" -- "
+      # Try split-window first (stays in current window)
+      pane_id=$(tmux split-window -v -P -F "#{pane_id}" -d -- "
         $(typeset -f exec_and_monitor_status)
         exec_and_monitor_status \"$file\"
       " 2>/dev/null) || {
-        # If split fails (small screen), create a new tab/window
+        # If split fails (small screen), create a new window
         pane_id=$(tmux new-window -P -F "#{pane_id}" -- "
           $(typeset -f exec_and_monitor_status)
           exec_and_monitor_status \"$file\"
@@ -104,6 +104,12 @@ if ((!$#)) || [[ ${watch-} ]]; then
         }
       }
       tmux select-layout even-vertical 2>/dev/null ||:
+
+      # BLOCK: wait for this pane to exit before allowing the watcher loop
+      #   to spawn another one. Without this, the loop fires off njobs
+      #   panes immediately, then keeps stacking more ("spawns +4 panels
+      #   per each new window too").
+      tmux wait-for -U "$pane_id" 2>/dev/null ||:
     }
   else
     echo "Err: run inside tmux"
