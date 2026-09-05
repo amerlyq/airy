@@ -6,12 +6,12 @@
 set -o errexit -o errtrace -o functrace -o noclobber -o noglob -o nounset -o pipefail
 shopt -qs inherit_errexit lastpipe
 
-while LC_COLLATE=C getopts 'ac:gswx-:' o; do
+while LC_COLLATE=C getopts 'ac:gwx-:' o; do
 case $o in :|'?') exit 2
 ;; a) ifx=a
 ;; c) qa=$OPTARG
 ;; g) gpu=1
-;; s) byserver=1
+# ;; s) byserver=1
 ;; w) watch=1
 ;; x) set -x && xt=${-//[^x]}
 esac; done; flags=("${@:1:OPTIND-1}"); shift $((OPTIND-1)); unset o
@@ -143,34 +143,34 @@ fi
 fin=$1
 out="${fin%.*}_${ifx}${qa}.${fin##*.}"
 
-# BET? $ mkdir -p /t/vd_cvt && sshfs lf:/cache/vd_cvt /t/vd_cvt -o kernel_cache -o compression=no
-# TRY: REMOTE-cvt:
-# ONELINE: $ ssh lf 'ffmpeg ... -i pipe:0 ... -f mp4 pipe:1' < local_input.mp4 > local_output.mp4
-#   [?] BET:DEV: python ThreadPool() watching a dir to parallelize queue of jobs=5 (measure)
-# VIEW: $ mpv sftp://lf/cache/vd_cvt/todo/input_a25.mp4
-# if [[ -t 0 ]]; then
-#   fin=$1
-#   out="${fin%.*}_${ifx}${qa}.${fin##*.}"
-# else
-#   fin='pipe:0'
-#   [[ -t 1 ]] && exit 2
-#   out="pipe:1"
-# fi
-
 if [[ -e $out ]]; then
   # FIXME: use mtime?
   mv -vfT --backup=t -- "$out" "${out%.*}_prev${RANDOM}.${out##*.}"
 fi
 
-if [[ ${byserver-} ]]; then
-  # NEED: sudo ln -svft /b -- /d/airy/ffmpeg/vcvt
-  exec ssh lf 'vcvt' <"$fin" >"$out"
-  exit 13
-fi
+# BET? $ mkdir -p /t/vd_cvt && sshfs lf:/cache/vd_cvt /t/vd_cvt -o kernel_cache -o compression=no
+# TRY: REMOTE-cvt:
+# ONELINE: $ ssh lf 'ffmpeg ... -i pipe:0 ... -f mp4 pipe:1' < local_input.mp4 > local_output.mp4
+#   [?] BET:DEV: python ThreadPool() watching a dir to parallelize queue of jobs=5 (measure)
+# VIEW: $ mpv sftp://lf/cache/vd_cvt/todo/input_a25.mp4
+# if [[ ! -t 0 ]]; then
+#   fin='pipe:0'
+#   [[ -t 1 ]] && exit 2
+#   out="pipe:1"
+# fi
+## MAYBE: restore/allow piping?
+# [[ $fin == - ]] && declare fin="pipe:0" out="output_${ifx}${qa}.mp4"
+# [[ $out == "pipe:1" ]] && out=(-f mp4 "pipe:1") || out=(-y "$out")
+#
+# if [[ ${byserver-} ]]; then
+#   # NEED: sudo ln -svft /b -- /d/airy/ffmpeg/vcvt
+#   exec ssh lf 'vcvt' <"$fin" >"$out"
+#   exit 13
+# fi
 
 ffmpeg=(ffmpeg -hide_banner)  # -v error | -v verbose
 
-[[ $out == "pipe:1" ]] && out=(-f mp4 "pipe:1") || out=(-y "$out")
+out=(-y "$out")
 
 if [[ $use == nv ]]; then
   # PC with Dedicated NVIDIA (Always active, no integrated graphics)
