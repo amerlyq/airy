@@ -1,9 +1,37 @@
 #!/usr/bin/env bash
 # DEBUG: $ ffprobe input.mp4
-# USAGE:(watcher): $ tmux new-session -s cvt && vcvt -w
-# USAGE: $ print -l {22..30} |xargs -t -n1 -P0 sh -c 'time /b/vcvt -c"$0" input.mp4 &>"$0".log'
-# USAGE:(batch panes): $ vcvt -b a.mp4 b.mp4 c.mp4
-# USAGE:(batch panes from stdin): $ find . -name '*.mp4' -not -name '*_[acnqv][0-9][0-9].mp4' | vcvt -b
+#%USAGE:
+#   [single_file]:     $ vcvt input.mp4
+#   [multiple/batch]:  $ vcvt a.mp4 b.mp4 c.mp4
+#   [dir_recursive]:   $ vcvt ./some_dir/
+#   [stdin_list]:      $ find . -name '*.mp4' -not -name '*_[acnqv][0-9][0-9].mp4' | vcvt
+#   [watch_dir]:       $ [tmux new-session -s cvt &&] vcvt -w /cache/vd_cvt/todo
+#   [serial_no-tmux]:  $ vcvt -j1 *.mp4
+#   [parallel_tmux]:   $ vcvt -j4 *.mp4
+#   [codec_dashboard]: $ print -l {22..30} |xargs -t -n1 -P4 sh -c 'time vcvt -c"$0" input.mp4 &>"$0".log'
+#
+# Resolves input to a list of non-AV1 mp4 files, then:
+#   - exactly one file  -> converts it in-process, no tmux involved at all
+#   - more than one file -> re-execs through tmux-jobs (xargs-mode)
+#     = spawns `vcvt <passthrough flags> FILE` per file in its own pane
+#     = njobs is decided based on codec-specific thread usage
+#
+# TODO:ENH:OPT: persistent queue for !tmux-jobs
+#   so multiple calls to vcvt will be only adding to that list and exiting
+#   * vcvt runs tmux-jobs which appends to queue -- and keeps running in background (i.e. detachable tmux pane)
+#     = queue format is governed by tmux-jobs
+#   * should pass session name to tmux-jobs (e.g. "-s vcvt") to make later "tmux attach" easier
+#     by default "jobs" session name/queue is shared between all invocations of tmux-jobs -- so pool of cpu stays the same for heterogeneous tasks
+#   * store persistent queue in DFL=$HOME/.cache/tmux/<session_name>.txt (override by "-Q" flag)
+#     = WARN: you should save full cmdlines in queue, as vcvt flags may be different
+#   * "vcvt files..." exits immediately -- and user can attach to same tmux session name later from different terminal to see progress
+#   * "vcvt -w" continues running in idle loop and supplying new args to tmux-jobs to append to queue
+#     = always route watch mode to append to queue
+#   * tmux-jobs is running if persistent queue non-empty, then exits when empty, and respawns when new args added to queue
+#   * WARN: optimal "-jN" may be different between different tasks added to shared queue
+#     FUT:IDEA: store in queue how many CPU threads each job needs, and then take as many jobs,
+#       as fit into total CPU budget
+#       e.g. inof -j4 x16 for AV1 -- mark each job as needing 16 AV1 threads out of 64 core budget
 
 set -o errexit -o errtrace -o functrace -o noclobber -o noglob -o nounset -o pipefail
 shopt -qs inherit_errexit lastpipe
@@ -12,459 +40,325 @@ PS4='+[$BASHPID] ${BASH_SOURCE[0]##*/}:$LINENO:  '
 njobs=4  # workers=(1..4) x16 threads per each AV1
 
 readonly _app_orig_argv=("$@")
-while LC_COLLATE=C getopts 'ac:bgwx-:' o; do
+while LC_COLLATE=C getopts 'ac:gj:wxD' o; do
 case $o in :|'?') exit 2
-;; a) ifx=a
-;; b) batch=1
-;; c) qa=$OPTARG
-;; g) gpu=1
+;; a) ifx=a               #: -a    : force ifx=a (infix tag override)
+;; c) qa=$OPTARG          #: -c QA : quality (crf/cq/global_quality, encoder-dependent)
+;; D) archive=1           #: -D    : archive fin+out to ../done/ after a successful convert
+;; g) gpu=1               #: -g    : prefer GPU encode (nvenc/qsv) over cpu (svt-av1)
+;; j) forcejobs=$OPTARG   #: -j N  : concurrency, "1" skips tmux; DFL=0 : auto (sized from codec below)
 # ;; s) byserver=1
-;; w) watch=1
-;; x) set -x && xt=${-//[^x]}
+;; w) watch=1             #: -w DIR: watch mode (implies -D), owns ./{todo,queue,done} directory layout
+;; x) set -x              #: -x    : set -x tracing, forwarded to per-file re-invocations
 esac; done; flags=("${@:1:OPTIND-1}"); shift $((OPTIND-1)); unset o
+# xt=${-//[^x]}
 
+: "${use:=}" "${qa:=}" "${ifx:=v}"
+if [[ -z ${gpu:+x} ]]; then
+  # declare use=cpu qa=32 ifx=va
+  : ${use:=cpu} ${qa:=32} ${ifx:=v}
+elif [[ -e /dev/nvidia0 ]]; then
+  # OR: [[ -e /etc/bumblebee/bumblebee.conf ]] && ffmpeg=(optirun "${ffmpeg[@]}")
+  : ${use:=nv} ${qa:=28} ${ifx:=n}  # PC with Dedicated NVIDIA (Always active, no integrated graphics)
+elif [[ -d /sys/module/i915 ]] || [[ -d /sys/module/xe ]]; then
+  # elif [ -d /sys/class/drm/card0/device/intel-guc ] || [ -e /dev/dri/by-path/*-pci-*-intel-* ]
+  # REF:(qa): https://www.ffmpeg.org/ffmpeg-codecs.html#Ratecontrol-Method
+  #   For the ICQ modes, global quality range is 1 to 51, with 1 being the best quality.
+  : ${use:=nv} ${qa:=28} ${ifx:=n}  # Laptop with Intel QSV (Intel driver loaded, no active NVIDIA)
+else
+  >&2 echo "Err: no GPU encode path found (no nvidia/i915/xe)"
+  exit 1  # <MAYBE: Fallback to Software Encoding
+fi
+readonly use qa ifx
+
+# Codec-specific concurrency: svt-av1 (cpu) is heavily multithreaded per job
+#   (~16 threads/job), so only a handful of jobs should run at once even on
+#   a big machine. nvenc/qsv have their own session caps (~3-12) but are far
+#   less per-job-thread-hungry, so allow more concurrent dispatch.
+_auto_njobs() {
+  local nproc_n
+  nproc_n=$(nproc 2>/dev/null || echo 4)
+  case $use in
+  cpu) echo $(( nproc_n / 16 > 0 ? nproc_n / 16 : 1 )) ;;
+  nv|qsv) echo $(( nproc_n / 4 > 0 ? nproc_n / 4 : 1 )) ;;
+  *) echo 1 ;;
+  esac
+}
+if [[ -n ${forcejobs-} ]]; then
+  njobs=$forcejobs
+else
+  njobs=$(_auto_njobs)
+fi
+
+# ── input resolution ─────────────────────────────────────────────────
 # NOTE: find -H with a missing path silently emits nothing for that path
 #   and continues with the rest. No error, no non-zero exit. So pre-checking
 #   with [[ -e ]] is the only way to surface "Err: not found: ..." cleanly.
-#   Verified:
-#     $ printf 'exists/\nmissing/\n' | find -H - -type f -name '*.mp4' -print
-#     exists/a.mp4
-#     $ echo $?
-#     0
-#   Directories are expanded recursively to non-AV1 mp4 files
-#   Files and symlinked files are passed through as-is (must exist)
-_collect_paths() {
-  # Reads stdin (one path per line), echoes \0-separated existing paths
-  local f
+# DEBUG: $ printf 'exists/\nmissing/\n' | find -H - -type f -name '*.mp4' -print; echo $?
+collect_paths() { local f
   while IFS= read -r f || [[ -n $f ]]; do
     [[ -z $f ]] && continue
+    # REMOVE? we verify it below AGAIN anyway
     [[ -e $f ]] || { >&2 echo "Err: not found: $f"; return 1; }
     printf '%s\0' "$f"
   done
 }
 
-_expand_to_mp4s() {
-  # Reads \0-separated paths on stdin, emits \0-separated existing mp4 files
-  # (recursively expanded if a path is a directory). Paths that don't exist
-  # are reported on stderr and cause a non-zero exit.
-  #
-  # NOTE: `find -H` silently skips missing paths (no error, exit 0). To surface
-  #   typos/missing args cleanly, we pre-validate with [[ -e ]] before passing
-  #   anything to find. Without this, `vcvt bad.mp4 good.mp4` would silently
-  #   process only good.mp4 with no indication that bad.mp4 was dropped.
-  local p
+# RQ:(--files0-from):DEP: !findutils>=4.9
+#   ALT:BUG:(<4.9): `find -H` silently ignores stdin and scans $PWD instead
+_expand_to_mp4s() { local p
   while IFS= read -r -d '' p; do
     [[ -e $p ]] || { >&2 echo "Err: not found: $p"; return 1; }
     [[ -r $p || -d $p ]] || { >&2 echo "Err: not readable: $p"; return 1; }
     printf '%s\0' "$p"
   # Include symlinked files explicitly. Do not use realpath: ffmpeg must see
   # the submitted symlink path so its output is created beside the symlink.
-  done | find -H \( -type f -o -type l \) -iname '*.mp4' -print0
+  # MAYBE: use "-xtype f"
+  done | find -H -files0-from - -maxdepth 1 \( -type f -o -type l \) -iname '*.mp4' -print0
 }
 
 _filter_non_av1() {
-  # Reads \0-separated mp4 paths, emits \0-separated non-AV1 ones.
+  # BUG(fixed): mawk's printf "\0" does NOT emit a literal NUL byte (silently
+  #   dropped) -- only gawk supports that. Portable fix: ORS="\0" with plain
+  #   print, which mawk handles correctly.
   xargs -0r -P4 -L10 mediainfo --Inform="General;%Video_Codec_List% %CompleteName%\n" -- \
-    | awk -vC="AV1" 'NF&&$1!=C{print substr($0,index($0," ")+1)}'
+    | awk -vC="AV1" 'BEGIN{ORS="\0"} NF&&$1!=C{print substr($0,index($0," ")+1)}'
 }
 
-# REFACTOR: single input-resolver. Replaces the 3 copies of the
-#   _collect_paths | _expand_to_mp4s | _filter_non_av1 chain.
-#   Args come from "$@"; empty $# means read paths from stdin.
-#   Emits NUL-separated non-AV1 mp4 paths on stdout.
-#   Errors (missing/unreadable paths) are reported on stderr and propagate
-#   via the pipe's last command's exit status (preserved by lastpipe +
-#   inherit_errexit set at top).
+# Args come from "$@"; empty $# means read paths from stdin.
+# Emits NUL-separated non-AV1 mp4 paths on stdout.
 _resolve_inputs() {
-  { (($#)) && printf '%s\0' "$@" || _collect_paths
+  { (($#)) && printf '%s\0' "$@" || collect_paths
   } | _expand_to_mp4s | _filter_non_av1
 }
 
-input_files=()
-if (($#)); then
-  # NOTE: lastpipe (set at top) runs readarray in the current shell as the
-  #   last command of the pipeline, so inherit_errexit propagates failures
-  #   from _expand_to_mp4s / _filter_non_av1. <(...) would fork a subshell
-  #   and break that.
-  _resolve_inputs "$@" | readarray -d '' -t input_files
-elif [[ ! -t 0 ]]; then
-  # Stream-mode stdin path: dispatch each resolved mp4 immediately. We avoid
-  #   buffering into input_files here because that would block on EOF before
-  #   any conversion runs.
-  #
-  #   Dispatcher precedence:
-  #     -b  → buffered batch (handled below; this branch falls through)
-  #     -w  → ignored here; -w owns the watched dir, not stdin (its branch
-  #            is mutually exclusive with -b and runs from the inotify source
-  #            below). If -w is set with piped stdin, we still buffer so the
-  #            -w branch can iterate synchronously.
-#     else (default) → tmux pane per file, mirroring the stdin-watcher
-  #         branch. Falls back to local runner if tmux is unavailable.
-  if [[ ${batch-} || ${watch-} ]]; then
-    # Batch/watcher paths expect input_files populated; buffer as before.
-    _resolve_inputs | readarray -d '' -t input_files
-  else
-    # Default stream mode: spawn a tmux pane per resolved mp4 as soon as
-    #   each one arrives. Mirrors the stdin-watcher branch below so
-    #   behavior is consistent across the two stdin-driven entry points.
-    _bootstrap_tmux
-    command -v tmux &>/dev/null && runner=run_job_in_pane || runner=run_job_local
-    _resolve_inputs \
-      | while IFS= read -r -d '' f; do
-          [[ -f $f ]] && "$runner" "$f"
-        done
-    exit
-  fi
-fi
-((${batch:-0} + ${watch:-0} > 1)) && { >&2 echo "Err: -b and -w are mutually exclusive"; exit 2; }
-
-# If a path was supplied (args or stdin) but produced no non-AV1 mp4 files,
-#   exit cleanly here. Directory and multi-file arguments must use the batch
-#   dispatcher: otherwise the resolved list gets collapsed to its first item
-#   and `vcvt .` either converts only one file or passes the directory itself
-#   to ffmpeg.
-if (($#)) || [[ ! -t 0 ]]; then
-  if ((!${batch:-0} && !${watch:-0})); then
-    if ((${#input_files[@]} == 0)); then
-      >&2 echo "Err: no non-AV1 mp4 files found in input"
-      exit 2
-    fi
-    # A directory (even one containing only one matching file), or multiple
-    # resolved files, is a batch request. Leave input_files intact so the
-    # tmux dispatcher below receives one file per job.
-    if (( ${#input_files[@]} > 1 )) || [[ -d $1 ]]; then
-      batch=1
-    else
-      # Preserve the fast/direct path for one explicit file.
-      set -- "${input_files[0]}"
-    fi
-  fi
-fi
-
-
 # ─────────────────────────────────────────────────────────
-# tmux-aware worker: runs conversion in its own pane
-# On failure, pane contents are captured to <file>_err_<pid>.log
+# Single-file conversion (in-process, real argv, no shell-string layer)
 # ─────────────────────────────────────────────────────────
-exec_and_monitor_status() {
-  local file="$1" rc=
-  bash -xec '
-    echo "[convert] $0"
-    vcvt "$0"
-    mv -vt ../done/ -- "$0" "${0%.*}_"[acnqv][0-9][0-9]".${0##*.}"
-    echo "---"
-  ' "$file" || rc=$?
-  if ((rc)); then
+_convert_one() { local fin="$1" vf_scale
+  local out="${fin%.*}_${ifx}${qa}.${fin##*.}"
+  local ffmpeg=(ffmpeg -hide_banner)  # -v error | -v verbose
+  # MAYBE: ffmpeg+=(-y)
+
+  if [[ -e $out ]]; then
+    # FIXME: use mtime inof RANDOM for deterministic sorting of old variants in !ranger ?
+    mv -vfT --backup=t -- "$out" "${out%.*}_prev${RANDOM}.${out##*.}"
+  fi
+
+  # TODO:SPLIT: dedicated functions _cvt_nv(){ "${ffmpeg[@]:-ffmpeg}" ... -i "$1" -o "$2"
+  case $use
+  in nv)
+    local nvopts=(  # <CASE:(amv):
+      -preset p7 -highbitdepth 1 -multipass qres
+      -rc vbr -cq "$qa" -maxrate 8M -bufsize 16M
+      -rc-lookahead 48 -lookahead_level auto
+      -spatial_aq 1 -aq-strength 8 -g 30 -bf 4 -b_ref_mode middle
+    )
+    vf_scale="scale_cuda=w='trunc(iw*min(1,min(if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih))/2)*2':h='trunc(ih*min(1,min(if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih))/2)*2':format=yuv420p"
+    "${ffmpeg[@]}" -hwaccel cuda -hwaccel_output_format cuda -i "$fin" \
+      -vf "$vf_scale" \
+      -c:v hevc_nvenc "${nvopts[@]}" -c:a copy "$out"
+
+  ;; qsv)
+    vf_scale="scale_qsv=w='trunc(iw*min(1,min(if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih))/2)*2':h='trunc(ih*min(1,min(if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih))/2)*2',format=qsv"
+    ## ALT:(qsv variants): -c:v h264_qsv|av1_qsv|hevc_qsv OR:(auto): -init_hw_device qsv=qsv:hw
+    # BAD: no "-tune animation" -- only for software-render
+    "${ffmpeg[@]}" -init_hw_device qsv=qsv:hw -hwaccel qsv -hwaccel_output_format qsv -i "$fin" \
+      -vf "$vf_scale" \
+      -c:v hevc_qsv -preset slow -global_quality "$qa" "$out"
+
+  ;; cpu)
+    vf_scale="scale=w='if(gt(iw,ih),min(iw,1920),min(iw,1080))':h='if(gt(iw,ih),min(ih,1080),min(ih,1920))':force_original_aspect_ratio=decrease:force_divisible_by=2:flags=lanczos,format=yuv420p10le"
+    "${ffmpeg[@]}" -i "$fin" \
+      -vf "$vf_scale" \
+      -c:v libsvtav1 -preset 4 -crf "$qa" -pix_fmt yuv420p10le \
+      -svtav1-params "tune=1:scd=1:keyint=5s:lookahead=120:enable-qm=1:qm-min=0:qm-max=15:enable-overlays=1:sharpness=1" \
+      -c:a copy "$out"
+
+  ;; *)
+    >&2 echo "MAYBE: Fallback to Software Encoding"
+    exit 2
+  esac
+
+  if [[ ${archive-} || ${watch-} ]]; then
     mkdir -p ../done
-    local log_path
-    log_path="../done/$(basename "${file%.*}")_err_$$.log"
-    tmux capture-pane -pt "$TMUX_PANE" -S - > "$log_path"
-    printf '\n\n\033[1;31m[ERROR] Conversion failed!\033[0m\n'
-    printf '\033[1;33m[ERROR] Pane output dumped to: %s\033[0m\n' "$log_path"
-    # TEMP:
-    printf '\033[1;36m[ERROR] Press ENTER to close this pane...\033[0m\n'
-    read -r
-    exit "$rc"
+    mv -vt ../done/ -- "$fin" "$out"
   fi
 }
-export -f exec_and_monitor_status
 
-# Spawns a vertical tmux pane, runs the job, blocks until pane exits
-run_job_in_pane() {
-  local file="$1" pane_id
-
-  # Limit concurrent panes across ALL windows (not just current one)
-  #   tmux list-panes -a counts panes in every window; +1 for the
-  #   controlling shell pane that runs the watcher loop.
-  while (( $(tmux list-panes -a | wc -l) >= njobs + 1 )); do
-    sleep 0.5
-  done
-
-  # Try split-window first (stays in current window)
-  pane_id=$(tmux split-window -v -P -F "#{pane_id}" -d -- "
-    $(typeset -f exec_and_monitor_status)
-    exec_and_monitor_status \"$file\"
-  " 2>/dev/null) || {
-    # If split fails (small screen), create a new window
-    pane_id=$(tmux new-window -P -F "#{pane_id}" -- "
-      $(typeset -f exec_and_monitor_status)
-      exec_and_monitor_status \"$file\"
-    " 2>/dev/null) || {
-      echo "[tmux] split-window and new-window both failed for: $file" >&2
-      return 1
-    }
-  }
-  tmux select-layout even-vertical 2>/dev/null ||:
-
-  # BLOCK: wait for this pane to exit before allowing the watcher loop
-  #   to spawn another one. Without this, the loop fires off njobs
-  #   panes immediately, then keeps stacking more ("spawns +4 panels
-  #   per each new window too").
-  tmux wait-for -U "$pane_id" 2>/dev/null ||:
-}
-export -f run_job_in_pane
-
-# ALT: no-tmux fallback worker
-run_job_local() {
-  echo "[convert] $1"
-  # ALT:(&pg): vcvt ... 2>&1 | pv -N "$(basename "$0" | cut -c1-15)" -l -q > /dev/null
-  vcvt "$1"
-  mv -vt ../done/ -- "$1" "${1%.*}_"[acnqv][0-9][0-9]".${1##*.}"
-  echo "---"
-}
-export -f run_job_local
-
-# Re-exec self into a fresh tmux session if not already inside one.
-# Callers (watch / batch / stdin-watcher) all need the same bootstrap.
-_bootstrap_tmux() {
-  command -v tmux &>/dev/null || { echo "Err: run inside tmux" >&2; exit 2; }
-  # An existing tmux server can have a different default directory. Keep the
-  # child in the caller's directory so relative inputs such as `.` resolve to
-  # the same files after re-exec.
-  [[ -n "${TMUX-}" ]] || exec tmux new-session -c "$PWD" "$0" "${_app_orig_argv[@]}"
+# Flags to forward when re-invoking vcvt per-file for parallel dispatch.
+# Mirrors what was parsed above; -j is deliberately NOT forwarded (each
+#   per-file worker is a single-file call, no further fan-out needed).
+_passthrough_flags() {
+  local -a f=()
+  [[ ${ifx-} == a ]] && f+=(-a)
+  [[ -n ${qa-} ]] && f+=(-c "$qa")
+  [[ ${gpu-} ]] && f+=(-g)
+  [[ ${archive-} ]] && f+=(-D)
+  [[ $- == *x* ]] && f+=(-x)
+  printf '%s\0' "${f[@]}"
 }
 
-if [[ -z ${gpu:+x} ]]; then
-  # declare use=cpu qa=32 ifx=va
-  : ${use:=cpu} ${qa:=32} ${ifx:=v}
-elif [[ -e /dev/nvidia0 ]]; then
-  : ${use:=nv} ${qa:=28} ${ifx:=n}
-elif [[ -d /sys/module/i915 ]] || [[ -d /sys/module/xe ]]; then
-  # REF:(qa): https://www.ffmpeg.org/ffmpeg-codecs.html#Ratecontrol-Method
-  #   For the ICQ modes, global quality range is 1 to 51, with 1 being the best quality.
-  : ${use:=nv} ${qa:=28} ${ifx:=n}
-else >&2 echo "MAYBE: Fallback to Software Encoding"; exit 1; fi
+# Dispatches a NUL-sep file list on stdin: single file converts in-process,
+#   multiple files fan out through tmux-jobs at the codec-sized njobs.
+_dispatch() {
+  local -a files=()
+  # BET?TRY:(RQ=lastpipe): $ readarray -d '' -t files
+  # FAIL: convertion is blocked till EOF from *streaming* watcher
+  while IFS= read -r -d '' f; do files+=("$f"); done
 
+  case ${#files[@]}
+  in 0) # return 0
+    >&2 echo "Err: no non-AV1 mp4 files found in input"
+    exit 2
+  ;; 1) _convert_one "${files[0]}"
+  ;; *)
+    if ((njobs <= 1)); then
+      echo "Batch: $PWD (${#files[@]} files, no-tmux serialized loop)"
+      local f; for f in "${files[@]}"; do
+        echo "[convert] $f"
+        # ALT:(&pg): vcvt ... 2>&1 | pv -N "$(basename "$0" | cut -c1-15)" -l -q > /dev/null
+        _convert_one "$f"
+        ## ALT:MAYBE: do this to move files after failed/interrupted conversion?
+        # mv -vt ../done/ -- "$1" "${1%.*}_"[acnqv][0-9][0-9]".${1##*.}"
+        echo "---"
+      done
+    else
+      local -a flags=()
+      while IFS= read -r -d '' a; do flags+=("$a"); done < <(_passthrough_flags)
+      echo "Batch: $PWD (${#files[@]} files, tmux-jobs)"
+      command -v tmux-jobs &>/dev/null || { >&2 echo "Err: tmux-jobs not found on PATH"; exit 2; }
+      printf '%s\0' "${files[@]}" | exec tmux-jobs -j"$njobs" -- vcvt "${flags[@]}"
+    fi
+  esac
+}
 
+# ── modes ────────────────────────────────────────────────────────────
 # ─────────────────────────────────────────────────────────
 # -w : inotify-based watcher
 # ─────────────────────────────────────────────────────────
 if [[ ${watch-} ]]; then
-  set -x
-  cd "${1:-/cache/vd_cvt/todo}"  # RENAME? ./watch
-  echo "Watching: $PWD"
+  dir=${1:-/cache/vd_cvt/todo}  # RENAME? ./watch
+  [[ -d $dir ]] || { >&2 echo "Err: watch dir not found: $dir"; exit 2; }
+  cd "$dir"
+  >&2 echo "Watching: $PWD"
+  archive=1  # watch mode always archives to ../done/
 
-  _bootstrap_tmux
-
-  # inotify pipeline: emits paths as they're close_write'd in $PWD.
-  # `-w` owns its input source (the watched dir); stdin is not consumed
-  # here -- the stdin-watcher path is the alternative for piped input.
-  inotify_src() {
+  # Emits queued mp4 paths as they arrive (existing backlog first, then
+  #   inotify for close_write()), moving each into ../queue/ before emitting
+  #   -- this is watch-mode's own bookkeeping, orthogonal to job execution.
+  _inotify_src() {
     find ../queue -regextype egrep -type f -name '*.mp4' \
-      -not -regex '.*_(va|[acnqv])[0-9]{2}\.mp4$' -print
+      -not -regex '.*_(va|[acnqv])[0-9]{2}\.mp4$' -print0
     inotifywait -m -e close_write --format '%f' . | while read -r f; do
       [[ ${f:0:1} == "." ]] && continue  # <CASE: skip rsync temp files
-      echo "[detected] $f"
+      >&2 echo "[detected] $f"
       mv -vt ../queue/ -- "./$f"
-      # Preserve symlink paths; ffmpeg uses this path to place the output
-      # alongside the symlink rather than alongside its target.
-      printf '%s\n' "../queue/$f"
+      printf '%s\0' "../queue/$f"
     done
   }
 
-  inotify_src | while read -r f; do
-    run_job_in_pane "$f"
+  # Watch mode dispatches one file at a time as it arrives (not batched),
+  #   so each goes through _dispatch's single-file in-process path unless
+  #   njobs>1, in which case successive arrivals still respect the
+  #   concurrency cap via tmux-jobs' own pane-count throttle.
+  _inotify_src | while IFS= read -r -d '' f; do
+    [[ -f $f ]] || continue  # REMOVE?
+    printf '%s\0' "$f" | _dispatch
   done
   exit
 fi
 
-# ─────────────────────────────────────────────────────────
-# stdin-watcher: when invoked with no args and stdin is a pipe,
-#   read paths forever and dispatch each to a tmux pane.
-#   External watcher app pipes paths; we spawn a cvt job per line.
-# ─────────────────────────────────────────────────────────
-if [[ ! -t 0 ]] && (($# == 0)); then
-  _bootstrap_tmux
-
-  # Stream stdin: each line is a path (file or dir). Reuse the same
-  # find+mediainfo AV1 filter as the batch path, then dispatch each
-  # resulting mp4 to a tmux pane as soon as it appears.
-  while IFS= read -r f || [[ -n $f ]]; do
-    [[ -z $f ]] && continue
-    printf '%s\0' "$f"
-  done | _expand_to_mp4s | _filter_non_av1 | while IFS= read -r -d '' mp4; do
-    [[ -f $mp4 ]] && run_job_in_pane "$mp4"
-  done
-  exit
-fi
-
-# ─────────────────────────────────────────────────────────
-# -b : batch mode -- dispatch resolved input list to tmux panes
-# ─────────────────────────────────────────────────────────
-if [[ ${batch-} ]]; then
-  ((${#input_files[@]} == 0)) && { >&2 echo "Err: -b requires files as args or stdin"; exit 2; }
-  set -x
-
-  if command -v tmux &>/dev/null; then
-    _bootstrap_tmux
-    runner=run_job_in_pane
-  else
-    runner=run_job_local
-  fi
-  echo "Batch: $PWD (${#input_files[@]} files -> $runner)"
-  for f in "${input_files[@]}"; do
-    "$runner" "$f"
-  done
-  exit
-fi
-
-# ─────────────────────────────────────────────────────────
-# Single-file conversion path (unchanged)
-# ─────────────────────────────────────────────────────────
+# No -w: resolve argv/stdin to file list, then dispatch
+#   (single in-process, multiple via tmux-jobs)
+_resolve_inputs "$@" | _dispatch
 
 
-fin=$1
-out="${fin%.*}_${ifx}${qa}.${fin##*.}"
+#######################################################################
+### INFO:
 
-if [[ -e $out ]]; then
-  # FIXME: use mtime?
-  mv -vfT --backup=t -- "$out" "${out%.*}_prev${RANDOM}.${out##*.}"
-fi
-
-# BET? $ mkdir -p /t/vd_cvt && sshfs lf:/cache/vd_cvt /t/vd_cvt -o kernel_cache -o compression=no
-# TRY: REMOTE-cvt:
-# ONELINE: $ ssh lf 'ffmpeg ... -i pipe:0 ... -f mp4 pipe:1' < local_input.mp4 > local_output.mp4
-#   [?] BET:DEV: python ThreadPool() watching a dir to parallelize queue of jobs=5 (measure)
-# VIEW: $ mpv sftp://lf/cache/vd_cvt/todo/input_a25.mp4
-# if [[ ! -t 0 ]]; then
-#   fin='pipe:0'
-#   [[ -t 1 ]] && exit 2
-#   out="pipe:1"
-# fi
-## MAYBE: restore/allow piping?
+# ── pipe ─────────────────────────────────────────────────────────────
+## MAYBE: restore/allow piping? <BUT:BAD: network errors will fail whole ongoing cvt
+# [[ -t 0 ]] || { fin='pipe:0'; [[ -t 1 ]] && exit 2; out="pipe:1"; }
 # [[ $fin == - ]] && declare fin="pipe:0" out="output_${ifx}${qa}.mp4"
 # [[ $out == "pipe:1" ]] && out=(-f mp4 "pipe:1") || out=(-y "$out")
-#
 # if [[ ${byserver-} ]]; then
-#   # NEED: sudo ln -svft /b -- /d/airy/ffmpeg/vcvt
+#   ## BET? $ mkdir -p /t/vd_cvt && sshfs lf:/cache/vd_cvt /t/vd_cvt -o kernel_cache -o compression=no
+#   # ONELINE: $ ssh lf 'ffmpeg ... -i pipe:0 ... -f mp4 pipe:1' < local_input.mp4 > local_output.mp4
+#   #   [?] BET:DEV: python ThreadPool() watching a dir to parallelize queue of jobs=5 (measure)
+#   # VIEW: $ mpv sftp://lf/cache/vd_cvt/todo/input_a25.mp4
 #   exec ssh lf 'vcvt' <"$fin" >"$out"
 #   exit 13
 # fi
 
-ffmpeg=(ffmpeg -hide_banner)  # -v error | -v verbose
 
-out=(-y "$out")
+# ── nv ───────────────────────────────────────────────────────────────
 
-if [[ $use == nv ]]; then
-  # PC with Dedicated NVIDIA (Always active, no integrated graphics)
-  #   OR: [[ -e /etc/bumblebee/bumblebee.conf ]] && ffmpeg=(optirun "${ffmpeg[@]}")
+# INFO: hardware encoding via NVENC will still be significantly faster than software encoding, even with 32-cores
+#   NICE: NVENC on consumer cards supports up to 3..12 concurrent encoding sessions.
+#     $ ls *.mp4 | xargs -rP4 vcvt
+#   DEBUG:(number of sessions): nvidia-smi --query-gpu=driver_version --format=csv,noheader
+#   DEBUG:(GPU memory used): watch -n 1 nvidia-smi
 
-  # INFO: hardware encoding via NVENC will still be significantly faster than software encoding, even with 32-cores
-  #   * NVENC on consumer cards supports up to 3..12 concurrent encoding sessions.
-  #   DEBUG:(number of sessions): nvidia-smi --query-gpu=driver_version --format=csv,noheader
-  #   DEBUG:(GPU memory used): watch -n 1 nvidia-smi
+# BAD: no "-tune animation", only "fill flat areas"
+#   INFO: -aq-strength=0–15, no single "correct" value — worth testing 6/8/10 on a sample clip if quality matters here.
+#   -preset p7 -tune hq -rc vbr -cq 25 -b:v 0 -spatial_aq 1 -aq-strength 8 -rc-lookahead 32 \
+#   -preset p7 -tune hq -profile:v main10 -pix_fmt p010le -rc vbr -cq 22 -b:v 0 -spatial_aq 1 -aq-strength 10 -rc-lookahead 32 \
+# BAD:(no compression?): -rc vbr -cq "$qa" -b:v 0
+#   ALT: -rc constqp -qp 23
+# nvopts=( -preset p5 -tune hq -rc vbr -cq "$qa" -maxrate 8M -bufsize 16M )
 
-  # BAD: no "-tune animation", only "fill flat areas"
-  #   INFO: -aq-strength=0–15, no single "correct" value — worth testing 6/8/10 on a sample clip if quality matters here.
-  #   -preset p7 -tune hq -rc vbr -cq 25 -b:v 0 -spatial_aq 1 -aq-strength 8 -rc-lookahead 32 \
-  #   -preset p7 -tune hq -profile:v main10 -pix_fmt p010le -rc vbr -cq 22 -b:v 0 -spatial_aq 1 -aq-strength 10 -rc-lookahead 32 \
+# INFO:(-rc-lookahead 32): What Does Look-ahead Do in OBS NVENC Settings? - obs-studio ⌇⡪⡮⠗⢐
+#   https://salivity.github.io/obs-studio/article/what-does-look-ahead-do-in-obs-nvenc-settings
 
-  # BAD:(no compression?): -rc vbr -cq "$qa" -b:v 0
-  #   ALT: -rc constqp -qp 23
-  # nvopts=( -preset p5 -tune hq -rc vbr -cq "$qa" -maxrate 8M -bufsize 16M )
+## ALT: cuda
+# -hwaccel cuda -hwaccel_device 0 -c:v h264_cuvid ...
+# -vf "scale_cuda=w='min(iw,1920)':h='min(ih,1080)':format=yuv420p" \
+# FPS: -vf "fps=30,scale_cuda=..." -fps_mode cfr -c:v ...
+# -vf "scale_cuda=w='if(gt(iw,ih),min(iw,1920),trunc(1920*iw/ih/2)*2)':h='if(gt(ih,iw),min(ih,1920),trunc(1920*ih/iw/2)*2)':format=yuv420p" \
+#   BUT: detect VFR first: $ ffprobe -v error -select_streams v:0 -show_entries stream=avg_frame_rate,r_frame_rate -of default=nw=1 "$f"
 
-  # INFO:(-rc-lookahead 32): What Does Look-ahead Do in OBS NVENC Settings? - obs-studio ⌇⡪⡮⠗⢐
-  #   https://salivity.github.io/obs-studio/article/what-does-look-ahead-do-in-obs-nvenc-settings
-  # INFO:(supported): $ ffmpeg -h encoder=hevc_nvenc
-  # nvopts=(  # <CASE:(amv):
-  #   -preset p7 -highbitdepth 1 -multipass fullres
-  #   -rc vbr -cq 23 -maxrate 16M -bufsize 32M
-  #   -rc-lookahead 48 -lookahead_level auto -tf_level 4
-  #   -spatial_aq 1 -aq-strength 12 -g 60 -bf 4 -b_ref_mode middle
-  # )
-  nvopts=(  # <CASE:(amv):
-    -preset p7 -highbitdepth 1 -multipass qres
-    -rc vbr -cq "$qa" -maxrate 8M -bufsize 16M
-    -rc-lookahead 48 -lookahead_level auto
-    -spatial_aq 1 -aq-strength 8 -g 30 -bf 4 -b_ref_mode middle
-  )
 
-  ## ALT: cuda
-  # -hwaccel cuda -hwaccel_device 0 -c:v h264_cuvid ...
-  # -vf "scale_cuda=w='min(iw,1920)':h='min(ih,1080)':format=yuv420p" \
-  # FPS: -vf "fps=30,scale_cuda=..." -fps_mode cfr -c:v ...
-  # -vf "scale_cuda=w='if(gt(iw,ih),min(iw,1920),trunc(1920*iw/ih/2)*2)':h='if(gt(ih,iw),min(ih,1920),trunc(1920*ih/iw/2)*2)':format=yuv420p" \
-  #   BUT: detect VFR first: $ ffprobe -v error -select_streams v:0 -show_entries stream=avg_frame_rate,r_frame_rate -of default=nw=1 "$f"
-  exec "${ffmpeg[@]}" \
-    -hwaccel cuda -hwaccel_output_format cuda -i "$fin" \
-    -vf "scale_cuda=w='trunc(iw*min(1,min(if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih))/2)*2':h='trunc(ih*min(1,min(if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih))/2)*2':format=yuv420p" \
-    -c:v hevc_nvenc "${nvopts[@]}" -c:a copy "${out[@]}"
+# ── qsv ──────────────────────────────────────────────────────────────
 
-  ## ALT: 3..12 concurrent encoding sessions with NVENC
-  #   OR:(re-exec): $ ls *.mp4 | xargs -P4 -I{} vcvt {}
-  # convert_one(){ "${ffmpeg[@]}" ... }
-  # export -f convert_one
-  # export CQ
-  # ls *.mp4 | xargs -P "$PARALLEL" -I{} bash -c 'convert_one "$@"' _ {}
-fi
+## ALT: -vf ...
+# "scale=w=1920:h=1080"
+# "hwdownload"
+# "scale_qsv=w=1920:h=1080,format=yuv420p"
+# "scale_qsv=w=-1:h=1080"
+# "scale_qsv=w='min(iw,1920)':h='min(ih,1080)',format=qsv"
+# "scale=w=1920:h=1920:force_original_aspect_ratio=decrease,format=qsv"
+# "scale_qsv=w='if(gt(iw,ih),1920,round(1920*a/2)*2)':h='if(gt(ih,iw),1920,round(1920/a/2)*2)',format=qsv"
+# "scale_qsv=w='if(gt(iw,ih),min(iw,1920),trunc(1920*a/2)*2)':h='if(gt(ih,iw),min(ih,1920),trunc(1920/a/2)*2)',format=qsv"
 
-if [[ $use == qsv ]]; then
-  # elif [ -d /sys/class/drm/card0/device/intel-guc ] || [ -e /dev/dri/by-path/*-pci-*-intel-* ] || [ -d /sys/module/i915 ];
-  # Laptop with Intel QSV (Intel driver loaded, no active NVIDIA)
-  # BAD: no "-tune animation" -- only for software-render
-  qsvopts=( )
 
-  ## ALT: qsv variants
-  # -c:v h264_qsv|av1_qsv|hevc_qsv OR:(auto): -init_hw_device qsv=qsv:hw
-  # -vf 'scale=w=1920:h=1080' \
-  # -vf 'hwdownload' \
-  # -vf 'scale_qsv=w=1920:h=1080,format=yuv420p' \
-  # -vf 'scale_qsv=w=-1:h=1080' \
-  # "scale_qsv=w='min(iw,1920)':h='min(ih,1080)',format=qsv"
-  # "scale=w=1920:h=1920:force_original_aspect_ratio=decrease,format=qsv" \
-  # "scale_qsv=w='if(gt(iw,ih),1920,round(1920*a/2)*2)':h='if(gt(ih,iw),1920,round(1920/a/2)*2)',format=qsv" \
-  # "scale_qsv=w='if(gt(iw,ih),min(iw,1920),trunc(1920*a/2)*2)':h='if(gt(ih,iw),min(ih,1920),trunc(1920/a/2)*2)',format=qsv" \
-  exec "${ffmpeg[@]}" \
-    -init_hw_device qsv=qsv:hw -hwaccel qsv -hwaccel_output_format qsv -i "$fin" \
-    -vf "scale_qsv=w='trunc(iw*min(1,min(if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih))/2)*2':h='trunc(ih*min(1,min(if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih))/2)*2',format=qsv" \
-    -c:v hevc_qsv "${qsvopts[@]}" -preset slow -global_quality "$qa" "${out[@]}"
+# ── cpu ──────────────────────────────────────────────────────────────
 
-fi
+## INFO: 2013 HEVC/x265
+#   NICE: --scenecut is on by default and quite mature (best-tested IMPL despite the codec being older)
+# USAGE: ... -c:v libx265 -preset slower -crf 18 -pix_fmt yuv420p10le \
+#     -x265-params "aq-mode=3:aq-strength=0.8:psy-rd=2.0:psy-rdoq=1.0:rdoq-level=2:bframes=8:ref=6:deblock=-1,-1:rc-lookahead=60"
 
-if [[ $use == cpu ]]; then
+## INFO: 2018 AV1 (svt-av1) at equivalent quality typically runs 20-30% smaller than x265, at higher encode cost
+#   BAD: no hardware decode on 2080Ti
+#     INFO:(is_supported): $ ffmpeg -h encoder={hevc,av1}_nvenc
+# MAYBE: lower GOP keyint=5s to 2s if transitions are extremely frequent
+#   BAD: much worse compression
+# ALSO: -svtav1-params "tune=0:film-grain=0:..." \
 
-  # # 2013/Hevc
-  # #   NICE: x265 (previous): --scenecut is on by default and quite mature; if scene-cut handling specifically matters most,
-  # #     x265 arguably has the best-tested implementation of the three despite the codec being older.
-  # exec "${ffmpeg[@]}" -i "$fin" \
-  #   -vf "scale=w='if(gt(iw,ih),min(iw,1920),min(iw,1080))':h='if(gt(iw,ih),min(ih,1080),min(ih,1920))':force_original_aspect_ratio=decrease:force_divisible_by=2:flags=lanczos,format=yuv420p10le" \
-  #   -c:v libx265 -preset slower -crf 18 -pix_fmt yuv420p10le \
-  #   -x265-params "aq-mode=3:aq-strength=0.8:psy-rd=2.0:psy-rdoq=1.0:rdoq-level=2:bframes=8:ref=6:deblock=-1,-1:rc-lookahead=60" \
-  #   -c:a copy "${out[@]}"
+## INFO: 2020 VVC/H.266 (vv-enc)
+## DISABLED: not supported yet in ffmpeg=8.1.2 (unless manually rebuilt)
+# USAGE: ... -c:v libvvenc -preset slower -qp 26 -vvenc-params "qpa=1:scc=0"
+#   BAD: * GOP/refresh period is closer to fixed (-period); it's weaker here than svt-av1 for irregular cut patterns.
 
-  # NOTE: 2018 AV1 (svt-av1) at equivalent quality typically runs 20-30% smaller than x265, at higher encode cost
-  #   BAD: no hardware decode on 2080Ti
-  #   * lower GOP keyint=5s to 2s if transitions are extremely frequent
-  # exec "${ffmpeg[@]}" -i "$fin" \
-  #   -vf "scale=w='if(gt(iw,ih),min(iw,1920),min(iw,1080))':h='if(gt(iw,ih),min(ih,1080),min(ih,1920))':force_original_aspect_ratio=decrease:force_divisible_by=2:flags=lanczos,format=yuv420p10le" \
-  #   -c:v libsvtav1 -preset 4 -crf 24 -pix_fmt yuv420p10le \
-  #   -svtav1-params "tune=0:film-grain=0:scd=1:keyint=5s:lookahead=120:enable-qm=1:qm-min=0:qm-max=15" \
-  #   -c:a copy "${out[@]}"
-  exec "${ffmpeg[@]}" -i "$fin" \
-    -vf "scale=w='if(gt(iw,ih),min(iw,1920),min(iw,1080))':h='if(gt(iw,ih),min(ih,1080),min(ih,1920))':force_original_aspect_ratio=decrease:force_divisible_by=2:flags=lanczos,format=yuv420p10le" \
-    -c:v libsvtav1 -preset 4 -crf "$qa" -pix_fmt yuv420p10le \
-    -svtav1-params "tune=1:scd=1:keyint=5s:lookahead=120:enable-qm=1:qm-min=0:qm-max=15:enable-overlays=1:sharpness=1" \
-    -c:a copy "${out[@]}"
-
-  ## DISABLED: not supported yet in ffmpeg=8.1.2 (unless manually rebuilt)
-  # # VVC/H.266 (2020 spec)
-  # #   BAD: * GOP/refresh period is closer to fixed (-period); it's weaker here than svt-av1 for irregular cut patterns.
-  # exec "${ffmpeg[@]}" -i "$fin" \
-  #   -vf "scale=w='if(gt(iw,ih),min(iw,1920),min(iw,1080))':h='if(gt(iw,ih),min(ih,1080),min(ih,1920))':force_original_aspect_ratio=decrease:force_divisible_by=2:flags=lanczos,format=yuv420p10le" \
-  #   -c:v libvvenc -preset slower -qp 26 \
-  #   -vvenc-params "qpa=1:scc=0" \
-  #   -c:a copy "${out[@]}"
-
-fi
-
->&2 echo "MAYBE: Fallback to Software Encoding"
 ## ALT:(sw): when vaapi doesn't work e.g: fps>30/re-scale
 # ffmpeg -y -hide_banner -i "$1" -vf 'fps=60,scale=w=1920:h=1080' \
 # ffmpeg -y -hide_banner -i "$1" \
 #   -c:v hevc -global_quality "${2:-25}" "${1%.*}_c.${1##*.}"
 #  ... "-c:v libx265"
-exit 2
 
+
+# ── vaapi ────────────────────────────────────────────────────────────
 ## ALT: vaapi (non-NVIDIA hardware w/o proprietary vendor APIs):
 ##   e.g. AMD Radeon GPUs and older Intel chips (pre-Broadwell / 5th Gen w/o QuickSync API)
 ## MAYBE? paci libva-nvidia-driver -- for vaapi-only chromium to use nvidia-cuda

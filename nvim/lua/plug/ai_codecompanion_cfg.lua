@@ -152,8 +152,8 @@ CC.setup({
           schema = {
             model = {
               -- default = "thinkingmachines/inkling:free",
-              default = "minimax/minimax-m3:free",
-              -- default = "nvidia/nemotron-3-ultra-550b-a55b:free",
+              -- default = "minimax/minimax-m3:free",
+              default = "nvidia/nemotron-3-ultra-550b-a55b:free",
               -- default = "poolside/laguna-s-2.1:free",
               -- default = "qwen/qwen-2.5-coder-32b-instruct:free",
               -- default = "anthropic/claude-sonnet-4.6"
