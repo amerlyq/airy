@@ -122,7 +122,7 @@ TRAPINT() {
   # return $1
   ## OLD~~ return "1" or don't return anything if no zle
   if [[ -n "$BUFFER" ]]
-  then zle && print -s -r -- $BUFFER && return $1  # Default
+  then builtin zle && print -s -r -- $BUFFER && return $1  # Default
   else return 1; fi
 
   ## safe test for "am I in a context where zle exists as a widget-capable function", no side effect, no error.

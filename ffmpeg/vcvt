@@ -11,27 +11,20 @@
 #   [codec_dashboard]: $ print -l {22..30} |xargs -t -n1 -P4 sh -c 'time vcvt -c"$0" input.mp4 &>"$0".log'
 #
 # Resolves input to a list of non-AV1 mp4 files, then:
-#   - exactly one file  -> converts it in-process, no tmux involved at all
-#   - more than one file -> re-execs through tmux-jobs (xargs-mode)
-#     = spawns `vcvt <passthrough flags> FILE` per file in its own pane
-#     = njobs is decided based on codec-specific thread usage
+#   - exactly one file  -> converts it in-process, no tmux/queue at all
+#   - more than one file, or -w watch arrivals -> enqueues via !tmux-jobs
+#     = persistent queue (append-and-exit)
+#     = a detached "vcvt" tmux session drains it
+#       : it spawns `vcvt <passthrough flags> FILE` per file in its own pane
+#     = `tmux attach -t vcvt` from elsewhere shows progress.
+#     = njobs should be decided based on codec-specific thread usage TEMP: same for whole session
 #
-# TODO:ENH:OPT: persistent queue for !tmux-jobs
-#   so multiple calls to vcvt will be only adding to that list and exiting
-#   * vcvt runs tmux-jobs which appends to queue -- and keeps running in background (i.e. detachable tmux pane)
-#     = queue format is governed by tmux-jobs
-#   * should pass session name to tmux-jobs (e.g. "-s vcvt") to make later "tmux attach" easier
-#     by default "jobs" session name/queue is shared between all invocations of tmux-jobs -- so pool of cpu stays the same for heterogeneous tasks
-#   * store persistent queue in DFL=$HOME/.cache/tmux/<session_name>.txt (override by "-Q" flag)
-#     = WARN: you should save full cmdlines in queue, as vcvt flags may be different
-#   * "vcvt files..." exits immediately -- and user can attach to same tmux session name later from different terminal to see progress
-#   * "vcvt -w" continues running in idle loop and supplying new args to tmux-jobs to append to queue
-#     = always route watch mode to append to queue
-#   * tmux-jobs is running if persistent queue non-empty, then exits when empty, and respawns when new args added to queue
-#   * WARN: optimal "-jN" may be different between different tasks added to shared queue
-#     FUT:IDEA: store in queue how many CPU threads each job needs, and then take as many jobs,
-#       as fit into total CPU budget
-#       e.g. inof -j4 x16 for AV1 -- mark each job as needing 16 AV1 threads out of 64 core budget
+# TODO:ENH: optimal "-jN" may differ between different tasks sharing one
+#     queue/session (e.g. GPU vs CPU jobs enqueued together)
+#     FUT:IDEA: store in queue how many CPU threads each job needs, and
+#       take as many jobs as fit into total CPU budget -- e.g. instead of
+#       flat -j4 x16 for AV1, mark each job as needing 16 threads out of a
+#       64-core budget and let the worker pack jobs to fit
 
 set -o errexit -o errtrace -o functrace -o noclobber -o noglob -o nounset -o pipefail
 shopt -qs inherit_errexit lastpipe
@@ -40,18 +33,20 @@ PS4='+[$BASHPID] ${BASH_SOURCE[0]##*/}:$LINENO:  '
 njobs=4  # workers=(1..4) x16 threads per each AV1
 
 readonly _app_orig_argv=("$@")
-while LC_COLLATE=C getopts 'ac:gj:wxD' o; do
+while LC_COLLATE=C getopts 'Aac:gj:wxD' o; do
 case $o in :|'?') exit 2
+;; A) tmux attach -t "vcvt"
 ;; a) ifx=a               #: -a    : force ifx=a (infix tag override)
 ;; c) qa=$OPTARG          #: -c QA : quality (crf/cq/global_quality, encoder-dependent)
 ;; D) archive=1           #: -D    : archive fin+out to ../done/ after a successful convert
+;; i) inprocess=1         #: -i    : convert files w/o tmux one-by-one ("individual/isolated/inplace")
 ;; g) gpu=1               #: -g    : prefer GPU encode (nvenc/qsv) over cpu (svt-av1)
 ;; j) forcejobs=$OPTARG   #: -j N  : concurrency, "1" skips tmux; DFL=0 : auto (sized from codec below)
 # ;; s) byserver=1
 ;; w) watch=1             #: -w DIR: watch mode (implies -D), owns ./{todo,queue,done} directory layout
 ;; x) set -x              #: -x    : set -x tracing, forwarded to per-file re-invocations
 esac; done; flags=("${@:1:OPTIND-1}"); shift $((OPTIND-1)); unset o
-# xt=${-//[^x]}
+xt=${-//[^x]}
 
 : "${use:=}" "${qa:=}" "${ifx:=v}"
 if [[ -z ${gpu:+x} ]]; then
@@ -125,13 +120,6 @@ _filter_non_av1() {
     | awk -vC="AV1" 'BEGIN{ORS="\0"} NF&&$1!=C{print substr($0,index($0," ")+1)}'
 }
 
-# Args come from "$@"; empty $# means read paths from stdin.
-# Emits NUL-separated non-AV1 mp4 paths on stdout.
-_resolve_inputs() {
-  { (($#)) && printf '%s\0' "$@" || collect_paths
-  } | _expand_to_mp4s | _filter_non_av1
-}
-
 # ─────────────────────────────────────────────────────────
 # Single-file conversion (in-process, real argv, no shell-string layer)
 # ─────────────────────────────────────────────────────────
@@ -179,7 +167,8 @@ _convert_one() { local fin="$1"
     mv -vfT --backup=t -- "$out" "${out%.*}_prev${RANDOM}.${out##*.}"
   fi
 
-  "_cvt_$use" "$fin" "$out"
+  echo "_cvt_$use" "$fin" "$out"
+  sleep 5
 
   if [[ ${archive-} || ${watch-} ]]; then
     mkdir -p ../done
@@ -200,41 +189,51 @@ _passthrough_flags() {
   printf '%s\0' "${f[@]}"
 }
 
-# Dispatches a NUL-sep file list on stdin: single file converts in-process,
-#   multiple files fan out through tmux-jobs at the codec-sized njobs.
+# Hands a NUL-sep file list off to tmux-jobs' persistent queue and returns
+#   immediately (append-and-exit) -- this IS the fan-out path for every
+#   multi-file case, batch or watch. njobs still governs how many of these
+#   run concurrently once picked up by the (possibly-already-running)
+#   worker session; it does not decide whether the queue is used at all.
+#   (Resolved TODO:FIXME:duplication -- this replaces two near-identical
+#   inline blocks that used to live in _dispatch and the watch loop.)
+_enqueue() {
+  # ALSO: print filename if $#==1
+  echo "Batch ($# files -> !tmux-jobs) in [PWD=$PWD]"
+  command -v tmux-jobs &>/dev/null || { >&2 echo "Err: tmux-jobs not found on PATH"; exit 2; }
+  local -a flags=()
+  while IFS= read -r -d '' a; do flags+=("$a"); done < <(_passthrough_flags)
+  # "$@" = files to enqueue (NUL-sep list is read by the caller into an array
+  #   and passed here as positional args, so this can be called with either
+  #   one file (watch-mode arrivals) or many (batch) uniformly).
+  printf '%s\0' "$@" | exec tmux-jobs ${xt:+-x} -j"$njobs" -s vcvt -- vcvt "${flags[@]}"
+}
+
+# Dispatches a NUL-sep file list on stdin: single file converts in-process
+#   (no tmux/queue involved -- this is the one case with nothing to fan out),
+#   multiple files always enqueue via tmux-jobs (append-and-exit).
 _dispatch() {
   local -a files=()
-  # TODO:BET?TRY:(RQ=lastpipe): $ readarray -d '' -t files
   # Batch mode intentionally consumes stdin to EOF.
   #   FAIL? convertion is blocked till EOF from *streaming external watcher*
-  while IFS= read -r -d '' f; do files+=("$f"); done
+  readarray -d '' -t files
+  ((${#files[@]})) || { >&2 echo "Err: no non-AV1 mp4 files found in input"; exit 2; }
 
-  case ${#files[@]}
-  in 0) # return 0
-    >&2 echo "Err: no non-AV1 mp4 files found in input"
-    exit 2
-  ;; 1) _convert_one "${files[0]}"
-  ;; *)
-    # TODO:FIXME: inof njobs here make flag "-i : individual/isolated/inplace"
-    #   => in all other cases send to tmux-jobs to add to queue with its whatever current -j
-    if ((njobs <= 1)); then
-      echo "Batch: $PWD (${#files[@]} files, no-tmux serialized loop)"
-      local f; for f in "${files[@]}"; do
-        echo "[convert] $f"
-        # ALT:(&pg): vcvt ... 2>&1 | pv -N "$(basename "$0" | cut -c1-15)" -l -q > /dev/null
-        _convert_one "$f"
-        ## ALT:MAYBE: do this to move files after failed/interrupted conversion?
-        # mv -vt ../done/ -- "$1" "${1%.*}_"[acnqv][0-9][0-9]".${1##*.}"
-        echo "---"
-      done
-    else
-      local -a flags=()
-      while IFS= read -r -d '' a; do flags+=("$a"); done < <(_passthrough_flags)
-      echo "Batch: $PWD (${#files[@]} files, tmux-jobs)"
-      command -v tmux-jobs &>/dev/null || { >&2 echo "Err: tmux-jobs not found on PATH"; exit 2; }
-      printf '%s\0' "${files[@]}" | exec tmux-jobs -j"$njobs" -s "vcvt" -- vcvt "${flags[@]}"
-    fi
-  esac
+  if [[ -z ${inprocess:+x} ]]; then
+    # DISABLED:FAIL: tmux mess doesn't work yet
+    _enqueue "${files[@]}"
+  elif ((${#files[@]} <= 1)); then
+    _convert_one "${files[0]}"
+  else
+    echo "Batch (${#files[@]} files -> one-by-one) in [PWD=$PWD]"
+    local f; for f in "${files[@]}"; do
+      echo "[convert] $f"
+      # ALT:(&pg): vcvt ... 2>&1 | pv -N "$(basename "$0" | cut -c1-15)" -l -q > /dev/null
+      _convert_one "$f"
+      ## ALT:MAYBE: do this to move files after failed/interrupted conversion?
+      # mv -vt ../done/ -- "$1" "${1%.*}_"[acnqv][0-9][0-9]".${1##*.}"
+      echo "---"
+    done
+  fi
 }
 
 # ── modes ────────────────────────────────────────────────────────────
@@ -262,30 +261,25 @@ if [[ ${watch-} ]]; then
     done
   }
 
-  # Watch mode dispatches one file at a time as it arrives (not batched),
-  #   so each goes through _dispatch's single-file in-process path unless
-  #   njobs>1, in which case successive arrivals still respect the
-  #   concurrency cap via tmux-jobs' own pane-count throttle.
-  # _dispatch waits for EOF before choosing single-file or batch mode.
-  # A live watcher never reaches EOF, so dispatch each event directly.
+  # RESOLVED FAIL: every arrival now enqueues via tmux-jobs (append-and-exit,
+  #   near-instant) instead of running _convert_one inline -- the inotify
+  #   reader is no longer blocked for the duration of a conversion, however
+  #   long. This holds regardless of njobs: njobs governs the worker
+  #   session's own concurrency, not whether THIS loop blocks.
+  #   (njobs=0/auto is a sizing default for the worker, never a signal to
+  #   skip the queue -- resolved the "njobs=0 implies multiple jobs" FAIL by
+  #   no longer branching on njobs here at all.)
   _inotify_src | while IFS= read -r -d '' f; do
     [[ -f $f ]] || continue  # <REMOVE? events should be existing files OR it should be error, not silent skipping
-    # FAIL: njobs=0 is automatic fallback, which implicitly assumes multiple jobs when files number is unknown
-    if ((njobs <= 1)); then
-      # FAIL: should add to queue, to not stale many events by one long conversion
-      _convert_one "$f"
-    else
-      # TODO:FIXME:BAD: duplication
-      command -v tmux-jobs &>/dev/null || { >&2 echo "Err: tmux-jobs not found on PATH"; exit 2; }
-      printf '%s\0' "$f" | tmux-jobs -j"$njobs" -s "vcvt" -- vcvt
-    fi
+    _enqueue "$f"
   done
   exit
 fi
 
-# No -w: resolve argv/stdin to file list, then dispatch
-#   (single in-process, multiple via tmux-jobs)
-_resolve_inputs "$@" | _dispatch
+# Args come from "$@"; empty $# means read paths from stdin.
+# Emits NUL-separated non-AV1 mp4 paths on stdout.
+{ (($#)) && printf '%s\0' "$@" || collect_paths
+} | _expand_to_mp4s | _filter_non_av1 | _dispatch
 
 
 #######################################################################
