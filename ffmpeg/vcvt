@@ -135,7 +135,41 @@ _resolve_inputs() {
 # ─────────────────────────────────────────────────────────
 # Single-file conversion (in-process, real argv, no shell-string layer)
 # ─────────────────────────────────────────────────────────
-_convert_one() { local fin="$1" vf_scale
+
+_cvt_nv() { local fin="$1" out="$2"
+  local nvopts=(  # <CASE:(amv):
+    -preset p7 -highbitdepth 1 -multipass qres
+    -rc vbr -cq "$qa" -maxrate 8M -bufsize 16M
+    -rc-lookahead 48 -lookahead_level auto
+    -spatial_aq 1 -aq-strength 8 -g 30 -bf 4 -b_ref_mode middle
+  )
+  local vf_scale="scale_cuda=w='trunc(iw*min(1,min(if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih))/2)*2':h='trunc(ih*min(1,min(if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih))/2)*2':format=yuv420p"
+  "${ffmpeg[@]:-ffmpeg}" -hwaccel cuda -hwaccel_output_format cuda \
+    -i "$fin" -vf "$vf_scale" \
+    -c:v hevc_nvenc "${nvopts[@]}" -c:a copy "$out"
+}
+
+_cvt_qsv() { local fin="$1" out="$2"
+  local vf_scale="scale_qsv=w='trunc(iw*min(1,min(if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih))/2)*2':h='trunc(ih*min(1,min(if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih))/2)*2',format=qsv"
+  ## ALT:(qsv variants): -c:v h264_qsv|av1_qsv|hevc_qsv OR:(auto): -init_hw_device qsv=qsv:hw
+  # BAD: no "-tune animation" -- only for software-render
+  "${ffmpeg[@]:-ffmpeg}" -init_hw_device qsv=qsv:hw -hwaccel qsv -hwaccel_output_format qsv \
+    -i "$fin" -vf "$vf_scale" \
+    -c:v hevc_qsv -preset slow -global_quality "$qa" "$out"
+}
+
+_cvt_cpu() { local fin="$1" out="$2"
+  local cpuopts=(  # <CASE:(amv/cg):
+    -preset 4 -crf "$qa" -pix_fmt yuv420p10le
+    -svtav1-params "tune=1:scd=1:keyint=5s:lookahead=120:enable-qm=1:qm-min=0:qm-max=15:enable-overlays=1:sharpness=1"
+  )
+  local vf_scale="scale=w='if(gt(iw,ih),min(iw,1920),min(iw,1080))':h='if(gt(iw,ih),min(ih,1080),min(ih,1920))':force_original_aspect_ratio=decrease:force_divisible_by=2:flags=lanczos,format=yuv420p10le"
+  "${ffmpeg[@]:-ffmpeg}" \
+    -i "$fin" -vf "$vf_scale" \
+    -c:v libsvtav1 "${cpuopts[@]}" -c:a copy "$out"
+}
+
+_convert_one() { local fin="$1"
   local out="${fin%.*}_${ifx}${qa}.${fin##*.}"
   local ffmpeg=(ffmpeg -hide_banner)  # -v error | -v verbose
   # MAYBE: ffmpeg+=(-y)
@@ -145,40 +179,7 @@ _convert_one() { local fin="$1" vf_scale
     mv -vfT --backup=t -- "$out" "${out%.*}_prev${RANDOM}.${out##*.}"
   fi
 
-  # TODO:SPLIT: dedicated functions _cvt_nv(){ "${ffmpeg[@]:-ffmpeg}" ... -i "$1" -o "$2"
-  case $use
-  in nv)
-    local nvopts=(  # <CASE:(amv):
-      -preset p7 -highbitdepth 1 -multipass qres
-      -rc vbr -cq "$qa" -maxrate 8M -bufsize 16M
-      -rc-lookahead 48 -lookahead_level auto
-      -spatial_aq 1 -aq-strength 8 -g 30 -bf 4 -b_ref_mode middle
-    )
-    vf_scale="scale_cuda=w='trunc(iw*min(1,min(if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih))/2)*2':h='trunc(ih*min(1,min(if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih))/2)*2':format=yuv420p"
-    "${ffmpeg[@]}" -hwaccel cuda -hwaccel_output_format cuda -i "$fin" \
-      -vf "$vf_scale" \
-      -c:v hevc_nvenc "${nvopts[@]}" -c:a copy "$out"
-
-  ;; qsv)
-    vf_scale="scale_qsv=w='trunc(iw*min(1,min(if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih))/2)*2':h='trunc(ih*min(1,min(if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih))/2)*2',format=qsv"
-    ## ALT:(qsv variants): -c:v h264_qsv|av1_qsv|hevc_qsv OR:(auto): -init_hw_device qsv=qsv:hw
-    # BAD: no "-tune animation" -- only for software-render
-    "${ffmpeg[@]}" -init_hw_device qsv=qsv:hw -hwaccel qsv -hwaccel_output_format qsv -i "$fin" \
-      -vf "$vf_scale" \
-      -c:v hevc_qsv -preset slow -global_quality "$qa" "$out"
-
-  ;; cpu)
-    vf_scale="scale=w='if(gt(iw,ih),min(iw,1920),min(iw,1080))':h='if(gt(iw,ih),min(ih,1080),min(ih,1920))':force_original_aspect_ratio=decrease:force_divisible_by=2:flags=lanczos,format=yuv420p10le"
-    "${ffmpeg[@]}" -i "$fin" \
-      -vf "$vf_scale" \
-      -c:v libsvtav1 -preset 4 -crf "$qa" -pix_fmt yuv420p10le \
-      -svtav1-params "tune=1:scd=1:keyint=5s:lookahead=120:enable-qm=1:qm-min=0:qm-max=15:enable-overlays=1:sharpness=1" \
-      -c:a copy "$out"
-
-  ;; *)
-    >&2 echo "MAYBE: Fallback to Software Encoding"
-    exit 2
-  esac
+  "_cvt_$use" "$fin" "$out"
 
   if [[ ${archive-} || ${watch-} ]]; then
     mkdir -p ../done
@@ -203,8 +204,9 @@ _passthrough_flags() {
 #   multiple files fan out through tmux-jobs at the codec-sized njobs.
 _dispatch() {
   local -a files=()
-  # BET?TRY:(RQ=lastpipe): $ readarray -d '' -t files
-  # FAIL: convertion is blocked till EOF from *streaming* watcher
+  # TODO:BET?TRY:(RQ=lastpipe): $ readarray -d '' -t files
+  # Batch mode intentionally consumes stdin to EOF.
+  #   FAIL? convertion is blocked till EOF from *streaming external watcher*
   while IFS= read -r -d '' f; do files+=("$f"); done
 
   case ${#files[@]}
@@ -213,6 +215,8 @@ _dispatch() {
     exit 2
   ;; 1) _convert_one "${files[0]}"
   ;; *)
+    # TODO:FIXME: inof njobs here make flag "-i : individual/isolated/inplace"
+    #   => in all other cases send to tmux-jobs to add to queue with its whatever current -j
     if ((njobs <= 1)); then
       echo "Batch: $PWD (${#files[@]} files, no-tmux serialized loop)"
       local f; for f in "${files[@]}"; do
@@ -228,7 +232,7 @@ _dispatch() {
       while IFS= read -r -d '' a; do flags+=("$a"); done < <(_passthrough_flags)
       echo "Batch: $PWD (${#files[@]} files, tmux-jobs)"
       command -v tmux-jobs &>/dev/null || { >&2 echo "Err: tmux-jobs not found on PATH"; exit 2; }
-      printf '%s\0' "${files[@]}" | exec tmux-jobs -j"$njobs" -- vcvt "${flags[@]}"
+      printf '%s\0' "${files[@]}" | exec tmux-jobs -j"$njobs" -s "vcvt" -- vcvt "${flags[@]}"
     fi
   esac
 }
@@ -262,9 +266,19 @@ if [[ ${watch-} ]]; then
   #   so each goes through _dispatch's single-file in-process path unless
   #   njobs>1, in which case successive arrivals still respect the
   #   concurrency cap via tmux-jobs' own pane-count throttle.
+  # _dispatch waits for EOF before choosing single-file or batch mode.
+  # A live watcher never reaches EOF, so dispatch each event directly.
   _inotify_src | while IFS= read -r -d '' f; do
-    [[ -f $f ]] || continue  # REMOVE?
-    printf '%s\0' "$f" | _dispatch
+    [[ -f $f ]] || continue  # <REMOVE? events should be existing files OR it should be error, not silent skipping
+    # FAIL: njobs=0 is automatic fallback, which implicitly assumes multiple jobs when files number is unknown
+    if ((njobs <= 1)); then
+      # FAIL: should add to queue, to not stale many events by one long conversion
+      _convert_one "$f"
+    else
+      # TODO:FIXME:BAD: duplication
+      command -v tmux-jobs &>/dev/null || { >&2 echo "Err: tmux-jobs not found on PATH"; exit 2; }
+      printf '%s\0' "$f" | tmux-jobs -j"$njobs" -s "vcvt" -- vcvt
+    fi
   done
   exit
 fi

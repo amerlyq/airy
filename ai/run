@@ -140,6 +140,13 @@ rargs=(\
   #   bwrap --unshare-user --uid 0 --gid 0 --ro-bind / / /bin/true && echo "bwrap ok"
   --security-opt seccomp=unconfined --cap-add SYS_ADMIN
 
+  # WTF:ERR: bwrap: Can't mount proc on /proc: Operation not permitted
+  #   https://github.com/openai/codex/issues/14919
+  #   https://github.com/openai/codex/issues/15517
+  #   https://github.com/openai/codex/issues/29908
+  # TEMP:
+  --security-opt systempaths=unconfined
+
   --network=host
   --add-host="$cnm:127.0.0.1"
   # --group-add=998
