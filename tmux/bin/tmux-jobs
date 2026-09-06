@@ -277,34 +277,37 @@ _wrap() {
     fi
     exit "$rc"
   fi
+  # Signal completion to the waiter (non-error path too, so dispatch unblocks)
+  tmux wait-for -S "job-done-$id"
 }
 export -f _wrap
 
 # RENAME? run_job_in_pane()
 # Spawns a vertical tmux pane, runs the job, blocks until pane exits
 # $1 = job id, $2.. = argv to run via _wrap in a pane
-dispatch() {
-  local id="$1"; shift
-  local pane_id
-  ## FAIL: can't kill on C-c
-  # Limit concurrent panes across ALL windows (not just current one)
-  #   tmux list-panes -a counts panes in every window; +1 for the
-  #   controlling shell pane that runs the watcher loop.
-  while (( $(tmux list-panes -s -t "$session" | wc -l) >= njobs + 1 )); do
-    sleep 0.5
-  done
+dispatch() { local id="$1" pane_id; shift
+  ## ALT: count panes (+1 for --worker) across ALL windows (not just current one)
+  # while (( $(tmux list-panes -s -t "$session" | wc -l) >= njobs + 1 ))
+  # do sleep 0.5; done
+  #
+  # Wait for a free slot using wait-for (no polling)
+  # We use a counting semaphore via wait-for locks: acquire "slot", release on done
+  tmux wait-for "slot-acquire"  # blocks until a slot is released
+
   ## ALT: inject function into tmux
   #   pane_id=$(tmux split-window ... -- "$(typeset -f _wrap); _wrap \"$id\"" 2>/dev/null)
   # Try split-window first (stays in current window)
   pane_id=$(tmux split-window -t "$session" -v -P -F "#{pane_id}" -d -- \
-    bash -euc 'tmux set-option -p remain-on-exit failed; _wrap "$@"' _ "$id" "$@" 2>/dev/null) || {
+    bash -euc 'tmux set-option -p remain-on-exit failed; _wrap "$@"; tmux wait-for -S "slot-release"' _ "$id" "$@" 2>/dev/null) || {
     # If split fails (small screen), create a new window
     pane_id=$(tmux new-window -t "$session" -P -F "#{pane_id}" -- \
-      bash -euc 'tmux set-option -p remain-on-exit failed; _wrap "$@"' _ "$id" "$@" 2>/dev/null) || {
-        >&2 echo "Err: split-window and new-window both failed (job $id)"
-        return 1
-      }
+      bash -euc 'tmux set-option -p remain-on-exit failed; _wrap "$@"; tmux wait-for -S "slot-release"' _ "$id" "$@" 2>/dev/null) || {
+      >&2 echo "Err: split-window and new-window both failed (job $id)"
+      tmux wait-for -S "slot-release"  # release the slot we acquired
+      return 1
+    }
   }
+
   # FIXME: better name matching cmdline
   tmux select-pane -t "$pane_id" -T "job $id: ${*: -1}" 2>/dev/null ||:
 
@@ -315,12 +318,14 @@ dispatch() {
   # pane_run "$cmd"
 
   tmux select-layout -t "$session" even-vertical 2>/dev/null ||:
-  # BLOCK: wait for this pane to exit before allowing the watcher loop
-  #   to spawn another one. Without this, the loop fires off njobs
-  #   panes immediately, then keeps stacking more ("spawns +4 panels
-  #   per each new window too").
-  # tmux wait-for -U "$pane_id" 2>/dev/null ||:
-  while [[ ! -s $status_dir/$id ]]; do sleep 0.2; done
+
+  # Block until this specific job signals done (no polling, no sleep)
+  #   before allowing the watcher loop to spawn another one
+  # ALT? tmux wait-for -U "$pane_id" 2>/dev/null ||:
+  # ALT~ while [[ ! -s $status_dir/$id ]]; do sleep 0.2; done
+  tmux wait-for "job-done-$id"
+
+  # Read exit code (written by _wrap before signaling)
   read -r _ rc < "$status_dir/$id"
   tmux kill-pane -t "$pane_id" 2>/dev/null ||:
   rm -f -- "$status_dir/$id"
@@ -336,6 +341,13 @@ if ((worker)); then
   fi
   flock -u "$rfd"
   exec {rfd}>&-
+
+  ## BAD: hardcoded -j, will be hard to make it dynamic based on queue "thread weights"
+  # Prime the semaphore with njobs slots
+  for ((i=0; i<njobs; i++)); do
+    tmux wait-for -S "slot-release"
+  done
+
   declare -A worker_record=()
   declare -A worker_job=()
   running=0
@@ -348,6 +360,7 @@ if ((worker)); then
       command=${record#* }
       _seq=$((_seq + 1))
       job=$_seq
+      # FAIL:(&): can't kill them on C-c
       dispatch "$job" bash -xec "$command" &
       pid=$!
       worker_record[$pid]=$record
@@ -358,7 +371,6 @@ if ((worker)); then
   while :; do
     _start_queued
     if ((running == 0)); then
-      sleep 0.2
       _start_queued
       ((running)) || break
     fi
