@@ -252,6 +252,8 @@ _wrap() {
   local id="$1" rc=; shift
   "$@" || rc=$?
   printf '%s %s\n' "$id" "$rc" > "$status_dir/$id"
+  # Always signal completion via FIFO (worker reads this)
+  printf '%s %s\n' "$id" "$rc" > "$events_fifo"
   if ((rc)); then
     # MAYBE:OPT: store log for non-error case too (e.g. for DEBUG script itself)
     local log="./${id}_err_$$.log"
@@ -277,8 +279,8 @@ _wrap() {
     fi
     exit "$rc"
   fi
-  # Signal completion to the waiter (non-error path too, so dispatch unblocks)
-  tmux wait-for -S "job-done-$id"
+  ## OLD: Signal completion to the waiter (non-error path too, so dispatch unblocks)
+  # tmux wait-for -S "job-done-$id"
 }
 export -f _wrap
 
@@ -292,7 +294,7 @@ dispatch() { local id="$1" pane_id; shift
   #
   # Wait for a free slot using wait-for (no polling)
   # We use a counting semaphore via wait-for locks: acquire "slot", release on done
-  tmux wait-for "slot-acquire"  # blocks until a slot is released
+  # tmux wait-for "slot-acquire"  # blocks until a slot is released
 
   ## ALT: inject function into tmux
   #   pane_id=$(tmux split-window ... -- "$(typeset -f _wrap); _wrap \"$id\"" 2>/dev/null)
@@ -319,17 +321,20 @@ dispatch() { local id="$1" pane_id; shift
 
   tmux select-layout -t "$session" even-vertical 2>/dev/null ||:
 
-  # Block until this specific job signals done (no polling, no sleep)
-  #   before allowing the watcher loop to spawn another one
+  # DONT BLOCK HERE - returns immediately, pane runs in background
+  # Completion comes via FIFO
+
+  ## OLD: Block until this specific job signals done (no polling, no sleep)
+  ##   before allowing the watcher loop to spawn another one
   # ALT? tmux wait-for -U "$pane_id" 2>/dev/null ||:
   # ALT~ while [[ ! -s $status_dir/$id ]]; do sleep 0.2; done
-  tmux wait-for "job-done-$id"
-
+  # tmux wait-for "job-done-$id"
+  #
   # Read exit code (written by _wrap before signaling)
-  read -r _ rc < "$status_dir/$id"
-  tmux kill-pane -t "$pane_id" 2>/dev/null ||:
-  rm -f -- "$status_dir/$id"
-  return "$rc"
+  # read -r _ rc < "$status_dir/$id"
+  # tmux kill-pane -t "$pane_id" 2>/dev/null ||:
+  # rm -f -- "$status_dir/$id"
+  # return "$rc"
 }
 
 if ((worker)); then
@@ -342,17 +347,34 @@ if ((worker)); then
   flock -u "$rfd"
   exec {rfd}>&-
 
+  # Semaphore FIFO (replaces tmux wait-for slot-acquire/slot-release)
+  # Write njobs tokens; read one to acquire, write back to release
+  sem_fifo="$status_dir/sem.fifo"
+  mkfifo "$sem_fifo"
+  exec {sem_fd}<>"$sem_fifo"
+  rm -f "$sem_fifo"
+
   ## BAD: hardcoded -j, will be hard to make it dynamic based on queue "thread weights"
   # Prime the semaphore with njobs slots
   for ((i=0; i<njobs; i++)); do
-    tmux wait-for -S "slot-release"
+    printf 'x\n' >&"$sem_fd"
   done
+
+  ## BET?MOVE: events fifo into ~/.cache/tmux/<session>.fifo
+  # Event FIFO for job completions
+  events_fifo="$status_dir/events.fifo"
+  mkfifo "$events_fifo"
+  export events_fifo
+  # Keep FIFO open for reading (prevents EOF when last writer closes)
+  exec {fifo_fd}<>"$events_fifo"
+  rm -f "$events_fifo"  # unlink, fd keeps it alive
 
   declare -A worker_record=()
   declare -A worker_job=()
   running=0
+
   _start_queued() {
-    local record added_ts command job pid
+    local record added_ts command job
     while ((running < njobs)); do
       _queue_take_first
       [[ -n $record ]] || break
@@ -360,24 +382,40 @@ if ((worker)); then
       command=${record#* }
       _seq=$((_seq + 1))
       job=$_seq
-      # FAIL:(&): can't kill them on C-c
-      dispatch "$job" bash -xec "$command" &
-      pid=$!
-      worker_record[$pid]=$record
-      worker_job[$pid]=$job
+      # Acquire slot (blocks interruptibly)
+      IFS= read -r _ <&"$sem_fd" || return 1
+      dispatch "$job" bash -xec "$command"
+      worker_record[$job]=$record
+      worker_job[$job]=$job
       running=$((running + 1))
     done
   }
-  while :; do
-    _start_queued
-    if ((running == 0)); then
-      _start_queued
-      ((running)) || break
-    fi
-    if wait -n -p done_pid; then rc=0; else rc=$?; fi
-    record=${worker_record[$done_pid]}
-    unset 'worker_record[$done_pid]' 'worker_job[$done_pid]'
+
+  _start_queued
+
+  ## WARN: killing worker on <C-c> doesn't kill panes
+  # _cleanup() {
+  #   for pid in "${child_pids[@]}"; do
+  #     kill -TERM "$pid" 2>/dev/null ||:
+  #   done
+  #   # Also kill any tmux panes we spawned
+  #   tmux list-panes -t "$session" -F "#{pane_id} #{pane_title}" 2>/dev/null | \
+  #     awk '/^job / {print $1}' | xargs -r tmux kill-pane -t 2>/dev/null ||:
+  #   exit 130
+  # }
+  # trap _cleanup INT TERM
+
+  # Main loop: read completions from FIFO
+  while ((running > 0)); do
+
+    IFS= read -r job rc <&"$fifo_fd"
+    [[ -n $job ]] || continue
+    record=${worker_record[$job]}
+    unset 'worker_record[$job]' 'worker_job[$job]'
     running=$((running - 1))
+    # Release slot
+    printf 'x\n' >&"$sem_fd"
+
     if ((rc == 0)); then
       _queue_log "$success_log" "$record"
       _inflight_remove "$record"
@@ -389,14 +427,24 @@ if ((worker)); then
       else
         _queue_requeue "$record"
         >&2 echo "Err: queued job failed; retained in $queue"
-        while ((running)); do
-          if wait -n; then :; else :; fi
+        # Drain remaining jobs
+        while ((running > 0)); do
+          IFS= read -r job rc <&"$fifo_fd"
+          record=${worker_record[$job]}
+          unset 'worker_record[$job]' 'worker_job[$job]'
           running=$((running - 1))
+          printf 'x\n' >&"$sem_fd"
+          ((rc == 0)) && _queue_log "$success_log" "$record" || _queue_log "$failure_log" "$record"
+          _inflight_remove "$record"
         done
         break
       fi
     fi
+    _start_queued
   done
+
+  exec {fifo_fd}<&-
+  exec {sem_fd}<&-
 elif ((${#prog[@]})); then
   # xargs-mode: each stdin record is one arg, appended to the fixed prog+args.
   while IFS= read -r -d '' arg; do
