@@ -6,6 +6,10 @@
 #      [control]: $ tmux-jobs -k -s vcvt   # switch a running session to unattended-on-failure
 #                 $ tmux-jobs -K -s vcvt   # switch back to stop-on-error (blocks new+existing failures)
 #      [cleanup]: $ tmux kill-session -t vcvt
+#%DEBUG:
+#   $ printf '%s\0' {01..10} | tmux-jobs -s test -- dunstify
+#   $ printf 'sleep 1 && dunstify %s\0' {01..10} | tmux-jobs -x -j1 -s test --
+#   $ tmux attach -t jobs
 #%SPEC:
 #   cmd-mode (default, no trailing argv after options):
 #     stdin = \0-separated full shell command STRINGS.
@@ -52,7 +56,7 @@ while getopts 'j:nkKs:x' o; do
 case $o in :|'?') exit 2
 ;; j) njobs=$OPTARG
 ;; n) dry_run=1
-;; k) keepgoing=1
+;; k) keepgoing=1  # TODO:RENAME: -p/-P : prompt-pause and ADD: -k/-K kill/killall to stop running queue (and jobs)
 ;; K) keepgoing=0
 ;; s) session=$OPTARG
 ;; x) set -x
@@ -112,10 +116,11 @@ inflight=${session_dir}/inflight
 _wrap() {
   local id="$1" rc=; shift
   local events_fifo="$session_dir/events.fifo"  # <AGAIN: set inside tmux pane children
+  local start_ts=$SECONDS
   "$@" || rc=$?
   # Signal completion via FIFO (worker reads this).
   # The per-job status file write was removed -- FIFO is now the sole IPC for rc.
-  printf '%s %s\n' "$id" "$rc" > "$events_fifo"
+  echo "$id $rc $((SECONDS - start_ts))" > "$events_fifo"
   if ((rc)); then
     # MAYBE:OPT: store log for non-error case too (e.g. for DEBUG script itself)
     local log="./${id}_err_$$.log"
@@ -324,9 +329,6 @@ dispatch() { local id="$1" pane_id; shift
   # We use a counting semaphore via wait-for locks: acquire "slot", release on done
   # tmux wait-for "slot-acquire"  # blocks until a slot is released
 
-  ## ALT: inject function into tmux
-  #   pane_id=$(tmux split-window ... -- "$(typeset -f _wrap); _wrap \"$id\"" 2>/dev/null)
-  # Try split-window first (stays in current window)
   # BUG(fixed): `tmux set-option -p ...` (implicit "current pane" via $TMUX_PANE
   #   resolution) called from inside a pane that belongs to a DETACHED session
   #   (no client ever attached) crashes the entire tmux server -- confirmed via
@@ -335,13 +337,18 @@ dispatch() { local id="$1" pane_id; shift
   #   job's queue record just stayed stranded in $inflight forever. Fix: target
   #   the pane explicitly via $TMUX_PANE (set correctly inside the new pane's own
   #   shell) instead of relying on -p.
-  local script='tmux set-option -t "$TMUX_PANE" remain-on-exit failed; _wrap "$@"; tmux wait-for -S "slot-release"'
+  local script='tmux set-option -t "$TMUX_PANE" remain-on-exit failed; session_dir="$0"; _wrap "$@"; tmux wait-for -S "slot-release"'
+  # FIXED?:ERR: _: line 1: _wrap: command not found
+  script="$(declare -f _wrap); $script"
 
+  # [!] BET:RFC: re-run "tmux-jobs" with per-pane args inof injecting large _wrap function directly into cmdline
+
+  # Try split-window first (stays in current window)
   pane_id=$(tmux split-window -t "$session" -v -P -F "#{pane_id}" -d -- \
-    bash -euc "$script" _ "$id" "$@" 2>/dev/null) || {
+    bash -euc "$script" "$session_dir" "$id" "$@" 2>/dev/null) || {
     # If split fails (small screen), create a new window
     pane_id=$(tmux new-window -t "$session" -P -F "#{pane_id}" -- \
-      bash -euc "$script" _ "$id" "$@" 2>/dev/null) || {
+      bash -euc "$script" "$session_dir" "$id" "$@" 2>/dev/null) || {
       >&2 echo "Err: split-window and new-window both failed (job $id)"
       tmux wait-for -S "slot-release"  # release the slot we acquired
       return 1
@@ -454,7 +461,7 @@ if ((worker)); then
     #   every job id came back with a trailing space that never matched any key in
     #   worker_record (set without one), crashing under nounset on every single job.
     #   Default IFS is required here to split _wrap's two space-separated fields.
-    read -r job rc <&"$fifo_fd"
+    read -r job rc dt <&"$fifo_fd"
     [[ -n $job ]] || continue
     record=${worker_record[$job]}
     unset 'worker_record[$job]' 'worker_job[$job]'
@@ -463,7 +470,7 @@ if ((worker)); then
     printf 'x\n' >&"$sem_fd"
 
     if ((rc == 0)); then
-      _queue_log "$success_log" "$record"
+      _queue_log "$success_log" "$dt $record"
       _inflight_remove "$record"
     else
       # Capture pre-write size so we can fire dunstify exactly once per
@@ -471,7 +478,7 @@ if ((worker)); then
       #   failures see size>0 and skip the notify.
       pre_sz=0
       [[ -s $failure_log ]] && pre_sz=$(wc -c < "$failure_log")
-      _queue_log "$failure_log" "$record"
+      _queue_log "$failure_log" "$dt $record"
       _inflight_remove "$record"
       # BAD: to get next failure ntf we should reset failure log after user looked into it
       if (( pre_sz == 0 )) && command -v dunstify &>/dev/null; then
@@ -482,12 +489,13 @@ if ((worker)); then
         >&2 echo "Err: queued job failed; retained in $queue"
         # Drain remaining jobs
         while ((running > 0)); do
-          read -r job rc <&"$fifo_fd"
+          read -r job rc dt <&"$fifo_fd"
           record=${worker_record[$job]}
           unset 'worker_record[$job]' 'worker_job[$job]'
           running=$((running - 1))
           printf 'x\n' >&"$sem_fd"
-          ((rc == 0)) && _queue_log "$success_log" "$record" || _queue_log "$failure_log" "$record"
+          ((rc == 0)) && logfile=$success_log || logfile=$failure_log
+          _queue_log "$logfile" "$dt $record"
           _inflight_remove "$record"
         done
         break
