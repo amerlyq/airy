@@ -77,6 +77,8 @@ _imv_sync_pending = False
 _owned_imv_sockets: set[str] = set()
 _ignored_imv_sockets: set[str] = set()
 _socket_baseline: set[str] = set()
+
+
 class ImvState(TypedDict):
     sock: str
     list_hash: int
@@ -123,9 +125,9 @@ def _newest_imv_socket() -> str | None:
     rt = _xdg_runtime_dir()
     try:
         entries = [
-            p for p in Path(rt).glob(SOCKET_GLOB)
-            if str(p) in _owned_imv_sockets
-            and str(p) not in _ignored_imv_sockets
+            p
+            for p in Path(rt).glob(SOCKET_GLOB)
+            if str(p) in _owned_imv_sockets and str(p) not in _ignored_imv_sockets
         ]
     except Exception:
         return None
@@ -213,9 +215,11 @@ def _current_imv_path(sock: str) -> str | None:
         # The exec is asynchronous, so allow a short handoff/write window.
         for _ in range(5):
             try:
-                path = Path(result_path).read_text(
-                    encoding="utf-8", errors="surrogateescape"
-                ).strip()
+                path = (
+                    Path(result_path)
+                    .read_text(encoding="utf-8", errors="surrogateescape")
+                    .strip()
+                )
             except OSError:
                 path = ""
             if path:
@@ -240,36 +244,65 @@ def _sync_from_imv_fm(fm: FM) -> None:
         if not sock:
             continue
         path = _current_imv_path(sock)
-        if path and os.path.exists(path):
-            # imv reports the canonical path even when it was opened through a
-            # symlink.  Select the visible Ranger entry that points to it,
-            # otherwise Ranger jumps from e.g. /view into the source folder.
-            selected = path
-            try:
-                real_path = os.path.realpath(path)
-                for entry in (getattr(fm.thisdir, "files", None) or ()):
+        if not path or not os.path.exists(path):
+            continue
+
+        # imv reports the canonical path even when opened through a symlink.
+        # Resolve it to a visible ranger entry (which may itself be a symlink)
+        # so ranger stays on the symlinked path the user is browsing instead
+        # of being moved to the realpath under a different folder.
+        visible_files = getattr(fm.thisdir, "files", None) or ()
+        selected: str | None = None
+        try:
+            real_path = os.path.realpath(path)
+            for entry in visible_files:
+                try:
                     if os.path.realpath(entry.path) == real_path:
                         selected = entry.path
                         break
+                except OSError:
+                    continue
+        except OSError:
+            selected = None
+        if selected is None:
+            continue
+
+        # Only sync when ranger is in the same directory as the matched
+        # visible entry.  We compare the entry's parent dir (which may itself
+        # be a symlinked path) against fm.thisdir.path so that browsing a
+        # symlinked view directory still matches imv's reported realpath.
+        fm_dir = getattr(fm.thisdir, "path", "") or ""
+        try:
+            entry_dir = os.path.dirname(selected)
+        except (OSError, TypeError):
+            entry_dir = ""
+        if not fm_dir or not entry_dir:
+            continue
+        try:
+            if os.path.realpath(entry_dir) != os.path.realpath(fm_dir):
+                continue
+        except OSError:
+            continue
+
+        # If imv still shows the image ranger sent last, it is not a handoff
+        # change.  Let the user's current ranger navigation win instead of
+        # jumping back.
+        if _last_imv_sent_path:
+            try:
+                if os.path.realpath(path) == os.path.realpath(_last_imv_sent_path):
+                    return
             except OSError:
                 pass
-            # If imv still shows the image Ranger sent when it was opened (or
-            # when Ranger last moved), it is not a handoff change.  Let the
-            # user's current Ranger navigation win instead of jumping back.
-            if (
-                _last_imv_sent_path
-                and os.path.realpath(path) == os.path.realpath(_last_imv_sent_path)
-            ):
-                return
-            if _last_imv_sent_dir and getattr(fm.thisdir, "path", "") != _last_imv_sent_dir:
-                return
-            if getattr(fm.thisfile, "path", None) != selected:
-                fm.select_file(selected)
-            global _last_path
-            _last_path = selected
-            _last_imv_sent_path = selected
-            _last_imv_sent_dir = getattr(fm.thisdir, "path", "")
+        if _last_imv_sent_dir and getattr(fm.thisdir, "path", "") != _last_imv_sent_dir:
             return
+
+        if getattr(fm.thisfile, "path", None) != selected:
+            fm.select_file(selected)
+        global _last_path
+        _last_path = selected
+        _last_imv_sent_path = selected
+        _last_imv_sent_dir = getattr(fm.thisdir, "path", "")
+        return
 
 
 def _poll_imv_before_input(fm: FM) -> None:

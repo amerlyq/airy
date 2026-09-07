@@ -30,3 +30,4 @@ l = next 5
 ; l = exec bash -c 'printf "%s\\n" "$imv_pid $imv_current_index $imv_current_file" >> /t/imv_sel'
 m = exec bash -c 'printf "%s\\n" "$imv_pid $imv_current_index $imv_current_file" >> /t/imv_sel'
 <Return> = exec bash -c 'printf "%s\\n" "$imv_pid $imv_current_index $imv_current_file" >> /t/imv_sel'
+<Shift+Delete> = exec rm -- "$imv_current_file"

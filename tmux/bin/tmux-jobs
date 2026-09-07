@@ -19,24 +19,26 @@
 #   On nonzero exit: pane contents captured to ./<n>_err_<pid>.log,
 #     printed and pane held open until ENTER.
 #
+# All session state lives under ${XDG_CACHE_HOME:-$HOME/.cache}/tmux/<session>/:
+#   queue, lock, inflight, keepgoing, success.log, failure.log,
+#   sem.fifo, events.fifo, status/, notify.lock
+#
 # SEE/SEIZE: pane-focus from :/tmux/ctl/{parallel,job}
 
 set -o errexit -o errtrace -o functrace -o noclobber -o nounset -o pipefail
 shopt -qs inherit_errexit lastpipe
 PS4='+[$BASHPID] ${BASH_SOURCE[0]##*/}:$LINENO:  '
 
-# DEBUG:
-# exec &> /tmp/tmux-jobs.$$
+# DEBUG: exec &> /t/tmux-jobs.$$ && echo "$0 $*"
 
 njobs=4
 dry_run=0
 keepgoing=0
 session='jobs'
-queue=
 worker=0
 
 # FIXME? merge with case-esac getops parsing of "-:" opts
-# --worker is an internal re-exec marker (see `tmux new-session -d ... "$script" ... --worker`
+# --worker is an internal re-exec marker (see `tmux new-session -d ... "$this" ... --worker`
 #   below), not a public getopts flag -- must be stripped before getopts sees argv, and may
 #   appear either as $1 (first re-exec) or after options (if ever passed positionally). One
 #   pre-pass strips it wherever found; single-check `getopts` loop handles everything else.
@@ -46,44 +48,102 @@ for a in "$@"; do
 done
 set -- "${_args[@]}"; unset _args a
 
-while getopts 'j:nkKs:Q:x' o; do
+while getopts 'j:nkKs:x' o; do
 case $o in :|'?') exit 2
 ;; j) njobs=$OPTARG
 ;; n) dry_run=1
 ;; k) keepgoing=1
 ;; K) keepgoing=0
 ;; s) session=$OPTARG
-;; Q) queue=$OPTARG
 ;; x) set -x
 esac; done; shift $((OPTIND-1))
-
-: "${queue:=${XDG_CACHE_HOME:-$HOME/.cache}/tmux/${session}.txt}"
-
 prog=("$@")  # Remaining argv (if any) is `prog [fixed-args...]` for xargs-mode.
 
-lock=${queue}.lock
-queue_dir=${queue%/*}
-[[ $queue_dir == "$queue" ]] && queue_dir=.
-mkdir -p "$queue_dir"
-notify_lock=/tmp/tmux-jobs.${session}.$$.failed
-status_dir=${TMPDIR:-/tmp}/tmux-jobs.${session}.$$
-mkdir -p "$status_dir"
-# Live attention-mode toggle: a plain `tmux-jobs -k/-K -s SESSION` (no stdin, no queue-op --
-#   see ctl-command handling below) flips this file, which _wrap polls WHILE BLOCKED on an
-#   already-failed pane's "press ENTER" prompt, not just at worker startup. Session-keyed
-#   (not $$-keyed) so a control invocation and the long-running worker agree on the same path.
-keepgoing_file=${queue}.keepgoing
+# Session directory in XDG cache: ~/.cache/tmux/<session>/
+# All per-session files live here, so a single rm -rf cleans a session completely
+#   (queue, lock, inflight, sem fifo, events fifo, status dir, logs, etc.).
+# (queue/lock are inside session_dir too -- see `queue` derivation.)
+session_dir=${XDG_CACHE_HOME:-$HOME/.cache}/tmux/${session}
+mkdir -p "$session_dir"
 
-# Exported because `tmux split-window`/`new-window` fork+exec bash as a direct child of the
-#   tmux SERVER, which inherited this process's environment at `tmux new-session` time (first
-#   launch only -- see below); panes are not login/interactive shells re-reading rc files, so
-#   this is the only way they see these paths. (Resolved FAIL: exporting is required, not dead
-#   weight -- confirmed against tmux's fork/exec model, not a config-reload path.)
-export notify_lock status_dir keepgoing_file
+# ATT: Exported because `tmux split-window`/`new-window` spawn the pane's shell as a fresh
+#   process, forked/exec'd from the environment the tmux SERVER snapshotted once at
+#   `tmux new-session` time (the first call, made by the top-level non-worker process
+#   below) -- NOT the environment of whatever process later calls `tmux split-window`.
+#   Plain (non-exported) shell variables never survive that exec; only exported ones
+#   picked up by the very first new-session call do. keepgoing_file/session_dir are
+#   both real values by the time that first new-session runs (derived from $session,
+#   known right after getopts), so exporting them here is correct and necessary.
+#   (Resolved FAIL: exporting is required, not dead weight -- confirmed against tmux's
+#   fork/exec model, not a config-reload path.)
+#
+# BUG(fixed): events_fifo used to be in this export list too, but it isn't assigned a
+#   real value until deep inside the worker's OWN process (see `events_fifo=...` near
+#   the worker block below) -- which only runs AFTER the server (and its one-time env
+#   snapshot) already exists. Exported-but-still-empty at server-start means every pane
+#   spawned by split-window/new-window sees events_fifo="" forever, regardless of what
+#   the worker later assigns -- so _wrap's `printf ... > "$events_fifo"` redirects to an
+#   empty path and fails outright under errexit, breaking every job's completion signal
+#   silently. Fix: don't export it at all -- its path is deterministic from session_dir
+#   (which IS correctly exported early), so _wrap just computes the same path itself.
+export session_dir
 
-success_log=${queue}.success.log
-failure_log=${queue}.failure.log
-inflight=${queue}.inflight
+queue=${session_dir}/queue.txt
+lock=${queue}.lock  # <WKRND: can't flock($queue) as it's replaced when modified
+success_log=${session_dir}/success.log
+failure_log=${session_dir}/failure.log
+inflight=${session_dir}/inflight
+
+# BUG(fixed): _wrap used to be defined (and `export -f`'d) far below, inside code that
+#   only runs in the --worker process -- a CHILD of the tmux server, spawned only AFTER
+#   the top-level enqueue-and-launch code's `tmux new-session -d` call already created
+#   that server and took its one-time environment snapshot. Exactly the same timing bug
+#   as events_fifo above, but for a function instead of a variable: `export -f` only
+#   reaches panes spawned by a server that existed at (or after) export time -- a server
+#   that already existed before the export can never see it, no matter how many panes it
+#   spawns afterward. Every dispatched job's pane failed outright with
+#   "_wrap: command not found", crashing/exiting before ever running the real command or
+#   signaling completion, which is why jobs sat stranded in $inflight forever. Moving the
+#   definition here (before the first `tmux new-session -d` call, further below) fixes it.
+# RENAME? exec_and_monitor_status
+# Wraps the real invocation so failure is caught *before* the pane closes,
+#   letting us capture pane contents to a log. Runs inside the spawned pane.
+# $1 = job id, $2.. = the actual argv to exec (bash -c string, or prog+args)
+_wrap() {
+  local id="$1" rc=; shift
+  local events_fifo="$session_dir/events.fifo"  # <AGAIN: set inside tmux pane children
+  "$@" || rc=$?
+  # Signal completion via FIFO (worker reads this).
+  # The per-job status file write was removed -- FIFO is now the sole IPC for rc.
+  printf '%s %s\n' "$id" "$rc" > "$events_fifo"
+  if ((rc)); then
+    # MAYBE:OPT: store log for non-error case too (e.g. for DEBUG script itself)
+    local log="./${id}_err_$$.log"
+    tmux capture-pane -pt "$TMUX_PANE" -S - > "$log"
+    printf '\n\n\033[1;31m[ERROR] Job %s failed (rc=%s)\033[0m\n' "$id" "$rc"
+    printf '\033[1;33m[ERROR] Pane output dumped to: %s\033[0m\n' "$log"
+    # Per-job desktop notification is fired by the worker watcher (NOT here),
+    #   so we get one dunstify per failure burst instead of one per job.
+    # command -v dunstify &>/dev/null && dunstify -u critical "tmux-jobs: job $id failed (rc=$rc)" ||:
+    if [[ -e ${session_dir}/keepgoing ]]; then
+      printf '\033[1;36m[ERROR] Continuing unattended (-k).\033[0m\n'
+    else
+      printf '\033[1;36m[ERROR] Press ENTER to close this pane (or run: tmux-jobs -k -s SESSION)...\033[0m\n'
+      # Poll instead of blind `read -r`: an unattended/detached worker (--worker, no human
+      #   attached to this pane) would otherwise block here forever. Watching $keepgoing_file
+      #   lets a live `tmux-jobs -k -s SESSION` control command unstick an ALREADY-blocked
+      #   pane, not just prevent future ones from blocking.
+      while :; do
+        [[ -e ${session_dir}/keepgoing ]] && { printf '\n[continuing: -k set on session]\n'; break; }
+        read -r -t 0.5 && break
+      done
+    fi
+    exit "$rc"
+  fi
+  ## OLD: Signal completion to the waiter (non-error path too, so dispatch unblocks)
+  # tmux wait-for -S "job-done-$id"
+}
+export -f _wrap
 
 _queue_append() {
   local record="$1" fd added_ts
@@ -156,12 +216,19 @@ if (( ! dry_run )); then
   touch "$queue" "$lock" "$inflight"
 fi
 
+# Live attention-mode toggle: a plain `tmux-jobs -k/-K -s SESSION` (no stdin, no queue-op --
+#   see ctl-command handling below) flips this file, which _wrap polls WHILE BLOCKED on an
+#   already-failed pane's "press ENTER" prompt, not just at worker startup. Session-keyed
+#   (not $$-keyed) so a control invocation and the long-running worker agree on the same path.
 # Control-command: `-k`/`-K` given with stdin NOT piped (a terminal, or explicitly closed) is
 #   not a job submission -- just flips $keepgoing_file for whatever worker owns $session and
 #   exits. Lets the user launch a batch in stop-on-error mode, watch it for a while, then
 #   switch to unattended once satisfied it's healthy: `tmux-jobs -k -s vcvt`.
-if (( ! worker && ! dry_run )) && [[ -t 0 ]]; then
-  if ((keepgoing)); then : >| "$keepgoing_file"; else rm -f -- "$keepgoing_file"; fi
+if (( ! worker && ! dry_run )) && { [[ -t 0 ]] ||
+  [[ $(readlink -f /proc/self/fd/0 2>/dev/null) == /dev/null ]]
+}; then
+  stamp=${session_dir}/keepgoing
+  if ((keepgoing)); then : >| "$stamp"; else rm -f -- "$stamp"; fi
   >&2 echo "tmux-jobs: session '$session' keepgoing=$keepgoing"
   exit 0
 fi
@@ -185,13 +252,14 @@ if (( ! worker && ! dry_run )); then
   fi
   command -v tmux &>/dev/null || { >&2 echo "Err: tmux not found"; exit 2; }
   if ! tmux has-session -t "$session" 2>/dev/null; then
-    script=$(realpath -e "$0")
-    worker_args=("-j$njobs" "-s$session" "-Q$queue")
-    if ((keepgoing)); then worker_args+=(-k); : >| "$keepgoing_file"; else rm -f -- "$keepgoing_file"; fi
+    this=$(realpath -e "$0")
+    worker_args=("-j$njobs" "-s$session")
+    stamp=${session_dir}/keepgoing
+    if ((keepgoing)); then worker_args+=(-k); : >| "$stamp"; else rm -f -- "$stamp"; fi
     # win_cnt(){ tmux list-windows -t "$nm" 2>/dev/null | wc -l; }
     # -n "$session-$((1+$(win_cnt)))"
     tmux new-session -d -s "$session" -c "$PWD" -- \
-      "$script" "${worker_args[@]}" --worker
+      "$this" "${worker_args[@]}" --worker
     tmux set-option -s -t "$session" status on
   fi
   exit 0
@@ -244,46 +312,6 @@ command -v tmux &>/dev/null || { >&2 echo "Err: tmux not found"; exit 2; }
 
 _seq=0
 
-# RENAME? exec_and_monitor_status
-# Wraps the real invocation so failure is caught *before* the pane closes,
-#   letting us capture pane contents to a log. Runs inside the spawned pane.
-# $1 = job id, $2.. = the actual argv to exec (bash -c string, or prog+args)
-_wrap() {
-  local id="$1" rc=; shift
-  "$@" || rc=$?
-  printf '%s %s\n' "$id" "$rc" > "$status_dir/$id"
-  # Always signal completion via FIFO (worker reads this)
-  printf '%s %s\n' "$id" "$rc" > "$events_fifo"
-  if ((rc)); then
-    # MAYBE:OPT: store log for non-error case too (e.g. for DEBUG script itself)
-    local log="./${id}_err_$$.log"
-    tmux capture-pane -pt "$TMUX_PANE" -S - > "$log"
-    printf '\n\n\033[1;31m[ERROR] Job %s failed (rc=%s)\033[0m\n' "$id" "$rc"
-    printf '\033[1;33m[ERROR] Pane output dumped to: %s\033[0m\n' "$log"
-    if [[ ! -e $notify_lock ]]; then
-      >"$notify_lock" && \
-        command -v dunstify &>/dev/null && dunstify -u critical "tmux-jobs: job $id failed (rc=$rc)" ||:
-    fi
-    if [[ -e $keepgoing_file ]]; then
-      printf '\033[1;36m[ERROR] Continuing unattended (-k).\033[0m\n'
-    else
-      printf '\033[1;36m[ERROR] Press ENTER to close this pane (or run: tmux-jobs -k -s SESSION)...\033[0m\n'
-      # Poll instead of blind `read -r`: an unattended/detached worker (--worker, no human
-      #   attached to this pane) would otherwise block here forever. Watching $keepgoing_file
-      #   lets a live `tmux-jobs -k -s SESSION` control command unstick an ALREADY-blocked
-      #   pane, not just prevent future ones from blocking.
-      while :; do
-        [[ -e $keepgoing_file ]] && { printf '\n[continuing: -k set on session]\n'; break; }
-        read -r -t 0.5 && break
-      done
-    fi
-    exit "$rc"
-  fi
-  ## OLD: Signal completion to the waiter (non-error path too, so dispatch unblocks)
-  # tmux wait-for -S "job-done-$id"
-}
-export -f _wrap
-
 # RENAME? run_job_in_pane()
 # Spawns a vertical tmux pane, runs the job, blocks until pane exits
 # $1 = job id, $2.. = argv to run via _wrap in a pane
@@ -299,11 +327,21 @@ dispatch() { local id="$1" pane_id; shift
   ## ALT: inject function into tmux
   #   pane_id=$(tmux split-window ... -- "$(typeset -f _wrap); _wrap \"$id\"" 2>/dev/null)
   # Try split-window first (stays in current window)
+  # BUG(fixed): `tmux set-option -p ...` (implicit "current pane" via $TMUX_PANE
+  #   resolution) called from inside a pane that belongs to a DETACHED session
+  #   (no client ever attached) crashes the entire tmux server -- confirmed via
+  #   isolated repro, 100% reproducible. This silently took down every dispatched
+  #   job's pane before _wrap ever ran, so no completion event, no error log, the
+  #   job's queue record just stayed stranded in $inflight forever. Fix: target
+  #   the pane explicitly via $TMUX_PANE (set correctly inside the new pane's own
+  #   shell) instead of relying on -p.
+  local script='tmux set-option -t "$TMUX_PANE" remain-on-exit failed; _wrap "$@"; tmux wait-for -S "slot-release"'
+
   pane_id=$(tmux split-window -t "$session" -v -P -F "#{pane_id}" -d -- \
-    bash -euc 'tmux set-option -p remain-on-exit failed; _wrap "$@"; tmux wait-for -S "slot-release"' _ "$id" "$@" 2>/dev/null) || {
+    bash -euc "$script" _ "$id" "$@" 2>/dev/null) || {
     # If split fails (small screen), create a new window
     pane_id=$(tmux new-window -t "$session" -P -F "#{pane_id}" -- \
-      bash -euc 'tmux set-option -p remain-on-exit failed; _wrap "$@"; tmux wait-for -S "slot-release"' _ "$id" "$@" 2>/dev/null) || {
+      bash -euc "$script" _ "$id" "$@" 2>/dev/null) || {
       >&2 echo "Err: split-window and new-window both failed (job $id)"
       tmux wait-for -S "slot-release"  # release the slot we acquired
       return 1
@@ -349,7 +387,7 @@ if ((worker)); then
 
   # Semaphore FIFO (replaces tmux wait-for slot-acquire/slot-release)
   # Write njobs tokens; read one to acquire, write back to release
-  sem_fifo="$status_dir/sem.fifo"
+  sem_fifo="$session_dir/sem.fifo"
   mkfifo "$sem_fifo"
   exec {sem_fd}<>"$sem_fifo"
   rm -f "$sem_fifo"
@@ -360,14 +398,16 @@ if ((worker)); then
     printf 'x\n' >&"$sem_fd"
   done
 
-  ## BET?MOVE: events fifo into ~/.cache/tmux/<session>.fifo
-  # Event FIFO for job completions
-  events_fifo="$status_dir/events.fifo"
-  mkfifo "$events_fifo"
-  export events_fifo
+  events_fifo="$session_dir/events.fifo"
+  [[ -p $events_fifo ]] || { rm -f "$events_fifo"; mkfifo "$events_fifo"; }
   # Keep FIFO open for reading (prevents EOF when last writer closes)
   exec {fifo_fd}<>"$events_fifo"
-  rm -f "$events_fifo"  # unlink, fd keeps it alive
+  ## DISABLED: deliberately NOT unlinked (unlike sem_fifo): _wrap runs in a
+  #   separate process per job and must open this same path fresh each time. sem_fifo is only
+  #   ever touched via the worker's own already-open $sem_fd, so unlinking it is safe; here it
+  #   would silently make _wrap's `> "$events_fifo"` create a dead-end regular file instead of
+  #   writing into the pipe, and the worker's read would hang forever on an already-finished job.
+  # rm -f "$events_fifo"  # unlink, fd keeps it alive
 
   declare -A worker_record=()
   declare -A worker_job=()
@@ -408,7 +448,13 @@ if ((worker)); then
   # Main loop: read completions from FIFO
   while ((running > 0)); do
 
-    IFS= read -r job rc <&"$fifo_fd"
+    ## ALT:BET? read whole lines, and then split manually?
+    # BUG(fixed): `IFS= read -r job rc` used to disable word-splitting entirely, so the
+    #   WHOLE line (job id + space + rc, e.g. "1 ") landed in $job with $rc left empty --
+    #   every job id came back with a trailing space that never matched any key in
+    #   worker_record (set without one), crashing under nounset on every single job.
+    #   Default IFS is required here to split _wrap's two space-separated fields.
+    read -r job rc <&"$fifo_fd"
     [[ -n $job ]] || continue
     record=${worker_record[$job]}
     unset 'worker_record[$job]' 'worker_job[$job]'
@@ -420,16 +466,23 @@ if ((worker)); then
       _queue_log "$success_log" "$record"
       _inflight_remove "$record"
     else
+      # Capture pre-write size so we can fire dunstify exactly once per
+      #   failure burst -- first failure of this run sees size==0, later
+      #   failures see size>0 and skip the notify.
+      pre_sz=0
+      [[ -s $failure_log ]] && pre_sz=$(wc -c < "$failure_log")
       _queue_log "$failure_log" "$record"
       _inflight_remove "$record"
-      if [[ -e $keepgoing_file ]]; then
-        :
-      else
+      # BAD: to get next failure ntf we should reset failure log after user looked into it
+      if (( pre_sz == 0 )) && command -v dunstify &>/dev/null; then
+        dunstify -u critical "tmux-jobs: job $job failed (rc=$rc)" ||:
+      fi
+      if [[ ! -e ${session_dir}/keepgoing ]]; then
         _queue_requeue "$record"
         >&2 echo "Err: queued job failed; retained in $queue"
         # Drain remaining jobs
         while ((running > 0)); do
-          IFS= read -r job rc <&"$fifo_fd"
+          read -r job rc <&"$fifo_fd"
           record=${worker_record[$job]}
           unset 'worker_record[$job]' 'worker_job[$job]'
           running=$((running - 1))
@@ -445,6 +498,7 @@ if ((worker)); then
 
   exec {fifo_fd}<&-
   exec {sem_fd}<&-
+  exit 0
 elif ((${#prog[@]})); then
   # xargs-mode: each stdin record is one arg, appended to the fixed prog+args.
   while IFS= read -r -d '' arg; do
@@ -462,11 +516,9 @@ else
 fi
 
 if command -v dunstify &>/dev/null; then
-  if [[ -e $notify_lock ]]; then
+  if [[ -s $failure_log ]]; then
     dunstify -u critical "tmux-jobs: jobs finished with failures"
   else
     dunstify "tmux-jobs: all jobs finished"
   fi
 fi
-rm -f -- "$notify_lock"
-rmdir "$status_dir" 2>/dev/null ||:

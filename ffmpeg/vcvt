@@ -33,7 +33,7 @@ PS4='+[$BASHPID] ${BASH_SOURCE[0]##*/}:$LINENO:  '
 njobs=4  # workers=(1..4) x16 threads per each AV1
 
 readonly _app_orig_argv=("$@")
-while LC_COLLATE=C getopts 'Aac:gj:wxD' o; do
+while LC_COLLATE=C getopts 'Aac:gij:wxD' o; do
 case $o in :|'?') exit 2
 ;; A) tmux attach -t "vcvt"
 ;; a) ifx=a               #: -a    : force ifx=a (infix tag override)
@@ -70,13 +70,13 @@ readonly use qa ifx
 #   (~16 threads/job), so only a handful of jobs should run at once even on
 #   a big machine. nvenc/qsv have their own session caps (~3-12) but are far
 #   less per-job-thread-hungry, so allow more concurrent dispatch.
-_auto_njobs() {
-  local nproc_n
+_auto_njobs() { local nproc_n
   nproc_n=$(nproc 2>/dev/null || echo 4)
-  case $use in
-  cpu) echo $(( nproc_n / 16 > 0 ? nproc_n / 16 : 1 )) ;;
-  nv|qsv) echo $(( nproc_n / 4 > 0 ? nproc_n / 4 : 1 )) ;;
-  *) echo 1 ;;
+  case $use
+  in cpu) echo $(( nproc_n / 16 > 0 ? nproc_n / 16 : 1 ))
+  ;; nv) echo 5
+  ;; qsv) echo 1
+  ;; *) echo 1
   esac
 }
 if [[ -n ${forcejobs-} ]]; then
