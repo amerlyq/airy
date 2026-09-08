@@ -33,6 +33,8 @@ set -o errexit -o errtrace -o functrace -o noclobber -o nounset -o pipefail
 shopt -qs inherit_errexit lastpipe
 PS4='+[$BASHPID] ${BASH_SOURCE[0]##*/}:$LINENO:  '
 
+this=$(realpath -e "$0")
+
 # DEBUG: exec &> /t/tmux-jobs.$$ && echo "$0 $*"
 
 njobs=4
@@ -40,6 +42,20 @@ dry_run=0
 keepgoing=0
 session='jobs'
 worker=0
+
+# --run-job is an internal per-pane re-exec marker (see dispatch()'s
+#   "$this" --run-job "$session_dir" "$id" -- "$@" below) -- NOT a public
+#   getopts flag, and unlike --worker it's followed by the job's own argv
+#   (which may itself contain option-looking tokens like -x, so it must
+#   never reach --worker's pre-pass or getopts). Detected here, before
+#   anything touches $@; the shape is peeled off into run_job_args now,
+#   but actually dispatched to _wrap further down once _wrap is defined.
+#   Always $1: only dispatch() emits it, always in this exact shape.
+if [[ ${1-} == --run-job ]]; then
+  shift
+  run_job_args=("$@")
+  set --
+fi
 
 # FIXME? merge with case-esac getops parsing of "-:" opts
 # --worker is an internal re-exec marker (see `tmux new-session -d ... "$this" ... --worker`
@@ -148,7 +164,19 @@ _wrap() {
   ## OLD: Signal completion to the waiter (non-error path too, so dispatch unblocks)
   # tmux wait-for -S "job-done-$id"
 }
-export -f _wrap
+
+# Handle deferred --run-job dispatch now that _wrap exists (see the top-of-file
+#   detection: getopts/--worker's pre-pass never saw these args, since a job's
+#   own argv could itself contain option-looking tokens like -x).
+if [[ -n ${run_job_args+x} ]]; then
+  set -- "${run_job_args[@]}"
+  declare session_dir=$1 jobid=$2; shift 2
+  [[ $1 == -- ]] && shift
+  tmux set-option -t "$TMUX_PANE" remain-on-exit failed
+  _wrap "$jobid" "$@"
+  tmux wait-for -S "slot-release"
+  exit
+fi
 
 _queue_append() {
   local record="$1" fd added_ts
@@ -257,7 +285,6 @@ if (( ! worker && ! dry_run )); then
   fi
   command -v tmux &>/dev/null || { >&2 echo "Err: tmux not found"; exit 2; }
   if ! tmux has-session -t "$session" 2>/dev/null; then
-    this=$(realpath -e "$0")
     worker_args=("-j$njobs" "-s$session")
     stamp=${session_dir}/keepgoing
     if ((keepgoing)); then worker_args+=(-k); : >| "$stamp"; else rm -f -- "$stamp"; fi
@@ -329,6 +356,14 @@ dispatch() { local id="$1" pane_id; shift
   # We use a counting semaphore via wait-for locks: acquire "slot", release on done
   # tmux wait-for "slot-acquire"  # blocks until a slot is released
 
+  # Re-exec tmux-jobs itself per pane instead of splicing `declare -f _wrap` plus
+  #   a literal script string into `bash -euc "$script"` on the pane's cmdline --
+  #   real argv for job argv, no quoting/escaping layer, no function-body-as-text.
+  #   --run-job is an internal re-exec marker (mirrors --worker above): stripped
+  #   before getopts sees argv (see the pre-pass near the top of the file).
+  #   _wrap itself is just defined at top-level in every tmux-jobs process, so
+  #   the re-exec'd pane already has it -- nothing to inject or export.
+  #
   # BUG(fixed): `tmux set-option -p ...` (implicit "current pane" via $TMUX_PANE
   #   resolution) called from inside a pane that belongs to a DETACHED session
   #   (no client ever attached) crashes the entire tmux server -- confirmed via
@@ -336,19 +371,21 @@ dispatch() { local id="$1" pane_id; shift
   #   job's pane before _wrap ever ran, so no completion event, no error log, the
   #   job's queue record just stayed stranded in $inflight forever. Fix: target
   #   the pane explicitly via $TMUX_PANE (set correctly inside the new pane's own
-  #   shell) instead of relying on -p.
-  local script='tmux set-option -t "$TMUX_PANE" remain-on-exit failed; session_dir="$0"; _wrap "$@"; tmux wait-for -S "slot-release"'
-  # FIXED?:ERR: _: line 1: _wrap: command not found
-  script="$(declare -f _wrap); $script"
+  #   shell) instead of relying on -p. Still true under --run-job: $TMUX_PANE is
+  #   set by tmux in every pane's own env regardless of how the pane's process
+  #   was launched.
 
-  # [!] BET:RFC: re-run "tmux-jobs" with per-pane args inof injecting large _wrap function directly into cmdline
+  ## BET:FIXED: re-exec "tmux-jobs --job ARGV" inof injecting large _wrap() into bash -c
+  # local script='tmux set-option -t "$TMUX_PANE" remain-on-exit failed; session_dir="$0"; _wrap "$@"; tmux wait-for -S "slot-release"'
+  # FIXED?:ERR: _: line 1: _wrap: command not found
+  # script="$(declare -f _wrap); $script"
 
   # Try split-window first (stays in current window)
   pane_id=$(tmux split-window -t "$session" -v -P -F "#{pane_id}" -d -- \
-    bash -euc "$script" "$session_dir" "$id" "$@" 2>/dev/null) || {
+    "$this" --run-job "$session_dir" "$id" -- "$@" 2>/dev/null) || {
     # If split fails (small screen), create a new window
     pane_id=$(tmux new-window -t "$session" -P -F "#{pane_id}" -- \
-      bash -euc "$script" "$session_dir" "$id" "$@" 2>/dev/null) || {
+      "$this" --run-job "$session_dir" "$id" -- "$@" 2>/dev/null) || {
       >&2 echo "Err: split-window and new-window both failed (job $id)"
       tmux wait-for -S "slot-release"  # release the slot we acquired
       return 1
