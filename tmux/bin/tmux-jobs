@@ -130,13 +130,13 @@ inflight=${session_dir}/inflight
 #   letting us capture pane contents to a log. Runs inside the spawned pane.
 # $1 = job id, $2.. = the actual argv to exec (bash -c string, or prog+args)
 _wrap() {
-  local id="$1" rc=; shift
+  local id="$1" rc=0; shift
   local events_fifo="$session_dir/events.fifo"  # <AGAIN: set inside tmux pane children
   local start_ts=$SECONDS
   "$@" || rc=$?
   # Signal completion via FIFO (worker reads this).
   # The per-job status file write was removed -- FIFO is now the sole IPC for rc.
-  echo "$id $rc $((SECONDS - start_ts))" > "$events_fifo"
+  printf '%s %s %s\n' "$id" "$rc" "$((SECONDS - start_ts))" > "$events_fifo"
   if ((rc)); then
     # MAYBE:OPT: store log for non-error case too (e.g. for DEBUG script itself)
     local log="./${id}_err_$$.log"
