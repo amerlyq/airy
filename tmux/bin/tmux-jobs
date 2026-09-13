@@ -3,15 +3,15 @@
 #%USAGE:
 #     [cmd-mode]: $ printf 'cmd1\0cmd2\0' | tmux-jobs -j4
 #   [xargs-mode]: $ printf 'a.mp4\0b.mp4\0' | tmux-jobs -j4 -- vcvt -c30 -g
-#      [control]: $ tmux-jobs -c -s vcvt   # continue after failures (switch running session to unattended mode)
-#                 $ tmux-jobs -C -s vcvt   # stop panes on errors (you will need to kill panes manually)
+#      [control]: $ tmux-jobs -c -s vcvt   # continue all failures unattended
+#                 $ tmux-jobs -C -s vcvt   # strict mode: every failure waits for ENTER
 #                 $ tmux-jobs -k -s vcvt   # finish active jobs, don't start new ones
 #                 $ tmux-jobs -K -s vcvt   # kill active jobs and worker, preserving queue state
 #      [cleanup]: $ tmux kill-session -t vcvt
 #%DEBUG:
-#   $ printf '%s\0' {01..10} | tmux-jobs -s test -- dunstify
-#   $ printf 'sleep 1 && dunstify %s\0' {01..20} | tmux-jobs -j4
+#   $ printf '%s\n' {01..10} | tmux-jobs -1j1 -- dunstify
 #   $ printf 'sleep 1 && dunstify %s\0' {01..10} | tmux-jobs -x -j1 -s test --
+#   $ printf 'sleep 1 && exit $((10#%s %% 4))\n' {01..10} | tmux-jobs -1j4
 #   $ tmux attach -t jobs
 #%SPEC:
 #   cmd-mode (default, no trailing argv after options):
@@ -29,7 +29,7 @@
 #     printed and pane held open until ENTER.
 #
 # All session state lives under ${XDG_CACHE_HOME:-$HOME/.cache}/tmux/<session>/:
-#   queue, lock, inflight, keepgoing, success.log, failure.log,
+#   queue, lock, inflight, mode, success.log, failure.log,
 #   sem.fifo, events.fifo, status/, notify.lock
 #
 # ALG:
@@ -160,6 +160,7 @@ success_log=${session_dir}/success.log
 failure_log=${session_dir}/failure.log
 inflight=${session_dir}/inflight
 stop_file=${session_dir}/stop
+mode_file=${session_dir}/mode
 coordinator_lock=${session_dir}/coordinator.lock
 
 # BUG(fixed): _wrap used to be defined (and `export -f`'d) far below, inside code that
@@ -182,11 +183,16 @@ _wrap() {
   local events_fifo="$session_dir/events.fifo"  # <AGAIN: set inside tmux pane children
   local exec_ts=$(date +%s)
   local start_ts=$SECONDS
+  local resume=0
+  trap 'resume=1' USR1
+  _emit_event() {
+    timeout 1s bash -c 'printf "%s\\n" "$1" > "$2"' _ "$1" "$events_fifo" ||:
+  }
   "$@" || rc=$?
   # Signal completion via FIFO (worker reads this).
   # The per-job status file write was removed -- FIFO is now the sole IPC for rc.
   if ((rc)); then
-    printf '%s\n' "$id fail $rc $exec_ts $((SECONDS - start_ts))" > "$events_fifo"
+    _emit_event "$id fail $rc $exec_ts $((SECONDS - start_ts))"
     # MAYBE:OPT: store log for non-error case too (e.g. for DEBUG script itself)
     local log errdir="$session_dir/err"
     [[ -d $errdir ]] || mkdir -p "$errdir"
@@ -197,7 +203,9 @@ _wrap() {
     # Per-job desktop notification is fired by the worker watcher (NOT here),
     #   so we get one dunstify per failure burst instead of one per job.
     # command -v dunstify &>/dev/null && dunstify -u critical "tmux-jobs: job $id failed (rc=$rc)" ||:
-    if [[ -e ${session_dir}/keepgoing ]]; then
+    mode=adaptive
+    [[ -s $session_dir/mode ]] && read -r mode < "$session_dir/mode"
+    if [[ $mode == continue ]]; then
       printf '\033[1;36m[ERROR] Continuing unattended (-c).\033[0m\n'
     else
       printf '\033[1;36m[ERROR] Press ENTER to close this pane (or run: tmux-jobs -c -s SESSION)...\033[0m\n'
@@ -206,13 +214,15 @@ _wrap() {
       #   lets a live `tmux-jobs -c -s SESSION` control command unstick an ALREADY-blocked
       #   pane, not just prevent future ones from blocking.
       while :; do
-        [[ -e ${session_dir}/keepgoing ]] && { printf '\n[continuing: -c set on session]\n'; break; }
+        ((resume)) && { printf '\n[continuing: adaptive success]\n'; break; }
+        [[ -s $session_dir/mode ]] && read -r mode < "$session_dir/mode"
+        [[ $mode == continue ]] && { printf '\n[continuing: -c set on session]\n'; break; }
         read -r -t 0.5 && break
       done
     fi
     rm -f -- "$session_dir/panes/$TMUX_PANE"
-    printf '%s\n' "$id done $rc $exec_ts $((SECONDS - start_ts))" > "$events_fifo"
-    if [[ -e ${session_dir}/keepgoing ]]; then
+    _emit_event "$id done $rc $exec_ts $((SECONDS - start_ts))"
+    if [[ $mode == continue ]]; then
       tmux kill-pane -t "$TMUX_PANE" 2>/dev/null ||:
     else
       tmux set-option -t "$TMUX_PANE" remain-on-exit off 2>/dev/null ||:
@@ -220,7 +230,7 @@ _wrap() {
     exit "$rc"
   fi
   rm -f -- "$session_dir/panes/$TMUX_PANE"
-  printf '%s\n' "$id done 0 $exec_ts $((SECONDS - start_ts))" > "$events_fifo"
+  _emit_event "$id done 0 $exec_ts $((SECONDS - start_ts))"
   ## OLD: Signal completion to the waiter (non-error path too, so dispatch unblocks)
   # tmux wait-for -S "job-done-$id"
 }
@@ -324,8 +334,11 @@ fi
 if (( ! worker && ! dry_run )) && { [[ -t 0 ]] ||
   [[ $(readlink -f /proc/self/fd/0 2>/dev/null) == /dev/null ]]
 }; then
-  stamp=${session_dir}/keepgoing
-  if ((keepgoing)); then : >| "$stamp"; else rm -f -- "$stamp"; fi
+  if ((keepgoing)); then
+    printf 'continue\n' >| "$mode_file"
+  else
+    printf 'blocking\n' >| "$mode_file"
+  fi
   >&2 echo "tmux-jobs: session '$session' keepgoing=$keepgoing"
   if ((keepgoing)) && [[ -s $queue || -s $inflight ]]; then
     worker_args=("-j$njobs" "-s$session" -c --worker)
@@ -360,8 +373,10 @@ if (( ! worker && ! dry_run )); then
   command -v tmux &>/dev/null || { >&2 echo "Err: tmux not found"; exit 2; }
   if ! tmux has-session -t "$session" 2>/dev/null; then
     worker_args=("-j$njobs" "-s$session")
-    stamp=${session_dir}/keepgoing
-    if ((keepgoing)); then worker_args+=(-c); : >| "$stamp"; else rm -f -- "$stamp"; fi
+    if ((keepgoing)); then
+      worker_args+=(-c)
+      printf 'continue\n' >| "$mode_file"
+    fi
     # win_cnt(){ tmux list-windows -t "$nm" 2>/dev/null | wc -l; }
     # -n "$session-$((1+$(win_cnt)))"
     tmux new-session -d -s "$session" -c "$PWD" -- \
@@ -563,6 +578,23 @@ if ((worker)); then
     done
   }
 
+  _adaptive_resume_one() {
+    local map pane job pid
+    mode=adaptive
+    [[ -s $mode_file ]] && read -r mode < "$mode_file"
+    [[ $mode == adaptive ]] || return 0
+    for map in "$session_dir"/panes/*; do
+      [[ -f $map ]] || continue
+      read -r job < "$map"
+      [[ ${worker_failed[$job]-} ]] || continue
+      pane=${map##*/}
+      pid=$(tmux display-message -p -t "$pane" '#{pane_pid}' 2>/dev/null) || continue
+      kill -USR1 "$pid" 2>/dev/null || continue
+      _diag "adaptive resume job=$job pane=$pane pid=$pid"
+      return 0
+    done
+  }
+
   _start_queued
 
   ## WARN: killing worker on <C-c> doesn't kill panes
@@ -625,6 +657,7 @@ if ((worker)); then
     if ((rc == 0 && !failed)); then
       _locked_append "$success_log" "$exec_ts $dt $record"
       _inflight_remove "$record"
+      _adaptive_resume_one
     elif ((failed)); then
       :
     else
