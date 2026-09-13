@@ -8,6 +8,7 @@
 #                 $ tmux-jobs -k -s vcvt   # finish active jobs, don't start new ones
 #                 $ tmux-jobs -K -s vcvt   # kill active jobs and worker, preserving queue state
 #      [cleanup]: $ tmux kill-session -t vcvt
+#      -O saves successful pane scrollback under the session state directory.
 #%DEBUG:
 #   $ printf '%s\n' {01..10} | tmux-jobs -1j1 -- dunstify
 #   $ printf 'sleep 1 && dunstify %s\0' {01..10} | tmux-jobs -x -j1 -s test --
@@ -54,6 +55,7 @@ this=$(realpath -e "$0")
 
 njobs=4
 dry_run=0
+capture_outputs=0
 keepgoing=0
 kill_queue=0
 kill_all=0
@@ -99,11 +101,12 @@ for a in "$@"; do
 done
 set -- "${_args[@]}"; unset _args a
 
-while getopts 'j:01ncCkKs:x' o; do
+while getopts 'j:01nOcCkKs:x' o; do
 case $o in :|'?') exit 2
 ;; j) njobs=$OPTARG
 ;; 0) input_delim=0
 ;; 1) input_delim=1
+;; O) capture_outputs=1
 ;; n) dry_run=1
 ;; c) keepgoing=1
 ;; C) keepgoing=0
@@ -229,6 +232,12 @@ _wrap() {
     fi
     exit "$rc"
   fi
+  if ((capture_outputs)); then
+    local outlog outdir="$session_dir/out"
+    [[ -d $outdir ]] || mkdir -p "$outdir"
+    printf -v outlog '%s/job%03d_ppid%d.log' "$outdir" "$id" "$$"
+    tmux capture-pane -pt "$TMUX_PANE" -S - > "$outlog"
+  fi
   rm -f -- "$session_dir/panes/$TMUX_PANE"
   _emit_event "$id done 0 $exec_ts $((SECONDS - start_ts))"
   ## OLD: Signal completion to the waiter (non-error path too, so dispatch unblocks)
@@ -241,6 +250,7 @@ _wrap() {
 if [[ -n ${run_job_args+x} ]]; then
   set -- "${run_job_args[@]}"
   declare session_dir=$1 jobid=$2; shift 2
+  capture_outputs=$1; shift
   [[ $1 == -- ]] && shift
   tmux set-option -t "$TMUX_PANE" remain-on-exit failed
   _wrap "$jobid" "$@"
@@ -471,10 +481,10 @@ dispatch() { local jobid="$1" pane_id; shift
 
   # Try split-window first (stays in current window)
   pane_id=$(tmux split-window -t "$session" -v -P -F "#{pane_id}" -d -- \
-    "$this" --run-job "$session_dir" "$jobid" -- "$@" 2>/dev/null) || {
+    "$this" --run-job "$session_dir" "$jobid" "$capture_outputs" -- "$@" 2>/dev/null) || {
     # If split fails (small screen), create a new window
     pane_id=$(tmux new-window -t "$session" -P -F "#{pane_id}" -- \
-      "$this" --run-job "$session_dir" "$jobid" -- "$@" 2>/dev/null) || {
+      "$this" --run-job "$session_dir" "$jobid" "$capture_outputs" -- "$@" 2>/dev/null) || {
       >&2 echo "Err: split-window and new-window both failed (job $jobid)"
       tmux wait-for -S "slot-release"  # release the slot we acquired
       return 1

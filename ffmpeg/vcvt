@@ -7,6 +7,8 @@
 #   [stdin_list]:      $ find . -name '*.mp4' -not -name '*_[acnqv][0-9][0-9].mp4' | vcvt
 #   [watch_dir]:       $ [tmux new-session -s cvt &&] vcvt -w /cache/vd_cvt/todo
 #   [serial_no-tmux]:  $ vcvt -j1 *.mp4
+#   [dry_run]:          $ vcvt -d files...
+#   [save_outputs]:     $ vcvt -O files...
 #   [parallel_tmux]:   $ vcvt -j4 *.mp4
 #   [codec_dashboard]: $ print -l {22..30} |xargs -t -n1 -P4 sh -c 'time vcvt -c"$0" input.mp4 &>"$0".log'
 #
@@ -33,15 +35,17 @@ PS4='+[$BASHPID] ${BASH_SOURCE[0]##*/}:$LINENO:  '
 njobs=4  # workers=(1..4) x16 threads per each AV1
 
 readonly _app_orig_argv=("$@")
-while LC_COLLATE=C getopts 'Aac:gij:wxD' o; do
+while LC_COLLATE=C getopts 'Aac:dgij:OwxD' o; do
 case $o in :|'?') exit 2
-;; A) tmux attach -t "vcvt"
+;; A) exec tmux attach -t "vcvt"; exit 13
 ;; a) ifx=a               #: -a    : force ifx=a (infix tag override)
 ;; c) qa=$OPTARG          #: -c QA : quality (crf/cq/global_quality, encoder-dependent)
 ;; D) archive=1           #: -D    : archive fin+out to ../done/ after a successful convert
+;; d) dryrun=1            #: -d    : print simulated commands
 ;; i) inprocess=1         #: -i    : convert files w/o tmux one-by-one ("individual/isolated/inplace")
 ;; g) gpu=1               #: -g    : prefer GPU encode (nvenc/qsv) over cpu (svt-av1)
 ;; j) forcejobs=$OPTARG   #: -j N  : concurrency, "1" skips tmux; DFL=0 : auto (sized from codec below)
+;; O) outputs=1           #: -O    : save successful tmux pane output
 # ;; s) byserver=1
 ;; w) watch=1             #: -w DIR: watch mode (implies -D), owns ./{todo,queue,done} directory layout
 ;; x) set -x              #: -x    : set -x tracing, forwarded to per-file re-invocations
@@ -65,6 +69,9 @@ else
   exit 1  # <MAYBE: Fallback to Software Encoding
 fi
 readonly use qa ifx
+
+_dryrun() { cat>/dev/null; printf '[dry-run] %q\n' "$@"; }
+dryrun=${dryrun:+_dryrun}
 
 # Codec-specific concurrency: svt-av1 (cpu) is heavily multithreaded per job
 #   (~16 threads/job), so only a handful of jobs should run at once even on
@@ -159,20 +166,22 @@ _cvt_cpu() { local fin="$1" out="$2"
 
 _convert_one() { local fin="$1"
   local out="${fin%.*}_${ifx}${qa}.${fin##*.}"
-  local ffmpeg=(ffmpeg -hide_banner)  # -v error | -v verbose
+  local ffmpeg=($dryrun ffmpeg -hide_banner)  # -v error | -v verbose
   # MAYBE: ffmpeg+=(-y)
 
   if [[ -e $out ]]; then
     # FIXME: use mtime inof RANDOM for deterministic sorting of old variants in !ranger ?
-    mv -vfT --backup=t -- "$out" "${out%.*}_prev${RANDOM}.${out##*.}"
+    $dryrun mv -vfT --backup=t -- "$out" "${out%.*}_prev${RANDOM}.${out##*.}"
   fi
 
-  echo "_cvt_$use" "$fin" "$out"
-  sleep 5
+  "_cvt_$use" "$fin" "$out"
 
   if [[ ${archive-} || ${watch-} ]]; then
-    mkdir -p ../done
-    mv -vt ../done/ -- "$fin" "$out"
+    local fdir=${fin%/*}
+    [[ $fdir == "$fin" ]] && fdir=.
+    local done_dir="$fdir/../done"
+    $dryrun mkdir -p "$done_dir"
+    $dryrun mv -vt "$done_dir"/ -- "$fin" "$out"
   fi
 }
 
@@ -201,11 +210,17 @@ _enqueue() {
   echo "Batch ($# files -> !tmux-jobs) in [PWD=$PWD]"
   command -v tmux-jobs &>/dev/null || { >&2 echo "Err: tmux-jobs not found on PATH"; exit 2; }
   local -a flags=(-i)
+  local -a full_files=()
+  local f
+  for f in "$@"; do
+    [[ $f == /* ]] || f="$PWD/$f"
+    full_files+=("$f")
+  done
   while IFS= read -r -d '' a; do flags+=("$a"); done < <(_passthrough_flags)
   # "$@" = files to enqueue (NUL-sep list is read by the caller into an array
   #   and passed here as positional args, so this can be called with either
   #   one file (watch-mode arrivals) or many (batch) uniformly).
-  printf '%s\0' "$@" | exec tmux-jobs ${xt:+-x} -j"$njobs" -s vcvt -- vcvt "${flags[@]}"
+  printf '%s\0' "${full_files[@]}" | $dryrun exec tmux-jobs ${xt:+-x} ${outputs:+-O} -j"$njobs" -s vcvt -- vcvt "${flags[@]}"
 }
 
 # Dispatches a NUL-sep file list on stdin: default always enqueues and exits.
@@ -251,7 +266,7 @@ if [[ ${watch-} ]]; then
     inotifywait -m -e close_write --format '%f' . | while read -r f; do
       [[ ${f:0:1} == "." ]] && continue  # <CASE: skip rsync temp files
       >&2 echo "[detected] $f"
-      mv -vt ../queue/ -- "./$f"
+      $dryrun mv -vt ../queue/ -- "./$f"
       printf '%s\0' "../queue/$f"
     done
   }
