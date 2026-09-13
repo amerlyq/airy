@@ -190,6 +190,8 @@ _wrap() {
     printf '%s\n' "$id done $rc $exec_ts $((SECONDS - start_ts))" > "$events_fifo"
     if [[ -e ${session_dir}/keepgoing ]]; then
       tmux kill-pane -t "$TMUX_PANE" 2>/dev/null ||:
+    else
+      tmux set-option -t "$TMUX_PANE" remain-on-exit off 2>/dev/null ||:
     fi
     exit "$rc"
   fi
@@ -471,6 +473,7 @@ dispatch() { local jobid="$1" pane_id; shift
 }
 
 if ((worker)); then
+  _diag() { printf '[tmux-jobs %s] %s\n' "$(date +%T)" "$*"; }
   tmux select-pane -t "$TMUX_PANE" -T queue-worker 2>/dev/null ||:
   tmux set-hook -t "$session" pane-died \
     "run-shell '$this --pane-died $session_dir #{hook_pane_id} #{hook_pane_dead_status}'" 2>/dev/null ||:
@@ -530,6 +533,7 @@ if ((worker)); then
       # Acquire slot (blocks interruptibly)
       IFS= read -r _ <&"$sem_fd" || return 1
       dispatch "$job" bash -xec "$command"
+      _diag "started job=$job slots=$((running + 1)) record=$record"
       worker_record[$job]=$record
       worker_job[$job]=$job
       running=$((running + 1))
@@ -557,6 +561,7 @@ if ((worker)); then
         paused=0
       fi
       if ((paused)); then
+        _diag "paused running=0 queue=$(wc -l < "$queue")"
         sleep 0.5
         continue
       fi
@@ -572,6 +577,7 @@ if ((worker)); then
     #   Default IFS is required here to split _wrap's two space-separated fields.
     read -r job state rc exec_ts dt <&"$fifo_fd"
     [[ -n $job ]] || continue
+    _diag "event job=$job state=$state rc=$rc exec_ts=$exec_ts dt=$dt"
     if [[ $state == dead ]]; then
       record=${worker_record[$job]}
       _locked_append "$failure_log" "$exec_ts $dt $record rc=$rc interrupted"
@@ -591,8 +597,10 @@ if ((worker)); then
       if command -v dunstify &>/dev/null; then
         dunstify -u critical "tmux-jobs: job $job failed (rc=$rc)" ||:
       fi
+      _diag "failed job=$job paused=$paused"
       continue
     fi
+    _diag "finished job=$job rc=$rc running=$running queue=$(wc -l < "$queue")"
     record=${worker_record[$job]}
     failed=${worker_failed[$job]-0}
     unset 'worker_record[$job]' 'worker_job[$job]' 'worker_failed[$job]'
