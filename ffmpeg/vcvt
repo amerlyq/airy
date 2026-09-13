@@ -117,7 +117,7 @@ _filter_non_av1() {
   #   dropped) -- only gawk supports that. Portable fix: ORS="\0" with plain
   #   print, which mawk handles correctly.
   xargs -0r -P4 -L10 mediainfo --Inform="General;%Video_Codec_List% %CompleteName%\n" -- \
-    | awk -vC="AV1" 'BEGIN{ORS="\0"} NF&&$1!=C{print substr($0,index($0," ")+1)}'
+    | awk -vC="AV1" 'BEGIN{ORS=sprintf("%c",0)} NF&&$1!=C{print substr($0,index($0," ")+1)}'
 }
 
 # ─────────────────────────────────────────────────────────
