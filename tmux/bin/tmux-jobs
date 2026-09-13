@@ -3,8 +3,10 @@
 #%USAGE:
 #     [cmd-mode]: $ printf 'cmd1\0cmd2\0' | tmux-jobs -j4
 #   [xargs-mode]: $ printf 'a.mp4\0b.mp4\0' | tmux-jobs -j4 -- vcvt -c30 -g
-#      [control]: $ tmux-jobs -k -s vcvt   # switch a running session to unattended-on-failure
-#                 $ tmux-jobs -K -s vcvt   # switch back to stop-on-error (blocks new+existing failures)
+#      [control]: $ tmux-jobs -c -s vcvt   # continue after failures (switch running session to unattended mode)
+#                 $ tmux-jobs -C -s vcvt   # stop panes on errors (you will need to kill panes manually)
+#                 $ tmux-jobs -k -s vcvt   # finish active jobs, don't start new ones
+#                 $ tmux-jobs -K -s vcvt   # kill active jobs and worker, preserving queue state
 #      [cleanup]: $ tmux kill-session -t vcvt
 #%DEBUG:
 #   $ printf '%s\0' {01..10} | tmux-jobs -s test -- dunstify
@@ -41,6 +43,8 @@ this=$(realpath -e "$0")
 njobs=4
 dry_run=0
 keepgoing=0
+kill_queue=0
+kill_all=0
 session='jobs'
 worker=0
 
@@ -69,12 +73,14 @@ for a in "$@"; do
 done
 set -- "${_args[@]}"; unset _args a
 
-while getopts 'j:nkKs:x' o; do
+while getopts 'j:ncCkKs:x' o; do
 case $o in :|'?') exit 2
 ;; j) njobs=$OPTARG
 ;; n) dry_run=1
-;; k) keepgoing=1  # TODO:RENAME: -c/-C continue (OR -p/-P : prompt-pause) and ADD: -k/-K kill/killall to stop running queue (and jobs)
-;; K) keepgoing=0
+;; c) keepgoing=1
+;; C) keepgoing=0
+;; k) kill_queue=1
+;; K) kill_all=1
 ;; s) session=$OPTARG
 ;; x) set -x
 esac; done; shift $((OPTIND-1))
@@ -116,6 +122,7 @@ lock=${queue}.lock  # <WKRND: can't flock($queue) as it's replaced when modified
 success_log=${session_dir}/success.log
 failure_log=${session_dir}/failure.log
 inflight=${session_dir}/inflight
+stop_file=${session_dir}/stop
 coordinator_lock=${session_dir}/coordinator.lock
 
 # BUG(fixed): _wrap used to be defined (and `export -f`'d) far below, inside code that
@@ -152,15 +159,15 @@ _wrap() {
     #   so we get one dunstify per failure burst instead of one per job.
     # command -v dunstify &>/dev/null && dunstify -u critical "tmux-jobs: job $id failed (rc=$rc)" ||:
     if [[ -e ${session_dir}/keepgoing ]]; then
-      printf '\033[1;36m[ERROR] Continuing unattended (-k).\033[0m\n'
+      printf '\033[1;36m[ERROR] Continuing unattended (-c).\033[0m\n'
     else
-      printf '\033[1;36m[ERROR] Press ENTER to close this pane (or run: tmux-jobs -k -s SESSION)...\033[0m\n'
+      printf '\033[1;36m[ERROR] Press ENTER to close this pane (or run: tmux-jobs -c -s SESSION)...\033[0m\n'
       # Poll instead of blind `read -r`: an unattended/detached worker (--worker, no human
       #   attached to this pane) would otherwise block here forever. Watching $keepgoing_file
-      #   lets a live `tmux-jobs -k -s SESSION` control command unstick an ALREADY-blocked
+      #   lets a live `tmux-jobs -c -s SESSION` control command unstick an ALREADY-blocked
       #   pane, not just prevent future ones from blocking.
       while :; do
-        [[ -e ${session_dir}/keepgoing ]] && { printf '\n[continuing: -k set on session]\n'; break; }
+        [[ -e ${session_dir}/keepgoing ]] && { printf '\n[continuing: -c set on session]\n'; break; }
         read -r -t 0.5 && break
       done
     fi
@@ -244,14 +251,31 @@ if (( ! dry_run )); then
   touch "$queue" "$lock" "$inflight"
 fi
 
-# Live attention-mode toggle: a plain `tmux-jobs -k/-K -s SESSION` (no stdin, no queue-op --
+# Live attention-mode toggle: a plain `tmux-jobs -c/-C -s SESSION` (no stdin, no queue-op --
 #   see ctl-command handling below) flips this file, which _wrap polls WHILE BLOCKED on an
 #   already-failed pane's "press ENTER" prompt, not just at worker startup. Session-keyed
 #   (not $$-keyed) so a control invocation and the long-running worker agree on the same path.
-# Control-command: `-k`/`-K` given with stdin NOT piped (a terminal, or explicitly closed) is
+# Control-command: `-c`/`-C` given with stdin NOT piped (a terminal, or explicitly closed) is
 #   not a job submission -- just flips $keepgoing_file for whatever worker owns $session and
 #   exits. Lets the user launch a batch in stop-on-error mode, watch it for a while, then
-#   switch to unattended once satisfied it's healthy: `tmux-jobs -k -s vcvt`.
+#   switch to unattended once satisfied it's healthy: `tmux-jobs -c -s vcvt`.
+if (( ! worker && ! dry_run && (kill_queue || kill_all) )); then
+  : >| "$stop_file"
+  if tmux has-session -t "$session" 2>/dev/null; then
+    if ((kill_all)); then
+      while read -r pane title; do
+        [[ $title == job\ * || $title == queue-worker ]] || continue
+        tmux kill-pane -t "$pane" 2>/dev/null ||:
+      done < <(tmux list-panes -a -t "$session" -F '#{pane_id} #{pane_title}' 2>/dev/null)
+    fi
+  fi
+  if ((kill_all)); then
+    >&2 echo "tmux-jobs: killed session '$session' jobs; queue state preserved"
+  else
+    >&2 echo "tmux-jobs: draining session '$session'; no new jobs will start"
+  fi
+  exit 0
+fi
 if (( ! worker && ! dry_run )) && { [[ -t 0 ]] ||
   [[ $(readlink -f /proc/self/fd/0 2>/dev/null) == /dev/null ]]
 }; then
@@ -263,6 +287,7 @@ fi
 
 if (( ! worker && ! dry_run )); then
   if ((${#prog[@]})); then
+    rm -f -- "$stop_file"
     while IFS= read -r -d '' arg; do
       [[ -z $arg ]] && continue
       record=''
@@ -271,6 +296,7 @@ if (( ! worker && ! dry_run )); then
       _locked_append "$queue" "$(date +%s) $record$arg"
     done
   else
+    rm -f -- "$stop_file"
     while IFS= read -r -d '' cmd; do
       [[ -z $cmd ]] && continue
       # TODO:OPT:(-c): use shell OR:DFL split execv args by "|" or "<Tab>"
@@ -282,7 +308,7 @@ if (( ! worker && ! dry_run )); then
   if ! tmux has-session -t "$session" 2>/dev/null; then
     worker_args=("-j$njobs" "-s$session")
     stamp=${session_dir}/keepgoing
-    if ((keepgoing)); then worker_args+=(-k); : >| "$stamp"; else rm -f -- "$stamp"; fi
+    if ((keepgoing)); then worker_args+=(-c); : >| "$stamp"; else rm -f -- "$stamp"; fi
     # win_cnt(){ tmux list-windows -t "$nm" 2>/dev/null | wc -l; }
     # -n "$session-$((1+$(win_cnt)))"
     tmux new-session -d -s "$session" -c "$PWD" -- \
@@ -415,6 +441,7 @@ dispatch() { local id="$1" pane_id; shift
 }
 
 if ((worker)); then
+  tmux select-pane -t "$TMUX_PANE" -T queue-worker 2>/dev/null ||:
   exec {coord_fd}>>"$coordinator_lock"
   if ! flock -n "$coord_fd"; then
     >&2 echo "tmux-jobs: coordinator already running for session '$session'"
@@ -459,7 +486,7 @@ if ((worker)); then
 
   _start_queued() {
     local record added_ts command job
-    while ((running < njobs)); do
+    while ((running < njobs)) && [[ ! -e $stop_file ]]; do
       _queue_take_first
       [[ -n $record ]] || break
       added_ts=${record%% *}
