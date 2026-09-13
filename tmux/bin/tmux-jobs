@@ -23,12 +23,24 @@
 #     Each run as `execv prog fixed-args... arg` in its own pane --
 #     no shell, no quoting/escaping layer, arg passed through verbatim.
 #
+#   stdin delimiter: -0 selects NUL records (default), -1 selects newline records.
+#
 #   On nonzero exit: pane contents captured to ./<n>_err_<pid>.log,
 #     printed and pane held open until ENTER.
 #
 # All session state lives under ${XDG_CACHE_HOME:-$HOME/.cache}/tmux/<session>/:
 #   queue, lock, inflight, keepgoing, success.log, failure.log,
 #   sem.fifo, events.fifo, status/, notify.lock
+#
+# ALG:
+#   - Failed pane waits for ENTER.
+#   - Failed pane keeps its slot occupied.
+#   - Other slots continue processing.
+#   - At most -jN failures can accumulate.
+#   - If all slots wait, queue stops naturally.
+#   - ENTER releases one slot, then one new queued job starts.
+#   - -c unblocks all failed panes, future failures auto-continue.
+#   - -C removes unattended mode, future failures freeze pane for inspection.
 #
 # SEE/SEIZE: pane-focus from :/tmux/ctl/{parallel,job}
 
@@ -45,6 +57,7 @@ dry_run=0
 keepgoing=0
 kill_queue=0
 kill_all=0
+input_delim=0
 session='jobs'
 worker=0
 
@@ -86,9 +99,11 @@ for a in "$@"; do
 done
 set -- "${_args[@]}"; unset _args a
 
-while getopts 'j:ncCkKs:x' o; do
+while getopts 'j:01ncCkKs:x' o; do
 case $o in :|'?') exit 2
 ;; j) njobs=$OPTARG
+;; 0) input_delim=0
+;; 1) input_delim=1
 ;; n) dry_run=1
 ;; c) keepgoing=1
 ;; C) keepgoing=0
@@ -98,6 +113,15 @@ case $o in :|'?') exit 2
 ;; x) set -x
 esac; done; shift $((OPTIND-1))
 prog=("$@")  # Remaining argv (if any) is `prog [fixed-args...]` for xargs-mode.
+
+read_record() {
+  declare -n out=$1
+  if ((input_delim == 0)); then
+    IFS= read -r -d '' out
+  else
+    IFS= read -r out
+  fi
+}
 
 # Session directory in XDG cache: ~/.cache/tmux/<session>/
 # All per-session files live here, so a single rm -rf cleans a session completely
@@ -164,7 +188,7 @@ _wrap() {
   if ((rc)); then
     printf '%s\n' "$id fail $rc $exec_ts $((SECONDS - start_ts))" > "$events_fifo"
     # MAYBE:OPT: store log for non-error case too (e.g. for DEBUG script itself)
-    local log errdir="$session_dir/panes"
+    local log errdir="$session_dir/err"
     [[ -d $errdir ]] || mkdir -p "$errdir"
     printf -v log '%s/job%03d_ppid%d.log' "$errdir" "$id" "$$"
     tmux capture-pane -pt "$TMUX_PANE" -S - > "$log"
@@ -317,7 +341,7 @@ fi
 if (( ! worker && ! dry_run )); then
   if ((${#prog[@]})); then
     rm -f -- "$stop_file"
-    while IFS= read -r -d '' arg; do
+    while read_record arg; do
       [[ -z $arg ]] && continue
       record=''
       printf -v record '%q ' "${prog[@]}"
@@ -326,7 +350,7 @@ if (( ! worker && ! dry_run )); then
     done
   else
     rm -f -- "$stop_file"
-    while IFS= read -r -d '' cmd; do
+    while read_record cmd; do
       [[ -z $cmd ]] && continue
       # TODO:OPT:(-c): use shell OR:DFL split execv args by "|" or "<Tab>"
       printf -v record 'bash -xec %q' "$cmd"
@@ -350,14 +374,14 @@ fi
 if ((dry_run)); then
   printf 'session=%s queue=%s jobs=%s mode=%s\n' "$session" "$queue" "$njobs" "$([[ ${#prog[@]} -gt 0 ]] && echo xargs || echo cmd)"
   if ((${#prog[@]})); then
-    while IFS= read -r -d '' item; do
+    while read_record item; do
       [[ -z $item ]] && continue
       printf '[dry-run]'
       printf ' %q' "${prog[@]}" "$item"
       printf '\n'
     done
   else
-    while IFS= read -r -d '' item; do
+    while read_record item; do
       [[ -z $item ]] && continue
       printf '[dry-run] bash -xec %q\n' "$item"
     done
@@ -519,11 +543,10 @@ if ((worker)); then
   declare -A worker_job=()
   declare -A worker_failed=()
   running=0
-  paused=0
 
   _start_queued() {
     local record added_ts command job
-    while ((running < njobs)) && [[ ! -e $stop_file && $paused -eq 0 ]]; do
+    while ((running < njobs)) && [[ ! -e $stop_file ]]; do
       _queue_take_first
       [[ -n $record ]] || break
       added_ts=${record%% *}
@@ -557,14 +580,6 @@ if ((worker)); then
   # Main loop: read completions from FIFO
   while :; do
     if ((running == 0)); then
-      if ((paused)) && [[ -e ${session_dir}/keepgoing ]]; then
-        paused=0
-      fi
-      if ((paused)); then
-        _diag "paused running=0 queue=$(wc -l < "$queue")"
-        sleep 0.5
-        continue
-      fi
       _start_queued
       ((running)) || break
     fi
@@ -593,11 +608,10 @@ if ((worker)); then
       worker_failed[$job]=1
       _locked_append "$failure_log" "$exec_ts $dt $record"
       _inflight_remove "$record"
-      [[ -e ${session_dir}/keepgoing ]] || paused=1
       if command -v dunstify &>/dev/null; then
         dunstify -u critical "tmux-jobs: job $job failed (rc=$rc)" ||:
       fi
-      _diag "failed job=$job paused=$paused"
+      _diag "failed job=$job"
       continue
     fi
     _diag "finished job=$job rc=$rc running=$running queue=$(wc -l < "$queue")"
@@ -615,10 +629,6 @@ if ((worker)); then
       :
     else
       _inflight_remove "$record"
-      [[ -e ${session_dir}/keepgoing ]] || paused=1
-    fi
-    if ((paused)) && [[ -e ${session_dir}/keepgoing ]]; then
-      paused=0
     fi
     _start_queued
   done
@@ -628,14 +638,14 @@ if ((worker)); then
   exit 0
 elif ((${#prog[@]})); then
   # xargs-mode: each stdin record is one arg, appended to the fixed prog+args.
-  while IFS= read -r -d '' arg; do
+  while read_record arg; do
     [[ -z $arg ]] && continue
     _seq=$((_seq + 1))
     dispatch "$_seq" "${prog[@]}" "$arg"
   done
 else
   # cmd-mode: each stdin record is a full command string, run under bash -xec.
-  while IFS= read -r -d '' cmd; do
+  while read_record cmd; do
     [[ -z $cmd ]] && continue
     _seq=$((_seq + 1))
     dispatch "$_seq" bash -xec "$cmd"

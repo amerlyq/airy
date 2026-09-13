@@ -11,8 +11,8 @@
 #   [codec_dashboard]: $ print -l {22..30} |xargs -t -n1 -P4 sh -c 'time vcvt -c"$0" input.mp4 &>"$0".log'
 #
 # Resolves input to a list of non-AV1 mp4 files, then:
-#   - exactly one file  -> converts it in-process, no tmux/queue at all
-#   - more than one file, or -w watch arrivals -> enqueues via !tmux-jobs
+#   - cmdline 1..N files (and -w watch arrivals) -> enqueues via !tmux-jobs
+#   - -i input -> converts here in-process (avoids !tmux-jobs)
 #     = persistent queue (append-and-exit)
 #     = a detached "vcvt" tmux session drains it
 #       : it spawns `vcvt <passthrough flags> FILE` per file in its own pane
@@ -200,7 +200,7 @@ _enqueue() {
   # ALSO: print filename if $#==1
   echo "Batch ($# files -> !tmux-jobs) in [PWD=$PWD]"
   command -v tmux-jobs &>/dev/null || { >&2 echo "Err: tmux-jobs not found on PATH"; exit 2; }
-  local -a flags=()
+  local -a flags=(-i)
   while IFS= read -r -d '' a; do flags+=("$a"); done < <(_passthrough_flags)
   # "$@" = files to enqueue (NUL-sep list is read by the caller into an array
   #   and passed here as positional args, so this can be called with either
@@ -208,9 +208,8 @@ _enqueue() {
   printf '%s\0' "$@" | exec tmux-jobs ${xt:+-x} -j"$njobs" -s vcvt -- vcvt "${flags[@]}"
 }
 
-# Dispatches a NUL-sep file list on stdin: single file converts in-process
-#   (no tmux/queue involved -- this is the one case with nothing to fan out),
-#   multiple files always enqueue via tmux-jobs (append-and-exit).
+# Dispatches a NUL-sep file list on stdin: default always enqueues and exits.
+#   -i converts files directly in-process.
 _dispatch() {
   local -a files=()
   # Batch mode intentionally consumes stdin to EOF.
@@ -218,22 +217,18 @@ _dispatch() {
   readarray -d '' -t files
   ((${#files[@]})) || { >&2 echo "Err: no non-AV1 mp4 files found in input"; exit 2; }
 
-  if [[ -z ${inprocess:+x} ]]; then
-    # DISABLED:FAIL: tmux mess doesn't work yet
-    _enqueue "${files[@]}"
-  elif ((${#files[@]} <= 1)); then
-    _convert_one "${files[0]}"
-  else
-    echo "Batch (${#files[@]} files -> one-by-one) in [PWD=$PWD]"
-    local f; for f in "${files[@]}"; do
-      echo "[convert] $f"
-      # ALT:(&pg): vcvt ... 2>&1 | pv -N "$(basename "$0" | cut -c1-15)" -l -q > /dev/null
-      _convert_one "$f"
-      ## ALT:MAYBE: do this to move files after failed/interrupted conversion?
-      # mv -vt ../done/ -- "$1" "${1%.*}_"[acnqv][0-9][0-9]".${1##*.}"
-      echo "---"
-    done
-  fi
+  # CASE: try to cvt inprocess if _enqueue fails (e.g. due to tmux-jobs queue backpressure)
+  [[ ${inprocess:+x} ]] || { _enqueue "${files[@]}" && return; }
+
+  echo "Batch (${#files[@]} files -> one-by-one) in [PWD=$PWD]"
+  local f; for f in "${files[@]}"; do
+    echo "[convert] $f"
+    # ALT:(&pg): vcvt ... 2>&1 | pv -N "$(basename "$0" | cut -c1-15)" -l -q > /dev/null
+    _convert_one "$f"
+    ## ALT:MAYBE: do this to move files after failed/interrupted conversion?
+    # mv -vt ../done/ -- "$1" "${1%.*}_"[acnqv][0-9][0-9]".${1##*.}"
+    echo "---"
+  done
 }
 
 # ── modes ────────────────────────────────────────────────────────────
