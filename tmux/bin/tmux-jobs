@@ -48,6 +48,19 @@ kill_all=0
 session='jobs'
 worker=0
 
+if [[ ${1-} == --pane-died ]]; then
+  shift
+  session_dir=$1
+  pane_id=$2
+  pane_rc=${3:-137}
+  map_file="$session_dir/panes/$pane_id"
+  [[ -s $map_file ]] || exit 0
+  read -r dead_job < "$map_file"
+  printf '%s dead %s %s 0\n' "$dead_job" "$pane_rc" "$(date +%s)" > "$session_dir/events.fifo"
+  rm -f -- "$map_file"
+  exit 0
+fi
+
 # --run-job is an internal per-pane re-exec marker (see dispatch()'s
 #   "$this" --run-job "$session_dir" "$id" -- "$@" below) -- NOT a public
 #   getopts flag, and unlike --worker it's followed by the job's own argv
@@ -93,6 +106,7 @@ prog=("$@")  # Remaining argv (if any) is `prog [fixed-args...]` for xargs-mode.
 session_dir=${XDG_CACHE_HOME:-$HOME/.cache}/tmux/${session}
 if (( ! dry_run )); then
   mkdir -p "$session_dir"
+  mkdir -p "$session_dir/panes"
 fi
 
 # ATT: Exported because `tmux split-window`/`new-window` spawn the pane's shell as a fresh
@@ -148,8 +162,8 @@ _wrap() {
   "$@" || rc=$?
   # Signal completion via FIFO (worker reads this).
   # The per-job status file write was removed -- FIFO is now the sole IPC for rc.
-  printf '%s\n' "$id $rc $exec_ts $((SECONDS - start_ts))" > "$events_fifo"
   if ((rc)); then
+    printf '%s\n' "$id fail $rc $exec_ts $((SECONDS - start_ts))" > "$events_fifo"
     # MAYBE:OPT: store log for non-error case too (e.g. for DEBUG script itself)
     local log="${session_dir}/${id}_err_$$.log"
     tmux capture-pane -pt "$TMUX_PANE" -S - > "$log"
@@ -171,11 +185,15 @@ _wrap() {
         read -r -t 0.5 && break
       done
     fi
+    rm -f -- "$session_dir/panes/$TMUX_PANE"
+    printf '%s\n' "$id done $rc $exec_ts $((SECONDS - start_ts))" > "$events_fifo"
     if [[ -e ${session_dir}/keepgoing ]]; then
       tmux kill-pane -t "$TMUX_PANE" 2>/dev/null ||:
     fi
     exit "$rc"
   fi
+  rm -f -- "$session_dir/panes/$TMUX_PANE"
+  printf '%s\n' "$id done 0 $exec_ts $((SECONDS - start_ts))" > "$events_fifo"
   ## OLD: Signal completion to the waiter (non-error path too, so dispatch unblocks)
   # tmux wait-for -S "job-done-$id"
 }
@@ -282,6 +300,14 @@ if (( ! worker && ! dry_run )) && { [[ -t 0 ]] ||
   stamp=${session_dir}/keepgoing
   if ((keepgoing)); then : >| "$stamp"; else rm -f -- "$stamp"; fi
   >&2 echo "tmux-jobs: session '$session' keepgoing=$keepgoing"
+  if ((keepgoing)) && [[ -s $queue || -s $inflight ]]; then
+    worker_args=("-j$njobs" "-s$session" -c --worker)
+    if ! tmux has-session -t "$session" 2>/dev/null; then
+      tmux new-session -d -s "$session" -c "$PWD" -- "$this" "${worker_args[@]}"
+    elif ! tmux list-panes -a -t "$session" -F '#{pane_title}' 2>/dev/null | grep -qx 'queue-worker'; then
+      tmux new-window -d -t "$session" -- "$this" "${worker_args[@]}"
+    fi
+  fi
   exit 0
 fi
 
@@ -415,6 +441,7 @@ dispatch() { local id="$1" pane_id; shift
 
   # FIXME: better name matching cmdline
   tmux select-pane -t "$pane_id" -T "job $id: ${*: -1}" 2>/dev/null ||:
+  printf '%s\n' "$id" >| "$session_dir/panes/$pane_id"
 
   # pane_run(){ tmux send-keys -t "$nm" "$*" "C-m"; }
   # pane_nm(){ local p=${1:?}; p=${p:0:12}; p=${p/[.:]/_}
@@ -442,6 +469,8 @@ dispatch() { local id="$1" pane_id; shift
 
 if ((worker)); then
   tmux select-pane -t "$TMUX_PANE" -T queue-worker 2>/dev/null ||:
+  tmux set-hook -t "$session" pane-died \
+    "run-shell '$this --pane-died $session_dir #{hook_pane_id} #{hook_pane_dead_status}'" 2>/dev/null ||:
   exec {coord_fd}>>"$coordinator_lock"
   if ! flock -n "$coord_fd"; then
     >&2 echo "tmux-jobs: coordinator already running for session '$session'"
@@ -482,11 +511,13 @@ if ((worker)); then
 
   declare -A worker_record=()
   declare -A worker_job=()
+  declare -A worker_failed=()
   running=0
+  paused=0
 
   _start_queued() {
     local record added_ts command job
-    while ((running < njobs)) && [[ ! -e $stop_file ]]; do
+    while ((running < njobs)) && [[ ! -e $stop_file && $paused -eq 0 ]]; do
       _queue_take_first
       [[ -n $record ]] || break
       added_ts=${record%% *}
@@ -517,7 +548,18 @@ if ((worker)); then
   # trap _cleanup INT TERM
 
   # Main loop: read completions from FIFO
-  while ((running > 0)); do
+  while :; do
+    if ((running == 0)); then
+      if ((paused)) && [[ -e ${session_dir}/keepgoing ]]; then
+        paused=0
+      fi
+      if ((paused)); then
+        sleep 0.5
+        continue
+      fi
+      _start_queued
+      ((running)) || break
+    fi
 
     ## ALT:BET? read whole lines, and then split manually?
     # BUG(fixed): `IFS= read -r job rc` used to disable word-splitting entirely, so the
@@ -525,44 +567,47 @@ if ((worker)); then
     #   every job id came back with a trailing space that never matched any key in
     #   worker_record (set without one), crashing under nounset on every single job.
     #   Default IFS is required here to split _wrap's two space-separated fields.
-    read -r job rc exec_ts dt <&"$fifo_fd"
+    read -r job state rc exec_ts dt <&"$fifo_fd"
     [[ -n $job ]] || continue
+    if [[ $state == dead ]]; then
+      record=${worker_record[$job]}
+      _locked_append "$failure_log" "$exec_ts $dt $record rc=$rc interrupted"
+      _inflight_remove "$record"
+      unset 'worker_record[$job]' 'worker_job[$job]'
+      running=$((running - 1))
+      printf 'x\n' >&"$sem_fd"
+      _start_queued
+      continue
+    fi
+    if [[ $state == fail ]]; then
+      record=${worker_record[$job]}
+      worker_failed[$job]=1
+      _locked_append "$failure_log" "$exec_ts $dt $record"
+      _inflight_remove "$record"
+      [[ -e ${session_dir}/keepgoing ]] || paused=1
+      if command -v dunstify &>/dev/null; then
+        dunstify -u critical "tmux-jobs: job $job failed (rc=$rc)" ||:
+      fi
+      continue
+    fi
     record=${worker_record[$job]}
-    unset 'worker_record[$job]' 'worker_job[$job]'
+    failed=${worker_failed[$job]-0}
+    unset 'worker_record[$job]' 'worker_job[$job]' 'worker_failed[$job]'
     running=$((running - 1))
     # Release slot
     printf 'x\n' >&"$sem_fd"
 
-    if ((rc == 0)); then
+    if ((rc == 0 && !failed)); then
       _locked_append "$success_log" "$exec_ts $dt $record"
       _inflight_remove "$record"
+    elif ((failed)); then
+      :
     else
-      # Capture pre-write size so we can fire dunstify exactly once per
-      #   failure burst -- first failure of this run sees size==0, later
-      #   failures see size>0 and skip the notify.
-      pre_sz=0
-      [[ -s $failure_log ]] && pre_sz=$(wc -c < "$failure_log")
-      _locked_append "$failure_log" "$exec_ts $dt $record"
       _inflight_remove "$record"
-      # BAD: to get next failure ntf we should reset failure log after user looked into it
-      if (( pre_sz == 0 )) && command -v dunstify &>/dev/null; then
-        dunstify -u critical "tmux-jobs: job $job failed (rc=$rc)" ||:
-      fi
-      if [[ ! -e ${session_dir}/keepgoing ]]; then
-        >&2 echo "Err: queued job failed; retained in $failure_log"
-        # Drain remaining jobs
-        while ((running > 0)); do
-          read -r job rc exec_ts dt <&"$fifo_fd"
-          record=${worker_record[$job]}
-          unset 'worker_record[$job]' 'worker_job[$job]'
-          running=$((running - 1))
-          printf 'x\n' >&"$sem_fd"
-          ((rc == 0)) && logfile=$success_log || logfile=$failure_log
-          _locked_append "$logfile" "$exec_ts $dt $record"
-          _inflight_remove "$record"
-        done
-        break
-      fi
+      [[ -e ${session_dir}/keepgoing ]] || paused=1
+    fi
+    if ((paused)) && [[ -e ${session_dir}/keepgoing ]]; then
+      paused=0
     fi
     _start_queued
   done
