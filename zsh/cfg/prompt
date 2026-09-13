@@ -88,6 +88,11 @@ function prompt_submit_rewrite {
 }
 
 function prompt_precmd {
+  # FIXED: save $? before `prompt_git_query` overwrites it
+  #   ALT:BAD: any statement before prompt will override "%?"
+  #     ALT: local err=$(print -P '%?')
+  local exit_status=$? status_info=
+
   # restore full prompt unconditionally before doing anything else this cycle
   if [[ -n $_prompt_saved_prompt ]]; then
     PROMPT=$_prompt_saved_prompt; _prompt_saved_prompt=
@@ -95,11 +100,10 @@ function prompt_precmd {
   fi
   prompt_git_query
 
-  # BAD: any statement before prompt will override "%?"
-  #   ALT: local err=$(print -P '%?')
   # BAD: perscent-expansion isn't recursive in PROMPT (and it keeps ANSI as-is)
   #   ALT:WKRND: print immediately inof expanding by %(1V.%F{$color}╸%f%1v.)
-  print -v 'psvar[1]' -nrP '%(1j.%F{9}⚙%j%f.)%(?.. %F{1}%?↵%f)$(prompt_elapsed)'
+  ((exit_status)) && status_info=" %F{1}${exit_status}↵%f"
+  print -v 'psvar[1]' -nrP "%(1j.%F{9}⚙%j%f.)${status_info}$(prompt_elapsed)"
   [[ ${psvar[1]:+x} ]] && print -P "%F{$_prompt_color}╸%f${psvar[1]}"
 
   # HACK: don't append timer on empty <CR>

@@ -24,9 +24,16 @@ readonly here=${this%/*} PATH=/usr/bin  # PATH=/b:$HOME/.local/bin:/usr/bin:/usr
 # source "$here/helpers.sh" "$this" "$@"
 
 readonly nm=airydev
-readonly cnm=$nm
 readonly vnm=$nm-data
 readonly ltag="localhost:0/$nm:latest"
+cwd_tag=${PWD//[^A-Za-z0-9]}
+cnm="$nm-$cwd_tag"
+if (( ${#cnm} > 63 )); then
+  cwd_hash=$(printf '%s' "$PWD" | sha256sum | cut -c1-16)
+  cwd_prefix_len=$((63 - ${#nm} - 1 - 1 - ${#cwd_hash}))
+  cnm="$nm-${cwd_tag:0:cwd_prefix_len}-$cwd_hash"
+fi
+readonly cnm
 
 
 DockerActive(){ docker container inspect -f '{{.State.Status}}' -- "${@:?}" 2>/dev/null | grep -qwF running; }
@@ -58,7 +65,7 @@ fi
 
 if DockerActive "$cnm"; then
   docker ps
-  exec docker exec -it "$nm" /bin/bash
+  exec docker exec -it "$cnm" /bin/bash
   exit 13
 fi
 
