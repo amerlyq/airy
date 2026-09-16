@@ -32,7 +32,8 @@ shopt -s histappend
 # SRC: https://askubuntu.com/questions/67283/is-it-possible-to-make-writing-to-bash-history-immediate
 # OR:(ble.sh): bleopt history_share=1
 #   https://github.com/akinomyoga/ble.sh/issues/457
-PROMPT_COMMAND="history -a; history -n; ${PROMPT_COMMAND-}"
+# FIXED:(_last_cmd): syncing history makes $(fc -ln -1) unreliable
+PROMPT_COMMAND="read -r _ _last_cmd < <(history 1); history -a; history -n; ${PROMPT_COMMAND-}"
 
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
 HISTSIZE=10000
@@ -73,8 +74,11 @@ shopt -s cdspell
 
 # Enable xsel to copy current cmdline/output (like in zsh)
 # NOTE: xsel-remote works even w/o $DISPLAY set
-_xc_copy_cmdline(){ xci <<< "${READLINE_LINE:-$(fc -ln -1)}"; }
-_xc_copy_output(){ xci <<< "$(eval $(fc -ln -1) 2>/dev/null)"; }
+# ALT:(if no !xci/!xco in PATH):
+#   xci(){ >&- 2>&- xclip -selection clipboard -in "$@"; }
+#   xco(){ <&- xclip -selection clipboard -out "$@"; }
+_xc_copy_cmdline(){ xci <<< "${READLINE_LINE:-$_last_cmd}"; }
+_xc_copy_output(){ xci <<< "$(eval "$_last_cmd" 2>/dev/null)"; }
 bind -x '"\C-y": _xc_copy_cmdline'
 bind -x '"\C-o": _xc_copy_output'
 
