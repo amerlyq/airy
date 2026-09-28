@@ -153,15 +153,50 @@ _cvt_qsv() { local fin="$1" out="$2"
     -c:v hevc_qsv -preset slow -global_quality "$qa" "$out"
 }
 
-_cvt_cpu() { local fin="$1" out="$2"
+_cvt_cpu() { local fin="$1" out="$2"; shift 2
+  ## USE:
+  # * tune=0 -- low orse tune=1 makes "detailed boundaries of gradients" somewhat blurry
+  #   INFO: tune=1 is PSNR, which rewards smoothing, and thin low-contrast lines contribute almost nothing to it -> tune 0 (VQ) is the perceptual mode
+  # * enable-tf=0 -- orse enable-tf=1 loses standalone thin lines (like hairs) in low-contrast zones
+  #   INFO: temporal filtering averages neighbouring frames, which softens fine lines; worse compression on noisy, grainy sources
+  local params="tune=0:scd=1:keyint=5s:lookahead=120:enable-qm=1:qm-min=0:qm-max=15:enable-overlays=1:sharpness=1:enable-tf=0"
+  ## TRY:BAD: too much file increase 1.19MiB -> 1.72MiB (out of 5.97MiB .webp) for very subtle noisy sharpness
+  # * enable-variance-boost=1:variance-boost-strength=3 (default strength 2)
+  #   it targets exactly this: low-contrast detail inside otherwise flat regions gets extra bits
+  #   ! variance boost gets you the lines without raising the whole bitrate, so try it before going below qa~28
+  # * variance-octile=6 (default 6) shifts the boost toward low-variance blocks; lower it if lines are still lost
+  #   needs SVT-AV1 ≥ 2.3; check SvtAv1EncApp --help | grep variance on your build
+  # If lines are still soft, try each separately:
+  #   * enable-cdef=0: CDEF smooths low-contrast texture
+  #   * enable-restoration=0: the loop restoration filter can also blur lines
+  # Not the scaler:
+  #   * lanczos sharpens rather than blurs, and it only runs when the source exceeds 1080, for a source ≤ 1080 the scale is a no-op
+  # params+=":enable-variance-boost=1:variance-boost-strength=3:variance-octile=6"
+
   local cpuopts=(  # <CASE:(amv/cg):
     -preset 4 -crf "$qa" -pix_fmt yuv420p10le
-    -svtav1-params "tune=1:scd=1:keyint=5s:lookahead=120:enable-qm=1:qm-min=0:qm-max=15:enable-overlays=1:sharpness=1"
+    -svtav1-params "$params"
   )
   local vf_scale="scale=w='if(gt(iw,ih),min(iw,1920),min(iw,1080))':h='if(gt(iw,ih),min(ih,1080),min(ih,1920))':force_original_aspect_ratio=decrease:force_divisible_by=2:flags=lanczos,format=yuv420p10le"
   "${ffmpeg[@]:-ffmpeg}" \
-    -i "$fin" -vf "$vf_scale" \
+    -i "$fin" "$@" -vf "$vf_scale" \
     -c:v libsvtav1 "${cpuopts[@]}" -c:a copy "$out"
+}
+
+_cvt_webp(){ local fin="$1" out="$2" dtmp
+  # dtmp=$(mktemp -d /dev/shm/webp_XXXXXX)
+  dtmp=$(mktemp -d /t/webp_XXXXXX)
+  trap 'rm -rf "$dtmp"' ERR INT
+  # ALT?FAIL?  webpmux -get frame $(seq 1 $(webpinfo 821683-182.webp | grep -c "Chunk ANMF")) 821683-182.webp -o - \
+  #   | ffmpeg -f image2pipe -i - -c:v libsvtav1 -crf 24 -preset 4 -pix_fmt yuv420p output.mp4
+  anim_dump -pam -folder "$dtmp" -prefix 'f_' "$fin"
+  webpinfo "$fin" | awk -v d="$dtmp" '
+    /Duration:/ { printf "file %s/f_%04d.pam\nduration %.3f\n", d, n++, $2/1000; last=n-1 }
+    END { printf "file %s/f_%04d.pam\n", d, last }   # concat drops the last duration otherwise
+  ' > "$dtmp/list.txt"
+  local ffmpeg=("${ffmpeg[@]:-ffmpeg}" -f concat -safe 0)
+  _cvt_cpu "$dtmp/list.txt" "$out" -fps_mode vfr
+  rm -rf "$dtmp"
 }
 
 _convert_one() { local fin="$1"
@@ -283,6 +318,16 @@ if [[ ${watch-} ]]; then
     [[ -f $f ]] || continue  # <REMOVE? events should be existing files OR it should be error, not silent skipping
     _enqueue "$f"
   done
+  exit
+fi
+
+# TEMP
+if (($#==1)); then  # && [[ ${inprocess:+x} ]]
+  if [[ $1 == *.webp ]]; then
+    _cvt_webp "$1" "${1%.webp}.mp4"
+  else
+    _convert_one "$1"
+  fi
   exit
 fi
 
