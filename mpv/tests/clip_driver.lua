@@ -65,13 +65,14 @@ mp = {
     return job
   end,
   command_native = function(command)
-    if command.name == "overlay-remove" then overlays[command.id] = nil; return {} end
+    if command.name == "overlay-remove" then overlays[command.id] = nil; return end
     assert(command.name == "overlay-add", "unexpected synchronous command")
     if props.overlay_error then return nil, "overlay test failure" end
     command.data = assert(read(command.file))
     assert(#command.data == command.w * command.h * 4, "invalid raw frame")
     overlays[command.id] = command
-    return {}
+    -- Real mpv returns no value for overlay-add, not an empty node map.
+    return nil
   end,
 }
 local script = arg[0]:gsub("tests/clip_driver.lua$", "scripts/clip.lua")
@@ -153,6 +154,7 @@ else
   assert(overlays[1])
   mark("end", 16); drain()
   assert(overlays[2].data:sub(1, 1) == "b", "B must use last frame")
+  assert(overlays[1].y >= 48, "reserve one OSD line above bitmap previews")
   -- Resize reuses the cached pixels, including portrait layout.
   local count = #calls
   props["osd-dimensions"].w = 400
@@ -163,6 +165,14 @@ else
   -- Hide/show caches; clearing must kill the pending debounce.
   messages.clip_toggle_previews(); assert(not next(overlays))
   messages.clip_toggle_previews(); assert(overlays[1] and #calls == count)
+  -- The OSC property reports the state set by the toggle, not another toggle.
+  observers["user-data/osc/visibility"]("user-data/osc/visibility", "always")
+  messages.clip_toggle_previews()
+  observers["user-data/osc/visibility"]("user-data/osc/visibility", "never")
+  assert(not next(overlays))
+  messages.clip_toggle_previews()
+  observers["user-data/osc/visibility"]("user-data/osc/visibility", "always")
+  assert(overlays[1] and #calls == count)
   mark("beg", 8); bindings.clip_clear_preview(); drain()
   assert(#calls == count and not next(overlays))
   -- Layout unavailable on marking: observer retries after layout appears.

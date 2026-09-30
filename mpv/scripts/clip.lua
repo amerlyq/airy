@@ -18,9 +18,24 @@ local state = {
 local edges = { { name = "A", id = 1, time = 0 }, { name = "B", id = 2, time = 0 } }
 local jobs = {} -- Includes cancelled processes until their completion callbacks.
 
+-- Bitmap overlays always cover mpv's text OSD. Keep one text line above them.
+local function osd_metrics()
+  local dims = mp.get_property_native("osd-dimensions")
+  local scale = mp.get_property_native("osd-scale-by-window") == false and 1
+    or (dims and dims.h or 720) / 720
+  local font = (mp.get_property_number("osd-font-size") or 30)
+    * (mp.get_property_number("osd-scale") or 1) * scale
+  local margin = (mp.get_property_number("osd-margin-y") or 16) * scale
+  return font, math.ceil(margin + font * 1.5 + PAD), dims
+end
+
 local function status(level, message)
   mp.msg.log(level, message)
-  mp.osd_message(level .. ": " .. message, 2)
+  local font, _, dims = osd_metrics()
+  local text = level .. ": " .. message:gsub("%s+", " ")
+  local limit = math.max(20, math.floor(((dims and dims.w or 1280) - 40) / (font * 0.65)))
+  if #text > limit then text = text:sub(1, limit - 10) .. "... (log)" end
+  mp.osd_message(text, 2)
 end
 
 local function finite(value)
@@ -72,15 +87,16 @@ local function geometry(edge)
   if not dims or not vw or not vh or vw <= 0 or vh <= 0 then return end
   local aw = dims.w - (dims.ml or 0) - (dims.mr or 0)
   local ah = dims.h - (dims.mt or 0) - (dims.mb or 0)
+  local _, top = osd_metrics()
   local ratio, w, h, x, y = vw / vh
   if vh > vw then
-    w = math.min(aw * 0.20, (dims.h - 3 * PAD) / 2 * ratio)
+    w = math.min(aw * 0.20, (dims.h - top - 2 * PAD) / 2 * ratio)
     h = w / ratio
-    x, y = dims.w - w - PAD, PAD + (edge.id - 1) * (h + PAD)
+    x, y = dims.w - w - PAD, top + (edge.id - 1) * (h + PAD)
   else
-    h = math.min(ah * 0.20, (dims.w - 3 * PAD) / 2 / ratio)
+    h = math.min(ah * 0.20, (dims.w - 3 * PAD) / 2 / ratio, dims.h - top - PAD)
     w = h * ratio
-    x, y = PAD + (edge.id - 1) * (w + PAD), PAD
+    x, y = PAD + (edge.id - 1) * (w + PAD), top
   end
   if w < 16 or h < 16 then return end
   return math.floor(x), math.floor(y), math.floor(w), math.floor(h)
@@ -120,14 +136,15 @@ local function render(edge)
   if state.hidden or not cached then return end
   local x, y, w, h = geometry(edge)
   if not x then remove_overlay(edge); return end
-  local result, err = mp.command_native({
+  local _, err = mp.command_native({
     name = "overlay-add", id = edge.id, x = x, y = y, file = cached.raw,
     offset = 0, fmt = "bgra", w = cached.w, h = cached.h,
     stride = cached.w * 4, dw = w, dh = h,
   })
-  if not result then remove_overlay(edge) end
-  edge.shown = result ~= nil
-  edge.error = not result and ("overlay: " .. tostring(err)) or nil
+  -- overlay-add has no result: nil,nil is success; nil,error is failure.
+  if err then remove_overlay(edge) end
+  edge.shown = err == nil
+  edge.error = err and ("overlay: " .. tostring(err)) or nil
   if edge.error then status("error", edge.error) end
 end
 
@@ -402,12 +419,13 @@ mp.observe_property("eof-reached", "bool", function(_, eof)
 end)
 mp.observe_property("osd-dimensions", "native", show_previews)
 mp.observe_property("video-out-params", "native", show_previews)
-local function observe_visibility()
-  local vis = mp.get_property("user-data/osc/visibility") or mp.get_property("script-opts/osc-visibility")
+local function observe_visibility(_, vis)
   if vis then set_hidden(vis == "never") end
 end
 mp.observe_property("user-data/osc/visibility", "string", observe_visibility)
-mp.observe_property("script-opts/osc-visibility", "string", observe_visibility)
+for _, property in ipairs({ "osd-font-size", "osd-scale", "osd-margin-y", "osd-scale-by-window" }) do
+  mp.observe_property(property, "native", show_previews)
+end
 mp.register_script_message("clip_toggle_previews", function()
   set_hidden(not state.hidden)
   mp.commandv("script-message", "osc-visibility", state.hidden and "never" or "always")
