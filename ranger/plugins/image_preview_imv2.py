@@ -1,113 +1,51 @@
+"""Follow ranger selection in imv; follow imv navigation passively in ranger.
+
+One controller belongs to each FM. Its input loop handles ranger input first,
+then sends the final selection. Background polls carry an input generation;
+results from before subsequent input are discarded. Back-sync never queues sends.
+No compositor or tmux focus notifications are needed.
+
+Track the newest imv socket created after ranger startup. This is discovery,
+not process ownership: another application's newly launched imv is also eligible.
+While tracking: i = tag_toggle, m = sync_imv_position, M = stop_imv_tracking.
+M ignores existing sockets until another imv appears; original maps are restored.
+
+Requires imv with shell-quoted `open` arguments (verified against imv 5.0.1).
+Playlists contain visible image files in ranger order, rebuilt only on changes.
+Commands fit imv's 1023-byte receive buffer. IPC EOF acknowledges enqueueing;
+an `exec printf` snapshot observes execution without relying on IPC replies.
 """
-ranger imgfollow for imv — smooth navigation via index (no black blink)
-
-What it does
-- Watches ranger selection changes ("move" signal).
-- Finds the newest imv UNIX socket in $XDG_RUNTIME_DIR (imv-*.sock).
-- Builds ranger's *visible* image list (fm.thisdir.files) in current order.
-- If the imv instance is new OR the visible list changed:
-    - close all
-    - open <many paths> (chunked, preserves order)
-- Then, on every move:
-    - goto <index> (1-based)
-- Poll imv before handling ranger input and follow its selection passively.
-- Suppress ranger-to-imv commands while applying an imv selection. Subsequent
-  ranger keyboard/mouse moves drive imv normally, without focus detection.
-
-Why
-- Avoids per-move `close all` which causes black flashes.
-- Avoids spawning imv-msg processes; talks to the socket directly.
-- No keymaps required.
-
-Install
-- Copy this file to: ~/.config/ranger/plugins/imgfollow_imv_index.py
-- Restart ranger
-
-Notes
-- We send one command per socket connection/message (no ';' chaining).
-- We try to send a *single* "open" command with many images, chunked to keep
-  message size reasonable. Paths are quoted with double-quotes.
-
-Tuning
-- DEBOUNCE_MS: increase if you scroll fast.
-"""
-
-# pylint:disable=invalid-name,global-statement,using-constant-test,broad-exception-caught
 
 from __future__ import annotations
 
-import hashlib
+import curses
 import mimetypes
 import os
+import shlex
 import socket
+import stat
 import tempfile
 import time
-from collections.abc import Sequence
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from typing import TypedDict
+from typing import NamedTuple
 
-import ranger.api  # for hook chaining
-from ranger.core.fm import FM
-from ranger.ext.keybinding_parser import parse_keybinding
-from ranger.ext.signals import Signal
+import ranger.api
 
-DEBOUNCE_MS = 60
 IMV_POLL_MS = 300
+IPC_TIMEOUT = 0.15
+IPC_MAX_BYTES = 1023
 SOCKET_GLOB = "imv-*.sock"
-
-# If your build expects NUL-terminated commands instead of newline, set True:
-SEND_NUL_TERMINATOR = False
-
-# Keep each "open ..." payload under ~24 KiB by default (conservative)
-OPEN_CMD_MAX_BYTES = 24 * 1024
-
-# -------- internal state --------
-_last_send_mono = 0.0
-_last_path = ""
-_last_imv_sent_path = ""
-_last_imv_sent_dir = ""
-_orig_i_num = 0
-_orig_i = ""
-_changed_i = False
-_changed_m = False
-_orig_m = ""
-_orig_M = ""
-_active_fm = None
-_orig_handle_input = None
-_wrapped_handle_input = False
-_last_imv_poll_mono = 0.0
-_imv_sync_pending = False
-_applying_imv_selection = False
-_owned_imv_sockets: set[str] = set()
-_ignored_imv_sockets: set[str] = set()
-_socket_baseline: set[str] = set()
-
-
-class ImvState(TypedDict):
-    sock: str
-    list_hash: int
-    thisdir: str
-    paths: tuple[str, ...]
-
-
-_state: ImvState = {
-    "sock": "",  # newest socket path
-    "list_hash": 0,  # hash of visible image list
-    "thisdir": "",
-    "paths": tuple(),
+TRACKING_MAPS = {
+    "i": "tag_toggle",
+    "m": "sync_imv_position",
+    "M": "stop_imv_tracking",
 }
 
 
-def _xdg_runtime_dir() -> str:
-    return os.environ.get("XDG_RUNTIME_DIR") or f"/run/user/{os.getuid()}" or "/tmp"
-
-
 def _looks_like_image(path: str) -> bool:
-    mt, _ = mimetypes.guess_type(path)
-    if mt and mt.startswith("image/"):
-        return True
-    ext = os.path.splitext(path)[1].lower()
-    return ext in {
+    mime, _ = mimetypes.guess_type(path)
+    return bool(mime and mime.startswith("image/")) or Path(path).suffix.lower() in {
         ".png",
         ".jpg",
         ".jpeg",
@@ -125,446 +63,328 @@ def _looks_like_image(path: str) -> bool:
     }
 
 
-def _newest_imv_socket() -> str | None:
-    rt = _xdg_runtime_dir()
+class SocketInfo(NamedTuple):
+    path: str
+    device: int
+    inode: int
+    modified_ns: int
+
+
+def _sockets() -> set[SocketInfo]:
+    """Socket identity includes inode/mtime so a reused PID can be tracked again."""
+    runtime = os.environ.get("XDG_RUNTIME_DIR") or f"/run/user/{os.getuid()}"
+    found = set()
     try:
-        entries = [
-            p
-            for p in Path(rt).glob(SOCKET_GLOB)
-            if str(p) in _owned_imv_sockets and str(p) not in _ignored_imv_sockets
-        ]
-    except Exception:
-        return None
-    if not entries:
-        return None
-    # newest by mtime
-    entries.sort(key=lambda p: p.stat().st_mtime if p.exists() else 0.0)
-    return str(entries[-1])
-
-
-def _remember_new_imv_sockets() -> None:
-    """Adopt sockets created by this Ranger's rifle invocation."""
-    global _socket_baseline
-    rt = _xdg_runtime_dir()
-    try:
-        current = {str(p) for p in Path(rt).glob(SOCKET_GLOB)}
-    except Exception:
-        return
-    new_sockets = current - _socket_baseline
-    _owned_imv_sockets.update(new_sockets)
-    # A freshly launched instance is always eligible, including after M.
-    # (Normally imv uses a new PID/socket name, but this also handles socket
-    # names being reused.)
-    _ignored_imv_sockets.difference_update(new_sockets)
-    _socket_baseline = current
-
-
-def _stop_imv_tracking() -> None:
-    """Forget all currently owned imv instances until a new one is opened."""
-    _ignored_imv_sockets.update(_owned_imv_sockets)
-    _set_imv_input_hooks(_active_fm, False)
-
-
-def _quote_imv(s: str) -> str:
-    """Double-quote a path for imv's command parser."""
-    s = s.replace("\x00", "?").replace("\n", "\\n").replace("\r", "\\r")
-    s = s.replace("\\", "\\\\").replace('"', '\\"')
-    return f'"{s}"'
-
-
-def _send_line(sock_path: str, line: str) -> bool:
-    return _request(sock_path, line) is not None
-
-
-def _request(sock_path: str, line: str) -> bytes | None:
-    """Send an IPC command and return imv's reply, if any."""
-    data = line.encode("utf-8", "surrogateescape")
-    data += b"\x00" if SEND_NUL_TERMINATOR else b"\n"
-
-    s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-    try:
-        s.settimeout(0.10)
-        s.connect(sock_path)
-        s.sendall(data)
-        reply = b""
-        try:
-            while True:
-                chunk = s.recv(4096)
-                if not chunk:
-                    break
-                reply += chunk
-        except Exception:
-            # A command which has no reply commonly times out here.
-            pass
-        return reply
-    except Exception:
-        return None
-    finally:
-        try:
-            s.close()
-        except Exception:
-            pass
-
-
-def _current_imv_path(sock: str) -> str | None:
-    """Ask imv which file is selected, using a temp file for the result."""
-    fd, result_path = tempfile.mkstemp(prefix="ranger-imv-", suffix=".path")
-    os.close(fd)
-    try:
-        # imv's exec command runs inside imv; its stdout is not the IPC reply.
-        command = f'exec echo "$imv_current_file" > {_quote_imv(result_path)}'
-        if _request(sock, command) is None:
-            return None
-
-        # The exec is asynchronous, so allow a short handoff/write window.
-        for _ in range(5):
+        for path in Path(runtime).glob(SOCKET_GLOB):
             try:
-                path = (
-                    Path(result_path)
-                    .read_text(encoding="utf-8", errors="surrogateescape")
-                    .strip()
+                info = path.stat()
+            except OSError:
+                continue  # imv may exit during discovery
+            if stat.S_ISSOCK(info.st_mode):
+                found.add(
+                    SocketInfo(str(path), info.st_dev, info.st_ino, info.st_mtime_ns)
                 )
-            except OSError:
-                path = ""
-            if path:
-                return path.splitlines()[-1].strip()
-            time.sleep(0.02)
-        return None
-    finally:
-        try:
-            os.unlink(result_path)
-        except OSError:
-            pass
+    except OSError:
+        pass
+    return found
 
 
-def _sync_from_imv_fm(fm: FM) -> None:
-    """Follow imv's selected image in ranger."""
-    global _last_imv_sent_path, _last_imv_sent_dir, _applying_imv_selection
-    # The compositor/tmux handoff can make the first request arrive too early.
-    for delay in (0.0, 0.03, 0.08):
-        if delay:
-            time.sleep(delay)
-        sock = _newest_imv_socket()
-        if not sock:
-            continue
-        path = _current_imv_path(sock)
-        if not path or not os.path.exists(path):
-            continue
-
-        # imv reports the canonical path even when opened through a symlink.
-        # Resolve it to a visible ranger entry (which may itself be a symlink)
-        # so ranger stays on the symlinked path the user is browsing instead
-        # of being moved to the realpath under a different folder.
-        visible_files = getattr(fm.thisdir, "files", None) or ()
-        selected: str | None = None
-        try:
-            real_path = os.path.realpath(path)
-            for entry in visible_files:
-                try:
-                    if os.path.realpath(entry.path) == real_path:
-                        selected = entry.path
-                        break
-                except OSError:
-                    continue
-        except OSError:
-            selected = None
-        if selected is None:
-            continue
-
-        # Only sync when ranger is in the same directory as the matched
-        # visible entry.  We compare the entry's parent dir (which may itself
-        # be a symlinked path) against fm.thisdir.path so that browsing a
-        # symlinked view directory still matches imv's reported realpath.
-        fm_dir = getattr(fm.thisdir, "path", "") or ""
-        try:
-            entry_dir = os.path.dirname(selected)
-        except (OSError, TypeError):
-            entry_dir = ""
-        if not fm_dir or not entry_dir:
-            continue
-        try:
-            if os.path.realpath(entry_dir) != os.path.realpath(fm_dir):
-                continue
-        except OSError:
-            continue
-
-        # If imv still shows the image ranger sent last, it is not a handoff
-        # change.  Let the user's current ranger navigation win instead of
-        # jumping back.
-        if _last_imv_sent_path:
-            try:
-                if os.path.realpath(path) == os.path.realpath(_last_imv_sent_path):
-                    return
-            except OSError:
+def _send_command(sock_path: str, command: str) -> bool:
+    """Wait for server EOF after half-close: prior commands are now enqueued."""
+    payload = os.fsencode(command) + b"\n"
+    if b"\0" in payload or len(payload) > IPC_MAX_BYTES:
+        raise ValueError("imv command exceeds IPC limit or contains NUL")
+    try:
+        with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as connection:
+            connection.settimeout(IPC_TIMEOUT)
+            connection.connect(sock_path)
+            connection.sendall(payload)
+            connection.shutdown(socket.SHUT_WR)
+            while connection.recv(4096):
                 pass
-        if _last_imv_sent_dir and getattr(fm.thisdir, "path", "") != _last_imv_sent_dir:
-            return
+        return True
+    except OSError:
+        return False
 
-        if getattr(fm.thisfile, "path", None) != selected:
-            # select_file emits move synchronously. Do not echo this snapshot
-            # back to imv: the viewer may already have advanced to another file.
-            # Keep other move handlers active so ranger redraws normally.
-            _applying_imv_selection = True
+
+class Snapshot(NamedTuple):
+    path: str
+    index: int
+    count: int
+
+
+def _snapshot(sock: str) -> Snapshot | None:
+    # A private directory prevents late execs from recreating an unlinked file
+    # after timeout. NUL framing preserves newlines and whitespace in filenames.
+    with tempfile.TemporaryDirectory(prefix="ranger-imv-") as directory:
+        result = Path(directory) / "selection"
+        command = (
+            "exec printf '%s\\0%s\\0%s\\0' "
+            '"$imv_current_file" "$imv_current_index" "$imv_file_count" > '
+            + shlex.quote(str(result))
+        )
+        if not _send_command(sock, command):
+            return None
+        deadline = time.monotonic() + IPC_TIMEOUT
+        while True:
             try:
-                fm.select_file(selected)
+                data = result.read_bytes()
+            except FileNotFoundError:
+                data = b""
+            if data.endswith(b"\0") and data.count(b"\0") == 3:
+                path, index, count, _ = data.split(b"\0")
+                try:
+                    return Snapshot(os.fsdecode(path), int(index), int(count))
+                except ValueError:
+                    return None
+            if time.monotonic() >= deadline:
+                return None
+            time.sleep(0.005)
+
+
+def _open_commands(paths: tuple[str, ...]) -> list[str]:
+    """Quote before chunking; never split a path across imv commands."""
+    commands = []
+    command = "open"
+    for path in paths:
+        argument = " " + shlex.quote(path)
+        if len(os.fsencode("open" + argument + "\n")) > IPC_MAX_BYTES:
+            raise ValueError(f"Path too long for imv IPC: {path}")
+        if len(os.fsencode(command + argument + "\n")) > IPC_MAX_BYTES:
+            commands.append(command)
+            command = "open"
+        command += argument
+    if command != "open":
+        commands.append(command)
+    return commands
+
+
+class ImvSync:
+    def __init__(self, fm):
+        self.fm = fm
+        self.ignored = _sockets()
+        self.socket = None
+        self.playlist = ()
+        self.directory = ""
+        self.observed_selection = None
+        self.pending = False
+        self.applying_snapshot = False
+        self.last_poll = 0.0
+        self.saved_maps = {}
+        self.original_input = fm.ui.handle_input
+        self.generation = 0
+        self.snapshot_job = None
+        self.executor = ThreadPoolExecutor(
+            max_workers=1, thread_name_prefix="ranger-imv"
+        )
+
+    def install(self):
+        self.fm.ui.handle_input = self.handle_input
+        # Count actual input even when it causes no move (e.g. Down at EOF).
+        # Both curses-buffered keys and unfocused mouse clicks reach these hooks.
+        for name in ("handle_key", "handle_mouse"):
+            original = getattr(self.fm.ui, name)
+
+            def input_received(*args, _original=original, **kwargs):
+                self.generation += 1
+                return _original(*args, **kwargs)
+
+            setattr(self.fm.ui, name, input_received)
+        self.fm.signal_bind("move", self.on_move, priority=0, weak=False)
+        self.fm.sync_imv_position = self.sync_from_imv
+        self.fm.stop_imv_tracking = self.stop
+        self.fm.commands.load_commands_from_object(
+            self.fm, ["sync_imv_position", "stop_imv_tracking"]
+        )
+        original_after = self.fm.rifle.hook_after_executing
+
+        def after_execution(*args, **kwargs):
+            try:
+                if original_after:
+                    return original_after(*args, **kwargs)
             finally:
-                _applying_imv_selection = False
-        global _last_path
-        _last_path = selected
-        _last_imv_sent_path = selected
-        _last_imv_sent_dir = getattr(fm.thisdir, "path", "")
-        return
+                self.discover()
+
+        self.fm.rifle.hook_after_executing = after_execution
+
+    def set_socket(self, selected):
+        if selected == self.socket:
+            return
+        self.generation += 1
+        self.socket = selected
+        self.playlist = ()
+        self.directory = getattr(self.fm.thisdir, "path", "")
+        self.observed_selection = None
+        self.pending = False
+        self.last_poll = 0.0
+        maps = self.fm.ui.keymaps
+        if selected and not self.saved_maps:
+            for key, command in TRACKING_MAPS.items():
+                self.saved_maps[key] = maps["browser"].get(ord(key))
+                maps.bind("browser", key, command)
+        elif not selected and self.saved_maps:
+            for key, original in self.saved_maps.items():
+                # Do not overwrite a mapping the user changed while tracking.
+                if maps["browser"].get(ord(key)) != TRACKING_MAPS[key]:
+                    continue
+                if original is None:
+                    maps.unbind("browser", key)
+                else:
+                    maps.bind("browser", key, original)
+            self.saved_maps.clear()
+
+    def discover(self):
+        current = _sockets()
+        self.ignored.intersection_update(current)
+        eligible = current - self.ignored
+        self.set_socket(
+            max(eligible, key=lambda item: (item.modified_ns, item.path), default=None)
+        )
+
+    def stop(self):
+        self.ignored.update(_sockets())
+        self.set_socket(None)
+
+    def on_move(self, signal):
+        if self.applying_snapshot:
+            return
+        if getattr(signal, "tab", self.fm.thistab) is not self.fm.thistab:
+            return
+        self.generation += 1
+        self.discover()
+        # Store intent, not an index: input may emit multiple moves or sort
+        # the directory before handle_input returns. Flush the final selection.
+        self.pending = self.socket is not None
+
+    def sync_to_imv(self):
+        if not self.pending or not self.socket:
+            return
+        directory = self.fm.thisdir
+        selected = getattr(self.fm.thisfile, "path", "")
+        paths = tuple(
+            entry.path
+            for entry in (getattr(directory, "files", None) or ())
+            if not entry.is_directory and _looks_like_image(entry.path)
+        )
+        if selected not in paths:
+            self.pending = False
+            return
+        rebuild = paths != self.playlist
+        index = paths.index(selected) + 1
+        try:
+            # Validate all commands before clearing the viewer's playlist.
+            commands = ["close all", *_open_commands(paths)] if rebuild else []
+            commands.append(f"goto {index}")
+            for command in commands:
+                if not _send_command(self.socket.path, command):
+                    self.playlist = ()  # Partial sends must be retried in full.
+                    return
+        except ValueError as error:
+            self.pending = False
+            self.fm.notify(str(error), bad=True)
+            return
+        self.playlist = paths
+        self.directory = directory.path
+        self.observed_selection = (os.path.realpath(selected), index)
+        self.pending = False
+
+    def sync_from_imv(self):
+        if not self.socket or self.pending or self.applying_snapshot:
+            return
+        context = (
+            self.generation,
+            self.socket,
+            self.fm.thistab,
+            getattr(self.fm.thisdir, "path", ""),
+        )
+        if self.snapshot_job is None:
+            self.last_poll = time.monotonic()
+            self.snapshot_job = (
+                context,
+                self.executor.submit(_snapshot, self.socket.path),
+            )
+        requested_context, future = self.snapshot_job
+        if not future.done():
+            return
+        self.snapshot_job = None
+        try:
+            snapshot = future.result()
+        except (OSError, ValueError):
+            return  # Temporary-file/IPC failures are retried on the next poll.
+        if requested_context != context or snapshot is None:
+            return
+        # imv can remove invalid/deleted images or edit its own playlist.
+        # Invalidate cached indices when the reported entry no longer matches.
+        if self.playlist and (
+            snapshot.count != len(self.playlist)
+            or not 0 < snapshot.index <= len(self.playlist)
+            or os.path.realpath(self.playlist[snapshot.index - 1])
+            != os.path.realpath(snapshot.path)
+        ):
+            self.playlist = ()
+        if not snapshot.path:
+            return
+        path = os.path.realpath(snapshot.path)
+        selection = (path, snapshot.index)
+        if selection == self.observed_selection:
+            return  # No new imv selection; preserve ranger's non-image moves.
+        directory = self.fm.thisdir
+        if getattr(directory, "path", "") != self.directory:
+            return
+        files = getattr(directory, "files", None) or ()
+        matches = [entry for entry in files if os.path.realpath(entry.path) == path]
+        if not matches:
+            return  # Never leave ranger's current visible directory.
+        selected = matches[0]
+        if self.playlist and 0 < snapshot.index <= len(self.playlist):
+            indexed = self.playlist[snapshot.index - 1]
+            selected = next(
+                (entry for entry in matches if entry.path == indexed), selected
+            )
+        self.applying_snapshot = True
+        try:
+            # Avoid select_file's enter_dir: it can change filters and history.
+            directory.move_to_obj(selected.path)
+        finally:
+            self.applying_snapshot = False
+        self.observed_selection = selection
+
+    def handle_input(self):
+        self.discover()
+        generation = self.generation
+        # Ranger normally blocks up to idle_delay (often 2s). Temporarily cap
+        # that wait while tracking so passive polling remains responsive.
+        capped_wait = self.socket is not None and not self.fm.ui.load_mode
+        if capped_wait:
+            curses.halfdelay(max(1, IMV_POLL_MS // 100))
+        try:
+            self.original_input()
+        finally:
+            if capped_wait and not self.fm.ui.load_mode:
+                curses.halfdelay(min(255, max(1, self.fm.settings.idle_delay // 100)))
+        self.sync_to_imv()
+        # A key waiting in curses is handled before any completed poll result.
+        # Moves also invalidate queries issued before programmatic navigation.
+        if (
+            self.generation == generation
+            and self.socket
+            and (
+                self.snapshot_job is not None
+                or (time.monotonic() - self.last_poll) * 1000 >= IMV_POLL_MS
+            )
+        ):
+            self.sync_from_imv()
 
 
-def _poll_imv_before_input(fm: FM) -> None:
-    global _last_imv_poll_mono, _imv_sync_pending
-    _remember_new_imv_sockets()
-    now = time.monotonic()
-    if (now - _last_imv_poll_mono) * 1000.0 < IMV_POLL_MS:
-        return
-    _last_imv_poll_mono = now
-    _sync_from_imv_fm(fm)
-    _imv_sync_pending = False
+_previous_hook_ready = ranger.api.hook_ready
 
 
-def _set_imv_input_hooks(fm: FM, enabled: bool) -> None:
-    """Temporarily follow imv while it exists, restoring ranger afterwards."""
-    global _changed_m, _wrapped_handle_input, _imv_sync_pending
-    if enabled and not _wrapped_handle_input:
-        original = _orig_handle_input
-        _imv_sync_pending = True
-
-        def handle_input_with_imv_sync():
-            if _newest_imv_socket():
-                _poll_imv_before_input(fm)
-            original()
-
-        fm.ui.handle_input = handle_input_with_imv_sync
-        _wrapped_handle_input = True
-    elif not enabled and _wrapped_handle_input:
-        fm.ui.handle_input = _orig_handle_input
-        _wrapped_handle_input = False
-        _imv_sync_pending = False
-
-    if enabled and not _changed_m:
-        fm.ui.keymaps.bind("browser", "m", "sync_imv_position")
-        fm.ui.keymaps.bind("browser", "M", "stop_imv_tracking")
-        _changed_m = True
-    elif not enabled and _changed_m:
-        if _orig_m is None:
-            fm.ui.keymaps.unbind("browser", "m")
-        else:
-            fm.ui.keymaps.bind("browser", "m", _orig_m)
-        if _orig_M is None:
-            fm.ui.keymaps.unbind("browser", "M")
-        else:
-            fm.ui.keymaps.bind("browser", "M", _orig_M)
-        _changed_m = False
-
-
-def _hash_paths(paths: Sequence[str]) -> str:
-    h = hashlib.sha1()
-    for p in paths:
-        h.update(p.encode("utf-8", "surrogateescape"))
-        h.update(b"\x00")
-    return h.hexdigest()
-
-
-# def _sync_playlist(sock: str, paths: List[str]) -> None:
-#     """Replace imv playlist with these paths, preserving order."""
-#     _send_line(sock, "close all")
-#     if not paths:
-#         return
-#
-#     prefix = "open "
-#     cur = prefix
-#     cur_bytes = len(
-#         (cur + ("\x00" if SEND_NUL_TERMINATOR else "\n")).encode(
-#             "utf-8", "surrogateescape"
-#         )
-#     )
-#
-#     def flush(cmd: str) -> None:
-#         if cmd.strip() != prefix.strip():
-#             _send_line(sock, cmd.rstrip())
-#
-#     for p in paths:
-#         qp = _quote_imv(p)
-#         add = qp + " "
-#         add_bytes = len(add.encode("utf-8", "surrogateescape"))
-#         if cur_bytes + add_bytes > OPEN_CMD_MAX_BYTES and cur != prefix:
-#             flush(cur)
-#             cur = prefix
-#             cur_bytes = len(
-#                 (cur + ("\x00" if SEND_NUL_TERMINATOR else "\n")).encode(
-#                     "utf-8", "surrogateescape"
-#                 )
-#             )
-#         cur += add
-#         cur_bytes += add_bytes
-#
-#     flush(cur)
-
-
-def _sync_playlist(sock: str, paths: Sequence[str]) -> None:
-    """Replace imv playlist with these paths, preserving order (one open per file)."""
-    _send_line(sock, "close all")
-    if not paths:
-        return
-
-    # One 'open' per file: most compatible, avoids multi-arg/quoting issues.
-    for p in paths:
-        _send_line(sock, f"open {p}")
-
-
-def _ensure_synced(sock: str, fm: FM) -> int | None:
-    dpath = getattr(fm.thisdir, "path", "")
-    if not dpath:
-        return None
-    # PERF: preserve list until thisdir changes e.g. go up and back
-    if _state["thisdir"] != dpath:
-        paths = tuple(f.path for f in fm.thisdir.files if _looks_like_image(f.path))
-        _state["paths"] = paths
-        _state["thisdir"] = dpath
-    else:
-        paths = _state["paths"]
-
-    # ALT:BAD: can't use (fm.thisdir.pointer + 1) COS we filter-out non-image files
-    fpath = getattr(fm.thisfile, "path", "")
-    if not fpath:
-        return None
-    idx = paths.index(fpath) + 1  # imv goto is 1-based
-
-    # lh = _hash_paths(paths)
-    lh = hash(paths)
-    if _state["sock"] != sock or _state["list_hash"] != lh:
-        if paths:
-            _send_line(sock, "close all")
-            _send_line(sock, f"open -r {dpath}")
-            # _send_line(sock, "\n".join(f"open {p}" for p in paths))
-            # BAD: it seems each open command is limited by 1024b
-            # fm.notify(len(" ".join(paths[:19])))
-            # _send_line(sock, "open " + " ".join(paths))
-            # _sync_playlist(sock, paths)
-            # FAIL:PERF too slow (loads like 5-10 pics / second)
-            # for p in paths:
-            #     _send_line(sock, f"open {p}")
-        _state["sock"] = sock
-        _state["list_hash"] = lh
-
-    return idx
-
-
-def _on_move(signal: Signal) -> None:
-    global _last_send_mono, _last_path, _changed_i
-    global _last_imv_sent_path, _last_imv_sent_dir
-
-    if _applying_imv_selection:
-        return
-
-    try:
-        fm: FM = signal.origin
-    except Exception:
-        return
-
-    # Some rifle paths do not invoke hook_after_executing. Discover sockets
-    # here as a fallback, while excluding sockets present at startup.
-    _remember_new_imv_sockets()
-    sock = _newest_imv_socket()
-    if sock and not _wrapped_handle_input:
-        # This also covers returning to Ranger on the same file: in that
-        # case there may be no useful move signal after focus changes.
-        _set_imv_input_hooks(fm, True)
-
-    # fm.notify("sljdslfjsdf", bad=True)
-
-    # Debounce
-    now = time.monotonic()
-    if (now - _last_send_mono) * 1000.0 < DEBOUNCE_MS:
-        return
-
-    new = getattr(signal, "new", None)
-    sel_path = getattr(new, "path", None) if new else None
-    if not sel_path or not _looks_like_image(sel_path):
-        return
-    if _last_path == sel_path:
-        return
-
-    km = fm.ui.keymaps["browser"]
-
-    # >OK
-    # fm.notify(sel_path, bad=True)
-
-    if not sock:
-        if _changed_i and km.get(_orig_i_num) != _orig_i:
-            fm.ui.keymaps.bind("browser", "i", _orig_i)
-            _changed_i = False
-        return
-
-    idx = _ensure_synced(sock, fm)
-    if idx is None:
-        return
-
-    _send_line(sock, f"goto {idx}")
-    _last_imv_sent_path = sel_path
-    _last_imv_sent_dir = getattr(fm.thisdir, "path", "")
-
-    if km.get("i") != "tag_toggle":
-        fm.ui.keymaps.bind("browser", "i", "tag_toggle")
-        _changed_i = True
-
-        # map zi    chain set preview_images!;
-        # eval cmd("map i tag_toggle" if fm.settings.preview_images else "map i display_file")
-
-    _last_send_mono = now
-    _last_path = sel_path
-
-
-# ---- robust hook wiring (official pattern) ----
-_HOOK_READY_OLD = ranger.api.hook_ready
-
-
-def hook_ready(fm: FM) -> None:
-    global _orig_i, _orig_m, _orig_M, _orig_handle_input
-    _orig_i_num = tuple(parse_keybinding("i"))[0]
-    _orig_i = fm.ui.keymaps["browser"].get(_orig_i_num)
-    _orig_m = fm.ui.keymaps["browser"].get("m")
-    _orig_M = fm.ui.keymaps["browser"].get("M")
-    _orig_handle_input = fm.ui.handle_input
-    global _active_fm, _socket_baseline
-    _active_fm = fm
-    try:
-        _socket_baseline = {str(p) for p in Path(_xdg_runtime_dir()).glob(SOCKET_GLOB)}
-    except Exception:
-        _socket_baseline = set()
-    # Keep a lightweight input hook installed so focus changes from imv back
-    # to Ranger are observable even when Ranger emits no move signal.
-    _set_imv_input_hooks(fm, True)
-    # fm.notify(_orig_i)
-
-    # bind selection-change signal
-    fm.signal_bind("move", _on_move, priority=0, weak=False)
-
-    # Focus notifications are unreliable when ranger is nested in tmux/st.
-    # Expose the same operation as :m while imv is active for manual testing.
-    fm.sync_imv_position = lambda: _sync_from_imv_fm(fm)
-    fm.stop_imv_tracking = _stop_imv_tracking
-    fm.commands.load_commands_from_object(fm, ["sync_imv_position"])
-    fm.commands.load_commands_from_object(fm, ["stop_imv_tracking"])
-
-    # Also activate the input hook when ranger launches imv through rifle.
-    old_rifle_after = fm.rifle.hook_after_executing
-
-    def rifle_after(*args, **kwargs):
-        if old_rifle_after:
-            old_rifle_after(*args, **kwargs)
-        _remember_new_imv_sockets()
-        _set_imv_input_hooks(fm, _newest_imv_socket() is not None)
-
-    fm.rifle.hook_after_executing = rifle_after
-
-    if _HOOK_READY_OLD:
-        _HOOK_READY_OLD(fm)
+def hook_ready(fm):
+    if _previous_hook_ready:
+        _previous_hook_ready(fm)
+    if not hasattr(fm, "_imv_sync"):
+        fm._imv_sync = ImvSync(fm)
+        fm._imv_sync.install()
 
 
 ranger.api.hook_ready = hook_ready
