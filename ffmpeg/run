@@ -2,24 +2,50 @@
 # USAGE: [-][<HH>:]<MM>:<SS>[.<m>...] OR [-]<S>+[.<m>...]
 set -euo pipefail
 
+# Preview protocol: NUL-delimited argv vectors separated by an empty argument.
+# mpv runs FFmpeg directly so cancellation cannot leave an orphan encoder.
+# run --preview-plan A|B SOURCE BEGIN END MODE OUTPUT WINDOW
+preview=
+if [[ ${1-} == --preview-plan ]]; then
+  preview=$2
+  [[ $preview == A || $preview == B ]] || exit 2
+  shift 2
+fi
 fname=$1
 beg=$2
 end=$3
 fmt=$4
 ddst=${5-}
+window=${6:-2}
+if [[ -n $preview ]]; then
+  [[ $fmt == copy || $fmt == fast || $fmt == smart ]] || exit 2
+  awk -vb="$beg" -ve="$end" -vw="$window" 'BEGIN{exit !(b>=0 && e>b && w>0)}' || exit 2
+fi
+
+emit_plan() { printf '%s\0' "$@"; printf '\0'; }
+execute_or_plan() {
+  if [[ -n $preview ]]; then emit_plan "$@"; else exec "$@"; fi
+}
+bound_preview() {
+  if [[ $preview == A ]]; then
+    end=$(awk -vb="$beg" -ve="$end" -vw="$window" 'BEGIN{printf "%.9f", (e<b+w?e:b+w)}')
+  elif [[ $preview == B ]]; then
+    beg=$(awk -vb="$beg" -ve="$end" -vw="$window" 'BEGIN{printf "%.9f", (b>e-w?b:e-w)}')
+  fi
+}
 
 path=$fname
 # ddst="${fname%/*}/fl-clip"
 # src=$(readlink -m "$1")
-if [[ -n $ddst ]]; then
+if [[ -n $preview ]]; then
+  path=$ddst
+elif [[ -n $ddst ]]; then
   mkdir -p "$ddst"
   path=$ddst/${fname##*/}
 fi
 
-exec &>> /t/log
-# exec &> /t/ffmpeg_${path##*/}.log
-printf "\n\n---\nARGS: %s\n" "$*"
-set -x
+# Keep stderr attached: clip.lua captures it to report export failures.
+if [[ ${FFMPEG_CLIP_DEBUG:-0} == 1 ]]; then set -x; fi
 
 mkbeg(){ local s=$1 ni=${1%%.*} nf=${1#*.}
   [[ $nf ]] && nf=${nf:0:1} || nf=0
@@ -36,10 +62,12 @@ mkdur(){ local b=$1 e=$2 d
 # e.g. 66.4664 80.447033333333 => sfx=,01'064+140
 # sfx=$(mkbeg "$beg")+$(mkdur "$beg" "$end")
 # path="${path%.*};${sfx}.${path##*.}"
-sfx=$(awk -vt="$beg" 'BEGIN{t=strtonum(t);printf"%02dm%02ds%d",t/60,t%60,(t-int(t))*10}')
-path="${path%.*}_${sfx}.${path##*.}"
+if [[ -z $preview ]]; then
+  sfx=$(awk -vt="$beg" 'BEGIN{t+=0;printf"%02dm%02ds%d",t/60,t%60,(t-int(t))*10}')
+  path="${path%.*}_${sfx}.${path##*.}"
+fi
 
-if [[ -e $path ]]; then
+if [[ -z $preview && -e $path ]]; then
     mv -vfT --backup=t "$path" "${path%.*}_prev${RANDOM}.${path##*.}"
 fi
 
@@ -74,7 +102,8 @@ elif [[ $fmt == copy ]]; then
   #   IDEA: cvt small clips in beg/end and preview in !mpv
   # -loglevel info
   # -avoid_negative_ts make_zero \
-  exec ffmpeg -hide_banner -nostats -nostdin \
+  bound_preview
+  execute_or_plan ffmpeg -hide_banner -nostats -nostdin -n \
     -ss "${beg:-00:00}" -to "${end:--00:00}" \
     -i "$fname" \
     -codec:v copy -codec:a copy -codec:d copy \
@@ -113,12 +142,13 @@ elif [[ $fmt == fast ]]; then
   #   "$path"
   #
 
-  exec ffmpeg -hide_banner -nostats -nostdin \
+  bound_preview
+  execute_or_plan ffmpeg -hide_banner -nostats -nostdin -n \
     -init_hw_device qsv=qsv:hw -hwaccel qsv -hwaccel_output_format qsv \
-    -i "$fname" ${beg:+-ss "$beg"} ${end:+to "$end"} \
+    ${beg:+-ss "$beg"} ${end:+-to "$end"} -i "$fname" \
     -vf "scale_qsv=w='trunc(iw*min(1,min(if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih))/2)*2':h='trunc(ih*min(1,min(if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih))/2)*2',format=qsv" \
     -c:v hevc_qsv -preset slow -global_quality 23 \
-    -c:a aac -codec:d copy \
+    -fps_mode passthrough -c:a aac -codec:d copy \
     "$path"
 
   # x4.5: ffmpeg -y -hide_banner -hwaccel vaapi -hwaccel_output_format vaapi -i input.mp4 -c:v hevc_vaapi -global_quality 25 output.mp4
@@ -145,26 +175,28 @@ elif [[ $fmt == smart ]]; then
   # matching the existing mkdur() constraint (no HH:MM:SS here).
   [[ $beg =~ : || $end =~ : ]] && { echo "smart-cut: HH:MM:SS not supported, use float seconds" >&2; exit 1; }
 
-  work=$(mktemp -d)
-  trap 'rm -rf "$work"' EXIT
+  if [[ -z $preview ]]; then
+    work=$(mktemp -d)
+    trap 'rm -rf "$work"' EXIT
+  fi
 
   # 1. Probe ALL source stream params via one JSON dump (needed to match
   #    boundary re-encodes for concat demuxer's bit-identical requirement,
   #    plus VFR detection and HDR mastering-display/CLL side data).
-  ffprobe -v error -show_streams -show_entries \
-    stream=codec_name,codec_type,profile,pix_fmt,r_frame_rate,avg_frame_rate,\
-sample_rate,channels,channel_layout,color_range,color_space,color_transfer,color_primaries \
-    -show_entries stream_side_data=side_data_type,red_x,red_y,green_x,green_y,blue_x,blue_y,\
-white_point_x,white_point_y,min_luminance,max_luminance,max_content,max_average \
-    -of json "$fname" > "$work/probe.json"
+  probe_json=$(ffprobe -v error -show_streams -show_format -of json "$fname")
 
-  jget(){ jq -r "$1 // empty" "$work/probe.json"; }
+  if ! jq -e '([.streams[]|select(.codec_type=="video")]|length)==1 and
+    ([.streams[]|select(.codec_type=="audio")]|length)<=1' <<< "$probe_json" >/dev/null; then
+    echo 'smart-cut requires exactly one video stream and at most one audio stream' >&2
+    exit 1
+  fi
+
+  jget(){ jq -r "$1 // empty" <<< "$probe_json"; }
 
   v_codec=$(jget '.streams[]|select(.codec_type=="video")|.codec_name')
   v_profile=$(jget '.streams[]|select(.codec_type=="video")|.profile')
   v_pixfmt=$(jget '.streams[]|select(.codec_type=="video")|.pix_fmt')
   v_rfps=$(jget '.streams[]|select(.codec_type=="video")|.r_frame_rate')
-  v_afps=$(jget '.streams[]|select(.codec_type=="video")|.avg_frame_rate')
   v_range=$(jget '.streams[]|select(.codec_type=="video")|.color_range')
   v_space=$(jget '.streams[]|select(.codec_type=="video")|.color_space')
   v_trc=$(jget '.streams[]|select(.codec_type=="video")|.color_transfer')
@@ -195,14 +227,6 @@ white_point_x,white_point_y,min_luminance,max_luminance,max_content,max_average 
     esac
   fi
 
-  # VFR check: r_frame_rate (container-declared) vs avg_frame_rate (measured).
-  # If they differ, forcing -r on boundary re-encodes would itself introduce
-  # drift; use -fps_mode vfr instead of a fixed -r there.
-  is_vfr=0
-  if [[ -n $v_rfps && -n $v_afps && $v_rfps != "$v_afps" ]]; then
-    is_vfr=1
-    echo "smart-cut: source is VFR (r=$v_rfps avg=$v_afps), using -fps_mode vfr on boundary segments" >&2
-  fi
   v_fps=$v_rfps  # used for expected-frame-count math later; nominal rate
 
   # Encoder library picked to match the SOURCE's actual encoder where it
@@ -222,9 +246,11 @@ white_point_x,white_point_y,min_luminance,max_luminance,max_content,max_average 
       fi
       ;;
     *) echo "smart-cut: unhandled codec '$v_codec', falling back to plain copy" >&2
-       ffmpeg -hide_banner -nostats -nostdin \
+       bound_preview
+       fallback=(ffmpeg -hide_banner -nostats -nostdin -n \
          -ss "${beg:-00:00}" -to "${end:--00:00}" \
-         -i "$fname" -codec:v copy -codec:a copy -codec:d copy "$path"
+         -i "$fname" -codec:v copy -codec:a copy -codec:d copy "$path")
+       if [[ -n $preview ]]; then emit_plan "${fallback[@]}"; else "${fallback[@]}"; fi
        exit 0 ;;
   esac
 
@@ -235,7 +261,14 @@ white_point_x,white_point_y,min_luminance,max_luminance,max_content,max_average 
   venc_profile_flag=()
   case "$venc" in
     libx264|libx265)
-      [[ -n $v_profile ]] && venc_profile_flag=(-profile:v "${v_profile,,}")
+      profile=${v_profile,,}
+      profile=${profile// /}
+      case "$profile" in
+        constrainedbaseline) profile=baseline ;;
+        high4:2:2) profile=high422 ;;
+        high4:4:4predictive) profile=high444 ;;
+      esac
+      [[ -n $profile ]] && venc_profile_flag=(-profile:v "$profile")
       ;;
     libaom-av1|libsvtav1)
       case "$v_profile" in
@@ -283,37 +316,36 @@ white_point_x,white_point_y,min_luminance,max_luminance,max_content,max_average 
     echo "smart-cut WARNING: HDR side data present but codec is $venc, not libx265 -- HDR metadata will NOT be preserved on boundary segments" >&2
   fi
 
-  # 2. Find keyframe timestamps.
-  mapfile -t kf_times < <(
-    ffprobe -v error -select_streams v:0 -skip_frame nokey \
-      -show_entries frame=pts_time -of csv=p=0 "$fname"
-  )
-
-  # nearest keyframe <= t
-  kf_at_or_before(){ local t=$1 best=""
-    for k in "${kf_times[@]}"; do
-      awk -vk="$k" -vt="$t" 'BEGIN{exit !(k<=t)}' && best=$k || break
+  # Probe packets near the marks, not decoded frames across the whole source.
+  # ffprobe seeks in the source timestamp domain; ffmpeg -ss is start-relative.
+  origin=$(jget '.format.start_time')
+  origin=${origin:-0}
+  keyframe_near() {
+    local t=$1 direction=$2 span=2 seek limit result packets
+    while :; do
+      seek=$(awk -vt="$t" -vs="$span" -vo="$origin" 'BEGIN{printf "%.9f", (t>s?t-s:0)+o}')
+      limit=$(awk -vt="$t" -vs="$span" -ve="$end" -vo="$origin" 'BEGIN{printf "%.9f", (t+s<e?t+s:e)+o+0.000001}')
+      packets=$(ffprobe -v error -select_streams v:0 -read_intervals "$seek%$limit" \
+        -show_packets -show_entries packet=pts_time,flags -of json "$fname")
+      result=$(jq -r --argjson t "$t" --argjson origin "$origin" --arg direction "$direction" '
+        [.packets[]? | select(.flags|startswith("K")) | .pts_time // empty |
+          tonumber - $origin | select(if $direction=="after" then . >= $t else . <= $t end)] |
+        if length==0 then empty elif $direction=="after" then min else max end' <<< "$packets")
+      if [[ -n $result ]]; then printf '%s\n' "$result"; return; fi
+      # An interval covering the selected range is conclusive; never scan an
+      # unrelated remainder of the source merely to construct a thumbnail.
+      if [[ $direction == after ]] && awk -vt="$t" -vs="$span" -ve="$end" 'BEGIN{exit !(t+s>=e)}'; then return; fi
+      if [[ $direction == before ]] && awk -vt="$t" -vs="$span" 'BEGIN{exit !(s>=t)}'; then return; fi
+      span=$(awk -vs="$span" -ve="$end" 'BEGIN{print (s*4<e?s*4:e)}')
     done
-    echo "$best"
   }
-  # nearest keyframe >= t
-  kf_at_or_after(){ local t=$1
-    for k in "${kf_times[@]}"; do
-      awk -vk="$k" -vt="$t" 'BEGIN{exit !(k>=t)}' && { echo "$k"; return; }
-    done
-    echo ""  # none found (t past last keyframe)
-  }
-
-  ka_next=$(kf_at_or_after "$beg")
-  kb=$(kf_at_or_before "$end")
+  ka_next=$(keyframe_near "$beg" after)
+  kb=$(keyframe_near "$end" before)
 
   # Common boundary-encode flags, shared by degenerate-case and normal path.
   vflags=(-c:v "$venc" "${venc_profile_flag[@]}" -pix_fmt "$v_pixfmt")
-  if [[ $is_vfr == 1 ]]; then
-    vflags+=(-fps_mode vfr)
-  else
-    vflags+=(-r "$v_fps")
-  fi
+  # Keep the source frame sequence; nominal-rate guesses lose/duplicate frames.
+  vflags+=(-fps_mode passthrough)
   vflags+=(${v_range:+-color_range "$v_range"} ${v_space:+-colorspace "$v_space"}
             ${v_trc:+-color_trc "$v_trc"} ${v_prim:+-color_primaries "$v_prim"}
             -crf 16)
@@ -333,18 +365,57 @@ white_point_x,white_point_y,min_luminance,max_luminance,max_content,max_average 
     # -profile:a is meaningful for AAC-family encoders; opus/vorbis/mp3 don't
     # take it and will error on an unrecognized profile string.
     if [[ -n $a_profile && $aenc == aac ]]; then
-      aflags+=(-profile:a "$a_profile")
+      case "$a_profile" in
+        LC) aflags+=(-profile:a aac_low) ;;
+        HE-AAC) aflags+=(-profile:a aac_he) ;;
+        HE-AACv2) aflags+=(-profile:a aac_he_v2) ;;
+      esac
     fi
   else
     aflags=(-an)
+  fi
+
+  # Pick the operation owning this edge in the FULL export, then bound it to
+  # the preview window. Do not run smart-cut independently on a short range:
+  # that could choose re-encoding where the full export uses stream copy.
+  # Lossy samples preserve frame selection, not full-encode rate-control state.
+  if [[ -n $preview ]]; then
+    segment="$path.segment.mp4"
+    codec_flags=("${vflags[@]}" "${aflags[@]}")
+    if [[ -z $ka_next || -z $kb ]] || awk -va="$ka_next" -vb="$kb" 'BEGIN{exit !(a>=b)}'; then
+      bound_preview
+      emit_plan ffmpeg -hide_banner -nostats -nostdin -n -ss "$beg" -to "$end" \
+        -i "$fname" "${codec_flags[@]}" "$path"
+      exit 0
+    elif [[ $preview == A ]]; then
+      if awk -va="$beg" -vk="$ka_next" 'BEGIN{exit !(a<k)}'; then
+        end=$ka_next
+      else
+        end=$kb
+        bound_preview
+        codec_flags=(-codec:v copy -codec:a copy -codec:d copy)
+      fi
+    elif awk -vk="$kb" -vb="$end" 'BEGIN{exit !(k<b)}'; then
+      beg=$kb
+    else
+      beg=$ka_next
+      bound_preview
+      codec_flags=(-codec:v copy -codec:a copy -codec:d copy)
+    fi
+    bound_preview
+    emit_plan ffmpeg -hide_banner -nostats -nostdin -n -ss "$beg" -to "$end" \
+      -i "$fname" "${codec_flags[@]}" "$segment"
+    emit_plan ffmpeg -hide_banner -nostats -nostdin -n -i "$segment" \
+      -codec:v copy -codec:a copy -codec:d copy "$path"
+    exit 0
   fi
 
   # Degenerate case: clip shorter than one GOP, or no keyframe fits between
   # marks -> just re-encode the whole thing, no copy segment possible.
   if [[ -z $ka_next || -z $kb ]] || awk -vka="$ka_next" -vkb="$kb" 'BEGIN{exit !(ka>=kb)}'; then
     echo "smart-cut: no usable keyframe span, re-encoding whole clip" >&2
-    ffmpeg -hide_banner -nostats -nostdin -i "$fname" \
-      -ss "$beg" -to "$end" \
+    ffmpeg -hide_banner -nostats -nostdin \
+      -ss "$beg" -to "$end" -i "$fname" \
       "${vflags[@]}" "${aflags[@]}" \
       "$path"
     exit 0
@@ -354,23 +425,31 @@ white_point_x,white_point_y,min_luminance,max_luminance,max_content,max_average 
   seg2="$work/seg2.mp4"
   seg3="$work/seg3.mp4"
 
-  # seg1: A -> ka_next (re-encode)
-  ffmpeg -hide_banner -nostats -nostdin -i "$fname" \
-    -ss "$beg" -to "$ka_next" \
-    "${vflags[@]}" "${aflags[@]}" "$seg1"
+  segments=()
+  # Do not feed empty boundary files to concat when a mark is a keyframe.
+  if awk -vb="$beg" -vk="$ka_next" 'BEGIN{exit !(b<k)}'; then
+    ffmpeg -hide_banner -nostats -nostdin \
+      -ss "$beg" -to "$ka_next" -i "$fname" \
+      "${vflags[@]}" "${aflags[@]}" "$seg1"
+    segments+=("$seg1")
+  fi
 
   # seg2: ka_next -> kb (copy, both bounds are keyframes)
   ffmpeg -hide_banner -nostats -nostdin \
     -ss "$ka_next" -to "$kb" -i "$fname" \
     -codec:v copy -codec:a copy -codec:d copy "$seg2"
+  segments+=("$seg2")
 
   # seg3: kb -> B (re-encode)
-  ffmpeg -hide_banner -nostats -nostdin -i "$fname" \
-    -ss "$kb" -to "$end" \
-    "${vflags[@]}" "${aflags[@]}" "$seg3"
+  if awk -vk="$kb" -ve="$end" 'BEGIN{exit !(k<e)}'; then
+    ffmpeg -hide_banner -nostats -nostdin \
+      -ss "$kb" -to "$end" -i "$fname" \
+      "${vflags[@]}" "${aflags[@]}" "$seg3"
+    segments+=("$seg3")
+  fi
 
   # 3. Concat via demuxer (stream copy, no further re-encode).
-  printf "file '%s'\nfile '%s'\nfile '%s'\n" "$seg1" "$seg2" "$seg3" > "$work/list.txt"
+  printf "file '%s'\n" "${segments[@]}" > "$work/list.txt"
   ffmpeg -hide_banner -nostats -nostdin -f concat -safe 0 -i "$work/list.txt" \
     -codec:v copy -codec:a copy -codec:d copy "$path"
 

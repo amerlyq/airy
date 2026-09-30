@@ -1,597 +1,319 @@
 -- vim:ft=lua:ts=2:sw=2:sts=2
 --%USAGE:
---% * Clip video from between two marks '[' and ']'
---% * Seek to placed marks 'S-[' and 'S-]'
---% * Convert by 'r.ffmpeg <path> <beg> <end>' on 'y'
---%DEBUG: mpv --msg-level=all=info yourfile.mkv (or check ~/.cache/mpv/mpv.log)
+--% * Mark '[' / ']' and seek to marks with 'S-[' / 'S-]'.
+--% * Thumbnails show first/last frames for the selected copy/fast/smart mode.
+--% * A different export key first switches previews; press again to export.
+--% * Lossy boundary samples match frame selection, not full-encode compression.
+--%DEBUG: mpv --msg-level=clip=debug yourfile.mkv
 
 local g = { A = 0.0, B = 0.0 }
-
-
--- ============================================================
--- Preview overlay module — insert after `local g = { A = 0.0, B = 0.0 }`
--- in the original script, before the "Behaviour" section.
--- ============================================================
-
 local utils = require 'mp.utils'
-
-local DEBUG = true -- set false to silence dbg() once stable
-
-local function dbg(fmt, ...)
-  if DEBUG then
-    mp.msg.log("info", "[preview] " .. string.format(fmt, ...))
-  end
-end
-
-local PREVIEW_WINDOW_S  = 2.0   -- seconds of copy-cut around each mark to sample
-local PREVIEW_FRACTION  = 0.20 -- previews must reach this fraction of orig video size
-local PAD               = 10
-local SHRINK_STEP       = 0.05 -- how much to shrink video-margin-ratio per attempt
-local MAX_SHRINK        = 0.5  -- don't reserve more than 50% of a dimension
+local options = { converter = "r.ffmpeg", preview_mode = "copy", preview_window_limit = 30 }
+require('mp.options').read_options(options, 'clip')
+local valid_mode = { copy = true, fast = true, smart = true }
+local preview_mode = valid_mode[options.preview_mode] and options.preview_mode or "copy"
 local OVERLAY_ID = { A = 1, B = 2 }
-local TMP = {
-  A = { clip = "/tmp/mpv_preview_A.mkv", raw = "/tmp/mpv_preview_A.raw" },
-  B = { clip = "/tmp/mpv_preview_B.mkv", raw = "/tmp/mpv_preview_B.raw" },
-}
-
--- (no reservation/shrinking -- we only use slack that already exists)
-
--- Helpers
-local function show_status(t, msg)
-  mp.msg.log(t, msg)
-  mp.osd_message(t .. ": " .. msg, 2)
-end
-
-
--- ---- layout ---------------------------------------------------
--- Uses mpv's actual video-out rect (dwidth/dheight give window size;
--- osd-width/height already reflect any video-margin-ratio-* reservation,
--- since those margins are subtracted from the video's drawable area, not
--- from the OSD canvas -- so we compute displayed-video rect ourselves
--- against the POST-MARGIN osd size).
-
-local function get_video_rect()
-  local dims = mp.get_property_native("osd-dimensions")
-  local vid_w = mp.get_property_native("width")
-  local vid_h = mp.get_property_native("height")
-  dbg("raw osd-dimensions = %s vid_w=%s vid_h=%s",
-    dims and utils.format_json(dims) or "NIL", tostring(vid_w), tostring(vid_h))
-  if not (dims and vid_w and vid_h and vid_w > 0 and vid_h > 0) then
-    dbg("get_video_rect: bailing, missing/invalid property")
-    return nil
-  end
-  -- osd-dimensions gives: w, h (full osd canvas) and ml, mr, mt, mb
-  -- (margins already carved out of that canvas -- by our own
-  -- video-margin-ratio-* AND by the OSC's own box-video reservation,
-  -- whichever is larger/active). The video is displayed inside the
-  -- REMAINING w-ml-mr by h-mt-mb rect, aspect-fit.
-  local osd_w, osd_h = dims.w, dims.h
-  local ml, mr, mt, mb = dims.ml or 0, dims.mr or 0, dims.mt or 0, dims.mb or 0
-  if not (osd_w and osd_h and osd_w > 0 and osd_h > 0) then
-    dbg("get_video_rect: bailing, bad osd_w/h in dims")
-    return nil
-  end
-
-  local canvas_w = osd_w - ml - mr
-  local canvas_h = osd_h - mt - mb
-  if canvas_w <= 0 or canvas_h <= 0 then
-    dbg("get_video_rect: bailing, non-positive canvas (%.1f x %.1f)", canvas_w, canvas_h)
-    return nil
-  end
-
-  local vid_ar = vid_w / vid_h
-  local canvas_ar = canvas_w / canvas_h
-
-  local disp_w, disp_h
-  if canvas_ar > vid_ar then
-    disp_h = canvas_h; disp_w = disp_h * vid_ar
-  else
-    disp_w = canvas_w; disp_h = disp_w / vid_ar
-  end
-
-  -- extra slack beyond the aspect-fit video, WITHIN the already-reserved
-  -- canvas (i.e. pillarbox/letterbox space mpv leaves automatically)
-  local slack_x = canvas_w - disp_w
-  local slack_y = canvas_h - disp_h
-
-  dbg("rect canvas=%.1fx%.1f (ml=%.1f mr=%.1f mt=%.1f mb=%.1f) disp=%.1fx%.1f slack_x=%.1f slack_y=%.1f",
-    canvas_w, canvas_h, ml, mr, mt, mb, disp_w, disp_h, slack_x, slack_y)
-
-  return {
-    osd_w = osd_w, osd_h = osd_h,
-    canvas_w = canvas_w, canvas_h = canvas_h,
-    ml = ml, mr = mr, mt = mt, mb = mb,
-    vid_ar = vid_ar,
-    disp_w = disp_w, disp_h = disp_h,
-    -- video's top-left within the FULL osd canvas (for overlay coordinates)
-    disp_x = ml + (canvas_w - disp_w) / 2,
-    disp_y = mt + (canvas_h - disp_h) / 2,
-    margin_x = slack_x,   -- pillarbox slack, within reserved canvas
-    margin_y = slack_y,   -- letterbox slack, within reserved canvas
-  }
-end
-
--- Decide mode + preview size. If neither margin can hit PREVIEW_FRACTION of
--- original video size at current reservation, increase reservation and
--- recompute (iteratively) instead of falling back to overlap.
--- Instead of set_margins/clear_margins, calculate overlay positions directly
-local function compute_layout()
-  local dims = mp.get_property_native("osd-dimensions")
-  if not dims then return nil end
-
-  -- Get the source video dimensions
-  local vid_w, vid_h
-  pcall(function()
-    vid_w = mp.get_property_number("width")
-    vid_h = mp.get_property_number("height")
-  end)
-
-  -- Handle video rotation: if the container has 90/270° rotation,
-  -- the display dimensions are swapped relative to the source.
-  -- Without this, phone-recorded vertical videos (stored as rotated
-  -- landscape) are misidentified as horizontal, distorting previews.
-  local rot
-  pcall(function() rot = mp.get_property_number("video-rotation") end)
-  if rot and (rot == 90 or rot == 270) and vid_w and vid_h then
-    vid_w, vid_h = vid_h, vid_w
-  end
-
-  -- Fallback if video params not available
-  if not vid_w or not vid_h or vid_w <= 0 or vid_h <= 0 then
-    if dims.w > dims.h then
-      vid_w, vid_h = 1920, 1080
-    else
-      vid_w, vid_h = 1080, 1920
-    end
-  end
-
-  local canvas_w = dims.w
-  local canvas_h = dims.h
-  local vid_aspect = vid_w / vid_h
-  local is_vertical = vid_h > vid_w
-
-  if is_vertical then
-    -- Portrait source video: place previews on the right side
-    local available_width = canvas_w - dims.ml - dims.mr
-    -- Preview width is 30% of available width
-    local preview_w = math.floor(available_width * PREVIEW_FRACTION)
-    -- Calculate height preserving source aspect ratio
-    -- For vertical video, height should be greater than width
-    local preview_h = math.floor(preview_w / vid_aspect)
-
-    -- If preview is too tall, constrain by height
-    local max_preview_h = math.floor(canvas_h * 0.8)
-    if preview_h > max_preview_h then
-      preview_h = max_preview_h
-      -- Maintain aspect ratio
-      preview_w = math.floor(preview_h * vid_aspect)
-    end
-
-    local avail_width_for_disp = available_width - preview_w - PAD * 2
-    local disp_w = avail_width_for_disp
-    local disp_h = canvas_h - dims.mt - dims.mb
-
-  return {
-      mode = "right",
-      ml = dims.ml,
-      mr = dims.mr,
-      mt = dims.mt,
-      mb = dims.mb,
-      canvas_w = dims.w,
-      canvas_h = dims.h,
-      disp_w = disp_w,
-      disp_h = disp_h,
-      vid_w = vid_w,
-      vid_h = vid_h,
-      vid_aspect = vid_aspect,
-      margin_x = preview_w,
-      margin_y = 0,
-      is_vertical = is_vertical,
-      preview_w = preview_w,
-      preview_h = preview_h
-    }
-  else
-    -- Landscape source video: place previews at top of window
-    local available_height = canvas_h - dims.mt - dims.mb
-    -- Preview height is 30% of available height (two previews side by side)
-    local preview_h = math.floor(available_height * PREVIEW_FRACTION)
-    -- Calculate width preserving source aspect ratio
-    local preview_w = math.floor(preview_h * vid_aspect)
-
-    -- If preview is too wide, constrain by width (each preview up to half canvas)
-    local max_preview_w = math.floor((canvas_w - dims.ml - dims.mr - PAD) / 2)
-    if preview_w > max_preview_w then
-      preview_w = max_preview_w
-      -- Maintain aspect ratio
-      preview_h = math.floor(preview_w / vid_aspect)
-    end
-
-    -- Reserve space at top for previews; video displays below
-    local avail_height_for_disp = available_height - preview_h - PAD * 2
-    local disp_w = canvas_w - dims.ml - dims.mr
-    local disp_h = avail_height_for_disp
-
-    return {
-      mode = "top",
-      ml = dims.ml,
-      mr = dims.mr,
-      mt = dims.mt,
-      mb = dims.mb,
-      canvas_w = dims.w,
-      canvas_h = dims.h,
-      disp_w = disp_w,
-      disp_h = disp_h,
-      vid_w = vid_w,
-      vid_h = vid_h,
-      vid_aspect = vid_aspect,
-      margin_x = 0,
-      margin_y = preview_h,
-      is_vertical = is_vertical,
-      preview_w = preview_w,
-      preview_h = preview_h
-    }
-  end
-end
-
-
-local function preview_geometry(which, layout)
-  -- Use the preview dimensions calculated in compute_layout
-  local pw = layout.preview_w
-  local ph = layout.preview_h
-
-  if layout.mode == "right" then
-    -- Previews on the right side of the video
-    -- OLD: Position relative to the displayed video area
-    -- Previews anchored to the right edge of the mpv window (canvas)
-    local px = layout.canvas_w - layout.preview_w - PAD
-    local py = layout.mt
-
-    -- For vertical video, stack previews vertically
-    if which == 'A' then
-      return math.floor(px), math.floor(py), pw, ph
-    else
-      -- Preview B goes below preview A
-      return math.floor(px), math.floor(py + ph + PAD), pw, ph
-    end
-  else
-    -- -- Previews at top of window (horizontal video)
-    -- local px = layout.ml
-    -- local py = layout.mt
-    -- Previews anchored to the top of the mpv window (canvas)
-    local px = layout.ml
-    local py = 0
-
-    if which == 'A' then
-      return math.floor(px), math.floor(py), pw, ph
-    else
-      return math.floor(px + pw + PAD), math.floor(py), pw, ph
-    end
-  end
-end
-
--- ---- overlay lifecycle ---------------------------------------
-
-local active_overlay = { A = false, B = false }
+local PREVIEW_WINDOW_S = 2
+local PREVIEW_FRACTION = 0.20
+local PAD = 10
+local previews = { A = { generation = 0 }, B = { generation = 0 } }
+local jobs = {}
 local mark_set = { A = false, B = false }
 local previews_hidden = false
 
--- Helper: read osc-visibility from either native property or script-opts
-local function read_osc_visibility()
-  local vis
-  pcall(function() vis = mp.get_property_native("osc-visibility") end)
-  if not vis then
-    pcall(function() vis = mp.get_property_native("script-opts/osc-visibility") end)
-  end
-  return vis or "auto"
+local function show_status(level, message)
+  mp.msg.log(level, message)
+  mp.osd_message(level .. ": " .. message, 2)
 end
 
--- Check initial osc-visibility
-pcall(function()
-  if read_osc_visibility() == "never" then
-    previews_hidden = true
+local function finite(t)
+  return type(t) == "number" and t == t and math.abs(t) < math.huge
+end
+
+local function source_path()
+  local path = mp.get_property("path")
+  if not path then return nil end
+  if not path:match("^/") and not path:match("^%a[%w+.-]*://") then
+    path = utils.join_path(mp.get_property("working-directory"), path)
   end
-end)
+  return path
+end
 
--- generation counter: bumped on every preview_cut(which) call. An in-flight
--- async chain captures its generation at start; if a newer call for the same
--- 'which' has started by the time it finishes, it's obsolete and must not
--- touch the overlay (prevents flicker/wrong-placement from rapid resize
--- events firing several overlapping preview_cut chains).
-local generation = { A = 0, B = 0 }
+-- Use display dimensions (rotation and sample aspect ratio already applied).
+-- Keep both portrait thumbnails on screen, even in short windows.
+local function preview_geometry(which)
+  local dims = mp.get_property_native("osd-dimensions")
+  local vw = mp.get_property_number("dwidth")
+  local vh = mp.get_property_number("dheight")
+  if not dims or not vw or not vh or vw <= 0 or vh <= 0 then return end
+  local aw = dims.w - (dims.ml or 0) - (dims.mr or 0)
+  local ah = dims.h - (dims.mt or 0) - (dims.mb or 0)
+  local ratio = vw / vh
+  local w, h, x, y
+  if vh > vw then
+    w = math.min(aw * PREVIEW_FRACTION, (dims.h - 3 * PAD) / 2 * ratio)
+    h = w / ratio
+    x = dims.w - w - PAD
+    y = PAD + (which == 'B' and h + PAD or 0)
+  else
+    h = math.min(ah * PREVIEW_FRACTION, (dims.w - 3 * PAD) / 2 / ratio)
+    w = h * ratio
+    x = PAD + (which == 'B' and w + PAD or 0)
+    y = PAD
+  end
+  if w < 16 or h < 16 then return end
+  return math.floor(x), math.floor(y), math.floor(w), math.floor(h)
+end
 
-local function overlay_remove(which)
-  if active_overlay[which] then
-    pcall(mp.command_native, { name = "overlay-remove", id = OVERLAY_ID[which] })
-    active_overlay[which] = false
+local function remove_overlay(which)
+  previews[which].shown = false
+  mp.command_native({ name = "overlay-remove", id = OVERLAY_ID[which] })
+end
+
+local function cleanup(job)
+  if job then
+    os.remove(job.clip)
+    os.remove(job.clip .. ".segment.mp4")
+    os.remove(job.raw)
+    jobs[job] = nil
   end
 end
 
--- ---- core: cut a short window, decode boundary frame, overlay ----
+-- Invalidate immediately, before debounce. Aborting is asynchronous: each job
+-- owns separate files until its callback, so an old writer cannot corrupt a
+-- newer thumbnail (or another mpv instance).
+local function cancel_preview(which, discard)
+  local state = previews[which]
+  state.generation = state.generation + 1
+  if state.timer then state.timer:kill(); state.timer = nil end
+  if state.job and state.job.handle then mp.abort_async_command(state.job.handle) end
+  state.job = nil
+  remove_overlay(which)
+  if discard then cleanup(state.cache); state.cache = nil end
+end
+
+local function display_preview(which)
+  local state = previews[which]
+  local cached = state.cache
+  if previews_hidden or not cached then return end
+  local x, y, w, h = preview_geometry(which)
+  if not x then return end
+  -- command_native returns nil,error on command failure; pcall alone misses it.
+  local result, err = mp.command_native({
+    name = "overlay-add", id = OVERLAY_ID[which], x = x, y = y,
+    file = cached.raw, offset = 0, fmt = "bgra",
+    w = cached.w, h = cached.h, stride = cached.w * 4, dw = w, dh = h,
+  })
+  state.shown = result ~= nil
+  if not result then show_status("error", "preview: " .. tostring(err)) end
+end
 
 local function preview_cut(which)
-  dbg("preview_cut(%s) called, g.A=%.3f g.B=%.3f", which, g.A, g.B)
-  local path = mp.get_property_native("path")
-  if not path then
-    dbg("preview_cut(%s): no path, bailing", which)
+  local state = previews[which]
+  if previews_hidden or not mark_set[which] or state.job or state.timer then return end
+  local _, _, w, h = preview_geometry(which)
+  if not w then return end -- osd-dimensions observer retries once layout exists.
+  local path = source_path()
+  local info = path and utils.file_info(path)
+  local ext = path and path:match("%.([^./]+)$")
+  if not info or not info.is_file or not ext then
+    show_status("warn", "preview requires a local file with a container extension")
     return
   end
-
-  generation[which] = generation[which] + 1
-  local my_gen = generation[which]
-  dbg("preview_cut(%s): generation=%d", which, my_gen)
-
-  local layout = compute_layout()
-  if not layout then
-    show_status("warn", "preview: layout not ready")
-    dbg("preview_cut(%s): compute_layout returned nil", which)
-    return
+  if not finite(g.A) or not finite(g.B) or g.A < 0 or g.B <= g.A then return end
+  local ok, raw = pcall(os.tmpname)
+  if not ok then show_status("error", "preview: " .. tostring(raw)); return end
+  local factor = math.min(1, 640 / math.max(w, h))
+  local job = {
+    raw = raw, clip = raw .. "." .. ext, generation = state.generation,
+    path = path, a = g.A, b = g.B, mode = preview_mode,
+    w = math.max(1, math.floor(w * factor)), h = math.max(1, math.floor(h * factor)),
+  }
+  state.job = job
+  jobs[job] = true
+  local function current()
+    return state.job == job and state.generation == job.generation
   end
-  local x, y, w, h = preview_geometry(which, layout)
-  dbg("preview_cut(%s): mode=%s x=%d y=%d w=%d h=%d", which, layout.mode, x, y, w, h)
-  if w < 16 or h < 16 then
-    dbg("preview_cut(%s): w/h too small, bailing", which)
-    return
+  local function fail(message)
+    if current() then
+      state.job = nil
+      show_status("error", "preview[" .. which .. "]: " .. message)
+    end
+    cleanup(job)
   end
-
-  local tmp = TMP[which]
-  local cut_args
-  if which == 'A' then
-    -- A is decoded directly below; no temporary clip or re-encode is needed.
-    cut_args = {}
-  else
-    local ss = math.max(0, g.B - PREVIEW_WINDOW_S)
-    cut_args = { "-ss", tostring(ss), "-i", path,
-                 "-t", tostring(PREVIEW_WINDOW_S), "-codec", "copy", tmp.clip }
-    -- NOTE: using -t (duration) not -to, since -to's reference point (absolute
-    -- vs relative-to-ss) varies across ffmpeg versions. -t is unambiguous:
-    -- always "duration from this -ss point," which is what we want here.
-  end
-
-  local cut_full
-  if which == 'A' then
-    -- Use a cheap FFmpeg probe as the async handoff; the actual A frame is
-    -- decoded directly from the source below.
-    cut_full = { "ffmpeg", "-hide_banner", "-version" }
-  else
-    local full_cut_args = { "-y", "-hide_banner", "-loglevel", "error" }
-    for _, v in ipairs(cut_args) do table.insert(full_cut_args, v) end
-    cut_full = (function()
-      local a = { "ffmpeg" }
-      for _, v in ipairs(full_cut_args) do table.insert(a, v) end
-      return a
-    end)()
-  end
-  dbg("preview_cut(%s): cut cmd = %s", which, table.concat(cut_full, " "))
-
-  mp.command_native_async({
-    name = "subprocess", playback_only = false,
-    capture_stdout = true, capture_stderr = true,
-    args = cut_full
-  }, function(ok, res)
-    dbg("preview_cut(%s): cut result ok=%s status=%s stderr=%s", which,
-      tostring(ok), tostring(res and res.status), tostring(res and res.stderr))
-    if not ok or res == nil or res.status ~= 0 then
-      show_status("error", "preview[" .. which .. "] cut failed: " ..
-        ((res and res.stderr) or "unknown"))
-      return
-    end
-    if my_gen ~= generation[which] then
-      dbg("preview_cut(%s): superseded (gen %d != current %d) after cut, abandoning",
-        which, my_gen, generation[which])
-      return
-    end
-
-    -- which frame within the short clip: 'A' -> first frame, 'B' -> last frame
-    local frame_flag
-    local decode_input = tmp.clip
-    if which == 'A' then
-      -- The stream-copied temporary file can contain packets before g.A.
-      -- Decode the original at the selected timestamp so the preview matches
-      -- the first frame mpv displays after opening the copied clip.
-      frame_flag = { "-ss", tostring(math.max(0, g.A)) }
-      decode_input = path
-    else
-      frame_flag = { "-sseof", "-0.05" }
-    end
-
-    local label
-    if which == 'A' then
-      label = to_ffmpeg_sfx(g.A)
-    else
-      label = to_ffmpeg_sfx(g.B)
-    end
-    -- Colons are option separators in the drawtext filter, so escape them.
-    local drawtext_label = label:gsub(":", "\\:")
-    local preview_filter = string.format(
-      "scale=%d:%d,drawtext=text='%s':x=10:y=h-th-10:fontsize=%d:fontcolor=white:borderw=2:bordercolor=black",
-      w, h, drawtext_label, math.max(12, math.floor(h * 0.14)))
-
-    local stride = w * 4
-    local decode_args = { "ffmpeg", "-y", "-hide_banner", "-loglevel", "error" }
-    if which == 'A' then
-      -- Output-side seek makes this decoded frame timestamp-accurate.
-      table.insert(decode_args, "-i")
-      table.insert(decode_args, decode_input)
-      table.insert(decode_args, frame_flag[1])
-      table.insert(decode_args, frame_flag[2])
-    else
-      table.insert(decode_args, frame_flag[1])
-      table.insert(decode_args, frame_flag[2])
-      table.insert(decode_args, "-i")
-      table.insert(decode_args, decode_input)
-    end
-    table.insert(decode_args, "-vframes")
-    table.insert(decode_args, "1")
-    table.insert(decode_args, "-vf")
-    table.insert(decode_args, preview_filter)
-    table.insert(decode_args, "-pix_fmt")
-    table.insert(decode_args, "bgra")
-    table.insert(decode_args, "-f")
-    table.insert(decode_args, "rawvideo")
-    table.insert(decode_args, tmp.raw)
-
-    dbg("preview_cut(%s): decode cmd = %s", which, table.concat(decode_args, " "))
-
-    mp.command_native_async({
-      name = "subprocess", playback_only = false,
-      capture_stdout = true, capture_stderr = true,
-      args = decode_args
-    }, function(ok2, res2)
-      dbg("preview_cut(%s): decode result ok=%s status=%s stderr=%s", which,
-        tostring(ok2), tostring(res2 and res2.status), tostring(res2 and res2.stderr))
-      if not ok2 or res2 == nil or res2.status ~= 0 then
-        show_status("error", "preview[" .. which .. "] decode failed: " ..
-          ((res2 and res2.stderr) or "unknown"))
+  local function run(args, next_step, on_error)
+    mp.msg.debug("preview[" .. which .. "]: " .. table.concat(args, " "))
+    job.handle = mp.command_native_async({
+      name = "subprocess", playback_only = true,
+      capture_stdout = true, capture_stderr = true, args = args,
+    }, function(success, result, err)
+      job.handle = nil
+      if not current() then cleanup(job); return end
+      if not success or not result or result.status ~= 0 then
+        local message = (result and result.stderr and result.stderr ~= "" and result.stderr)
+          or (result and result.error_string) or err or "subprocess failed"
+        if on_error and on_error(message) then return end
+        fail(message)
         return
       end
-      if my_gen ~= generation[which] then
-        dbg("preview_cut(%s): superseded (gen %d != current %d) after decode, abandoning",
-          which, my_gen, generation[which])
-        return
-      end
-
-      -- sanity: confirm the raw file actually exists and is the expected size
-      -- before handing its path to overlay-add. A short/missing/mismatched
-      -- file is a strong candidate for crashing mpv's overlay code, since
-      -- overlay-add reads `stride*h` bytes from it unconditionally.
-      local finfo = utils.file_info(tmp.raw)
-      local expect_bytes = stride * h
-      dbg("preview_cut(%s): raw file info = %s expect_bytes=%d", which,
-        finfo and utils.format_json(finfo) or "NIL", expect_bytes)
-      if not finfo or finfo.size ~= expect_bytes then
-        dbg("preview_cut(%s): raw file size mismatch/missing, ABORTING overlay-add", which)
-        show_status("error", "preview[" .. which .. "] raw file bad, skipping overlay")
-        return
-      end
-
-      -- re-fetch layout/geometry: window may have resized during the two
-      -- async round-trips; stale x/y/w/h would misplace or wrong-size overlay
-      local layout2 = compute_layout()
-      if not layout2 then
-        dbg("preview_cut(%s): layout2 nil after decode, bailing", which)
-        return
-      end
-      local x2, y2, w2, h2 = preview_geometry(which, layout2)
-      if w2 ~= w or h2 ~= h then
-        dbg("preview_cut(%s): size drifted (%d,%d)->(%d,%d), skipping this frame",
-          which, w, h, w2, h2)
-        return
-      end
-
-      -- Don't add overlay if previews have been hidden (osc-visibility=never)
-      if previews_hidden then
-        dbg("preview_cut(%s): previews hidden, not adding overlay", which)
-        return
-      end
-
-      local ov_id = OVERLAY_ID[which]
-      dbg("preview_cut(%s): overlay-add id=%d x=%d y=%d file=%s w=%d h=%d stride=%d dw=%d dh=%d",
-        which, ov_id, x2, y2, tmp.raw, w2, h2, stride, w2, h2)
-
-      local ok3, err3 = pcall(mp.command_native, {
-        name = "overlay-add",
-        id = ov_id,
-        x = x2,
-        y = y2,
-        file = tmp.raw,
-        offset = 0,
-        fmt = "bgra",
-        w = w2,
-        h = h2,
-        stride = stride,
-        dw = w2,   -- explicit: docs default dw/dh to w/h if omitted, but
-        dh = h2,   -- named-arg command warns not to rely on defaults either
-      })
-      if not ok3 then
-        dbg("preview_cut(%s): overlay-add THREW: %s", which, tostring(err3))
-        show_status("error", "overlay-add failed: " .. tostring(err3))
-        return
-      end
-      active_overlay[which] = true
-      dbg("preview_cut(%s): overlay-add OK", which)
+      next_step(result)
     end)
-  end)
+  end
+
+  local sample
+  sample = function(window)
+    os.remove(job.clip)
+    os.remove(job.clip .. ".segment.mp4")
+    local function retry_empty()
+      local limit = math.min(job.b - job.a, math.max(PREVIEW_WINDOW_S, options.preview_window_limit))
+      if window >= limit then return false end
+      sample(math.min(limit, window * 4))
+      return true
+    end
+    local function decode()
+      local label = string.format("%s %s %s", job.mode, which,
+        to_ffmpeg_sfx(which == 'A' and job.a or job.b)):gsub(":", "\\:")
+      local filter = string.format(
+        "scale=%d:%d,drawtext=text='%s':x=10:y=h-th-10:fontsize=%d:fontcolor=white:borderw=2:bordercolor=black",
+        job.w, job.h, label, math.max(12, math.floor(job.h * 0.14)))
+      local args = { "ffmpeg", "-nostdin", "-hide_banner", "-loglevel", "error", "-y",
+        "-i", job.clip, "-an", "-sn", "-dn", "-vf", filter,
+        "-pix_fmt", "bgra", "-fps_mode", "passthrough" }
+      if which == 'A' then
+        args[#args + 1] = "-frames:v"; args[#args + 1] = "1"
+      end
+      args[#args + 1] = "-f"; args[#args + 1] = "rawvideo"
+      args[#args + 1] = job.raw
+      run(args, function()
+        local size = utils.file_info(job.raw)
+        local bytes = job.w * job.h * 4
+        if size and size.size == 0 then
+          -- Sparse/VFR video or audio extending beyond video: widen until a
+          -- frame exists, without guessing a frame duration from nominal FPS.
+          if retry_empty() then return end
+        end
+        if not size or size.size < bytes or size.size % bytes ~= 0 then
+          fail("no complete video frame in " .. job.mode .. " boundary sample")
+          return
+        end
+        -- B is the last decoded frame, including delayed/reordered frames.
+        -- Keep only that frame in the cache; do not reverse full-size video.
+        local input, read_err = io.open(job.raw, "rb")
+        if not input then fail(read_err); return end
+        local offset = which == 'A' and 0 or size.size - bytes
+        local positioned = input:seek("set", offset)
+        local data = positioned and input:read(bytes)
+        input:close()
+        if not data or #data ~= bytes then fail("short raw frame"); return end
+        local output, write_err = io.open(job.raw, "wb")
+        if not output then fail(write_err); return end
+        local written = output:write(data)
+        local closed = output:close()
+        if not written or not closed then fail("could not cache raw frame"); return end
+        os.remove(job.clip)
+        os.remove(job.clip .. ".segment.mp4")
+        state.job = nil
+        cleanup(state.cache)
+        state.cache = job
+        display_preview(which)
+      end, function(message)
+        -- A sample in an audio-only tail can have no video stream at all.
+        return message:find("does not contain any stream", 1, true) and retry_empty()
+      end)
+    end
+    -- The converter owns muxer, stream selection, GOP splitting and encoders.
+    -- Its NUL protocol keeps filenames out of shell command strings.
+    run({ options.converter, "--preview-plan", which, job.path,
+      tostring(job.a), tostring(job.b), job.mode, job.clip, tostring(window),
+    }, function(result)
+      local commands, command = {}, {}
+      for value in (result.stdout or ""):gmatch("(.-)%z") do
+        if value == "" then
+          if #command > 0 then commands[#commands + 1] = command; command = {} end
+        else
+          command[#command + 1] = value
+        end
+      end
+      if #commands == 0 or #command ~= 0 then fail("invalid converter preview plan"); return end
+      local function execute(index)
+        if index > #commands then decode(); return end
+        run(commands[index], function() execute(index + 1) end)
+      end
+      execute(1)
+    end)
+  end
+  sample(PREVIEW_WINDOW_S)
 end
 
--- ---- debounce wrapper (avoid firing ffmpeg on every tiny nudge) ----
-
-local debounce_timers = { A = nil, B = nil }
-local DEBOUNCE_S = 0.15
-
-local function preview_cut_debounced(which)
-  if previews_hidden then
-    dbg("preview_cut_debounced(%s): hidden, skipping", which)
-    return
-  end
-  if debounce_timers[which] then
-    debounce_timers[which]:kill()
-  end
-  debounce_timers[which] = mp.add_timeout(DEBOUNCE_S, function()
-    debounce_timers[which] = nil
-    preview_cut(which)
-  end)
-end
-
--- ---- reposition on window resize (content unchanged, just re-run) ----
-
-local resize_timer = nil
-mp.observe_property("osd-dimensions", "native", function()
-  if suppress_resize_handler then
-    dbg("osd-dimensions fired but suppressed (self-triggered by apply_reserve)")
-    return
-  end
-  if resize_timer then resize_timer:kill() end
-  resize_timer = mp.add_timeout(0.35, function()
-    resize_timer = nil
-    if active_overlay.A then preview_cut('A') end
-    if active_overlay.B then preview_cut('B') end
-  end)
-end)
-
--- Hide previews when osc-visibility=never, show again when restored
-local function on_osc_visibility_change()
-  local vis = read_osc_visibility()
-  dbg("osc-visibility: %s", vis)
-  if vis == "never" then
-    previews_hidden = true
-    preview_hide()
-  elseif previews_hidden then
-    previews_hidden = false
-    if mark_set.A then preview_cut('A') end
-    if mark_set.B then preview_cut('B') end
+local function refresh_previews()
+  for _, which in ipairs({ 'A', 'B' }) do
+    cancel_preview(which, true)
+    if mark_set[which] and not previews_hidden then
+      previews[which].timer = mp.add_timeout(0.15, function()
+        previews[which].timer = nil
+        preview_cut(which)
+      end)
+    end
   end
 end
-
--- FAIL: doesn't seem to work; was forced to change keybinding
-pcall(function() mp.observe_property("osc-visibility", "native", on_osc_visibility_change) end)
-pcall(function() mp.observe_property("script-opts/osc-visibility", "native", on_osc_visibility_change) end)
-
--- ---- clear overlays when marks are cleared / clip written ----
 
 local function preview_hide()
-  overlay_remove('A')
-  overlay_remove('B')
+  for _, which in ipairs({ 'A', 'B' }) do cancel_preview(which, false) end
 end
 
 local function preview_clear()
-  preview_hide()
-  mark_set.A = false
-  mark_set.B = false
+  for _, which in ipairs({ 'A', 'B' }) do
+    mark_set[which] = false
+    cancel_preview(which, true)
+  end
 end
 
-
--- Toggle previews + osc-visibility via keybinding (';' key)
-mp.register_script_message("clip_toggle_previews", function()
-  if previews_hidden then
-    previews_hidden = false
-    pcall(function() mp.commandv("set", "osc-visibility", "always") end)
-    if mark_set.A then preview_cut('A') end
-    if mark_set.B then preview_cut('B') end
-  else
-    previews_hidden = true
-    pcall(function() mp.commandv("set", "osc-visibility", "never") end)
-    preview_hide()
+local function preview_show()
+  for _, which in ipairs({ 'A', 'B' }) do
+    if previews[which].cache then display_preview(which) else preview_cut(which) end
   end
+end
+
+mp.observe_property("osd-dimensions", "native", preview_show)
+mp.observe_property("video-out-params", "native", preview_show)
+mp.register_event("start-file", preview_clear)
+mp.register_event("end-file", preview_clear)
+mp.register_event("shutdown", function()
+  preview_clear()
+  for job in pairs(jobs) do
+    if job.handle then mp.abort_async_command(job.handle) end
+    cleanup(job)
+  end
+end)
+
+local function on_osc_visibility_change()
+  local vis = mp.get_property("user-data/osc/visibility")
+    or mp.get_property("script-opts/osc-visibility")
+  if not vis then return end
+  previews_hidden = vis == "never"
+  if previews_hidden then preview_hide() else preview_show() end
+end
+mp.observe_property("user-data/osc/visibility", "string", on_osc_visibility_change)
+mp.observe_property("script-opts/osc-visibility", "string", on_osc_visibility_change)
+
+mp.register_script_message("clip_toggle_previews", function()
+  previews_hidden = not previews_hidden
+  mp.commandv("script-message", "osc-visibility", previews_hidden and "never" or "always")
+  if previews_hidden then preview_hide() else preview_show() end
+end)
+
+local function select_preview_mode(mode)
+  if not valid_mode[mode] then show_status("error", "unknown clip mode: " .. tostring(mode)); return end
+  preview_mode = mode
+  previews_hidden = false
+  mp.commandv("script-message", "osc-visibility", "always")
+  mark_set.A, mark_set.B = true, true
+  refresh_previews()
+  show_status("info", "Previewing " .. mode .. "; review both ends before exporting")
+end
+mp.register_script_message("clip_preview_mode", select_preview_mode)
+mp.add_key_binding("", "clip_cycle_preview_mode", function()
+  select_preview_mode(({ copy = "fast", fast = "smart", smart = "copy" })[preview_mode])
 end)
 
 
@@ -611,6 +333,7 @@ function on_loaded()
   -- no loop was saved for this file.
   g.A = mp.get_property_number("ab-loop-a") or 0.0
   g.B = mp.get_property_number("ab-loop-b") or mp.get_property_number("duration/full")
+    or mp.get_property_number("duration") or g.A
 
   local duration = mp.get_property_number("duration")
   if duration and duration < 40 and duration > 0 then
@@ -655,7 +378,9 @@ function mark_update(m)
     m, g.B - g.A, to_ffmpeg_sfx(g.A), to_ffmpeg_sfx(g.B)))
 end
 function h_mark_beg()
-  g.A = mp.get_property_number("playback-time")
+  local t = mp.get_property_number("playback-time")
+  if not finite(t) or t < 0 then return end
+  g.A = t
   -- print(g.A)
   g.B = math.max(g.A, g.B)
   -- HACK: loop the snippet; clear it manually
@@ -664,10 +389,12 @@ function h_mark_beg()
   mark_update('<')
   mark_set.A = true
   update_duration_overlay()
-  preview_cut_debounced('A')
+  refresh_previews()
 end
 function h_mark_end()
-  g.B = mp.get_property_number("playback-time")
+  local t = mp.get_property_number("playback-time")
+  if not finite(t) or t < 0 then return end
+  g.B = t
   -- print(g.B)
   g.A = math.min(g.A, g.B)
   mp.set_property("ab-loop-a", g.A)
@@ -675,7 +402,7 @@ function h_mark_end()
   mark_update('>')
   mark_set.B = true
   update_duration_overlay()
-  preview_cut_debounced('B')
+  refresh_previews()
 end
 
 
@@ -693,33 +420,45 @@ function h_seek(begend,kfrxct)
   if (begend == 1) then mp.set_property("ab-loop-b", "no") end
 end
 
+local writing = false
 function h_write(mode)
-  if g.B - g.A == 0 then
-    show_status("error", "can't encode empty clip at=" .. g.A)
+  if writing then show_status("warn", "clip export already running"); return end
+  local path = source_path()
+  if not path or not finite(g.A) or not finite(g.B) or g.A < 0 or g.B <= g.A then
+    show_status("error", "clip needs a valid nonempty range")
     return
   end
+  if mode ~= preview_mode or previews_hidden or not mark_set.A or not mark_set.B then
+    select_preview_mode(mode)
+    return
+  end
+  if not previews.A.shown or not previews.B.shown then
+    show_status("warn", "Wait for both " .. mode .. " previews before exporting")
+    return
+  end
+  local generation = previews.A.generation
+  writing = true
   show_status("info", string.format("encoding '%s' dt=%4.3f", mode, g.B - g.A))
-  -- [_] BET: create hidden tmux session to allow parallel enconding
 
   mp.set_property("ab-loop-a", "no")
   mp.set_property("ab-loop-b", "no")
-  local r = mp.command_native({
+  mp.command_native_async({
       name = "subprocess",
       playback_only = false,
       capture_stdout = true,
       capture_stderr = true,
-      -- BET? wrap in tmux BUT I won't be able to read errors on FAIL
-      args = { "r.ffmpeg",
-        tostring(mp.get_property_native("path")),
+      args = { options.converter,
+        path,
         tostring(g.A), tostring(g.B), mode
-  }})
-  if r.status == 0 then
-    -- TODO: show how much time passed
-    show_status("info", string.format("Success encoding: %d", r.status))
-  else
-    show_status("error", string.format("Failed(%d) encoding: %s", r.status, r.stderr))
-  end
-  preview_clear()
+  }}, function(ok, result, err)
+    writing = false
+    if ok and result and result.status == 0 then
+      show_status("info", "Success encoding: " .. mode)
+      if path == source_path() and generation == previews.A.generation then preview_clear() end
+    else
+      show_status("error", "Failed encoding: " .. ((result and result.stderr) or err or "unknown"))
+    end
+  end)
 end
 
 function h_move()
