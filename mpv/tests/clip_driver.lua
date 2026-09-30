@@ -8,7 +8,7 @@ local props = {
   ["osd-dimensions"] = { w = 800, h = 450, ml = 0, mr = 0, mt = 0, mb = 0 },
 }
 local queue, timers, events, observers, bindings, messages = {}, {}, {}, {}, {}, {}
-local overlays, errors, calls, paths = {}, {}, {}, {}
+local overlays, errors, calls, paths, commands = {}, {}, {}, {}, {}
 local function read(path)
   local f = io.open(path, "rb")
   if not f then return end
@@ -45,7 +45,7 @@ mp = {
   get_property_native = function(name) return props[name] end,
   get_property_number = function(name) return tonumber(props[name]) end,
   set_property = function(name, value) props[name] = value end,
-  commandv = function() end,
+  commandv = function(...) commands[#commands + 1] = { ... } end,
   osd_message = function() end,
   observe_property = function(name, _, fn) observers[name] = fn end,
   register_event = function(name, fn) events[name] = fn end,
@@ -174,6 +174,7 @@ else
   props.overlay_error = true
   observers["osd-dimensions"]()
   assert(errors[#errors]:find("overlay test failure"))
+  assert(not next(overlays), "failed overlay updates must remove stale images")
   props.overlay_error = false
   -- Export must be asynchronous; failure must retain previews.
   mark("end", 16); drain()
@@ -198,6 +199,49 @@ else
   mark("beg", 10); flush_timers()
   events["start-file"](); drain()
   assert(not next(overlays))
+  -- Reject an entire malformed plan before executing even its valid prefix.
+  mark("beg", 5); flush_timers()
+  local plan = assert(table.remove(queue, 1))
+  count = #calls
+  plan.callback(true, { status = 0, stdout = "ffmpeg\0valid-prefix\0\0truncated" })
+  assert(#calls == count and errors[#errors]:find("invalid converter preview plan"))
+  observers["osd-dimensions"](); drain()
+  assert(#calls == count, "resize must not restart a failed pipeline")
+  -- Explicit mode selection retries a failed preview.
+  messages.clip_preview_mode("fast"); drain()
+  assert(overlays[1] and overlays[2])
+  -- Losing layout revokes export readiness without throwing away cached pixels.
+  count = #calls
+  props["osd-dimensions"] = nil
+  observers["osd-dimensions"]()
+  assert(not next(overlays))
+  bindings.clip_write_fast(); assert(#calls == count)
+  props["osd-dimensions"] = { w = 800, h = 450 }
+  observers["osd-dimensions"]()
+  assert(overlays[1] and overlays[2] and #calls == count)
+  -- Completing an older export must preserve a newer selection.
+  bindings.clip_write_fast()
+  export = assert(table.remove(queue, 1))
+  mark("beg", 6); drain()
+  local newer = assert(overlays[1])
+  export.callback(true, { status = 0 })
+  assert(overlays[1] == newer and overlays[2])
+  -- EOF is an observed property, not an mpv event.
+  props.pause = "no"
+  observers["eof-reached"]("eof-reached", true)
+  assert(props.pause == "yes")
+  -- Moving is asynchronous; process exit failures must not advance playback.
+  bindings.clip_moving()
+  local moving = assert(table.remove(queue, 1))
+  count = #commands
+  moving.callback(true, { status = 1, stderr = "move test failure" })
+  assert(#commands == count and errors[#errors]:find("move test failure"))
+  bindings.clip_moving()
+  moving = assert(table.remove(queue, 1))
+  props.path = source .. ".next"
+  moving.callback(true, { status = 0 })
+  assert(#commands == count, "old move must not advance a different source")
+  props.path = source
   cleanup_check()
   print("clip lifecycle: passed")
 end

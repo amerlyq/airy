@@ -58,7 +58,11 @@ Fast mode reports QSV failures; it does not silently substitute software encodin
 Each pending job has private temporary files.
 Mark changes immediately cancel obsolete work.
 Resize reuses cached pixels.
+An unavailable layout hides previews and blocks export until layout returns.
+Failed conversion jobs do not restart on resize.
+Change a mark or select a preview mode explicitly to retry.
 File changes and clearing previews invalidate pending callbacks.
+Completion of an older export does not clear a newer selection.
 
 ## Verification
 
