@@ -34,12 +34,19 @@ from typing import NamedTuple
 import ranger.api
 
 IMV_POLL_MS = 300
+IMV_DELAY_PRESETS_MS = [50, 100, 150, 200, 360, 420, 640, 800]
+IMV_FORWARD_DELAYS_MS = [120, 400]
+IMV_UP_DELAY_OVERRIDE_MS = 80
+IMV_BURST_SIZE = 3  # <CASE: <=1 uses normal delay behavior.
+IMV_BURST_BETWEEN_DELAY_MS = 700
+IMV_HOLD_THRESHOLD_MS = 120
 IPC_TIMEOUT = 0.15
 IPC_MAX_BYTES = 1023
 SOCKET_GLOB = "imv-*.sock"
 TRACKING_MAPS = {
     "i": "tag_toggle",
     "I": "sync_imv_position",
+    "m": "cycle_imv_forward_delay",
     "M": "stop_imv_tracking",
 }
 
@@ -169,7 +176,14 @@ class ImvSync:
         self.directory = ""
         self.playlist_tab = None
         self.last_tab = fm.thistab
+        self.last_directory = getattr(fm.thisdir, "path", "")
         self.observed_selection = None
+        self.forward_delay_index = 0
+        self.forward_delays = list(IMV_FORWARD_DELAYS_MS)
+        self.burst_progress = 0
+        self.last_forward_index = None
+        self.last_forward_time = None
+        self.held_steps = 0
         self.pending = False
         self.applying_snapshot = False
         self.last_poll = 0.0
@@ -195,9 +209,15 @@ class ImvSync:
             setattr(self.fm.ui, name, input_received)
         self.fm.signal_bind("move", self.on_move, priority=0, weak=False)
         self.fm.sync_imv_position = self.sync_from_imv
+        self.fm.cycle_imv_forward_delay = self.cycle_forward_delay
         self.fm.stop_imv_tracking = self.stop
         self.fm.commands.load_commands_from_object(
-            self.fm, ["sync_imv_position", "stop_imv_tracking"]
+            self.fm,
+            [
+                "sync_imv_position",
+                "cycle_imv_forward_delay",
+                "stop_imv_tracking",
+            ],
         )
         original_after = self.fm.rifle.hook_after_executing
 
@@ -249,6 +269,29 @@ class ImvSync:
         self.ignored.update(_sockets())
         self.set_socket(None)
 
+    def cycle_forward_delay(self, narg=None, quantifier=None):
+        count = narg if narg is not None else quantifier
+        if count is None:
+            self.forward_delay_index = 1 - self.forward_delay_index
+            delay = self.forward_delays[self.forward_delay_index]
+            self.fm.notify(f"imv forward delay: {delay} ms")
+            return
+        elif count <= len(IMV_DELAY_PRESETS_MS):
+            source = count - 1
+        elif count > 9:
+            while len(IMV_DELAY_PRESETS_MS) < 9:
+                IMV_DELAY_PRESETS_MS.append(0)
+            IMV_DELAY_PRESETS_MS[8] = count
+            source = 8
+        else:
+            self.fm.notify("imv delay slot unavailable", bad=True)
+            return
+        self.forward_delays[self.forward_delay_index] = IMV_DELAY_PRESETS_MS[source]
+        self.fm.notify(
+            f"imv forward delay {self.forward_delay_index + 1}: "
+            f"{self.forward_delays[self.forward_delay_index]} ms"
+        )
+
     def on_move(self, signal):
         if self.applying_snapshot:
             return
@@ -277,14 +320,23 @@ class ImvSync:
         entering = (
             self.fm.thistab is not self.playlist_tab or directory_path != self.directory
         )
-        rebuild = entering or not self.playlist
+        deleted = self.playlist and any(
+            not os.path.exists(path) for path in self.playlist
+        )
+        rebuild = entering or not self.playlist or deleted
         if rebuild:
+            self.last_forward_index = None
+            self.last_forward_time = None
+            self.held_steps = 0
+            directory_files = getattr(directory, "files", None)
+            if entering and directory_files is None:
+                return
             paths = tuple(
                 entry.path
-                for entry in (getattr(directory, "files", None) or ())
+                for entry in (directory_files or ())
                 if not entry.is_directory and _looks_like_image(entry.path)
             )
-            if paths:
+            if paths or deleted:
                 self.playlist = paths
         else:
             paths = self.playlist
@@ -296,6 +348,44 @@ class ImvSync:
         rebuild = rebuild and bool(paths)
         index = paths.index(selected) + 1
         try:
+            now = time.monotonic()
+            continuous = (
+                self.last_forward_time is not None
+                and (now - self.last_forward_time) * 1000 <= IMV_HOLD_THRESHOLD_MS
+            )
+            if continuous:
+                self.held_steps += 1
+            else:
+                self.held_steps = 0
+                self.burst_progress = 0
+            use_delay = continuous and self.held_steps >= 2
+            if entering:
+                self.burst_progress = 0
+            if not use_delay:
+                delay = 0
+            elif IMV_BURST_SIZE > 1:
+                delay = (
+                    IMV_BURST_BETWEEN_DELAY_MS
+                    if self.burst_progress == IMV_BURST_SIZE
+                    else self.forward_delays[self.forward_delay_index]
+                )
+                self.burst_progress = (self.burst_progress + 1) % (IMV_BURST_SIZE + 1)
+            else:
+                delay = self.forward_delays[self.forward_delay_index]
+            moving_up = (
+                self.last_forward_index is not None and index < self.last_forward_index
+            )
+            if use_delay and moving_up and IMV_UP_DELAY_OVERRIDE_MS is not None:
+                delay = IMV_UP_DELAY_OVERRIDE_MS
+            imv_directory = (
+                os.path.dirname(os.path.realpath(self.observed_selection))
+                if self.observed_selection
+                else None
+            )
+            if delay and imv_directory == os.path.realpath(directory_path):
+                time.sleep(delay / 1000)
+            elif imv_directory != os.path.realpath(directory_path):
+                self.burst_progress = 0
             # Validate all commands before clearing the viewer's playlist.
             commands = ["close all", *_open_commands(paths)] if rebuild else []
             for command in commands:
@@ -317,6 +407,8 @@ class ImvSync:
         self.playlist = paths
         self.directory = directory_path
         self.playlist_tab = self.fm.thistab
+        self.last_forward_index = index
+        self.last_forward_time = time.monotonic()
         self.observed_selection = os.path.realpath(selected)
         self.pending = False
 
@@ -396,6 +488,11 @@ class ImvSync:
                 curses.halfdelay(min(255, max(1, self.fm.settings.idle_delay // 100)))
         if self.fm.thistab is not self.last_tab:
             self.last_tab = self.fm.thistab
+            self.generation += 1
+            self.pending = self.socket is not None
+        current_directory = getattr(self.fm.thisdir, "path", "")
+        if current_directory != self.last_directory:
+            self.last_directory = current_directory
             self.generation += 1
             self.pending = self.socket is not None
         self.sync_to_imv()
