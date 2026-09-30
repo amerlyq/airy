@@ -11,7 +11,8 @@ While tracking: i = tag_toggle, m = sync_imv_position, M = stop_imv_tracking.
 M ignores existing sockets until another imv appears; original maps are restored.
 
 Requires imv with shell-quoted `open` arguments (verified against imv 5.0.1).
-Playlists contain visible image files in ranger order, rebuilt only on changes.
+Playlists contain visible image files in ranger order, captured when ranger
+enters an image-containing directory and kept until a new list is sent.
 Commands fit imv's 1023-byte receive buffer. IPC EOF acknowledges enqueueing;
 an `exec printf` snapshot observes execution without relying on IPC replies.
 """
@@ -38,7 +39,7 @@ IPC_MAX_BYTES = 1023
 SOCKET_GLOB = "imv-*.sock"
 TRACKING_MAPS = {
     "i": "tag_toggle",
-    "m": "sync_imv_position",
+    "I": "sync_imv_position",
     "M": "stop_imv_tracking",
 }
 
@@ -166,6 +167,8 @@ class ImvSync:
         self.socket = None
         self.playlist = ()
         self.directory = ""
+        self.playlist_tab = None
+        self.last_tab = fm.thistab
         self.observed_selection = None
         self.pending = False
         self.applying_snapshot = False
@@ -214,6 +217,7 @@ class ImvSync:
         self.socket = selected
         self.playlist = ()
         self.directory = getattr(self.fm.thisdir, "path", "")
+        self.playlist_tab = self.fm.thistab
         self.observed_selection = None
         self.pending = False
         self.last_poll = 0.0
@@ -250,6 +254,14 @@ class ImvSync:
             return
         if getattr(signal, "tab", self.fm.thistab) is not self.fm.thistab:
             return
+        selected = os.path.realpath(getattr(self.fm.thisfile, "path", ""))
+        if (
+            self.observed_selection == selected
+            and getattr(self.fm.thisdir, "path", "") == self.directory
+            and self.fm.thistab is self.playlist_tab
+        ):
+            self.pending = False
+            return
         self.generation += 1
         self.discover()
         # Store intent, not an index: input may emit multiple moves or sort
@@ -261,31 +273,51 @@ class ImvSync:
             return
         directory = self.fm.thisdir
         selected = getattr(self.fm.thisfile, "path", "")
-        paths = tuple(
-            entry.path
-            for entry in (getattr(directory, "files", None) or ())
-            if not entry.is_directory and _looks_like_image(entry.path)
+        directory_path = directory.path
+        entering = (
+            self.fm.thistab is not self.playlist_tab or directory_path != self.directory
         )
+        rebuild = entering or not self.playlist
+        if rebuild:
+            paths = tuple(
+                entry.path
+                for entry in (getattr(directory, "files", None) or ())
+                if not entry.is_directory and _looks_like_image(entry.path)
+            )
+            if paths:
+                self.playlist = paths
+        else:
+            paths = self.playlist
         if selected not in paths:
+            self.directory = directory_path
+            self.playlist_tab = self.fm.thistab
             self.pending = False
             return
-        rebuild = paths != self.playlist
+        rebuild = rebuild and bool(paths)
         index = paths.index(selected) + 1
         try:
             # Validate all commands before clearing the viewer's playlist.
             commands = ["close all", *_open_commands(paths)] if rebuild else []
-            commands.append(f"goto {index}")
             for command in commands:
                 if not _send_command(self.socket.path, command):
                     self.playlist = ()  # Partial sends must be retried in full.
                     return
+            if rebuild:
+                snapshot = _snapshot(self.socket.path)
+                if snapshot is None or snapshot.count != len(paths):
+                    self.pending = False
+                    return
+            if not _send_command(self.socket.path, f"goto {index}"):
+                self.playlist = ()
+                return
         except ValueError as error:
             self.pending = False
             self.fm.notify(str(error), bad=True)
             return
         self.playlist = paths
-        self.directory = directory.path
-        self.observed_selection = (os.path.realpath(selected), index)
+        self.directory = directory_path
+        self.playlist_tab = self.fm.thistab
+        self.observed_selection = os.path.realpath(selected)
         self.pending = False
 
     def sync_from_imv(self):
@@ -313,23 +345,23 @@ class ImvSync:
             return  # Temporary-file/IPC failures are retried on the next poll.
         if requested_context != context or snapshot is None:
             return
-        # imv can remove invalid/deleted images or edit its own playlist.
-        # Invalidate cached indices when the reported entry no longer matches.
-        if self.playlist and (
-            snapshot.count != len(self.playlist)
-            or not 0 < snapshot.index <= len(self.playlist)
-            or os.path.realpath(self.playlist[snapshot.index - 1])
-            != os.path.realpath(snapshot.path)
-        ):
+        # imv can add images or reorder its own playlist while ranger's list
+        # stays frozen. Invalidate only when the shown path leaves that list.
+        if self.playlist and os.path.realpath(snapshot.path) not in {
+            os.path.realpath(path) for path in self.playlist
+        }:
             self.playlist = ()
         if not snapshot.path:
             return
         path = os.path.realpath(snapshot.path)
-        selection = (path, snapshot.index)
+        selection = path
         if selection == self.observed_selection:
             return  # No new imv selection; preserve ranger's non-image moves.
         directory = self.fm.thisdir
-        if getattr(directory, "path", "") != self.directory:
+        if (
+            self.fm.thistab is not self.playlist_tab
+            or getattr(directory, "path", "") != self.directory
+        ):
             return
         files = getattr(directory, "files", None) or ()
         matches = [entry for entry in files if os.path.realpath(entry.path) == path]
@@ -362,6 +394,10 @@ class ImvSync:
         finally:
             if capped_wait and not self.fm.ui.load_mode:
                 curses.halfdelay(min(255, max(1, self.fm.settings.idle_delay // 100)))
+        if self.fm.thistab is not self.last_tab:
+            self.last_tab = self.fm.thistab
+            self.generation += 1
+            self.pending = self.socket is not None
         self.sync_to_imv()
         # A key waiting in curses is handled before any completed poll result.
         # Moves also invalidate queries issued before programmatic navigation.
