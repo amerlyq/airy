@@ -10,6 +10,9 @@ What it does
     - open <many paths> (chunked, preserves order)
 - Then, on every move:
     - goto <index> (1-based)
+- Poll imv before handling ranger input and follow its selection passively.
+- Suppress ranger-to-imv commands while applying an imv selection. Subsequent
+  ranger keyboard/mouse moves drive imv normally, without focus detection.
 
 Why
 - Avoids per-move `close all` which causes black flashes.
@@ -74,6 +77,7 @@ _orig_handle_input = None
 _wrapped_handle_input = False
 _last_imv_poll_mono = 0.0
 _imv_sync_pending = False
+_applying_imv_selection = False
 _owned_imv_sockets: set[str] = set()
 _ignored_imv_sockets: set[str] = set()
 _socket_baseline: set[str] = set()
@@ -235,7 +239,7 @@ def _current_imv_path(sock: str) -> str | None:
 
 def _sync_from_imv_fm(fm: FM) -> None:
     """Follow imv's selected image in ranger."""
-    global _last_imv_sent_path, _last_imv_sent_dir
+    global _last_imv_sent_path, _last_imv_sent_dir, _applying_imv_selection
     # The compositor/tmux handoff can make the first request arrive too early.
     for delay in (0.0, 0.03, 0.08):
         if delay:
@@ -297,7 +301,14 @@ def _sync_from_imv_fm(fm: FM) -> None:
             return
 
         if getattr(fm.thisfile, "path", None) != selected:
-            fm.select_file(selected)
+            # select_file emits move synchronously. Do not echo this snapshot
+            # back to imv: the viewer may already have advanced to another file.
+            # Keep other move handlers active so ranger redraws normally.
+            _applying_imv_selection = True
+            try:
+                fm.select_file(selected)
+            finally:
+                _applying_imv_selection = False
         global _last_path
         _last_path = selected
         _last_imv_sent_path = selected
@@ -447,6 +458,9 @@ def _ensure_synced(sock: str, fm: FM) -> int | None:
 def _on_move(signal: Signal) -> None:
     global _last_send_mono, _last_path, _changed_i
     global _last_imv_sent_path, _last_imv_sent_dir
+
+    if _applying_imv_selection:
+        return
 
     try:
         fm: FM = signal.origin
