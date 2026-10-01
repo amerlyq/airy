@@ -40,7 +40,9 @@ try:
 
     from pymediainfo import MediaInfo
     from ranger.api import register_linemode
+    from ranger.core.filter_stack import stack_filter
     from ranger.core.linemode import DEFAULT_LINEMODE, LinemodeBase
+    from ranger.core.shared import FileManagerAware
 except Exception:
     pass
 else:
@@ -87,7 +89,8 @@ else:
                 return "WTF"
             s, ms = divmod(ms, 1000)
             m, s = divmod(s, 60)
-            return (f"{m}:" if m else "") + f"{s:02d}.{ms:03d}"
+            sz = f"({f.size / 1024 / 1024:.1f}M) "
+            return sz + (f"{m}:" if m else "") + f"{s:02d}.{ms:03d}"
 
         def _get_default_infostring(self, f: FileSystemObject, metadata: object) -> str:
             # OR: return DefaultLinemode().infostring(f, metadata)
@@ -105,3 +108,45 @@ else:
                 return fallback_linemode.infostring(f, metadata)
 
             return ""
+
+    @stack_filter("duration")
+    class DurationFilter(FileManagerAware):
+        def __init__(self, arg):
+            self.tol = int(arg) if arg else 500
+            self._cache = {}  # dirpath -> (len(files_all), set(paired paths))
+
+        def _scan(self, files):
+            ms = []
+            for x in files:
+                if x.is_directory:
+                    continue
+                try:
+                    v = get_duration_mediainfo(x.path)
+                except Exception:
+                    continue
+                if v is not None:
+                    ms.append((v, x.path))
+            ms.sort()
+            out = set()
+            for i, (v, p) in enumerate(ms):
+                if (
+                    i
+                    and v - ms[i - 1][0] <= self.tol
+                    or i + 1 < len(ms)
+                    and ms[i + 1][0] - v <= self.tol
+                ):
+                    out.add(p)
+            return out
+
+        def __call__(self, f):
+            if f.is_directory:
+                return True
+            d = os.path.dirname(f.path)
+            files = self.fm.get_directory(d).files_all or []
+            hit = self._cache.get(d)
+            if hit is None or hit[0] != len(files):  # rescan if listing changed
+                hit = self._cache[d] = (len(files), self._scan(files))
+            return f.path in hit[1]
+
+        def __str__(self):
+            return f"<Filter: duration pairs ±{self.tol}ms>"

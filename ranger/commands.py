@@ -385,6 +385,7 @@ class cda(Command):
         path = re.sub(r"(?::\d+){1,2}:?$", "", path)
 
         if "M" in flags:
+
             def newest_entry(directory):
                 entries = []
                 try:
@@ -407,9 +408,7 @@ class cda(Command):
                 return candidates
 
             candidates = []
-            for date_directory in __import__("glob").glob(
-                path + f"/{today_date()}*"
-            ):
+            for date_directory in __import__("glob").glob(path + f"/{today_date()}*"):
                 candidates.extend(newest_entry(date_directory))
             if candidates:
                 path = max(
@@ -420,9 +419,8 @@ class cda(Command):
                     for candidate in candidates
                 )[1]
             else:
-                path = max(
-                    __import__("glob").glob(path + f"/{today_date()}*")
-                )
+                candidates = list(__import__("glob").glob(path + f"/{today_date()}*"))
+                path = max(candidates) if candidates else path
         elif "m" in flags:
             from stat import S_ISDIR
 

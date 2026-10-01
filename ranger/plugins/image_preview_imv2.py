@@ -180,6 +180,7 @@ class ImvSync:
         self.observed_selection = None
         self.forward_delay_index = 0
         self.forward_delays = list(IMV_FORWARD_DELAYS_MS)
+        self.burst_size = IMV_BURST_SIZE
         self.burst_progress = 0
         self.last_forward_index = None
         self.last_forward_time = None
@@ -265,7 +266,15 @@ class ImvSync:
             max(eligible, key=lambda item: (item.modified_ns, item.path), default=None)
         )
 
-    def stop(self):
+    def stop(self, narg=None, quantifier=None):
+        count = narg if narg is not None else quantifier
+        if count is not None:
+            if 1 <= count <= 9:
+                self.burst_size = count
+                self.fm.notify(f"imv burst size: {count}")
+            else:
+                self.fm.notify("imv burst size must be 1..9", bad=True)
+            return
         self.ignored.update(_sockets())
         self.set_socket(None)
 
@@ -363,13 +372,13 @@ class ImvSync:
                 self.burst_progress = 0
             if not use_delay:
                 delay = 0
-            elif IMV_BURST_SIZE > 1:
+            elif self.burst_size > 1:
                 delay = (
                     IMV_BURST_BETWEEN_DELAY_MS
-                    if self.burst_progress == IMV_BURST_SIZE
+                    if self.burst_progress == self.burst_size
                     else self.forward_delays[self.forward_delay_index]
                 )
-                self.burst_progress = (self.burst_progress + 1) % (IMV_BURST_SIZE + 1)
+                self.burst_progress = (self.burst_progress + 1) % (self.burst_size + 1)
             else:
                 delay = self.forward_delays[self.forward_delay_index]
             moving_up = (
