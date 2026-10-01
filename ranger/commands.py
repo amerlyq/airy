@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import re
+import stat
 from collections.abc import Callable, Iterable, Sequence
 from os import path as fs
 from re import Pattern
@@ -383,11 +384,49 @@ class cda(Command):
         # Strip :lnum:lpos:
         path = re.sub(r"(?::\d+){1,2}:?$", "", path)
 
-        if "m" in flags or "M" in flags:
+        if "M" in flags:
+            def newest_entry(directory):
+                entries = []
+                try:
+                    entries = [entry.path for entry in os.scandir(directory)]
+                except OSError:
+                    return []
+                candidates = []
+                for entry in entries:
+                    if entry.endswith(".pyc"):
+                        continue
+                    try:
+                        mode = os.lstat(entry).st_mode
+                    except OSError:
+                        continue
+                    if stat.S_ISDIR(mode):
+                        nested = newest_entry(entry)
+                        candidates.extend(nested or [entry])
+                    else:
+                        candidates.append(entry)
+                return candidates
+
+            candidates = []
+            for date_directory in __import__("glob").glob(
+                path + f"/{today_date()}*"
+            ):
+                candidates.extend(newest_entry(date_directory))
+            if candidates:
+                path = max(
+                    (
+                        max(os.lstat(candidate).st_mtime, os.lstat(candidate).st_ctime),
+                        candidate,
+                    )
+                    for candidate in candidates
+                )[1]
+            else:
+                path = max(
+                    __import__("glob").glob(path + f"/{today_date()}*")
+                )
+        elif "m" in flags:
             from stat import S_ISDIR
 
-            patt = "/**" if "m" in flags else f"/{today_date()}*/*"
-            files = __import__("glob").glob(path + patt, recursive=True)
+            files = __import__("glob").glob(path + "/**", recursive=True)
             files = [x for x in files if not x.endswith(".pyc")]
             if files:
                 path = max(
