@@ -9,12 +9,51 @@ from re import Pattern
 from typing import ClassVar, Protocol, TypeAlias, cast
 
 from ranger.api.commands import Command
+from ranger.config.commands import delete as _default_delete
 from ranger.core.fm import FM
 from ranger.ext.shell_escape import shell_quote
 
 CommandLine: TypeAlias = str | list[str]
 CommandSpec: TypeAlias = tuple[CommandLine, str]
 CompletionResult: TypeAlias = str | Iterable[str] | None
+
+
+# OR: map dD eval fm.set_clipboard(fm.thisfile.basename.encode('utf-8')); cmd('delete')
+class delete(_default_delete):
+    """:delete
+
+    Copy selected file names to the clipboard before deleting them.
+    Deletion is skipped when clipboard copy fails.
+    """
+
+    def _copy_names(self, names: Sequence[str]) -> bool:
+        import subprocess
+
+        try:
+            process = subprocess.run(
+                ["xci"],
+                input="\n".join(names),
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+        except OSError:
+            return False
+        return process.returncode == 0
+
+    def _delete_with_clipboard(self, files: Sequence[str]) -> None:
+        names = [fs.basename(file) for file in files]
+        if self._copy_names(names):
+            self._original_delete(files)
+        else:
+            self.fm.notify("Could not copy file name to clipboard", bad=True)
+
+    def execute(self) -> None:
+        if not hasattr(self.fm, "_airy_original_delete"):
+            self.fm._airy_original_delete = self.fm.delete
+        self._original_delete = self.fm._airy_original_delete
+        self.fm.delete = self._delete_with_clipboard
+        super().execute()
 
 
 class DirectoryEntry(Protocol):
@@ -516,6 +555,7 @@ class df(Command):
             #   else -> append filelist
             cmd += [f.path + ("/" if f.is_directory else "") for f in fls]
             print(cmd)
+            cmd += [" && printf '\033[31;40;1same\033[m '"]
             self.fm.execute_command(cmd, flags=flags)
 
 
