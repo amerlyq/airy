@@ -27,6 +27,12 @@ class vdsym(Command):
     _dir_cache: dict[str, dict[str, tuple[int, list[str], list[str]]]] = {}
     _pics_cache_key: object = None
     _pics_cache: list[str] = []
+    _deferred_index: dict[str, list[str]] = {}
+    _deferred_signature: object = None
+    _candidate_index: dict[str, list[str]] = {}
+    _candidate_index_ci: dict[str, list[str]] = {}
+    _candidate_index_paths: tuple[str, ...] = ()
+    _link_index: set[str] = set()
 
     def _args(self) -> tuple[set[str], list[str]]:
         import shlex
@@ -321,8 +327,10 @@ class vdsym(Command):
         return self._filter_matches(paths)
 
     def _filter_matches(self, paths: list[str]) -> list[str]:
+        self._ensure_candidate_index(paths)
         flags, _ = self._args()
         ignorecase = "i" in flags
+        index = self._candidate_index_ci if ignorecase else self._candidate_index
         names = self._names()
         matches = []
         seen = set()
@@ -334,20 +342,37 @@ class vdsym(Command):
                     name = rf"{match[1]}-{match[2]}"
             needle = name.casefold() if ignorecase else name
             pattern = f"*{needle}*" if "g" in flags else needle
-            for path in paths:
-                is_link = fs.islink(path)
+            candidates = (
+                [path for key, values in index.items() if fnmatch(key, pattern) for path in values]
+                if "g" in flags
+                else index.get(needle, ())
+            )
+            for path in candidates:
+                is_link = path in self._link_index
                 if "l" in flags and not is_link:
                     continue
-                candidates = [fs.basename(path)]
-                if is_link:
-                    candidates.append(fs.basename(os.readlink(path)))
-                if path not in seen and any(
-                    fnmatch(candidate.casefold() if ignorecase else candidate, pattern)
-                    for candidate in candidates
-                ):
+                if path not in seen:
                     seen.add(path)
                     matches.append(path)
         return matches
+
+    def _ensure_candidate_index(self, paths: list[str]) -> None:
+        signature = tuple(paths)
+        if signature == self._candidate_index_paths:
+            return
+        index: dict[str, list[str]] = {}
+        links = set()
+        for path in paths:
+            index.setdefault(fs.basename(path), []).append(path)
+            if fs.islink(path):
+                links.add(path)
+                index.setdefault(fs.basename(os.readlink(path)), []).append(path)
+        self._candidate_index = index
+        self._candidate_index_ci = {
+            key.casefold(): values for key, values in index.items()
+        }
+        self._link_index = links
+        self._candidate_index_paths = signature
 
     def _matches(self) -> list[str]:
         started = time.perf_counter()
@@ -360,8 +385,10 @@ class vdsym(Command):
         paths = []
         deferred = {}
         for root in roots:
-            if "Q" in flags or root not in self._dir_cache:
+            if "Q" in flags:
                 self._prefill_fd((root,))
+            elif root not in self._dir_cache:
+                self._cached_root(root, False)
             if "q" in flags:
                 normal, lazy = self._cached_root(root, False)
             else:
@@ -377,7 +404,8 @@ class vdsym(Command):
                         lazy[directory] = deferred_entries
             paths.extend(normal)
             deferred.update(lazy)
-            paths.extend(self._expand_deferred(deferred))
+        paths.extend(self._expand_deferred(deferred))
+        paths = list(dict.fromkeys(paths))
         expanded = time.perf_counter()
         matches = self._filter_matches(paths)
         self._kpi = {
@@ -457,6 +485,11 @@ class vdsym(Command):
                     path for path in entries if fs.isdir(path) and not fs.islink(path)
                 )
             else:
+                if self._is_pics_payload_dir(directory):
+                    entries, lazy = [], [directory]
+                    cache[directory] = (mtime, entries, lazy)
+                    deferred[directory] = lazy
+                    continue
                 entries, lazy = [], []
                 try:
                     for entry in os.scandir(directory):
@@ -483,27 +516,41 @@ class vdsym(Command):
             del cache[directory]
         return normal, deferred
 
+    def _is_pics_payload_dir(self, directory: str) -> bool:
+        parent = fs.basename(fs.dirname(directory))
+        return fs.basename(directory).isdigit() and "-pics" in parent
+
     def _expand_deferred(self, deferred: dict[str, list[str]]) -> list[str]:
         names = self._names()
-        numeric = tuple(
-            sorted({match[1] for name in names if (match := re.match(r"(\d+)", name))})
-        )
-        key = (
-            numeric,
-            tuple(
-                sorted(
-                    (directory, tuple(paths)) for directory, paths in deferred.items()
-                )
-            ),
-        )
+        normalized = []
+        flags, _ = self._args()
+        for name in names:
+            if "n" in flags:
+                name = re.sub(r"\.html$", "", name)
+                if match := re.fullmatch(r"(\d+)-0*(\d+)", name):
+                    name = rf"{match[1]}-{match[2]}"
+            normalized.append(name)
+        numeric = tuple(sorted({
+            (match[1], match[2])
+            for name in normalized
+            if (match := re.fullmatch(r"(\d+)-0*(\d+)", name))
+        }))
+        signature = tuple(sorted(deferred))
+        self._deferred_signature = signature
+        key = (numeric, signature)
         if key != self._pics_cache_key:
             self._pics_cache_key = key
-            self._pics_cache = [
-                path
-                for pics_dir, paths in deferred.items()
-                if fs.basename(pics_dir).split("-", 1)[0] in numeric
-                for path in paths
-            ]
+            self._pics_cache = []
+            for prefix, number in numeric:
+                for directory in deferred:
+                    if fs.basename(directory) != prefix:
+                        continue
+                    suffixes = {number, f"{int(number):02d}", f"{int(number):03d}", f"{int(number):04d}"}
+                    for width in suffixes:
+                        for extension in ("webp", "gif"):
+                            path = fs.join(directory, f"{prefix}-{width}.{extension}")
+                            if fs.lexists(path):
+                                self._pics_cache.append(path)
         return self._pics_cache
 
     def _matches_slow(self) -> list[str]:
