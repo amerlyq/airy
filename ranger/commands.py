@@ -516,7 +516,7 @@ class df(Command):
             #   else -> append filelist
             cmd += [f.path + ("/" if f.is_directory else "") for f in fls]
             print(cmd)
-            cmd += [" && printf '\033[31;40;1same\033[m '"]
+            # cmd += [" && printf '\033[31;40;1same\033[m '"]
             self.fm.execute_command(cmd, flags=flags)
 
 
