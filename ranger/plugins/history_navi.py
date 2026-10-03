@@ -1,22 +1,17 @@
-from os import path as fs
-
 from ranger.api.commands import Command
-from ranger.container.history import History
-from ranger.core.fm import FM
 
 
-### DEBUG
+### DEBUG: history per-tab → other tabs keep their history
 # :eval fm.thistab.history.maxlen
 # :eval len(fm.thistab.history.history)
 # :eval fm.thistab.history.__dict__
 # :eval fm.notify("\n".join(map(str, fm.thistab.history.history)) + f"\n@{fm.thistab.history.index}")
 # :display_log
 # :eval fm.thistab.history.unique
-# :eval setattr(fm.thistab.history, 'unique', False) → test live
+# :eval setattr(fm.thistab.history, 'unique', False)
 # :eval h = fm.thistab.history; h.history = [h.current()]; h.index = 0
-#   drop only the back part, keep forward: h.history = h.history[h.index:]; h.index = 0
-#   drop only the forward part: del h.history[h.index + 1:]
-#   per-tab → other tabs keep their history
+#   OR: drop only the back part, keep forward: h.history = h.history[h.index:]; h.index = 0
+#   OR: drop only the forward part: del h.history[h.index + 1:]
 class history_clear(Command):
     def execute(self):
         h = self.fm.thistab.history
@@ -25,46 +20,94 @@ class history_clear(Command):
         h.index = 0
 
 
-# Cause: probably History.add dedup + truncate, not the cap.
-# add does del _history[_index+1:], then remove(item) for an existing equal entry, then append.
-# → revisiting the same few dirs (symlink dir, plugin target, siblings) moves them to the end instead of adding steps
-# → the list collapses to the set of distinct dirs, in last-visit order
-# → history_go -1 at index 0 is a no-op → "stuck"
-#
-# Step 3 in cd_symlink1 is probably a no-op or broken:
-# → attrs are _history / _index (verify with :eval fm.thistab.history.__dict__); history.index / history.history probably don't exist (the latter just creates a new unused attribute)
-# → enter_dir → add already truncates the forward part
-#
-# → every cd / select_file / enter_dir(history=True) goes through add, so symlink + plugin jumps are covered
-# → if __dict__ shows different attr names in your version, adjust
-# Related, only if relevant:
-#   History.modify(unique=True) has its own dedup (used by some callers; probably not in this path)
-#   consecutive-only dedup → ping-pong A↔B between plugin jumps still fills the 100 slots
-#   new tabs copy history via History.__init__/rebuild → the patch applies there tookkkk
-#
-# def add(self, item):
-#     del self._history[self._index + 1 :]
-#     if self._history and self._history[-1] == item:
-#         return
-#     if len(self._history) >= max(self.maxlen, 1):
-#         del self._history[0]
-#     self._history.append(item)
-#     self._index = len(self._history) - 1
-#
-#
-# History.add = add
+# map J     move_parent_nohist 1
+# map K     move_parent_nohist -1
+# class move_parent_nohist(Command):
+#     def execute(self):
+#         fm = self.fm
+#         parent = fm.thistab.at_level(-1)
+#         if parent is None:
+#             return
+#         n = int(self.arg(1)) * (self.quantifier or 1)
+#         i = max(0, min(parent.pointer + n, len(parent.files) - 1))
+#         fm.change_mode("normal")
+#         fm.thistab.enter_dir(parent.files[i], history=False)
 
 
-class move_parent_nohist(Command):
-    def execute(self):
-        fm = self.fm
-        parent = fm.thistab.at_level(-1)
-        if parent is None:
-            return
-        n = int(self.arg(1)) * (self.quantifier or 1)
-        i = max(0, min(parent.pointer + n, len(parent.files) - 1))
-        fm.change_mode("normal")
-        fm.thistab.enter_dir(parent.files[i], history=False)
+import sys
+
+from ranger.container.history import History
+from ranger.core.tab import Tab
+
+
+def _is_step(frame):
+    if not frame.f_code.co_filename.endswith("core/actions.py"):
+        return False
+    name = frame.f_code.co_name
+    if name == "move":
+        return True
+    if name == "move_parent":
+        return abs(frame.f_locals.get("n", 0)) == 1
+    return False
+
+
+## ALG:
+# A → D: add(A), add(D) gives [A, D]
+# D → S1: add(D) is skipped (it's last), add(S1) gives [A, D, S1]
+# S1 → S2: [A, D, S1, S2]
+# S2 → A: [A, D, S1, S2, A], so [5/5]
+# history-back steps S2, S1, D, A, one entry per jump
+def _add(self, item):
+    h = self.history
+    # ALT:BUG: dedup messes history chain when chained symlinks walk you back to starting dir
+    # if item in h:
+    #     h.remove(item)
+    # h.append(item)
+    if not h or h[-1] != item:
+        h.append(item)
+    self.index = len(h) - 1
+    if self.maxlen and len(h) > self.maxlen:
+        del h[0]
+        self.index -= 1
+
+
+History.add = _add
+
+_enter_dir = Tab.enter_dir
+
+
+def enter_dir(self, path, history=True):
+    step = _is_step(sys._getframe(1))
+    old = self.thisdir
+    ret = _enter_dir(self, path, history=False)
+    new = self.thisdir
+    record = history and old and new and old.path != new.path and not step
+    ## DEBUG:
+    # --- tracedump: comment out when done ---
+    # __import__("logging").getLogger(__name__).warning(
+    #     "enter_dir %s -> %s step=%s record=%s\n%s",
+    #     getattr(old, "path", None),
+    #     getattr(new, "path", None),
+    #     step,
+    #     bool(record),
+    #     "".join(__import__("traceback").format_stack(limit=6)[:-1]),
+    # )
+    # ----------------------------------------
+    if record:
+        self.history.add(old)
+        self.history.add(new)
+    return ret
+
+
+Tab.enter_dir = enter_dir
+
+
+import os
+from os import path as fs
+from typing import cast
+
+from ranger.core.fm import FM
+from ranger.gui.widgets.titlebar import TitleBar
 
 
 class cd_symlink1(Command):
@@ -99,24 +142,24 @@ class cd_symlink1(Command):
             else fs.normpath(fs.join(origin_dir, link_target))
         )
 
-        # 3. Truncate forward history if we moved back with 'H'
-        tab = fm.thistab
-        if tab is None:
-            fm.notify("No active tab!", bad=True)
-            return
-        history = tab.history
-        if history and history.index < len(history) - 1:
-            # history.container = history.container[: history.index + 1]
-            # history._list = history._list[: history.index + 1]
-            # if hasattr(history, "history"):
-            history.history = history.history[: history.index + 1]
+        # # 3. Truncate forward history if we moved back with 'H'
+        # tab = fm.thistab
+        # if tab is None:
+        #     fm.notify("No active tab!", bad=True)
+        #     return
+        # history = tab.history
+        # if history and history.index < len(history) - 1:
+        #     # history.container = history.container[: history.index + 1]
+        #     # history._list = history._list[: history.index + 1]
+        #     # if hasattr(history, "history"):
+        #     history.history = history.history[: history.index + 1]
 
         # 4. Handle existing target (Directory or File)
         if fs.isdir(target_path):
             fm.cd(str(target_path))
             return
 
-        if fs.isfile(target_path):
+        if fs.isfile(target_path) or fs.islink(target_path):
             parent_dir: str = fs.dirname(target_path)
             fm.cd(str(parent_dir))
             if fm.thisdir:
@@ -141,3 +184,44 @@ class cd_symlink1(Command):
             fm.cd(str(target_dir))
         else:
             fm.notify("Link target and parent directories do not exist!", bad=True)
+
+
+def _hist(self):
+    h = self.fm.thistab.history
+    return f"[{len(h) and h.index + 1}/{len(h)}]"
+
+
+_tb_left = TitleBar._get_left_part
+
+
+def tb_left(self, bar):
+    _tb_left(self, bar)
+    n = len(bar.left)
+    bar.left.add(_hist(self), "history", fixedsize=True)
+    bar.left.add_space()
+    bar.left[:] = bar.left[n:] + bar.left[:n]
+
+
+TitleBar._get_left_part = tb_left
+
+## ALT: prepend to statusbar below
+# from ranger.gui.widgets.statusbar import StatusBar
+# _sb_left = StatusBar._get_left_part
+#
+# def sb_left(self, bar):
+#     _sb_left(self, bar)
+#     n = len(bar.left)
+#     bar.left.add(_hist(self), "history")
+#     bar.left.add_space()
+#     bar.left[:] = bar.left[n:] + bar.left[:n]
+# StatusBar._get_left_part = sb_left
+#
+## statusbar: append (right edge)
+# _sb_right = StatusBar._get_right_part
+# def sb_right(self, bar):
+#     _sb_right(self, bar)
+#     n = len(bar.right)
+#     bar.right.add(_hist(self), "history")
+#     bar.right.add_space()
+#     bar.right[:] = bar.right[n:] + bar.right[:n]
+# StatusBar._get_right_part = sb_right
