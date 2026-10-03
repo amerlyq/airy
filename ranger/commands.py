@@ -66,7 +66,7 @@ class vdsym(Command):
     data_roots = ("/media/pro/vd", "/cache/vd", "/media/hpx/vd_ssdt5")
     view_root = "/d/irome/view"
 
-    def _args(self) -> tuple[set[str], str | None]:
+    def _args(self) -> tuple[set[str], list[str]]:
         import shlex
 
         long_flags = {
@@ -78,11 +78,15 @@ class vdsym(Command):
             "ignore-case": "i",
             "jump": "j",
             "links-only": "l",
+            "multiple": "m",
             "numeric": "n",
             "open": "o",
             "print": "p",
+            "replace": "R",
+            "selection": "s",
             "view": "v",
-            "yank": "y",
+            "xclip": "x",
+            "yanked": "y",
         }
         tokens = shlex.split(self.rest(1))
         filtered: list[str] = []
@@ -100,7 +104,7 @@ class vdsym(Command):
             filtered.append(token)
         tokens = filtered
         flags: set[str] = set()
-        name: str | None = None
+        names: list[str] = []
         separator = False
         for token in tokens:
             if not separator and token == "--":
@@ -110,24 +114,95 @@ class vdsym(Command):
             elif not separator and token.startswith("-"):
                 flags.update(token[1:])
             else:
-                name = token if name is None else f"{name} {token}"
+                names.append(token)
                 separator = True
-        return flags, name
+        return flags, names
 
     def _name(self) -> str:
+        names = self._names()
+        return names[0] if names else ""
+
+    def _names(self) -> list[str]:
         import subprocess
 
-        flags, argument = self._args()
-        if argument is not None:
-            return fs.basename(argument)
+        flags, arguments = self._args()
+        if arguments:
+            return [fs.basename(argument) for argument in arguments]
+        if "s" in flags:
+            selection = self.fm.thistab.get_selection()
+            return [entry.basename for entry in selection]
         if "c" in flags:
             clipboard = subprocess.run(
                 ["xco"], stdout=subprocess.PIPE, text=True, check=False
             ).stdout
-            return fs.basename(clipboard.splitlines()[0]) if clipboard else ""
+            return [fs.basename(line) for line in clipboard.splitlines()]
         if "b" in flags:
-            return self.fm.thisfile.basename
-        return ""
+            return [self.fm.thisfile.basename]
+        return []
+
+    def _paths(self, flags: set[str]) -> list[str]:
+        if "s" in flags:
+            return [fs.abspath(entry.path) for entry in self.fm.thistab.get_selection()]
+        if "y" in flags:
+            return [fs.abspath(entry.path) for entry in self.fm.copy_buffer]
+        return []
+
+    def _replace_links(self, flags: set[str]) -> None:
+        source = fs.abspath(self.fm.thisfile.path)
+        targets = self._paths(flags)
+        if not fs.isfile(source) or len(targets) != 1 or not fs.isfile(targets[0]):
+            self.fm.notify("Need one existing cursor file and one yanked file.", bad=True)
+            return
+        target = targets[0]
+        replaced = 0
+        errors = 0
+        for root in self.data_roots + (self.view_root,):
+            if not fs.isdir(root):
+                continue
+            for directory, dirnames, filenames in os.walk(root):
+                entries = dirnames + filenames
+                dirnames[:] = [entry for entry in dirnames if not fs.islink(fs.join(directory, entry))]
+                for entry in entries:
+                    link = fs.join(directory, entry)
+                    if not fs.islink(link) or fs.realpath(link) != source:
+                        continue
+                    new_link = fs.join(directory, fs.basename(target))
+                    if fs.lexists(new_link):
+                        if not fs.islink(new_link):
+                            errors += 1
+                            continue
+                        if fs.realpath(new_link) == fs.realpath(target):
+                            if new_link != link:
+                                try:
+                                    os.unlink(link)
+                                    replaced += 1
+                                except OSError:
+                                    errors += 1
+                            continue
+                        if new_link != link:
+                            errors += 1
+                            continue
+                    temporary = fs.join(
+                        directory,
+                        f".{fs.basename(target)}.vdsym-{os.getpid()}-{replaced}",
+                    )
+                    try:
+                        os.symlink(fs.relpath(target, directory), temporary)
+                        os.replace(temporary, new_link)
+                        if new_link != link:
+                            os.unlink(link)
+                        replaced += 1
+                    except OSError:
+                        errors += 1
+                        if fs.lexists(temporary):
+                            try:
+                                os.unlink(temporary)
+                            except OSError:
+                                pass
+        message = f"Replaced {replaced} symlink(s)."
+        if errors:
+            message += f" {errors} failed."
+        self.fm.notify(message, bad=bool(errors))
 
     def _dashboard_root(self) -> str | None:
         import shlex
@@ -142,36 +217,40 @@ class vdsym(Command):
         return None
 
     def _matches(self) -> list[str]:
-        name = self._name()
         flags, _ = self._args()
-        if "n" in flags:
-            name = re.sub(r"\.html$", "", name)
-            if (match := re.fullmatch(r"(\d+)-0*(\d+)", name)):
-                name = rf"{match[1]}-{match[2]}"
         ignorecase = "i" in flags
-        needle = name.casefold() if ignorecase else name
-        pattern = f"*{needle}*" if "g" in flags else needle
         matches = []
+        seen = set()
+        names = self._names()
         roots = ((self.view_root,) if "v" in flags else ()) + self.data_roots
-        for root in roots:
-            if not fs.isdir(root):
-                continue
-            for directory, dirnames, filenames in os.walk(root):
-                entries = filenames + dirnames
-                dirnames[:] = [entry for entry in dirnames if not fs.islink(fs.join(directory, entry))]
-                for filename in entries:
-                    path = fs.join(directory, filename)
-                    is_link = fs.islink(path)
-                    if "l" in flags and not is_link:
-                        continue
-                    candidates = [filename]
-                    if is_link:
-                        candidates.append(fs.basename(os.readlink(path)))
-                    if any(
-                        fnmatch(candidate.casefold() if ignorecase else candidate, pattern)
-                        for candidate in candidates
-                    ):
-                        matches.append(path)
+        for raw_name in names:
+            name = raw_name
+            if "n" in flags:
+                name = re.sub(r"\.html$", "", name)
+                if (match := re.fullmatch(r"(\d+)-0*(\d+)", name)):
+                    name = rf"{match[1]}-{match[2]}"
+            needle = name.casefold() if ignorecase else name
+            pattern = f"*{needle}*" if "g" in flags else needle
+            for root in roots:
+                if not fs.isdir(root):
+                    continue
+                for directory, dirnames, filenames in os.walk(root):
+                    entries = filenames + dirnames
+                    dirnames[:] = [entry for entry in dirnames if not fs.islink(fs.join(directory, entry))]
+                    for filename in entries:
+                        path = fs.join(directory, filename)
+                        is_link = fs.islink(path)
+                        if "l" in flags and not is_link:
+                            continue
+                        candidates = [filename]
+                        if is_link:
+                            candidates.append(fs.basename(os.readlink(path)))
+                        if path not in seen and any(
+                            fnmatch(candidate.casefold() if ignorecase else candidate, pattern)
+                            for candidate in candidates
+                        ):
+                            seen.add(path)
+                            matches.append(path)
         return matches
 
     def _dashboard(self, matches: list[str]) -> str:
@@ -224,7 +303,14 @@ class vdsym(Command):
 
     def execute(self) -> None:
         flags, _ = self._args()
-        if not self._name():
+        if "R" in flags:
+            self._replace_links(flags)
+            return
+        names = self._names()
+        if len(names) > 1 and "m" not in flags:
+            self.fm.notify("Source has multiple needles; use --multiple.", bad=True)
+            return
+        if not names:
             self.fm.notify("Use --basename, --clipboard, or an explicit name.", duration=1, bad=True)
             return
         matches = self._matches()
@@ -239,7 +325,7 @@ class vdsym(Command):
             else:
                 self._dashboard(matches)
             return
-        if "y" in flags:
+        if "x" in flags:
             self._yank(matches)
             return
         if "d" in flags:
