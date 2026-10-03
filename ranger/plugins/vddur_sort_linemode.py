@@ -45,7 +45,9 @@ else:
             return f.relative_path
 
         def infostring(self, f: FileSystemObject, metadata: object) -> str:
-            if not f.is_file or not (f.video or f.audio):
+            ## FAIL: mimetype is empty for .mp4_*
+            # if not f.is_file or not (f.video or f.audio):
+            if not (f.is_file and (f.video or f.audio or ".mp4" in f.basename)):
                 return self._get_default_infostring(f, metadata)
 
             ms = get_duration_mediainfo(f.path)
@@ -91,6 +93,7 @@ else:
                 if x.is_directory:
                     continue
                 try:
+                    # if not (f.is_file and (f.video or f.audio or ".mp4" in f.basename)):
                     v = get_duration_mediainfo(x.path)
                 except Exception:
                     continue
