@@ -43,7 +43,8 @@ class vdsym(Command):
             "open": "o",
             "print": "p",
             "replace": "R",
-            "rescan": "q",
+            "refresh": "q",
+            "rescan": "Q",
             "selection": "s",
             "view": "v",
             "xclip": "x",
@@ -59,6 +60,8 @@ class vdsym(Command):
                 "replace": "R",
                 "rotate": "r",
                 "xclip": "x",
+                "refresh": "q",
+                "rescan": "Q",
             },
             "source": {
                 "basename": "b",
@@ -345,14 +348,51 @@ class vdsym(Command):
     def _matches(self) -> list[str]:
         flags, _ = self._args()
         roots = (self.view_root,) if "v" in flags else (self.view_root,) + self.data_roots
+        if "Q" in flags:
+            self._dir_cache.clear()
+        if "q" in flags or "Q" in flags:
+            self._prefill_fd(roots)
         paths = []
         deferred = {}
         for root in roots:
-            normal, lazy = self._cached_root(root, "q" in flags)
+            normal, lazy = self._cached_root(root, "Q" in flags)
             paths.extend(normal)
             deferred.update(lazy)
         paths.extend(self._expand_deferred(deferred))
         return self._filter_matches(paths)
+
+    def _prefill_fd(self, roots: tuple[str, ...]) -> None:
+        import subprocess
+
+        roots = tuple(root for root in roots if fs.isdir(root))
+        if not roots:
+            return
+        try:
+            result = subprocess.run(
+                ["fd", "--absolute-path", "--print0", ".", *roots],
+                stdout=subprocess.PIPE,
+                check=False,
+            )
+        except OSError:
+            return
+        entries: dict[str, list[str]] = {root: [] for root in roots}
+        for path in result.stdout.decode().split("\0"):
+            if not path:
+                continue
+            parent = fs.dirname(path)
+            if parent in entries:
+                entries[parent].append(path)
+        for root in roots:
+            mtimes = {}
+            for directory in (root, *entries):
+                if directory.startswith(root) and fs.isdir(directory):
+                    try:
+                        mtimes[directory] = os.stat(directory).st_mtime_ns
+                    except OSError:
+                        pass
+            for directory, paths in entries.items():
+                if directory.startswith(root):
+                    self._dir_cache.setdefault(directory, (mtimes.get(directory, 0), paths, []))
 
     def _cached_root(self, root: str, force: bool) -> tuple[list[str], dict[str, list[str]]]:
         cache = {} if force else self._dir_cache.setdefault(root, {})
@@ -485,6 +525,10 @@ class vdsym(Command):
 
     def execute(self) -> None:
         flags, _ = self._args()
+        if ("q" in flags or "Q" in flags) and not flags.intersection("ad jopxR".replace(" ", "")):
+            self._matches()
+            self.fm.notify("Cache refreshed.")
+            return
         if "R" in flags:
             self._replace_links(flags)
             return
