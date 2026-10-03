@@ -262,12 +262,58 @@ class vdsym(Command):
         return None
 
     def _matches(self) -> list[str]:
+        import subprocess
+
+        flags, _ = self._args()
+        roots = (self.view_root,) if "v" in flags else (self.view_root,) + self.data_roots
+        names = self._names()
+        roots = tuple(root for root in roots if fs.isdir(root))
+        if not roots or not names:
+            return []
+        paths = []
+        path_seen = set()
+        fd_flags = ["fd", "--absolute-path", "--print0", "--glob"]
+        if "i" in flags:
+            fd_flags.append("--ignore-case")
+        for raw_name in names:
+            name = raw_name
+            if "n" in flags:
+                name = re.sub(r"\.html$", "", name)
+                if match := re.fullmatch(r"(\d+)-0*(\d+)", name):
+                    name = rf"{match[1]}-{match[2]}"
+            pattern = f"*{name}*" if "g" in flags else name
+            try:
+                result = subprocess.run(
+                    fd_flags + [pattern, *roots],
+                    stdout=subprocess.PIPE,
+                    check=False,
+                )
+            except OSError:
+                return self._matches_slow()
+            for path in result.stdout.decode().split("\0"):
+                if path and path not in path_seen:
+                    path_seen.add(path)
+                    paths.append(path)
+        try:
+            result = subprocess.run(
+                ["fd", "--absolute-path", "--print0", "--type", "l", ".", *roots],
+                stdout=subprocess.PIPE,
+                check=False,
+            )
+        except OSError:
+            return self._matches_slow()
+        for path in result.stdout.decode().split("\0"):
+            if path and path not in path_seen:
+                path_seen.add(path)
+                paths.append(path)
+        return self._filter_matches(paths)
+
+    def _filter_matches(self, paths: list[str]) -> list[str]:
         flags, _ = self._args()
         ignorecase = "i" in flags
+        names = self._names()
         matches = []
         seen = set()
-        names = self._names()
-        roots = ((self.view_root,) if "v" in flags else ()) + self.data_roots
         for raw_name in names:
             name = raw_name
             if "n" in flags:
@@ -276,34 +322,37 @@ class vdsym(Command):
                     name = rf"{match[1]}-{match[2]}"
             needle = name.casefold() if ignorecase else name
             pattern = f"*{needle}*" if "g" in flags else needle
-            for root in roots:
-                if not fs.isdir(root):
+            for path in paths:
+                is_link = fs.islink(path)
+                if "l" in flags and not is_link:
                     continue
-                for directory, dirnames, filenames in os.walk(root):
-                    entries = filenames + dirnames
-                    dirnames[:] = [
-                        entry
-                        for entry in dirnames
-                        if not fs.islink(fs.join(directory, entry))
-                    ]
-                    for filename in entries:
-                        path = fs.join(directory, filename)
-                        is_link = fs.islink(path)
-                        if "l" in flags and not is_link:
-                            continue
-                        candidates = [filename]
-                        if is_link:
-                            candidates.append(fs.basename(os.readlink(path)))
-                        if path not in seen and any(
-                            fnmatch(
-                                candidate.casefold() if ignorecase else candidate,
-                                pattern,
-                            )
-                            for candidate in candidates
-                        ):
-                            seen.add(path)
-                            matches.append(path)
+                candidates = [fs.basename(path)]
+                if is_link:
+                    candidates.append(fs.basename(os.readlink(path)))
+                if path not in seen and any(
+                    fnmatch(candidate.casefold() if ignorecase else candidate, pattern)
+                    for candidate in candidates
+                ):
+                    seen.add(path)
+                    matches.append(path)
         return matches
+
+    def _matches_slow(self) -> list[str]:
+        flags, _ = self._args()
+        paths = []
+        roots = (self.view_root,) if "v" in flags else (self.view_root,) + self.data_roots
+        for root in roots:
+            if not fs.isdir(root):
+                continue
+            for directory, dirnames, filenames in os.walk(root):
+                entries = filenames + dirnames
+                dirnames[:] = [
+                    entry
+                    for entry in dirnames
+                    if not fs.islink(fs.join(directory, entry))
+                ]
+                paths.extend(fs.join(directory, entry) for entry in entries)
+        return self._filter_matches(paths)
 
     def _dashboard(self, matches: list[str]) -> str:
         root = self._dashboard_root()
