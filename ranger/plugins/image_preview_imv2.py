@@ -172,6 +172,7 @@ class ImvSync:
         self.fm = fm
         self.ignored = _sockets()
         self.socket = None
+        self.hunt_until = 0.0
         self.playlist = ()
         self.directory = ""
         self.playlist_tab = None
@@ -227,6 +228,7 @@ class ImvSync:
                 if original_after:
                     return original_after(*args, **kwargs)
             finally:
+                self.hunt_until = time.monotonic() + 3  # imv socket not created yet
                 self.discover()
 
         self.fm.rifle.hook_after_executing = after_execution
@@ -240,7 +242,8 @@ class ImvSync:
         self.directory = getattr(self.fm.thisdir, "path", "")
         self.playlist_tab = self.fm.thistab
         self.observed_selection = None
-        self.pending = False
+        # self.pending = False
+        self.pending = selected is not None  # new viewer: push ranger's playlist once
         self.last_poll = 0.0
         maps = self.fm.ui.keymaps
         if selected and not self.saved_maps:
@@ -487,9 +490,10 @@ class ImvSync:
         generation = self.generation
         # Ranger normally blocks up to idle_delay (often 2s). Temporarily cap
         # that wait while tracking so passive polling remains responsive.
-        capped_wait = self.socket is not None and not self.fm.ui.load_mode
+        hunting = self.socket is None and time.monotonic() < self.hunt_until
+        capped_wait = (self.socket is not None or hunting) and not self.fm.ui.load_mode
         if capped_wait:
-            curses.halfdelay(max(1, IMV_POLL_MS // 100))
+            curses.halfdelay(1 if hunting else max(1, IMV_POLL_MS // 100))
         try:
             self.original_input()
         finally:
