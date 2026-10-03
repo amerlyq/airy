@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import logging
 import os
 import re
+import time
 from collections.abc import Sequence
 from fnmatch import fnmatch
 from os import path as fs
@@ -273,7 +275,9 @@ class vdsym(Command):
         import subprocess
 
         flags, _ = self._args()
-        roots = (self.view_root,) if "v" in flags else (self.view_root,) + self.data_roots
+        roots = (
+            (self.view_root,) if "v" in flags else (self.view_root,) + self.data_roots
+        )
         names = self._names()
         roots = tuple(root for root in roots if fs.isdir(root))
         if not roots or not names:
@@ -346,20 +350,59 @@ class vdsym(Command):
         return matches
 
     def _matches(self) -> list[str]:
+        started = time.perf_counter()
         flags, _ = self._args()
-        roots = (self.view_root,) if "v" in flags else (self.view_root,) + self.data_roots
+        roots = (
+            (self.view_root,) if "v" in flags else (self.view_root,) + self.data_roots
+        )
         if "Q" in flags:
             self._dir_cache.clear()
-        if "q" in flags or "Q" in flags:
-            self._prefill_fd(roots)
         paths = []
         deferred = {}
         for root in roots:
-            normal, lazy = self._cached_root(root, "Q" in flags)
+            if "Q" in flags or root not in self._dir_cache:
+                self._prefill_fd((root,))
+            if "q" in flags:
+                normal, lazy = self._cached_root(root, False)
+            else:
+                normal = [root]
+                lazy = {}
+                seen = {root}
+                for directory, (_, entries, deferred_entries) in self._dir_cache.get(root, {}).items():
+                    if directory not in seen:
+                        seen.add(directory)
+                        normal.append(directory)
+                    normal.extend(entries)
+                    if deferred_entries:
+                        lazy[directory] = deferred_entries
             paths.extend(normal)
             deferred.update(lazy)
-        paths.extend(self._expand_deferred(deferred))
-        return self._filter_matches(paths)
+            paths.extend(self._expand_deferred(deferred))
+        expanded = time.perf_counter()
+        matches = self._filter_matches(paths)
+        self._kpi = {
+            "scan": expanded - started,
+            "filter": time.perf_counter() - expanded,
+            "paths": len(paths),
+            "matches": len(matches),
+        }
+        return matches
+
+    def _report_kpi(self, started: float, operation: float) -> None:
+        kpi = getattr(self, "_kpi", {})
+        line = (
+            "vdsym kpi: total=%.3fs scan=%.3fs filter=%.3fs op=%.3fs paths=%d matches=%d"
+            % (
+                time.perf_counter() - started,
+                kpi.get("scan", 0.0),
+                kpi.get("filter", 0.0),
+                time.perf_counter() - operation,
+                kpi.get("paths", 0),
+                kpi.get("matches", 0),
+            )
+        )
+        logging.getLogger("ranger.vdsym").info(line)
+        # self.fm.notify(line)
 
     def _prefill_fd(self, roots: tuple[str, ...]) -> None:
         import subprocess
@@ -380,21 +423,21 @@ class vdsym(Command):
             if not path:
                 continue
             parent = fs.dirname(path)
-            if parent in entries:
-                entries[parent].append(path)
+            entries.setdefault(parent, []).append(path)
         for root in roots:
-            mtimes = {}
-            for directory in (root, *entries):
+            root_cache = {}
+            for directory in entries:
                 if directory.startswith(root) and fs.isdir(directory):
                     try:
-                        mtimes[directory] = os.stat(directory).st_mtime_ns
+                        mtime = os.stat(directory).st_mtime_ns
                     except OSError:
-                        pass
-            for directory, paths in entries.items():
-                if directory.startswith(root):
-                    self._dir_cache.setdefault(directory, (mtimes.get(directory, 0), paths, []))
+                        continue
+                    root_cache[directory] = (mtime, entries[directory], [])
+            self._dir_cache[root] = root_cache
 
-    def _cached_root(self, root: str, force: bool) -> tuple[list[str], dict[str, list[str]]]:
+    def _cached_root(
+        self, root: str, force: bool
+    ) -> tuple[list[str], dict[str, list[str]]]:
         cache = {} if force else self._dir_cache.setdefault(root, {})
         normal = [root]
         deferred: dict[str, list[str]] = {}
@@ -411,8 +454,7 @@ class vdsym(Command):
             if cached and cached[0] == mtime:
                 entries, lazy = cached[1:]
                 stack.extend(
-                    path for path in entries
-                    if fs.isdir(path) and not fs.islink(path)
+                    path for path in entries if fs.isdir(path) and not fs.islink(path)
                 )
             else:
                 entries, lazy = [], []
@@ -443,12 +485,17 @@ class vdsym(Command):
 
     def _expand_deferred(self, deferred: dict[str, list[str]]) -> list[str]:
         names = self._names()
-        numeric = tuple(sorted({
-            match[1]
-            for name in names
-            if (match := re.match(r"(\d+)", name))
-        }))
-        key = (numeric, tuple(sorted((directory, tuple(paths)) for directory, paths in deferred.items())))
+        numeric = tuple(
+            sorted({match[1] for name in names if (match := re.match(r"(\d+)", name))})
+        )
+        key = (
+            numeric,
+            tuple(
+                sorted(
+                    (directory, tuple(paths)) for directory, paths in deferred.items()
+                )
+            ),
+        )
         if key != self._pics_cache_key:
             self._pics_cache_key = key
             self._pics_cache = [
@@ -462,7 +509,9 @@ class vdsym(Command):
     def _matches_slow(self) -> list[str]:
         flags, _ = self._args()
         paths = []
-        roots = (self.view_root,) if "v" in flags else (self.view_root,) + self.data_roots
+        roots = (
+            (self.view_root,) if "v" in flags else (self.view_root,) + self.data_roots
+        )
         for root in roots:
             if not fs.isdir(root):
                 continue
@@ -524,17 +573,22 @@ class vdsym(Command):
             self.fm.notify(f"MULTI ({position + 1}/{len(matches)})")
 
     def execute(self) -> None:
+        started = time.perf_counter()
         flags, _ = self._args()
-        if ("q" in flags or "Q" in flags) and not flags.intersection("ad jopxR".replace(" ", "")):
+        if ("q" in flags or "Q" in flags) and not flags.intersection(
+            "ad jopxR".replace(" ", "")
+        ):
             self._matches()
-            self.fm.notify("Cache refreshed.")
+            self._report_kpi(started, time.perf_counter())
             return
         if "R" in flags:
             self._replace_links(flags)
+            self._report_kpi(started, time.perf_counter())
             return
         names = self._names()
         if len(names) > 1 and "m" not in flags:
             self.fm.notify("Source has multiple needles; use --multiple.", bad=True)
+            self._report_kpi(started, time.perf_counter())
             return
         if not names:
             self.fm.notify(
@@ -542,10 +596,13 @@ class vdsym(Command):
                 duration=1,
                 bad=True,
             )
+            self._report_kpi(started, time.perf_counter())
             return
         matches = self._matches()
+        operation = time.perf_counter()
         if not matches and "a" not in flags and "p" not in flags:
             self.fm.notify(f"No matches for '{self._name()}'.", duration=1, bad=True)
+            self._report_kpi(started, operation)
             return
         if "a" in flags:
             if not matches:
@@ -556,12 +613,15 @@ class vdsym(Command):
                 self._jump(matches)
             else:
                 self._dashboard(matches)
+            self._report_kpi(started, time.perf_counter())
             return
         if "x" in flags:
             self._yank(matches)
+            self._report_kpi(started, time.perf_counter())
             return
         if "d" in flags:
             self._dashboard(matches)
+            self._report_kpi(started, time.perf_counter())
             return
         if "p" in flags:
             if "r" in flags and matches:
@@ -596,13 +656,16 @@ class vdsym(Command):
                 "printf '%b\\n' " + shell_quote(output) + "; read -k 1",
                 flags="-w",
             )
+            self._report_kpi(started, time.perf_counter())
             return
         if "j" in flags:
             self._jump(matches)
+            self._report_kpi(started, time.perf_counter())
             return
         self.fm.select_file(matches[0])
         if "o" in flags:
             self.fm.move(right=1)
+        self._report_kpi(started, time.perf_counter())
 
 
 # OR: map dD eval fm.set_clipboard(fm.thisfile.basename.encode('utf-8')); cmd('delete')
