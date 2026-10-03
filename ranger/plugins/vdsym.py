@@ -21,6 +21,10 @@ class vdsym(Command):
 
     data_roots = ("/media/pro/vd", "/cache/vd", "/media/hpx/vd_ssdt5")
     view_root = "/d/irome/view"
+    _path_cache: dict[str, tuple[dict[str, int], list[str], dict[str, list[str]]]] = {}
+    _dir_cache: dict[str, dict[str, tuple[int, list[str], list[str]]]] = {}
+    _pics_cache_key: object = None
+    _pics_cache: list[str] = []
 
     def _args(self) -> tuple[set[str], list[str]]:
         import shlex
@@ -39,6 +43,7 @@ class vdsym(Command):
             "open": "o",
             "print": "p",
             "replace": "R",
+            "rescan": "q",
             "selection": "s",
             "view": "v",
             "xclip": "x",
@@ -261,7 +266,7 @@ class vdsym(Command):
                 return tokens[index + 1]
         return None
 
-    def _matches(self) -> list[str]:
+    def _matches_fd(self) -> list[str]:
         import subprocess
 
         flags, _ = self._args()
@@ -336,6 +341,83 @@ class vdsym(Command):
                     seen.add(path)
                     matches.append(path)
         return matches
+
+    def _matches(self) -> list[str]:
+        flags, _ = self._args()
+        roots = (self.view_root,) if "v" in flags else (self.view_root,) + self.data_roots
+        paths = []
+        deferred = {}
+        for root in roots:
+            normal, lazy = self._cached_root(root, "q" in flags)
+            paths.extend(normal)
+            deferred.update(lazy)
+        paths.extend(self._expand_deferred(deferred))
+        return self._filter_matches(paths)
+
+    def _cached_root(self, root: str, force: bool) -> tuple[list[str], dict[str, list[str]]]:
+        cache = {} if force else self._dir_cache.setdefault(root, {})
+        normal = [root]
+        deferred: dict[str, list[str]] = {}
+        visited = set()
+        stack = [root]
+        while stack:
+            directory = stack.pop()
+            visited.add(directory)
+            try:
+                mtime = os.stat(directory).st_mtime_ns
+            except OSError:
+                continue
+            cached = cache.get(directory)
+            if cached and cached[0] == mtime:
+                entries, lazy = cached[1:]
+                stack.extend(
+                    path for path in entries
+                    if fs.isdir(path) and not fs.islink(path)
+                )
+            else:
+                entries, lazy = [], []
+                try:
+                    for entry in os.scandir(directory):
+                        path = entry.path
+                        if entry.is_dir(follow_symlinks=False):
+                            entries.append(path)
+                            stack.append(path)
+                        else:
+                            relative = fs.relpath(path, root).split(os.sep)
+                            if any(
+                                part.endswith("-pics") or "-pics-" in part
+                                for part in relative[:-1]
+                            ):
+                                lazy.append(path)
+                            else:
+                                entries.append(path)
+                except OSError:
+                    continue
+                cache[directory] = (mtime, entries, lazy)
+            normal.extend(entries)
+            if lazy:
+                deferred[directory] = lazy
+        for directory in set(cache) - visited:
+            del cache[directory]
+        return normal, deferred
+
+    def _expand_deferred(self, deferred: dict[str, list[str]]) -> list[str]:
+        names = self._names()
+        numeric = tuple(sorted({
+            match[1]
+            for name in names
+            if (match := re.match(r"(\d+)", name))
+        }))
+        key = (numeric, tuple(sorted((directory, tuple(paths)) for directory, paths in deferred.items())))
+        if key != self._pics_cache_key:
+            self._pics_cache_key = key
+            self._pics_cache = [
+                path
+                for pics_dir, paths in deferred.items()
+                if fs.basename(pics_dir).split("-", 1)[0] in numeric
+                for path in paths
+            ]
+        return self._pics_cache
 
     def _matches_slow(self) -> list[str]:
         flags, _ = self._args()
