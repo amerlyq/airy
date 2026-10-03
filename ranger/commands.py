@@ -3,8 +3,8 @@ from __future__ import annotations
 import os
 import re
 import stat
-from fnmatch import fnmatch
 from collections.abc import Callable, Iterable, Sequence
+from fnmatch import fnmatch
 from os import path as fs
 from re import Pattern
 from typing import ClassVar, Protocol, TypeAlias, cast
@@ -88,6 +88,32 @@ class vdsym(Command):
             "xclip": "x",
             "yanked": "y",
         }
+        groups = {
+            "action": {
+                "dashboard": "d",
+                "jump": "j",
+                "autojump1": "a",
+                "open": "o",
+                "print": "p",
+                "replace": "R",
+                "rotate": "r",
+                "xclip": "x",
+            },
+            "source": {
+                "basename": "b",
+                "clipboard": "c",
+                "selection": "s",
+                "yanked": "y",
+            },
+            "target": {"clipboard": "c", "yanked": "y", "selection": "s"},
+            "modifiers": {
+                "glob": "g",
+                "numeric": "n",
+                "ignore-case": "i",
+                "links-only": "l",
+                "view": "v",
+            },
+        }
         tokens = shlex.split(self.rest(1))
         filtered: list[str] = []
         skip = False
@@ -110,7 +136,13 @@ class vdsym(Command):
             if not separator and token == "--":
                 separator = True
             elif not separator and token.startswith("--"):
-                flags.add(long_flags[token[2:].split("=", 1)[0]])
+                option = token[2:].split("=", 1)[0]
+                value = token.split("=", 1)[1] if "=" in token else None
+                if option in groups and value is not None:
+                    for item in value.split(","):
+                        flags.add(groups[option][item])
+                else:
+                    flags.add(long_flags[option])
             elif not separator and token.startswith("-"):
                 flags.update(token[1:])
             else:
@@ -151,58 +183,115 @@ class vdsym(Command):
         source = fs.abspath(self.fm.thisfile.path)
         targets = self._paths(flags)
         if not fs.isfile(source) or len(targets) != 1 or not fs.isfile(targets[0]):
-            self.fm.notify("Need one existing cursor file and one yanked file.", bad=True)
+            self.fm.notify(
+                "Need one existing cursor file and one yanked file.", bad=True
+            )
             return
         target = targets[0]
-        replaced = 0
-        errors = 0
+        links = []
         for root in self.data_roots + (self.view_root,):
             if not fs.isdir(root):
                 continue
             for directory, dirnames, filenames in os.walk(root):
                 entries = dirnames + filenames
-                dirnames[:] = [entry for entry in dirnames if not fs.islink(fs.join(directory, entry))]
-                for entry in entries:
-                    link = fs.join(directory, entry)
-                    if not fs.islink(link) or fs.realpath(link) != source:
-                        continue
-                    new_link = fs.join(directory, fs.basename(target))
-                    if fs.lexists(new_link):
-                        if not fs.islink(new_link):
-                            errors += 1
-                            continue
-                        if fs.realpath(new_link) == fs.realpath(target):
-                            if new_link != link:
-                                try:
-                                    os.unlink(link)
-                                    replaced += 1
-                                except OSError:
-                                    errors += 1
-                            continue
-                        if new_link != link:
-                            errors += 1
-                            continue
-                    temporary = fs.join(
-                        directory,
-                        f".{fs.basename(target)}.vdsym-{os.getpid()}-{replaced}",
-                    )
-                    try:
-                        os.symlink(fs.relpath(target, directory), temporary)
-                        os.replace(temporary, new_link)
-                        if new_link != link:
-                            os.unlink(link)
-                        replaced += 1
-                    except OSError:
-                        errors += 1
-                        if fs.lexists(temporary):
-                            try:
-                                os.unlink(temporary)
-                            except OSError:
-                                pass
-        message = f"Replaced {replaced} symlink(s)."
-        if errors:
-            message += f" {errors} failed."
-        self.fm.notify(message, bad=bool(errors))
+                dirnames[:] = [
+                    entry
+                    for entry in dirnames
+                    if not fs.islink(fs.join(directory, entry))
+                ]
+                links.extend(
+                    fs.join(directory, entry)
+                    for entry in entries
+                    if fs.islink(fs.join(directory, entry))
+                    and fs.realpath(fs.join(directory, entry)) == source
+                )
+        self._ask_replace(links, source, target, False)
+
+    def _replace_links_confirmed(
+        self, answer: str, source: str, target: str, links: list[str]
+    ) -> None:
+        answer = answer.lower()
+        if answer in ("q", "n"):
+            return
+        if answer == "l":
+            output = "\n".join(
+                f"{link} -> {os.readlink(link)}" for link in links if fs.lexists(link)
+            )
+            self.fm.execute_command("printf '%s\\n' " + shell_quote(output), flags="-w")
+            self._ask_replace(links, source, target, False)
+            return
+        self._replace_links_now(links, source, target, answer == "a")
+
+    def _ask_replace(
+        self, links: list[str], source: str, target: str, automatic: bool
+    ) -> None:
+        if not links:
+            return
+        link, *remaining = links
+        if automatic:
+            self._replace_one(link, source, target)
+            self._ask_replace(remaining, source, target, True)
+            return
+        self.fm.ui.console.ask(
+            f"Replace ({len(links)} remaining): {link} -> {os.readlink(link)}? (y/n/q/a/l)",
+            lambda answer: self._replace_one_answer(
+                answer, link, remaining, source, target
+            ),
+            ("y", "Y", "n", "N", "q", "Q", "a", "A", "l", "L"),
+        )
+
+    def _replace_one_answer(
+        self, answer: str, link: str, remaining: list[str], source: str, target: str
+    ) -> None:
+        answer = answer.lower()
+        if answer == "l":
+            output = "\n".join(
+                f"{item} -> {os.readlink(item)}"
+                for item in [link] + remaining
+                if fs.lexists(item)
+            )
+            self.fm.execute_command("printf '%s\\n' " + shell_quote(output), flags="-w")
+            self._ask_replace([link] + remaining, source, target, False)
+        elif answer in ("y", "a"):
+            self._replace_one(link, source, target)
+            self._ask_replace(remaining, source, target, answer == "a")
+        elif answer == "n":
+            self._ask_replace(remaining, source, target, False)
+
+    def _replace_links_now(
+        self, links: list[str], source: str, target: str, automatic: bool
+    ) -> None:
+        for link in links:
+            self._replace_one(link, source, target)
+
+    def _replace_one(self, link: str, source: str, target: str) -> None:
+        if not fs.islink(link) or fs.realpath(link) != source:
+            return
+        directory = fs.dirname(link)
+        new_link = fs.join(directory, fs.basename(target))
+        if (
+            fs.lexists(new_link)
+            and (
+                not fs.islink(new_link) or fs.realpath(new_link) != fs.realpath(target)
+            )
+            and new_link != link
+        ):
+            self.fm.notify(f"Collision: {new_link}", bad=True)
+            return
+        if fs.lexists(new_link) and fs.realpath(new_link) == fs.realpath(target):
+            if new_link != link:
+                os.unlink(link)
+            return
+        temporary = fs.join(directory, f".{fs.basename(target)}.vdsym-{os.getpid()}")
+        try:
+            os.symlink(fs.relpath(target, directory), temporary)
+            os.replace(temporary, new_link)
+            if new_link != link:
+                os.unlink(link)
+        except OSError as error:
+            self.fm.notify(error, bad=True)
+            if fs.lexists(temporary):
+                os.unlink(temporary)
 
     def _dashboard_root(self) -> str | None:
         import shlex
@@ -227,7 +316,7 @@ class vdsym(Command):
             name = raw_name
             if "n" in flags:
                 name = re.sub(r"\.html$", "", name)
-                if (match := re.fullmatch(r"(\d+)-0*(\d+)", name)):
+                if match := re.fullmatch(r"(\d+)-0*(\d+)", name):
                     name = rf"{match[1]}-{match[2]}"
             needle = name.casefold() if ignorecase else name
             pattern = f"*{needle}*" if "g" in flags else needle
@@ -236,7 +325,11 @@ class vdsym(Command):
                     continue
                 for directory, dirnames, filenames in os.walk(root):
                     entries = filenames + dirnames
-                    dirnames[:] = [entry for entry in dirnames if not fs.islink(fs.join(directory, entry))]
+                    dirnames[:] = [
+                        entry
+                        for entry in dirnames
+                        if not fs.islink(fs.join(directory, entry))
+                    ]
                     for filename in entries:
                         path = fs.join(directory, filename)
                         is_link = fs.islink(path)
@@ -246,7 +339,10 @@ class vdsym(Command):
                         if is_link:
                             candidates.append(fs.basename(os.readlink(path)))
                         if path not in seen and any(
-                            fnmatch(candidate.casefold() if ignorecase else candidate, pattern)
+                            fnmatch(
+                                candidate.casefold() if ignorecase else candidate,
+                                pattern,
+                            )
                             for candidate in candidates
                         ):
                             seen.add(path)
@@ -276,7 +372,8 @@ class vdsym(Command):
 
     def _jump(self, matches: list[str]) -> None:
         current = self.fm.thisfile.path
-        if current in matches:
+        rotate = "r" in self._args()[0]
+        if rotate and current in matches:
             target = matches[(matches.index(current) + 1) % len(matches)]
         else:
             dashboard_match = next(
@@ -287,16 +384,14 @@ class vdsym(Command):
                 ),
                 None,
             )
-            target = next(
-                (match for match in matches if fs.realpath(match) == fs.realpath(current)),
-                dashboard_match or matches[0],
-            )
+            target = dashboard_match or matches[0]
         self.fm.select_file(target)
         if "o" in self._args()[0]:
             self.fm.move(right=1)
         if len(matches) > 1:
             position = next(
-                index for index, match in enumerate(matches)
+                index
+                for index, match in enumerate(matches)
                 if match == target or fs.realpath(match) == fs.realpath(target)
             )
             self.fm.notify(f"MULTI ({position + 1}/{len(matches)})")
@@ -311,7 +406,11 @@ class vdsym(Command):
             self.fm.notify("Source has multiple needles; use --multiple.", bad=True)
             return
         if not names:
-            self.fm.notify("Use --basename, --clipboard, or an explicit name.", duration=1, bad=True)
+            self.fm.notify(
+                "Use --basename, --clipboard, or an explicit name.",
+                duration=1,
+                bad=True,
+            )
             return
         matches = self._matches()
         if not matches and "a" not in flags and "p" not in flags:
@@ -319,7 +418,9 @@ class vdsym(Command):
             return
         if "a" in flags:
             if not matches:
-                self.fm.notify(f"No matches for '{self._name()}'.", duration=1, bad=True)
+                self.fm.notify(
+                    f"No matches for '{self._name()}'.", duration=1, bad=True
+                )
             elif len(matches) == 1:
                 self._jump(matches)
             else:
@@ -332,12 +433,20 @@ class vdsym(Command):
             self._dashboard(matches)
             return
         if "p" in flags:
+            if "r" in flags and matches:
+                current = self.fm.thisfile.path
+                if current in matches:
+                    matches = [matches[(matches.index(current) + 1) % len(matches)]]
+                else:
+                    matches = [matches[0]]
             needle = self._name()
             if "n" in flags:
                 needle = re.sub(r"\.html$", "", needle)
-                if (match := re.fullmatch(r"(\d+)-0*(\d+)", needle)):
+                if match := re.fullmatch(r"(\d+)-0*(\d+)", needle):
                     needle = rf"{match[1]}-{match[2]}"
-            pattern = re.compile(re.escape(needle), re.IGNORECASE if "i" in flags else 0)
+            pattern = re.compile(
+                re.escape(needle), re.IGNORECASE if "i" in flags else 0
+            )
 
             def highlight(value: str) -> str:
                 return pattern.sub(lambda match: f"\\033[31;1m{match[0]}\\033[m", value)
