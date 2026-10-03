@@ -1,11 +1,8 @@
 from os import path as fs
 
-import FM
-import import
-
-import ranger.core.fm
 from ranger.api.commands import Command
 from ranger.container.history import History
+from ranger.core.fm import FM
 
 
 ### DEBUG
@@ -44,17 +41,18 @@ class history_clear(Command):
 #   History.modify(unique=True) has its own dedup (used by some callers; probably not in this path)
 #   consecutive-only dedup → ping-pong A↔B between plugin jumps still fills the 100 slots
 #   new tabs copy history via History.__init__/rebuild → the patch applies there tookkkk
-def add(self, item):
-    del self._history[self._index + 1 :]
-    if self._history and self._history[-1] == item:
-        return
-    if len(self._history) >= max(self.maxlen, 1):
-        del self._history[0]
-    self._history.append(item)
-    self._index = len(self._history) - 1
-
-
-History.add = add
+#
+# def add(self, item):
+#     del self._history[self._index + 1 :]
+#     if self._history and self._history[-1] == item:
+#         return
+#     if len(self._history) >= max(self.maxlen, 1):
+#         del self._history[0]
+#     self._history.append(item)
+#     self._index = len(self._history) - 1
+#
+#
+# History.add = add
 
 
 class move_parent_nohist(Command):
