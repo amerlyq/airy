@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import re
 import stat
+from fnmatch import fnmatch
 from collections.abc import Callable, Iterable, Sequence
 from os import path as fs
 from re import Pattern
@@ -54,6 +55,228 @@ class delete(_default_delete):
         self._original_delete = self.fm._airy_original_delete
         self.fm.delete = self._delete_with_clipboard
         super().execute()
+
+
+class vdsym(Command):
+    """:vdsym [-a] [-b] [-c] [-d] [-g] [-i] [-j] [-l] [-n] [-p] [-v] [-y]
+
+    Search VD files and their symlink dashboards.
+    """
+
+    data_roots = ("/media/pro/vd", "/cache/vd", "/media/hpx/vd_ssdt5")
+    view_root = "/d/irome/view"
+
+    def _args(self) -> tuple[set[str], str | None]:
+        import shlex
+
+        long_flags = {
+            "autojump1": "a",
+            "basename": "b",
+            "clipboard": "c",
+            "dashboard": "d",
+            "glob": "g",
+            "ignore-case": "i",
+            "jump": "j",
+            "links-only": "l",
+            "numeric": "n",
+            "open": "o",
+            "print": "p",
+            "view": "v",
+            "yank": "y",
+        }
+        tokens = shlex.split(self.rest(1))
+        filtered: list[str] = []
+        skip = False
+        for index, token in enumerate(tokens):
+            if skip:
+                skip = False
+                continue
+            if token.startswith("--dashboard="):
+                filtered.append(token)
+                continue
+            if token in ("-d", "--dashboard") and index + 1 < len(tokens):
+                if not tokens[index + 1].startswith("-"):
+                    skip = True
+            filtered.append(token)
+        tokens = filtered
+        flags: set[str] = set()
+        name: str | None = None
+        separator = False
+        for token in tokens:
+            if not separator and token == "--":
+                separator = True
+            elif not separator and token.startswith("--"):
+                flags.add(long_flags[token[2:].split("=", 1)[0]])
+            elif not separator and token.startswith("-"):
+                flags.update(token[1:])
+            else:
+                name = token if name is None else f"{name} {token}"
+                separator = True
+        return flags, name
+
+    def _name(self) -> str:
+        import subprocess
+
+        flags, argument = self._args()
+        if argument is not None:
+            return fs.basename(argument)
+        if "c" in flags:
+            clipboard = subprocess.run(
+                ["xco"], stdout=subprocess.PIPE, text=True, check=False
+            ).stdout
+            return fs.basename(clipboard.splitlines()[0]) if clipboard else ""
+        if "b" in flags:
+            return self.fm.thisfile.basename
+        return ""
+
+    def _dashboard_root(self) -> str | None:
+        import shlex
+
+        tokens = shlex.split(self.rest(1))
+        for token in tokens:
+            if token.startswith("--dashboard="):
+                return token.split("=", 1)[1]
+        for index, token in enumerate(tokens[:-1]):
+            if token in ("-d", "--dashboard") and not tokens[index + 1].startswith("-"):
+                return tokens[index + 1]
+        return None
+
+    def _matches(self) -> list[str]:
+        name = self._name()
+        flags, _ = self._args()
+        if "n" in flags:
+            name = re.sub(r"\.html$", "", name)
+            if (match := re.fullmatch(r"(\d+)-0*(\d+)", name)):
+                name = rf"{match[1]}-{match[2]}"
+        ignorecase = "i" in flags
+        needle = name.casefold() if ignorecase else name
+        pattern = f"*{needle}*" if "g" in flags else needle
+        matches = []
+        roots = ((self.view_root,) if "v" in flags else ()) + self.data_roots
+        for root in roots:
+            if not fs.isdir(root):
+                continue
+            for directory, dirnames, filenames in os.walk(root):
+                entries = filenames + dirnames
+                dirnames[:] = [entry for entry in dirnames if not fs.islink(fs.join(directory, entry))]
+                for filename in entries:
+                    path = fs.join(directory, filename)
+                    is_link = fs.islink(path)
+                    if "l" in flags and not is_link:
+                        continue
+                    candidates = [filename]
+                    if is_link:
+                        candidates.append(fs.basename(os.readlink(path)))
+                    if any(
+                        fnmatch(candidate.casefold() if ignorecase else candidate, pattern)
+                        for candidate in candidates
+                    ):
+                        matches.append(path)
+        return matches
+
+    def _dashboard(self, matches: list[str]) -> str:
+        root = self._dashboard_root()
+        dest = (
+            fs.join(root, self._name())
+            if root is not None
+            else fs.join("/t/bnm", self.fm.thisfile.relative_path)
+        )
+        os.makedirs(dest, exist_ok=True)
+        for source in matches:
+            link = fs.join(dest, source.lstrip("/").replace("/", "⁄"))
+            if fs.lexists(link):
+                continue
+            os.symlink(source, link)
+        self.fm.cd(dest)
+        return dest
+
+    def _yank(self, matches: list[str]) -> None:
+        import subprocess
+
+        subprocess.run(["xci"], input="\n".join(matches), text=True, check=False)
+
+    def _jump(self, matches: list[str]) -> None:
+        current = self.fm.thisfile.path
+        if current in matches:
+            target = matches[(matches.index(current) + 1) % len(matches)]
+        else:
+            dashboard_match = next(
+                (
+                    fs.join(self.fm.thisdir.path, entry.basename)
+                    for entry in self.fm.thisdir.files
+                    if entry.is_link and fs.realpath(entry.path) == fs.realpath(current)
+                ),
+                None,
+            )
+            target = next(
+                (match for match in matches if fs.realpath(match) == fs.realpath(current)),
+                dashboard_match or matches[0],
+            )
+        self.fm.select_file(target)
+        if "o" in self._args()[0]:
+            self.fm.move(right=1)
+        if len(matches) > 1:
+            position = next(
+                index for index, match in enumerate(matches)
+                if match == target or fs.realpath(match) == fs.realpath(target)
+            )
+            self.fm.notify(f"MULTI ({position + 1}/{len(matches)})")
+
+    def execute(self) -> None:
+        flags, _ = self._args()
+        if not self._name():
+            self.fm.notify("Use --basename, --clipboard, or an explicit name.", duration=1, bad=True)
+            return
+        matches = self._matches()
+        if not matches and "a" not in flags and "p" not in flags:
+            self.fm.notify(f"No matches for '{self._name()}'.", duration=1, bad=True)
+            return
+        if "a" in flags:
+            if not matches:
+                self.fm.notify(f"No matches for '{self._name()}'.", duration=1, bad=True)
+            elif len(matches) == 1:
+                self._jump(matches)
+            else:
+                self._dashboard(matches)
+            return
+        if "y" in flags:
+            self._yank(matches)
+            return
+        if "d" in flags:
+            self._dashboard(matches)
+            return
+        if "p" in flags:
+            needle = self._name()
+            if "n" in flags:
+                needle = re.sub(r"\.html$", "", needle)
+                if (match := re.fullmatch(r"(\d+)-0*(\d+)", needle)):
+                    needle = rf"{match[1]}-{match[2]}"
+            pattern = re.compile(re.escape(needle), re.IGNORECASE if "i" in flags else 0)
+
+            def highlight(value: str) -> str:
+                return pattern.sub(lambda match: f"\\033[31;1m{match[0]}\\033[m", value)
+
+            if matches:
+                lines = []
+                for match in matches:
+                    line = highlight(match)
+                    if fs.islink(match):
+                        line += f"  ->  {highlight(os.readlink(match))}"
+                    lines.append(line)
+                output = "\\n".join(lines)
+            else:
+                output = "\\033[31;40;1mnotfound\\033[m "
+            self.fm.execute_command(
+                "printf '%b\\n' " + shell_quote(output) + "; read -k 1",
+                flags="-w",
+            )
+            return
+        if "j" in flags:
+            self._jump(matches)
+            return
+        self.fm.select_file(matches[0])
+        if "o" in flags:
+            self.fm.move(right=1)
 
 
 class DirectoryEntry(Protocol):
