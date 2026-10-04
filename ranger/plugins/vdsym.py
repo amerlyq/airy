@@ -343,7 +343,12 @@ class vdsym(Command):
             needle = name.casefold() if ignorecase else name
             pattern = f"*{needle}*" if "g" in flags else needle
             candidates = (
-                [path for key, values in index.items() if fnmatch(key, pattern) for path in values]
+                [
+                    path
+                    for key, values in index.items()
+                    if fnmatch(key, pattern)
+                    for path in values
+                ]
                 if "g" in flags
                 else index.get(needle, ())
             )
@@ -395,7 +400,9 @@ class vdsym(Command):
                 normal = [root]
                 lazy = {}
                 seen = {root}
-                for directory, (_, entries, deferred_entries) in self._dir_cache.get(root, {}).items():
+                for directory, (_, entries, deferred_entries) in self._dir_cache.get(
+                    root, {}
+                ).items():
                     if directory not in seen:
                         seen.add(directory)
                         normal.append(directory)
@@ -530,11 +537,15 @@ class vdsym(Command):
                 if match := re.fullmatch(r"(\d+)-0*(\d+)", name):
                     name = rf"{match[1]}-{match[2]}"
             normalized.append(name)
-        numeric = tuple(sorted({
-            (match[1], match[2])
-            for name in normalized
-            if (match := re.fullmatch(r"(\d+)-0*(\d+)", name))
-        }))
+        numeric = tuple(
+            sorted(
+                {
+                    (match[1], match[2])
+                    for name in normalized
+                    if (match := re.fullmatch(r"(\d+)-0*(\d+)", name))
+                }
+            )
+        )
         signature = tuple(sorted(deferred))
         self._deferred_signature = signature
         key = (numeric, signature)
@@ -545,7 +556,12 @@ class vdsym(Command):
                 for directory in deferred:
                     if fs.basename(directory) != prefix:
                         continue
-                    suffixes = {number, f"{int(number):02d}", f"{int(number):03d}", f"{int(number):04d}"}
+                    suffixes = {
+                        number,
+                        f"{int(number):02d}",
+                        f"{int(number):03d}",
+                        f"{int(number):04d}",
+                    }
                     for width in suffixes:
                         for extension in ("webp", "gif"):
                             path = fs.join(directory, f"{prefix}-{width}.{extension}")
@@ -738,12 +754,34 @@ class delete(_default_delete):
             return False
         return process.returncode == 0
 
-    def _delete_with_clipboard(self, files: Sequence[str]) -> None:
+    def _clips(self, files: Sequence[str]) -> list[str]:
+        cwd = self.fm.thisdir.path
+        paths = {os.path.join(cwd, f) for f in files}
+        found = set()
+        for p in paths:
+            stem = os.path.splitext(p)[0] + "_"
+            with os.scandir(os.path.dirname(p)) as it:
+                found.update(e.path for e in it if e.path.startswith(stem))
+        return sorted(found - paths)
+
+    def _copy_and_delete(self, files: Sequence[str]) -> None:
         names = [fs.basename(file) for file in files]
         if self._copy_names(names):
             self._original_delete(files)
         else:
             self.fm.notify("Could not copy file name to clipboard", bad=True)
+
+    def _delete_with_clipboard(self, files: Sequence[str]) -> None:
+        clips = self._clips(files)
+        if not clips:
+            return self._copy_and_delete(files)
+        self.fm.ui.console.ask(
+            f"{len(clips)} clip(s) exist: "
+            + ", ".join(map(os.path.basename, clips))
+            + " -- delete anyway? (y/N)",
+            lambda ans: ans in ("y", "Y") and self._copy_and_delete(files),
+            ("n", "N", "y", "Y"),
+        )
 
     def execute(self) -> None:
         if not hasattr(self.fm, "_airy_original_delete"):
