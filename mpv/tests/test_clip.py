@@ -157,6 +157,17 @@ class BoundaryTests(unittest.TestCase):
         self.compare_frame_identity(vfr, 5.123, 18.456, "smart")
 
     @unittest.skipUnless(LUA, "Lua required")
+    def test_copy_key_exports_after_previews(self):
+        with tempfile.TemporaryDirectory(dir=self.folder) as td:
+            folder = Path(td)
+            source = folder / "copy-key.mp4"
+            shutil.copyfile(self.source, source)
+            run([LUA, DRIVER, "export", source, folder, 5.123, 18.456])
+            outputs = [p for p in folder.glob("*.mp4") if p != source]
+            self.assertEqual(len(outputs), 1)
+            self.assertGreater(len(frames(outputs[0])), 0)
+
+    @unittest.skipUnless(LUA, "Lua required")
     def test_lua_pixels_match_copy_export(self):
         with tempfile.TemporaryDirectory(dir=self.folder) as td:
             folder = Path(td)

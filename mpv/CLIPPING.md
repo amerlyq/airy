@@ -17,6 +17,10 @@ Press it again after reviewing both ends to export.
 Export is blocked while either preview is missing or failed.
 An existing pair of visible previews in that mode allows immediate export.
 Exports run asynchronously.
+`;` toggles OSC visibility through the preview handler.
+Previews follow OSC's `never`/`always` visibility state.
+One OSD text line is reserved above previews because bitmap overlays cover text.
+Long diagnostic messages are shortened on screen; full details remain in the log.
 
 `clip.lua` invokes `ffmpeg/run --preview-plan` through `r.ffmpeg`.
 The planner uses the same codec/filter/muxer arguments as export.
@@ -64,6 +68,36 @@ Change a mark or select a preview mode explicitly to retry.
 File changes and clearing previews invalidate pending callbacks.
 Completion of an older export does not clear a newer selection.
 
+## Scene navigation
+
+`PgDn` searches forward from the current position.
+`PgUp` searches backward for the nearest earlier boundary.
+Press the same key again to cancel.
+Press the opposite key to change direction from the displayed position.
+Each detected boundary lands on the first frame of the new scene.
+Playback remains paused.
+
+Scanning uses a separate software-decoded FFmpeg process.
+It does not change mpv's hardware decoding, video filters, speed, or mute state.
+Every decoded frame is inspected at reduced spatial resolution.
+Eight-second windows continue until a boundary or file endpoint is reached.
+The displayed position advances between windows without playing audio.
+Keyframe preroll is decoded to avoid losing transitions at window seams.
+No clip is encoded or saved.
+Only local files with a selected internal video track are supported.
+
+Optional `script-opts/sceneseeker.conf`:
+
+```ini
+ffmpeg=ffmpeg
+threshold=12
+window=8
+```
+
+`threshold` is FFmpeg's `select` scene score multiplied by 100.
+Lower values detect smaller image changes but can stop on motion or flashes.
+Detection is heuristic; it does not guarantee every editorial cut.
+
 ## Verification
 
 ```sh
@@ -76,3 +110,5 @@ H.264 smart tests require `libx264`.
 QSV tests require a working Intel GPU/driver.
 The Lua harness exercises callback ordering without a display server.
 Media tests compare real full exports with the generated boundary previews.
+Scene tests cover known cuts, long GOPs, multiple windows, offset timestamps,
+variable frame rates, direction changes, cancellation, and stale callbacks.

@@ -1,6 +1,7 @@
 -- Headless mpv API harness. "frames" executes real FFmpeg; "lifecycle" controls
 -- callback ordering to exercise cancellation without timing-dependent sleeps.
 local mode, source, destination, first, last = table.unpack(arg)
+local real_processes = mode == "frames" or mode == "export"
 local converter = arg[0]:gsub("mpv/tests/clip_driver.lua$", "ffmpeg/run")
 local props = {
   path = source, ["working-directory"] = ".",
@@ -91,7 +92,7 @@ local function complete()
   if not job then return false end
   if job.aborted then job.callback(false, nil, "aborted"); return true end
   local args = job.command.args
-  if mode == "frames" then
+  if real_processes then
     local quoted = {}
     for _, value in ipairs(args) do quoted[#quoted + 1] = quote(value) end
     local errfile = os.tmpname()
@@ -127,7 +128,7 @@ local function cleanup_check()
   for path in pairs(paths) do assert(not file_info(path), "leaked " .. path) end
 end
 
-if mode == "frames" then
+if real_processes then
   mark("beg", tonumber(first)); mark("end", tonumber(last))
   drain()
   if #errors > 0 then
@@ -139,6 +140,14 @@ if mode == "frames" then
     local overlay = assert(overlays[id], "missing " .. which)
     write(destination .. "/" .. which .. ".raw", overlay.data)
     print(which, overlay.w, overlay.h)
+  end
+  if mode == "export" then
+    bindings.clip_write_copy()
+    assert(#queue == 1 and queue[1].command.args[2] ~= "--preview-plan",
+      "y must export after successful nil-result overlays")
+    drain()
+    assert(#errors == 0, table.concat(errors, "\n"))
+    assert(not next(overlays), "successful export must clear previews")
   end
   cleanup_check()
 else

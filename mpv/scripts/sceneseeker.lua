@@ -46,13 +46,16 @@ scan_window = function(scan)
   -- Include previous frames even at window seams or a keyframe cut. With
   -- noaccurate_seek the decoder's keyframe preroll reaches the scene filter;
   -- negative timestamps are excluded only AFTER computing the scene score.
-  local start = math.max(0, lo - 1)
+  -- Input -t counts from that earlier keyframe with noaccurate_seek. Trim by
+  -- decoded timestamp instead, or long GOPs silently shorten the search.
+  -- Integer seek origins avoid fractional -ss rounding in the stream timebase.
+  local start = math.max(0, math.floor(lo - 1))
   local filter = string.format(
-    "scale=320:-2,format=yuv420p,select='gte(scene,%.9f)*gte(t,%.9f)*lt(t,%.9f)',showinfo=checksum=0",
-    opts.threshold / 100, lo - start, hi - start)
+    "trim=end=%.9f,scale=320:-2,format=yuv420p,select='gte(scene,%.9f)*gte(t,%.9f)',showinfo=checksum=0",
+    hi - start, opts.threshold / 100, lo - start)
   local args = { opts.ffmpeg, "-nostdin", "-hide_banner", "-nostats", "-loglevel", "info",
     "-noaccurate_seek", "-ss", string.format("%.9f", start),
-    "-t", string.format("%.9f", hi - start), "-i", scan.path,
+    "-i", scan.path,
     "-map", scan.track, "-an", "-sn", "-dn", "-vf", filter,
     "-fps_mode", "passthrough" }
   -- Only stop early in the forward direction. Backward search needs the LAST
