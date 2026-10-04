@@ -141,8 +141,21 @@ for i in {1..9}; do
   alias -g C$i="|awk '{print\$$i}'"
   alias -g C/$i="|awk -F/ '{print\$$i}'"
   alias -g C\$$i="|awk '{print\$(NF-$i)}'"
-  alias -g C//$i="|awk -F/ '{print\$(NF-$i)}'"
+  alias -g C/-$i="|awk -F/ '{print\$(NF-$i)}'"
+
+  # Strips the file name from column $i and prints just the directory path
+  alias -g C${i}//="|awk '{sub(/\/[^\/]*$/, \"\", \$$i); print \$$i}'"
+  # Drops the last $i components of the last field (e.g., C/$2 drops last 2 segments)
+  alias -g C//$i="|awk -F/ '{if(NF>$i) NF-=$i; else \$0=\"\"; OFS=\"/\"; print \$0}'"
+  # Drops the first $i components of the last field
+  alias -g C/\^$i="|awk -F/ -v n=$i '{out=\"\"; for(j=n+1; j<=NF; j++) out=(out ? out \"/\" : \"\") \$j; print out}'"
 done
+
+# Strips the last slash and everything after it from the whole line
+alias -g C//="|awk '{sub(/\/[^\/]*$/, \"\"); print}'"
+# Strips the last slash and everything after it from the LAST column specifically
+alias -g C//\$="|awk '{sub(/\/[^\/]*$/, \"\", \$NF); print \$NF}'"
+
 alias -g C\$="|awk '{print\$NF}'"
 alias -g C/\$="|awk -F/ '{print\$NF}'"
 alias -g C:="|awk -F':\\\\s' '{print\$1}'"
