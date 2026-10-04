@@ -457,68 +457,6 @@ class cda(Command):
             self.fm.select_file(path)
 
 
-class df(Command):
-    def execute(self) -> int | None:  # pyright: ignore[reportIncompatibleMethodOverride]
-        fls = None
-        flags = ""
-        if self.arg(1) and self.arg(1)[0] == "-":
-            flags = self.arg(1)
-            self.shift()
-        cmd = self.rest(1).split()
-
-        cidx = list(self.fm.tabs).index(self.fm.current_tab)
-        # Cross-tab compare specified tab
-        if self.quantifier is not None:
-            tidx = self.quantifier
-        else:
-            tidx = (cidx + 1) % len(self.fm.tabs)
-        ctab = self.fm
-        ttab = list(self.fm.tabs.values())[tidx]
-        csel = len(ctab.thisdir.marked_items)
-        tsel = len(ttab.thisdir.marked_items)
-
-        # DEV: df cidx!=tidx: search file with same name in tidx
-        #   -- if no such file == show error
-        #   BUT: then can't compare different names in tabs fast
-        #       -- 'cause need to 'vsel' them before compare
-        # DEV: df multiselection to multiselection
-        #   => treat like dirs %d %D compare with only selected files
-        if cidx == tidx and csel == 0:
-            self.fm.notify("curr_tab: select targets to compare", bad=True)
-        elif cidx != tidx and csel == 0 and tsel == 0:
-            fls = [ctab.thisfile, ttab.thisfile]
-        elif cidx == tidx or tsel == 0:
-            if csel == 1:
-                # Gliding diff in curr_tab
-                fls = [ctab.thisdir.marked_items[0], ctab.thisfile]
-            elif csel == 2:
-                fls = ctab.thisdir.marked_items
-            else:
-                self.fm.notify("curr_tab: select only one or two files", bad=True)
-        elif cidx != tidx:
-            if csel == 0 and tsel == 1:
-                fls = [ctab.thisfile, ttab.thisdir.marked_items[0]]
-            elif csel == 0 and tsel > 1:
-                self.fm.notify("next_tab: select only one or zero files", bad=True)
-            elif csel == 1 and tsel == 1:
-                fls = [t.thisdir.marked_items[0] for t in [ctab, ttab]]
-            else:
-                self.fm.notify("TBD: uncompatible selection", bad=True)
-
-        if not fls:
-            return 1
-        elif fls[0] == fls[1]:
-            self.fm.notify("Err: refuse to compare the same file", bad=True)
-            return 2
-        else:
-            # DEV: substitute python-like placeholders -> {}, {1}, {2}
-            #   else -> append filelist
-            cmd += [f.path + ("/" if f.is_directory else "") for f in fls]
-            print(cmd)
-            # cmd += [" && printf '\033[31;40;1same\033[m '"]
-            self.fm.execute_command(cmd, flags=flags)
-
-
 class nrenum(Command):
     bmrk: ClassVar[Pattern[str]] = re.compile(r"(.*)\{(\d+)([^}]+?)(\d+)\}$")
 
