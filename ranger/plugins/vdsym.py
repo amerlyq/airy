@@ -1,18 +1,512 @@
-"""VD symlink search and replacement command."""
+"""VD symlink search and replacement command, plus a link-aware :delete.
+
+Layout:
+- _Cache      process-wide directory cache + per-roots search views (shared by
+              :vdsym, :delete and the replace flow; survives module re-exec)
+- vdsym       the command
+- find_backlinks / make_dashboard
+              reusable helpers (what :delete calls)
+- delete      :delete with clip + symlink guards
+"""
 
 from __future__ import annotations
 
+import hashlib
 import logging
 import os
 import re
+import subprocess
+import sys
+import threading
 import time
-from collections.abc import Sequence
-from fnmatch import fnmatch
+import types
+from collections.abc import Iterable, Sequence
+from concurrent.futures import ThreadPoolExecutor
+from fnmatch import translate as glob_translate
 from os import path as fs
+from typing import NamedTuple
 
 from ranger.api.commands import Command
 from ranger.config.commands import delete as _default_delete
 from ranger.ext.shell_escape import shell_quote
+
+DASHBOARD_ROOT = "/t/bnm"
+WARM_ON_IMPORT = True  # build the scan cache in a background thread at start-up
+
+# Clip naming: "<stem>_00m33s6", "<stem>_v32", "<stem>_06m44s7_prev29267", any extension.
+_TOKEN = r"(?:\d+m\d+s\d+|v\d+|prev\d+)"
+_CLIP_SUFFIX = _TOKEN + "(?:_" + _TOKEN + ")*"
+
+_NUMERIC = re.compile(r"(\d+)-0*(\d+)")
+_LOG = logging.getLogger("ranger.vdsym")
+
+_LONG_FLAGS = {
+    "autojump1": "a",
+    "basename": "b",
+    "clipboard": "c",
+    "dashboard": "d",
+    "glob": "g",
+    "ignore-case": "i",
+    "jump": "j",
+    "links-only": "l",
+    "multiple": "m",
+    "numeric": "n",
+    "open": "o",
+    "print": "p",
+    "replace": "R",
+    "refresh": "q",
+    "rescan": "Q",
+    "selection": "s",
+    "view": "v",
+    "xclip": "x",
+    "yanked": "y",
+}
+_GROUPS = {
+    "action": {
+        "dashboard": "d",
+        "jump": "j",
+        "autojump1": "a",
+        "open": "o",
+        "print": "p",
+        "replace": "R",
+        "rotate": "r",
+        "xclip": "x",
+        "refresh": "q",
+        "rescan": "Q",
+    },
+    "source": {
+        "basename": "b",
+        "clipboard": "c",
+        "selection": "s",
+        "yanked": "y",
+    },
+    "target": {"clipboard": "c", "yanked": "y", "selection": "s"},
+    "modifiers": {
+        "glob": "g",
+        "numeric": "n",
+        "ignore-case": "i",
+        "links-only": "l",
+        "view": "v",
+    },
+}
+
+
+# --------------------------------------------------------------------------- #
+# scan records
+# --------------------------------------------------------------------------- #
+
+
+class _Dir(NamedTuple):
+    mtime: int
+    entries: list[str]  # indexed paths: files, links and subdirectories
+    lazy: list[str]  # deferred "-pics" payload (not indexed, expanded on demand)
+    subdirs: list[str]  # real subdirectories to descend into
+    links: dict[str, str]  # symlink path -> readlink() for symlinks in `entries`
+
+
+def _is_pics_payload_dir(directory: str) -> bool:
+    parent = fs.basename(fs.dirname(directory))
+    return fs.basename(directory).isdigit() and "-pics" in parent
+
+
+def _in_pics(directory: str, root: str) -> bool:
+    return any(
+        part.endswith("-pics") or "-pics-" in part
+        for part in fs.relpath(directory, root).split(os.sep)
+    )
+
+
+def _safe_readlink(path: str) -> str | None:
+    try:
+        return os.readlink(path)
+    except OSError:
+        return None
+
+
+def _make_rec(
+    directory: str,
+    root: str,
+    mtime: int,
+    items: Iterable[tuple[str, bool, str | None]],
+) -> _Dir:
+    """Build a record from (path, is_real_dir, link_target) items."""
+    if _is_pics_payload_dir(directory):
+        return _Dir(mtime, [], [directory], [], {})
+    in_pics = _in_pics(directory, root)
+    entries: list[str] = []
+    lazy: list[str] = []
+    subdirs: list[str] = []
+    links: dict[str, str] = {}
+    for path, is_dir, target in items:
+        if is_dir:
+            entries.append(path)
+            subdirs.append(path)
+        elif in_pics:
+            lazy.append(path)
+        else:
+            entries.append(path)
+            if target is not None:
+                links[path] = target
+    return _Dir(mtime, entries, lazy, subdirs, links)
+
+
+def _scan_dir(directory: str, root: str, mtime: int | None = None) -> _Dir | None:
+    try:
+        if mtime is None:
+            mtime = os.stat(directory).st_mtime_ns
+        if _is_pics_payload_dir(directory):
+            return _make_rec(directory, root, mtime, ())
+        items = []
+        with os.scandir(directory) as it:
+            for entry in it:
+                target = None
+                if entry.is_symlink():
+                    target = _safe_readlink(entry.path) or ""
+                items.append((entry.path, entry.is_dir(follow_symlinks=False), target))
+    except OSError:
+        return None
+    return _make_rec(directory, root, mtime, items)
+
+
+# --------------------------------------------------------------------------- #
+# search index
+# --------------------------------------------------------------------------- #
+
+
+class _Index:
+    """basename -> paths; a symlink is also filed under its target's basename."""
+
+    def __init__(self) -> None:
+        self.names: dict[str, list[str]] = {}
+        self.links: set[str] = set()
+        self._ci: dict[str, list[str]] | None = None
+
+    def add(self, path: str, target: str | None = None) -> None:
+        self.names.setdefault(fs.basename(path), []).append(path)
+        if target is not None:
+            self.link(path, target)
+
+    def link(self, path: str, target: str) -> None:
+        self.links.add(path)
+        base = fs.basename(target.rstrip("/"))
+        if base:
+            self.names.setdefault(base, []).append(path)
+
+    def table(self, icase: bool) -> dict[str, list[str]]:
+        if not icase:
+            return self.names
+        if self._ci is None:
+            merged: dict[str, list[str]] = {}
+            for key, values in self.names.items():
+                merged.setdefault(key.casefold(), []).extend(values)
+            self._ci = merged
+        return self._ci
+
+    def find(self, needle: str, glob: bool, icase: bool) -> Iterable[str]:
+        table = self.table(icase)
+        if not glob:
+            return table.get(needle, ())
+        if any(char in needle for char in "*?["):
+            test = re.compile(glob_translate(f"*{needle}*")).match
+        else:
+            test = lambda key: needle in key  # noqa: E731
+        return [path for key, values in table.items() if test(key) for path in values]
+
+
+class _View:
+    """Index over one tuple of roots, valid for the given per-root versions."""
+
+    def __init__(
+        self,
+        versions: tuple[int, ...],
+        index: _Index,
+        pics_dirs: dict[str, list[str]],
+        count: int,
+    ) -> None:
+        self.versions = versions
+        self.index = index
+        self.pics_dirs = pics_dirs
+        self.count = count
+        self.pics: dict[tuple[tuple[str, str], ...], _Index] = {}
+
+
+# --------------------------------------------------------------------------- #
+# shared cache
+# --------------------------------------------------------------------------- #
+
+
+class _Cache:
+    """Directory records per root, validated by directory mtime; views per roots tuple."""
+
+    def __init__(self, stamp: str) -> None:
+        self.stamp = stamp
+        self.lock = threading.RLock()
+        self.dirs: dict[str, dict[str, _Dir]] = {}
+        self.rootver: dict[str, int] = {}
+        self.views: dict[tuple[str, ...], _View] = {}
+        self.warmed = False
+
+    def _bump(self, root: str) -> None:
+        self.rootver[root] = self.rootver.get(root, 0) + 1
+
+    def ensure(self, roots: Iterable[str], mode: str = "fast") -> _View:
+        """mode: fast (build if missing), validate (stat-walk, rescan changed dirs),
+        rescan (rebuild from scratch)."""
+        roots = tuple(roots)
+        with self.lock:
+            if mode == "rescan":
+                self._prefill(roots)
+            else:
+                missing = [root for root in roots if root not in self.dirs]
+                self._prefill(missing)
+                if mode == "validate":
+                    for root in roots:
+                        if root in self.dirs and root not in missing:
+                            self._refresh(root)
+            versions = tuple(self.rootver.get(root, 0) for root in roots)
+            view = self.views.get(roots)
+            if view is None or view.versions != versions:
+                view = self.views[roots] = self._build(roots, versions)
+            return view
+
+    # -- building ----------------------------------------------------------- #
+
+    def _build(self, roots: tuple[str, ...], versions: tuple[int, ...]) -> _View:
+        index = _Index()
+        names = index.names
+        pics_dirs: dict[str, list[str]] = {}
+        count = 0
+        for root in roots:
+            records = self.dirs.get(root)
+            if records is None:
+                continue
+            index.add(root)
+            count += 1
+            for directory, rec in records.items():
+                for path in rec.entries:
+                    names.setdefault(fs.basename(path), []).append(path)
+                for path, target in rec.links.items():
+                    index.link(path, target)
+                count += len(rec.entries)
+                if rec.lazy:
+                    pics_dirs.setdefault(fs.basename(directory), []).append(directory)
+        return _View(versions, index, pics_dirs, count)
+
+    def pics(self, view: _View, numeric: tuple[tuple[str, str], ...]) -> _Index:
+        """Deferred '<prefix>-<n>.webp|gif' files for numeric needles."""
+        found = view.pics.get(numeric)
+        if found is None:
+            found = _Index()
+            for prefix, number in numeric:
+                widths = dict.fromkeys(
+                    (
+                        number,
+                        f"{int(number):02d}",
+                        f"{int(number):03d}",
+                        f"{int(number):04d}",
+                    )
+                )
+                for directory in view.pics_dirs.get(prefix, ()):
+                    for width in widths:
+                        for extension in ("webp", "gif"):
+                            path = fs.join(directory, f"{prefix}-{width}.{extension}")
+                            if fs.lexists(path):
+                                found.add(path, _safe_readlink(path))
+            view.pics[numeric] = found
+        return found
+
+    # -- scanning ------------------------------------------------------------ #
+
+    def _refresh(self, root: str) -> None:
+        """Incremental os.stat walk: only directories whose mtime changed are re-read."""
+        old = self.dirs.get(root, {})
+        new: dict[str, _Dir] = {}
+        changed = root not in self.dirs
+        stack = [root]
+        while stack:
+            directory = stack.pop()
+            try:
+                mtime = os.stat(directory).st_mtime_ns
+            except OSError:
+                continue
+            rec = old.get(directory)
+            if rec is None or rec.mtime != mtime:
+                rec = _scan_dir(directory, root, mtime)
+                if rec is None:
+                    continue
+                changed = True
+            new[directory] = rec
+            stack.extend(rec.subdirs)
+        if changed or new.keys() != old.keys():
+            self.dirs[root] = new
+            self._bump(root)
+
+    def _prefill(self, roots: Iterable[str]) -> None:
+        """Full (re)build; fd in parallel when available, scandir walk otherwise."""
+        wanted = []
+        for root in roots:
+            if fs.isdir(root):
+                wanted.append(root)
+            elif self.dirs.pop(root, None) is not None:
+                self._bump(root)
+        if not wanted:
+            return
+        listings = self._fd(wanted)
+        for root in wanted:
+            records = None
+            if listings is not None:
+                records = self._from_listing(root, *listings[root])
+            if records is None:
+                self.dirs.pop(root, None)
+                self._refresh(root)
+            else:
+                self.dirs[root] = records
+                self._bump(root)
+
+    @staticmethod
+    def _fd(
+        roots: list[str],
+    ) -> dict[str, tuple[list[str], list[str], list[str]]] | None:
+        base = ["fd", "--absolute-path", "--print0", "--hidden", "--no-ignore"]
+
+        def run(job: tuple[str, str | None]) -> list[str]:
+            root, kind = job
+            args = base + (["--type", kind] if kind else []) + [".", root]
+            result = subprocess.run(args, stdout=subprocess.PIPE, check=False)
+            if result.returncode != 0 and not result.stdout:
+                raise OSError(f"fd failed on {root}")
+            # fd prints directories with a trailing "/"; normalise so dirname() works
+            return [
+                os.fsdecode(raw).rstrip("/")
+                for raw in result.stdout.split(b"\0")
+                if raw
+            ]
+
+        jobs = [(root, kind) for root in roots for kind in (None, "d", "l")]
+        try:
+            with ThreadPoolExecutor(min(len(jobs), 6)) as pool:
+                out = list(pool.map(run, jobs))
+        except (OSError, subprocess.SubprocessError):
+            return None
+        return {
+            root: (out[3 * i], out[3 * i + 1], out[3 * i + 2])
+            for i, root in enumerate(roots)
+        }
+
+    @staticmethod
+    def _from_listing(
+        root: str, everything: list[str], dirs: list[str], links: list[str]
+    ) -> dict[str, _Dir] | None:
+        by_parent: dict[str, list[str]] = {}
+        for path in everything:
+            by_parent.setdefault(fs.dirname(path), []).append(path)
+        if everything and root not in by_parent:
+            return None  # fd printed paths not under `root` (resolved symlink?); walk instead
+        dirset = set(dirs)
+        targets = {path: _safe_readlink(path) or "" for path in links}
+        records: dict[str, _Dir] = {}
+        stack = [root]
+        while stack:
+            directory = stack.pop()
+            try:
+                mtime = os.stat(directory).st_mtime_ns
+            except OSError:
+                continue
+            items = [
+                (path, path in dirset, targets.get(path))
+                for path in by_parent.get(directory, ())
+            ]
+            rec = _make_rec(directory, root, mtime, items)
+            records[directory] = rec
+            stack.extend(rec.subdirs)
+        return records
+
+    def touch(self, paths: Iterable[str]) -> None:
+        """Entries inside these paths' directories changed: re-read just those directories."""
+        with self.lock:
+            for directory in {fs.dirname(path) for path in paths}:
+                for root, records in self.dirs.items():
+                    if directory in records:
+                        rec = _scan_dir(directory, root)
+                        if rec is not None:
+                            records[directory] = rec
+                            self._bump(root)
+                        break
+
+
+def _shared_cache() -> _Cache:
+    """One cache per process and per source revision: an unchanged module reload keeps
+    the warm cache, an edited one starts clean (so old/new code never share state)."""
+    try:
+        with open(__file__, "rb") as handle:
+            stamp = hashlib.sha1(handle.read()).hexdigest()
+    except (NameError, OSError):
+        stamp = "unknown"
+    holder = sys.modules.setdefault("_vdsym_shared", types.ModuleType("_vdsym_shared"))
+    cache = getattr(holder, "cache", None)
+    if getattr(cache, "stamp", None) != stamp:
+        cache = holder.cache = _Cache(stamp)
+    return cache
+
+
+_cache = _shared_cache()
+
+
+# --------------------------------------------------------------------------- #
+# reusable helpers
+# --------------------------------------------------------------------------- #
+
+
+def find_backlinks(paths: Sequence[str]) -> list[str]:
+    """Symlinks under the VD roots that resolve to any of `paths`.
+
+    Candidates come from the shared name index (link name or target basename), chased
+    through link-to-link chains by name, then verified with realpath. The cache is
+    mtime-validated first, so links created since the last scan are seen.
+    """
+    real = {fs.realpath(path) for path in paths}
+    pending = {fs.basename(path) for path in paths}
+    done: set[str] = set()
+    found: dict[str, None] = {}
+    with _cache.lock:
+        index = _cache.ensure(vdsym.roots(), "validate").index
+        while pending:
+            name = pending.pop()
+            done.add(name)
+            for link in index.names.get(name, ()):
+                if link in index.links and link not in found:
+                    found[link] = None
+                    base = fs.basename(link)
+                    if base not in done:
+                        pending.add(base)
+    return [link for link in found if fs.realpath(link) in real]
+
+
+def make_dashboard(fm, matches: Sequence[str], dest: str) -> str:
+    """Populate `dest` with one symlink per match (dropping stale symlinks) and cd there."""
+    os.makedirs(dest, exist_ok=True)
+    wanted: dict[str, str] = {}
+    for source in matches:
+        name = source.lstrip("/").replace("/", "⁄")
+        if len(os.fsencode(name)) > 255:
+            digest = hashlib.sha1(os.fsencode(source)).hexdigest()[:8]
+            name = f"{name[-100:]}~{digest}"
+        wanted[name] = source
+    with os.scandir(dest) as it:
+        stale = [e.path for e in it if e.is_symlink() and e.name not in wanted]
+    for path in stale:
+        os.unlink(path)
+    for name, source in wanted.items():
+        link = fs.join(dest, name)
+        if not fs.lexists(link):
+            os.symlink(source, link)
+    fm.cd(dest)
+    return dest
+
+
+# --------------------------------------------------------------------------- #
+# :vdsym
+# --------------------------------------------------------------------------- #
 
 
 class vdsym(Command):
@@ -23,126 +517,115 @@ class vdsym(Command):
 
     data_roots = ("/media/pro/vd", "/cache/vd", "/media/hpx/vd_ssdt5")
     view_root = "/d/irome/view"
-    _path_cache: dict[str, tuple[dict[str, int], list[str], dict[str, list[str]]]] = {}
-    _dir_cache: dict[str, dict[str, tuple[int, list[str], list[str]]]] = {}
-    _pics_cache_key: object = None
-    _pics_cache: list[str] = []
-    _deferred_index: dict[str, list[str]] = {}
-    _deferred_signature: object = None
-    _candidate_index: dict[str, list[str]] = {}
-    _candidate_index_ci: dict[str, list[str]] = {}
-    _candidate_index_paths: tuple[str, ...] = ()
-    _link_index: set[str] = set()
 
-    def _args(self) -> tuple[set[str], list[str]]:
+    _parsed: tuple[set[str], list[str], str | None] | None = None
+    _names_cache: list[str] | None = None
+    _touched: set[str] | None = None
+    _kpi: dict[str, float | int] = {}
+
+    @classmethod
+    def roots(cls, view_only: bool = False) -> tuple[str, ...]:
+        return (cls.view_root,) if view_only else (cls.view_root,) + cls.data_roots
+
+    # -- argument parsing ----------------------------------------------------- #
+
+    def _parse(self) -> tuple[set[str], list[str], str | None]:
+        if self._parsed is not None:
+            return self._parsed
         import shlex
 
-        long_flags = {
-            "autojump1": "a",
-            "basename": "b",
-            "clipboard": "c",
-            "dashboard": "d",
-            "glob": "g",
-            "ignore-case": "i",
-            "jump": "j",
-            "links-only": "l",
-            "multiple": "m",
-            "numeric": "n",
-            "open": "o",
-            "print": "p",
-            "replace": "R",
-            "refresh": "q",
-            "rescan": "Q",
-            "selection": "s",
-            "view": "v",
-            "xclip": "x",
-            "yanked": "y",
-        }
-        groups = {
-            "action": {
-                "dashboard": "d",
-                "jump": "j",
-                "autojump1": "a",
-                "open": "o",
-                "print": "p",
-                "replace": "R",
-                "rotate": "r",
-                "xclip": "x",
-                "refresh": "q",
-                "rescan": "Q",
-            },
-            "source": {
-                "basename": "b",
-                "clipboard": "c",
-                "selection": "s",
-                "yanked": "y",
-            },
-            "target": {"clipboard": "c", "yanked": "y", "selection": "s"},
-            "modifiers": {
-                "glob": "g",
-                "numeric": "n",
-                "ignore-case": "i",
-                "links-only": "l",
-                "view": "v",
-            },
-        }
         tokens = shlex.split(self.rest(1))
         filtered: list[str] = []
+        eq_root: str | None = None
+        d_root: str | None = None
         skip = False
         for index, token in enumerate(tokens):
             if skip:
                 skip = False
                 continue
             if token.startswith("--dashboard="):
+                if eq_root is None:
+                    eq_root = token.split("=", 1)[1]
                 filtered.append(token)
                 continue
-            if token in ("-d", "--dashboard") and index + 1 < len(tokens):
-                if not tokens[index + 1].startswith("-"):
-                    skip = True
+            if (
+                token in ("-d", "--dashboard")
+                and index + 1 < len(tokens)
+                and not tokens[index + 1].startswith("-")
+            ):
+                if d_root is None:
+                    d_root = tokens[index + 1]
+                skip = True
             filtered.append(token)
-        tokens = filtered
         flags: set[str] = set()
         names: list[str] = []
         separator = False
-        for token in tokens:
+        for token in filtered:
             if not separator and token == "--":
                 separator = True
             elif not separator and token.startswith("--"):
-                option = token[2:].split("=", 1)[0]
-                value = token.split("=", 1)[1] if "=" in token else None
-                if option in groups and value is not None:
-                    for item in value.split(","):
-                        flags.add(groups[option][item])
-                else:
-                    flags.add(long_flags[option])
+                option, equals, value = token[2:].partition("=")
+                try:
+                    if option in _GROUPS and equals:
+                        for item in value.split(","):
+                            flags.add(_GROUPS[option][item])
+                    else:
+                        flags.add(_LONG_FLAGS[option])
+                except KeyError as error:
+                    raise ValueError(f"unknown option {token!r}") from error
             elif not separator and token.startswith("-"):
                 flags.update(token[1:])
             else:
                 names.append(token)
                 separator = True
+        root = eq_root if eq_root is not None else d_root
+        self._parsed = (flags, names, root)
+        return self._parsed
+
+    def _args(self) -> tuple[set[str], list[str]]:
+        flags, names, _ = self._parse()
         return flags, names
+
+    def _dashboard_root(self) -> str | None:
+        return self._parse()[2]
 
     def _name(self) -> str:
         names = self._names()
         return names[0] if names else ""
 
     def _names(self) -> list[str]:
-        import subprocess
+        if self._names_cache is None:
+            self._names_cache = self._compute_names()
+        return self._names_cache
 
+    def _compute_names(self) -> list[str]:
         flags, arguments = self._args()
         if arguments:
             return [fs.basename(argument) for argument in arguments]
         if "s" in flags:
-            selection = self.fm.thistab.get_selection()
-            return [entry.basename for entry in selection]
+            return [entry.basename for entry in self.fm.thistab.get_selection()]
         if "c" in flags:
-            clipboard = subprocess.run(
-                ["xco"], stdout=subprocess.PIPE, text=True, check=False
-            ).stdout
+            try:
+                clipboard = subprocess.run(
+                    ["xco"], stdout=subprocess.PIPE, text=True, check=False
+                ).stdout
+            except OSError:
+                self.fm.notify("xco not available", bad=True)
+                return []
             return [fs.basename(line) for line in clipboard.splitlines()]
         if "b" in flags:
             return [self.fm.thisfile.basename]
+        if "y" in flags:
+            return [entry.basename for entry in self.fm.copy_buffer]
         return []
+
+    @staticmethod
+    def _normalize(name: str, flags: set[str]) -> str:
+        if "n" in flags:
+            name = re.sub(r"\.html$", "", name)
+            if match := _NUMERIC.fullmatch(name):
+                name = f"{match[1]}-{match[2]}"
+        return name
 
     def _paths(self, flags: set[str]) -> list[str]:
         if "s" in flags:
@@ -151,61 +634,43 @@ class vdsym(Command):
             return [fs.abspath(entry.path) for entry in self.fm.copy_buffer]
         return []
 
+    # -- replace ---------------------------------------------------------------- #
+
     def _replace_links(self, flags: set[str]) -> None:
-        source = fs.abspath(self.fm.thisfile.path)
+        source = fs.realpath(self.fm.thisfile.path)
         targets = self._paths(flags)
         if not fs.isfile(source) or len(targets) != 1 or not fs.isfile(targets[0]):
             self.fm.notify(
                 "Need one existing cursor file and one yanked file.", bad=True
             )
             return
-        target = targets[0]
-        links = []
-        for root in self.data_roots + (self.view_root,):
-            if not fs.isdir(root):
-                continue
-            for directory, dirnames, filenames in os.walk(root):
-                entries = dirnames + filenames
-                dirnames[:] = [
-                    entry
-                    for entry in dirnames
-                    if not fs.islink(fs.join(directory, entry))
-                ]
-                links.extend(
-                    fs.join(directory, entry)
-                    for entry in entries
-                    if fs.islink(fs.join(directory, entry))
-                    and fs.realpath(fs.join(directory, entry)) == source
-                )
-        self._ask_replace(links, source, target, False)
+        self._touched = set()
+        self._ask_replace(find_backlinks([source]), source, targets[0], False)
 
-    def _replace_links_confirmed(
-        self, answer: str, source: str, target: str, links: list[str]
-    ) -> None:
-        answer = answer.lower()
-        if answer in ("q", "n"):
-            return
-        if answer == "l":
-            output = "\n".join(
-                f"{link} -> {os.readlink(link)}" for link in links if fs.lexists(link)
-            )
-            self.fm.execute_command("printf '%s\\n' " + shell_quote(output), flags="-w")
-            self._ask_replace(links, source, target, False)
-            return
-        self._replace_links_now(links, source, target, answer == "a")
+    def _finish_replace(self) -> None:
+        if self._touched:
+            _cache.touch(self._touched)
+            self._touched = set()
+
+    def _show_links(self, links: list[str]) -> None:
+        output = "\n".join(
+            f"{link} -> {os.readlink(link)}" for link in links if fs.islink(link)
+        )
+        self.fm.execute_command("printf '%s\\n' " + shell_quote(output), flags="-w")
 
     def _ask_replace(
         self, links: list[str], source: str, target: str, automatic: bool
     ) -> None:
-        if not links:
-            return
-        link, *remaining = links
         if automatic:
-            self._replace_one(link, source, target)
-            self._ask_replace(remaining, source, target, True)
-            return
+            for link in links:
+                self._replace_one(link, source, target)
+            return self._finish_replace()
+        if not links:
+            return self._finish_replace()
+        link, *remaining = links
+        current = _safe_readlink(link) or "?"
         self.fm.ui.console.ask(
-            f"Replace ({len(links)} remaining): {link} -> {os.readlink(link)}? (y/n/q/a/l)",
+            f"Replace ({len(links)} remaining): {link} -> {current}? (y/n/q/a/l)",
             lambda answer: self._replace_one_answer(
                 answer, link, remaining, source, target
             ),
@@ -217,24 +682,15 @@ class vdsym(Command):
     ) -> None:
         answer = answer.lower()
         if answer == "l":
-            output = "\n".join(
-                f"{item} -> {os.readlink(item)}"
-                for item in [link] + remaining
-                if fs.lexists(item)
-            )
-            self.fm.execute_command("printf '%s\\n' " + shell_quote(output), flags="-w")
+            self._show_links([link] + remaining)
             self._ask_replace([link] + remaining, source, target, False)
         elif answer in ("y", "a"):
             self._replace_one(link, source, target)
             self._ask_replace(remaining, source, target, answer == "a")
         elif answer == "n":
             self._ask_replace(remaining, source, target, False)
-
-    def _replace_links_now(
-        self, links: list[str], source: str, target: str, automatic: bool
-    ) -> None:
-        for link in links:
-            self._replace_one(link, source, target)
+        else:
+            self._finish_replace()
 
     def _replace_one(self, link: str, source: str, target: str) -> None:
         if not fs.islink(link) or fs.realpath(link) != source:
@@ -250,6 +706,8 @@ class vdsym(Command):
         ):
             self.fm.notify(f"Collision: {new_link}", bad=True)
             return
+        if self._touched is not None:
+            self._touched.add(new_link)
         if fs.lexists(new_link) and fs.realpath(new_link) == fs.realpath(target):
             if new_link != link:
                 os.unlink(link)
@@ -265,348 +723,75 @@ class vdsym(Command):
             if fs.lexists(temporary):
                 os.unlink(temporary)
 
-    def _dashboard_root(self) -> str | None:
-        import shlex
-
-        tokens = shlex.split(self.rest(1))
-        for token in tokens:
-            if token.startswith("--dashboard="):
-                return token.split("=", 1)[1]
-        for index, token in enumerate(tokens[:-1]):
-            if token in ("-d", "--dashboard") and not tokens[index + 1].startswith("-"):
-                return tokens[index + 1]
-        return None
-
-    def _matches_fd(self) -> list[str]:
-        import subprocess
-
-        flags, _ = self._args()
-        roots = (
-            (self.view_root,) if "v" in flags else (self.view_root,) + self.data_roots
-        )
-        names = self._names()
-        roots = tuple(root for root in roots if fs.isdir(root))
-        if not roots or not names:
-            return []
-        paths = []
-        path_seen = set()
-        fd_flags = ["fd", "--absolute-path", "--print0", "--glob"]
-        if "i" in flags:
-            fd_flags.append("--ignore-case")
-        for raw_name in names:
-            name = raw_name
-            if "n" in flags:
-                name = re.sub(r"\.html$", "", name)
-                if match := re.fullmatch(r"(\d+)-0*(\d+)", name):
-                    name = rf"{match[1]}-{match[2]}"
-            pattern = f"*{name}*" if "g" in flags else name
-            try:
-                result = subprocess.run(
-                    fd_flags + [pattern, *roots],
-                    stdout=subprocess.PIPE,
-                    check=False,
-                )
-            except OSError:
-                return self._matches_slow()
-            for path in result.stdout.decode().split("\0"):
-                if path and path not in path_seen:
-                    path_seen.add(path)
-                    paths.append(path)
-        try:
-            result = subprocess.run(
-                ["fd", "--absolute-path", "--print0", "--type", "l", ".", *roots],
-                stdout=subprocess.PIPE,
-                check=False,
-            )
-        except OSError:
-            return self._matches_slow()
-        for path in result.stdout.decode().split("\0"):
-            if path and path not in path_seen:
-                path_seen.add(path)
-                paths.append(path)
-        return self._filter_matches(paths)
-
-    def _filter_matches(self, paths: list[str]) -> list[str]:
-        self._ensure_candidate_index(paths)
-        flags, _ = self._args()
-        ignorecase = "i" in flags
-        index = self._candidate_index_ci if ignorecase else self._candidate_index
-        names = self._names()
-        matches = []
-        seen = set()
-        for raw_name in names:
-            name = raw_name
-            if "n" in flags:
-                name = re.sub(r"\.html$", "", name)
-                if match := re.fullmatch(r"(\d+)-0*(\d+)", name):
-                    name = rf"{match[1]}-{match[2]}"
-            needle = name.casefold() if ignorecase else name
-            pattern = f"*{needle}*" if "g" in flags else needle
-            candidates = (
-                [
-                    path
-                    for key, values in index.items()
-                    if fnmatch(key, pattern)
-                    for path in values
-                ]
-                if "g" in flags
-                else index.get(needle, ())
-            )
-            for path in candidates:
-                is_link = path in self._link_index
-                if "l" in flags and not is_link:
-                    continue
-                if path not in seen:
-                    seen.add(path)
-                    matches.append(path)
-        return matches
-
-    def _ensure_candidate_index(self, paths: list[str]) -> None:
-        signature = tuple(paths)
-        if signature == self._candidate_index_paths:
-            return
-        index: dict[str, list[str]] = {}
-        links = set()
-        for path in paths:
-            index.setdefault(fs.basename(path), []).append(path)
-            if fs.islink(path):
-                links.add(path)
-                index.setdefault(fs.basename(os.readlink(path)), []).append(path)
-        self._candidate_index = index
-        self._candidate_index_ci = {
-            key.casefold(): values for key, values in index.items()
-        }
-        self._link_index = links
-        self._candidate_index_paths = signature
+    # -- search ------------------------------------------------------------------ #
 
     def _matches(self) -> list[str]:
         started = time.perf_counter()
         flags, _ = self._args()
-        roots = (
-            (self.view_root,) if "v" in flags else (self.view_root,) + self.data_roots
-        )
-        if "Q" in flags:
-            self._dir_cache.clear()
-        paths = []
-        deferred = {}
-        for root in roots:
-            if "Q" in flags:
-                self._prefill_fd((root,))
-            elif root not in self._dir_cache:
-                self._cached_root(root, False)
-            if "q" in flags:
-                normal, lazy = self._cached_root(root, False)
-            else:
-                normal = [root]
-                lazy = {}
-                seen = {root}
-                for directory, (_, entries, deferred_entries) in self._dir_cache.get(
-                    root, {}
-                ).items():
-                    if directory not in seen:
-                        seen.add(directory)
-                        normal.append(directory)
-                    normal.extend(entries)
-                    if deferred_entries:
-                        lazy[directory] = deferred_entries
-            paths.extend(normal)
-            deferred.update(lazy)
-        paths.extend(self._expand_deferred(deferred))
-        paths = list(dict.fromkeys(paths))
-        expanded = time.perf_counter()
-        matches = self._filter_matches(paths)
+        mode = "rescan" if "Q" in flags else "validate" if "q" in flags else "fast"
+        with _cache.lock:
+            view = _cache.ensure(self.roots("v" in flags), mode)
+            expanded = time.perf_counter()
+            needles = [self._normalize(name, flags) for name in self._names()]
+            numeric = tuple(
+                sorted({(m[1], m[2]) for n in needles if (m := _NUMERIC.fullmatch(n))})
+            )
+            sources = [view.index]
+            if numeric:
+                sources.append(_cache.pics(view, numeric))
+            matches = self._lookup(sources, needles, flags)
+        matches = [path for path in matches if fs.lexists(path)]
         self._kpi = {
             "scan": expanded - started,
             "filter": time.perf_counter() - expanded,
-            "paths": len(paths),
+            "paths": view.count,
             "matches": len(matches),
         }
         return matches
 
+    @staticmethod
+    def _lookup(
+        sources: list[_Index], needles: list[str], flags: set[str]
+    ) -> list[str]:
+        icase, glob, links_only = "i" in flags, "g" in flags, "l" in flags
+        matches: list[str] = []
+        seen: set[str] = set()
+        for needle in needles:
+            if icase:
+                needle = needle.casefold()
+            for index in sources:
+                for path in index.find(needle, glob, icase):
+                    if links_only and path not in index.links:
+                        continue
+                    if path not in seen:
+                        seen.add(path)
+                        matches.append(path)
+        return matches
+
     def _report_kpi(self, started: float, operation: float) -> None:
-        kpi = getattr(self, "_kpi", {})
-        line = (
-            "vdsym kpi: total=%.3fs scan=%.3fs filter=%.3fs op=%.3fs paths=%d matches=%d"
-            % (
-                time.perf_counter() - started,
-                kpi.get("scan", 0.0),
-                kpi.get("filter", 0.0),
-                time.perf_counter() - operation,
-                kpi.get("paths", 0),
-                kpi.get("matches", 0),
-            )
+        kpi = self._kpi
+        _LOG.info(
+            "vdsym kpi: total=%.3fs scan=%.3fs filter=%.3fs op=%.3fs paths=%d matches=%d",
+            time.perf_counter() - started,
+            kpi.get("scan", 0.0),
+            kpi.get("filter", 0.0),
+            time.perf_counter() - operation,
+            kpi.get("paths", 0),
+            kpi.get("matches", 0),
         )
-        logging.getLogger("ranger.vdsym").info(line)
-        # self.fm.notify(line)
 
-    def _prefill_fd(self, roots: tuple[str, ...]) -> None:
-        import subprocess
-
-        roots = tuple(root for root in roots if fs.isdir(root))
-        if not roots:
-            return
-        try:
-            result = subprocess.run(
-                ["fd", "--absolute-path", "--print0", ".", *roots],
-                stdout=subprocess.PIPE,
-                check=False,
-            )
-        except OSError:
-            return
-        entries: dict[str, list[str]] = {root: [] for root in roots}
-        for path in result.stdout.decode().split("\0"):
-            if not path:
-                continue
-            parent = fs.dirname(path)
-            entries.setdefault(parent, []).append(path)
-        for root in roots:
-            root_cache = {}
-            for directory in entries:
-                if directory.startswith(root) and fs.isdir(directory):
-                    try:
-                        mtime = os.stat(directory).st_mtime_ns
-                    except OSError:
-                        continue
-                    root_cache[directory] = (mtime, entries[directory], [])
-            self._dir_cache[root] = root_cache
-
-    def _cached_root(
-        self, root: str, force: bool
-    ) -> tuple[list[str], dict[str, list[str]]]:
-        cache = {} if force else self._dir_cache.setdefault(root, {})
-        normal = [root]
-        deferred: dict[str, list[str]] = {}
-        visited = set()
-        stack = [root]
-        while stack:
-            directory = stack.pop()
-            visited.add(directory)
-            try:
-                mtime = os.stat(directory).st_mtime_ns
-            except OSError:
-                continue
-            cached = cache.get(directory)
-            if cached and cached[0] == mtime:
-                entries, lazy = cached[1:]
-                stack.extend(
-                    path for path in entries if fs.isdir(path) and not fs.islink(path)
-                )
-            else:
-                if self._is_pics_payload_dir(directory):
-                    entries, lazy = [], [directory]
-                    cache[directory] = (mtime, entries, lazy)
-                    deferred[directory] = lazy
-                    continue
-                entries, lazy = [], []
-                try:
-                    for entry in os.scandir(directory):
-                        path = entry.path
-                        if entry.is_dir(follow_symlinks=False):
-                            entries.append(path)
-                            stack.append(path)
-                        else:
-                            relative = fs.relpath(path, root).split(os.sep)
-                            if any(
-                                part.endswith("-pics") or "-pics-" in part
-                                for part in relative[:-1]
-                            ):
-                                lazy.append(path)
-                            else:
-                                entries.append(path)
-                except OSError:
-                    continue
-                cache[directory] = (mtime, entries, lazy)
-            normal.extend(entries)
-            if lazy:
-                deferred[directory] = lazy
-        for directory in set(cache) - visited:
-            del cache[directory]
-        return normal, deferred
-
-    def _is_pics_payload_dir(self, directory: str) -> bool:
-        parent = fs.basename(fs.dirname(directory))
-        return fs.basename(directory).isdigit() and "-pics" in parent
-
-    def _expand_deferred(self, deferred: dict[str, list[str]]) -> list[str]:
-        names = self._names()
-        normalized = []
-        flags, _ = self._args()
-        for name in names:
-            if "n" in flags:
-                name = re.sub(r"\.html$", "", name)
-                if match := re.fullmatch(r"(\d+)-0*(\d+)", name):
-                    name = rf"{match[1]}-{match[2]}"
-            normalized.append(name)
-        numeric = tuple(
-            sorted(
-                {
-                    (match[1], match[2])
-                    for name in normalized
-                    if (match := re.fullmatch(r"(\d+)-0*(\d+)", name))
-                }
-            )
-        )
-        signature = tuple(sorted(deferred))
-        self._deferred_signature = signature
-        key = (numeric, signature)
-        if key != self._pics_cache_key:
-            self._pics_cache_key = key
-            self._pics_cache = []
-            for prefix, number in numeric:
-                for directory in deferred:
-                    if fs.basename(directory) != prefix:
-                        continue
-                    suffixes = {
-                        number,
-                        f"{int(number):02d}",
-                        f"{int(number):03d}",
-                        f"{int(number):04d}",
-                    }
-                    for width in suffixes:
-                        for extension in ("webp", "gif"):
-                            path = fs.join(directory, f"{prefix}-{width}.{extension}")
-                            if fs.lexists(path):
-                                self._pics_cache.append(path)
-        return self._pics_cache
-
-    def _matches_slow(self) -> list[str]:
-        flags, _ = self._args()
-        paths = []
-        roots = (
-            (self.view_root,) if "v" in flags else (self.view_root,) + self.data_roots
-        )
-        for root in roots:
-            if not fs.isdir(root):
-                continue
-            for directory, dirnames, filenames in os.walk(root):
-                entries = filenames + dirnames
-                dirnames[:] = [
-                    entry
-                    for entry in dirnames
-                    if not fs.islink(fs.join(directory, entry))
-                ]
-                paths.extend(fs.join(directory, entry) for entry in entries)
-        return self._filter_matches(paths)
+    # -- actions ------------------------------------------------------------------- #
 
     def _dashboard(self, matches: list[str]) -> str:
         root = self._dashboard_root()
         dest = (
             fs.join(root, self._name())
             if root is not None
-            else fs.join("/t/bnm", self.fm.thisfile.relative_path)
+            else fs.join(DASHBOARD_ROOT, self.fm.thisfile.relative_path)
         )
-        os.makedirs(dest, exist_ok=True)
-        for source in matches:
-            link = fs.join(dest, source.lstrip("/").replace("/", "⁄"))
-            if fs.lexists(link):
-                continue
-            os.symlink(source, link)
-        self.fm.cd(dest)
-        return dest
+        return make_dashboard(self.fm, matches, dest)
 
     def _yank(self, matches: list[str]) -> None:
-        import subprocess
-
         subprocess.run(["xci"], input="\n".join(matches), text=True, check=False)
 
     def _jump(self, matches: list[str]) -> None:
@@ -615,11 +800,12 @@ class vdsym(Command):
         if rotate and current in matches:
             target = matches[(matches.index(current) + 1) % len(matches)]
         else:
+            current_real = fs.realpath(current)
             dashboard_match = next(
                 (
                     fs.join(self.fm.thisdir.path, entry.basename)
-                    for entry in self.fm.thisdir.files
-                    if entry.is_link and fs.realpath(entry.path) == fs.realpath(current)
+                    for entry in self.fm.thisdir.files or ()
+                    if entry.is_link and fs.realpath(entry.path) == current_real
                 ),
                 None,
             )
@@ -628,19 +814,59 @@ class vdsym(Command):
         if "o" in self._args()[0]:
             self.fm.move(right=1)
         if len(matches) > 1:
+            target_real = fs.realpath(target)
             position = next(
-                index
-                for index, match in enumerate(matches)
-                if match == target or fs.realpath(match) == fs.realpath(target)
+                (
+                    index
+                    for index, match in enumerate(matches)
+                    if match == target or fs.realpath(match) == target_real
+                ),
+                0,
             )
             self.fm.notify(f"MULTI ({position + 1}/{len(matches)})")
 
+    def _print(self, matches: list[str], flags: set[str]) -> None:
+        needles = [self._normalize(name, flags) for name in self._names()]
+        pattern = re.compile(
+            "|".join(re.escape(n) for n in needles if n) or "(?!)",
+            re.IGNORECASE if "i" in flags else 0,
+        )
+
+        def esc(value: str) -> str:  # printf %b would otherwise eat backslashes
+            return value.replace("\\", "\\\\")
+
+        def highlight(value: str) -> str:
+            out, last = [], 0
+            for match in pattern.finditer(value):
+                out.append(esc(value[last : match.start()]))
+                out.append(f"\\033[31;1m{esc(match[0])}\\033[m")
+                last = match.end()
+            out.append(esc(value[last:]))
+            return "".join(out)
+
+        if matches:
+            lines = []
+            for match in matches:
+                line = highlight(match)
+                if fs.islink(match):
+                    line += f"  ->  {highlight(os.readlink(match))}"
+                lines.append(line)
+            output = "\\n".join(lines)
+        else:
+            output = "\\033[31;40;1mnotfound\\033[m "
+        self.fm.execute_command(
+            "printf '%b\\n' " + shell_quote(output) + "; read -k 1",
+            flags="-w",
+        )
+
     def execute(self) -> None:
         started = time.perf_counter()
-        flags, _ = self._args()
-        if ("q" in flags or "Q" in flags) and not flags.intersection(
-            "ad jopxR".replace(" ", "")
-        ):
+        try:
+            flags, _ = self._args()
+        except ValueError as error:
+            self.fm.notify(f"vdsym: {error}", bad=True)
+            return
+        if flags & {"q", "Q"} and not flags & set("adjopxR"):
             self._matches()
             self._report_kpi(started, time.perf_counter())
             return
@@ -676,59 +902,41 @@ class vdsym(Command):
                 self._jump(matches)
             else:
                 self._dashboard(matches)
-            self._report_kpi(started, time.perf_counter())
-            return
-        if "x" in flags:
+        elif "x" in flags:
             self._yank(matches)
-            self._report_kpi(started, time.perf_counter())
-            return
-        if "d" in flags:
+        elif "d" in flags:
             self._dashboard(matches)
-            self._report_kpi(started, time.perf_counter())
-            return
-        if "p" in flags:
+        elif "p" in flags:
             if "r" in flags and matches:
                 current = self.fm.thisfile.path
                 if current in matches:
                     matches = [matches[(matches.index(current) + 1) % len(matches)]]
                 else:
                     matches = [matches[0]]
-            needle = self._name()
-            if "n" in flags:
-                needle = re.sub(r"\.html$", "", needle)
-                if match := re.fullmatch(r"(\d+)-0*(\d+)", needle):
-                    needle = rf"{match[1]}-{match[2]}"
-            pattern = re.compile(
-                re.escape(needle), re.IGNORECASE if "i" in flags else 0
-            )
-
-            def highlight(value: str) -> str:
-                return pattern.sub(lambda match: f"\\033[31;1m{match[0]}\\033[m", value)
-
-            if matches:
-                lines = []
-                for match in matches:
-                    line = highlight(match)
-                    if fs.islink(match):
-                        line += f"  ->  {highlight(os.readlink(match))}"
-                    lines.append(line)
-                output = "\\n".join(lines)
-            else:
-                output = "\\033[31;40;1mnotfound\\033[m "
-            self.fm.execute_command(
-                "printf '%b\\n' " + shell_quote(output) + "; read -k 1",
-                flags="-w",
-            )
-            self._report_kpi(started, time.perf_counter())
-            return
-        if "j" in flags:
+            self._print(matches, flags)
+        elif "j" in flags:
             self._jump(matches)
-            self._report_kpi(started, time.perf_counter())
-            return
-        self.fm.select_file(matches[0])
-        if "o" in flags:
-            self.fm.move(right=1)
-        self._report_kpi(started, time.perf_counter())
+        else:
+            self.fm.select_file(matches[0])
+            if "o" in flags:
+                self.fm.move(right=1)
+        self._report_kpi(started, operation)
+
+
+# --------------------------------------------------------------------------- #
+# :delete
+# --------------------------------------------------------------------------- #
+
+
+class _FmProxy:
+    """fm as seen by one :delete instance: delete() redirected, rest passed through."""
+
+    def __init__(self, fm, delete) -> None:
+        self._fm = fm
+        self.delete = delete
+
+    def __getattr__(self, name):
+        return getattr(self._fm, name)
 
 
 # OR: map dD eval fm.set_clipboard(fm.thisfile.basename.encode('utf-8')); cmd('delete')
@@ -737,11 +945,71 @@ class delete(_default_delete):
 
     Copy selected file names to the clipboard before deleting them.
     Deletion is skipped when clipboard copy fails.
+    Asks first when the files have sibling clips or symlinks pointing back at them.
     """
 
-    def _copy_names(self, names: Sequence[str]) -> bool:
-        import subprocess
+    def execute(self) -> None:
+        self._real_fm = self.fm
+        self.fm = _FmProxy(self._real_fm, self._guarded_delete)  # this command only
+        super().execute()
 
+    # -- steps ---------------------------------------------------------------- #
+
+    def _guarded_delete(self, files: Sequence[str] | None = None) -> None:
+        if files is None:
+            files = [f.path for f in self._real_fm.thistab.get_selection()]
+        cwd = self._real_fm.thisdir.path
+        paths = [fs.join(cwd, f) for f in files]
+        clips = self._clips(paths)
+        if not clips:
+            return self._check_links(files, paths)
+        self._ask(
+            f"{len(clips)} clip(s): {self._brief(map(fs.basename, clips))}"
+            " -- delete anyway? (y/N)",
+            ("n", "N", "y", "Y"),
+            lambda ans: ans in ("y", "Y") and self._check_links(files, paths),
+        )
+
+    def _check_links(self, files: Sequence[str], paths: Sequence[str]) -> None:
+        real = [path for path in paths if not fs.islink(path)]
+        links = find_backlinks(real) if real else []
+        if not links:
+            return self._copy_and_delete(files)
+        first = fs.basename(real[0])
+        self._ask(
+            f"{len(links)} symlink(s): {self._brief(links)}"
+            " -- delete? (y/n=dashboard/c)",
+            ("y", "Y", "n", "N", "c", "C"),
+            lambda ans: self._on_links(ans, files, links, first),
+        )
+
+    def _on_links(
+        self, answer: str, files: Sequence[str], links: list[str], first: str
+    ) -> None:
+        if answer in ("y", "Y"):
+            self._copy_and_delete(files)
+        elif answer in ("n", "N"):
+            make_dashboard(self._real_fm, links, fs.join(DASHBOARD_ROOT, first))
+
+    def _copy_and_delete(self, files: Sequence[str]) -> None:
+        names = [fs.basename(file) for file in files]
+        if self._copy_names(names):
+            self._real_fm.delete(files)
+        else:
+            self._real_fm.notify("Could not copy file name to clipboard", bad=True)
+
+    # -- helpers ---------------------------------------------------------------- #
+
+    def _ask(self, text: str, choices: tuple[str, ...], callback) -> None:
+        self._real_fm.ui.console.ask(text, callback, choices)
+
+    @staticmethod
+    def _brief(items: Iterable[str], limit: int = 3) -> str:
+        items = list(items)
+        more = f" +{len(items) - limit}" if len(items) > limit else ""
+        return " | ".join(items[:limit]) + more
+
+    def _copy_names(self, names: Sequence[str]) -> bool:
         try:
             process = subprocess.run(
                 ["xci"],
@@ -754,38 +1022,46 @@ class delete(_default_delete):
             return False
         return process.returncode == 0
 
-    def _clips(self, files: Sequence[str]) -> list[str]:
-        cwd = self.fm.thisdir.path
-        paths = {os.path.join(cwd, f) for f in files}
-        found = set()
-        for p in paths:
-            stem = os.path.splitext(p)[0] + "_"
-            with os.scandir(os.path.dirname(p)) as it:
-                found.update(e.path for e in it if e.path.startswith(stem))
-        return sorted(found - paths)
+    @staticmethod
+    def _clips(paths: Sequence[str]) -> list[str]:
+        """Siblings named '<stem>_<clip tokens>[.ext]' that are not themselves selected."""
+        stems: dict[str, list[str]] = {}
+        for path in paths:
+            stems.setdefault(fs.dirname(path), []).append(
+                fs.splitext(fs.basename(path))[0]
+            )
+        selected = set(paths)
+        found: list[str] = []
+        for directory, group in stems.items():
+            pattern = re.compile(
+                f"(?:{'|'.join(map(re.escape, group))})_{_CLIP_SUFFIX}(?:\\..*)?", re.S
+            )
+            try:
+                with os.scandir(directory) as it:
+                    found.extend(
+                        e.path
+                        for e in it
+                        if e.path not in selected and pattern.fullmatch(e.name)
+                    )
+            except OSError:
+                continue
+        return sorted(found)
 
-    def _copy_and_delete(self, files: Sequence[str]) -> None:
-        names = [fs.basename(file) for file in files]
-        if self._copy_names(names):
-            self._original_delete(files)
-        else:
-            self.fm.notify("Could not copy file name to clipboard", bad=True)
 
-    def _delete_with_clipboard(self, files: Sequence[str]) -> None:
-        clips = self._clips(files)
-        if not clips:
-            return self._copy_and_delete(files)
-        self.fm.ui.console.ask(
-            f"{len(clips)} clip(s) exist: "
-            + ", ".join(map(os.path.basename, clips))
-            + " -- delete anyway? (y/N)",
-            lambda ans: ans in ("y", "Y") and self._copy_and_delete(files),
-            ("n", "N", "y", "Y"),
-        )
+# --------------------------------------------------------------------------- #
+# start-up warm-up
+# --------------------------------------------------------------------------- #
 
-    def execute(self) -> None:
-        if not hasattr(self.fm, "_airy_original_delete"):
-            self.fm._airy_original_delete = self.fm.delete
-        self._original_delete = self.fm._airy_original_delete
-        self.fm.delete = self._delete_with_clipboard
-        super().execute()
+
+def _warm() -> None:
+    try:
+        roots = vdsym.roots()
+        _cache.ensure(roots)
+        _cache.ensure(roots[:1])  # view-only index used by --modifiers=view
+    except Exception:  # noqa: BLE001 - never break ranger start-up
+        _LOG.exception("vdsym warm-up failed")
+
+
+if WARM_ON_IMPORT and not _cache.warmed:
+    _cache.warmed = True
+    threading.Thread(target=_warm, name="vdsym-warm", daemon=True).start()
