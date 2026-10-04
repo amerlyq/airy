@@ -36,8 +36,16 @@ class history_clear(Command):
 
 import sys
 
-from ranger.container.history import History
 from ranger.core.tab import Tab
+
+## What happens on a jump that is not a plain step (e.g. <cl>) when you are NOT at the end of
+## history (you went back with <H> before):
+##   "truncate"  browser-like: forward entries are dropped, the new place follows current
+##               [1/35] + jump → [2/2]
+##   "insert"    the new place goes right after current, forward entries stay behind it
+##               [1/35] + jump → [2/36]   (keeps accidentally forked visits reachable)
+## Retracing the same jump (<cl> <H> <cl> <H> …) never grows history in either mode.
+FORK = "truncate"
 
 
 def _is_step(frame):
@@ -51,27 +59,37 @@ def _is_step(frame):
     return False
 
 
-## ALG:
-# A → D: add(A), add(D) gives [A, D]
-# D → S1: add(D) is skipped (it's last), add(S1) gives [A, D, S1]
+## ALG: one jump records old and new, relative to the CURRENT index (not to the list end!):
+# A → D: [A, D] @D
+# D → S1: current is already D; [A, D, S1]
 # S1 → S2: [A, D, S1, S2]
 # S2 → A: [A, D, S1, S2, A], so [5/5]
 # history-back steps S2, S1, D, A, one entry per jump
-def _add(self, item):
-    h = self.history
-    # ALT:BUG: dedup messes history chain when chained symlinks walk you back to starting dir
-    # if item in h:
-    #     h.remove(item)
-    # h.append(item)
-    if not h or h[-1] != item:
-        h.append(item)
-    self.index = len(h) - 1
-    if self.maxlen and len(h) > self.maxlen:
-        del h[0]
-        self.index -= 1
+# <H> from D to A: [A, D, S1, S2, A] @A is not touched by add; jumping A → D again:
+#   next entry already is D → just move index forward, nothing is appended
+# ALT:BUG: dedup messes history chain when chained symlinks walk you back to starting dir
+def _visit(h, item):
+    """Make `item` the current entry of tab history `h`: stay, retrace forward, or fork."""
+    items = h.history
+    if not items:
+        items.append(item)
+        h.index = 0
+        return
+    h.index = max(0, min(h.index, len(items) - 1))
+    if items[h.index] == item:
+        return
+    nxt = h.index + 1
+    if nxt < len(items) and items[nxt] == item:
+        h.index = nxt
+        return
+    if FORK == "truncate":
+        del items[nxt:]
+    items.insert(nxt, item)
+    h.index = nxt
+    if h.maxlen and len(items) > h.maxlen:
+        del items[0]
+        h.index -= 1
 
-
-History.add = _add
 
 _enter_dir = Tab.enter_dir
 
@@ -94,8 +112,8 @@ def enter_dir(self, path, history=True):
     # )
     # ----------------------------------------
     if record:
-        self.history.add(old)
-        self.history.add(new)
+        _visit(self.history, old)
+        _visit(self.history, new)
     return ret
 
 
@@ -114,7 +132,7 @@ class cd_symlink1(Command):
     """
     Follows a symlink exactly 1 level deep, maintaining a strict history chain.
     Handles broken symlinks by navigating to the closest parent directory.
-    Trims future history when branching off via <H> + <cl>.
+    Branching off after <H> + <cl> follows FORK (truncate forward history by default).
     """
 
     def execute(self) -> None:
@@ -142,19 +160,7 @@ class cd_symlink1(Command):
             else fs.normpath(fs.join(origin_dir, link_target))
         )
 
-        # # 3. Truncate forward history if we moved back with 'H'
-        # tab = fm.thistab
-        # if tab is None:
-        #     fm.notify("No active tab!", bad=True)
-        #     return
-        # history = tab.history
-        # if history and history.index < len(history) - 1:
-        #     # history.container = history.container[: history.index + 1]
-        #     # history._list = history._list[: history.index + 1]
-        #     # if hasattr(history, "history"):
-        #     history.history = history.history[: history.index + 1]
-
-        # 4. Handle existing target (Directory or File)
+        # 3. Handle existing target (Directory or File); history is handled in enter_dir()
         if fs.isdir(target_path):
             fm.cd(str(target_path))
             return
@@ -166,7 +172,7 @@ class cd_symlink1(Command):
                 fm.thisdir.move_to_obj(str(target_path))
             return
 
-        # 5. Handle broken symlink -> find nearest existing directory
+        # 4. Handle broken symlink -> find nearest existing directory
         target_dir: str = (
             target_path if fs.isdir(target_path) else fs.dirname(target_path)
         )
