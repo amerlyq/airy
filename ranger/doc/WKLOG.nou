@@ -135,3 +135,25 @@
         https://pypi.org/project/construct/2.0.0/
       Kaitai Struct: declarative binary format parsing language ⌇⡪⡱⠳⣕
         https://kaitai.io/#download
+
+
+5h50m 2026-10-03-Sat-W39
+  ga3 [X] 17:55 ⁂ 1h25m DEV Qs !ranger ADD :del -- should search file symlinks first ⌇⡪⣂⠋⢧
+    [X] 17:55 30m ADD:PERF: notify kpi status -- to know how much each op takes
+    [X] 03:35 10m ADD: additionally confirm deletion if there are any _clip files based on it
+      <<CASE: sort by <od> duration pairs and delete worse file w/o toggling to <on> and back
+    [X] 03:45 45m integ search file symlinks first
+      [✓] NEED: very fast search through all roots
+  ga3 [^] 21:50 ⁂ 4h25m DEV !ranger Qs FIXME plugins ⌇⡪⣂⠋⢷
+    [+] 21:35 15m CFG !ranger Qs :yank_as aliases
+    [✓] 21:50 10m MAYBE:TRY: disable going up/down J/H from being added to back-n-forth history
+    ga3 [X] 22:00 25m BUG: somehow back-n-forth history is short ~20 instead of ~100 I set in rc.conf
+      :eval fm.thistab.history.maxlen → should print 100
+      :eval len(fm.thistab.history.history) → current fill
+    [+] 22:55 1h20m CFG ranger pick !qimgv for ANIM webp ++ CFG its keybindings
+    [X] 01:20 1h45m DEBUG :history_go issue
+    ga3 [X] 03:05 15m FIXME: !imv viewer intially only opens 1 img on move=right after I edited rifle.conf
+      ~~ but if I focus ranger and move cursor down/up -- it loads full image set
+    ga3 [X] 03:20 15m BUG: when you do fm.cd() (or select_file?) -- parent dir cursor in miller still points whatever it was on before
+      e.g. continues to point to /t/delsome inof /t/bnm
+      ga3 [*] BUG: jumping to dashboard messes up back-n-forth history, cutting it short
