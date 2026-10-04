@@ -1,7 +1,7 @@
 -- Headless mpv API harness. "frames" executes real FFmpeg; "lifecycle" controls
 -- callback ordering to exercise cancellation without timing-dependent sleeps.
 local mode, source, destination, first, last = table.unpack(arg)
-local real_processes = mode == "frames" or mode == "export"
+local real_processes = mode == "frames" or mode == "export" or mode == "early-export"
 local converter = arg[0]:gsub("mpv/tests/clip_driver.lua$", "ffmpeg/run")
 local props = {
   path = source, ["working-directory"] = ".",
@@ -10,6 +10,7 @@ local props = {
 }
 local queue, timers, events, observers, bindings, messages = {}, {}, {}, {}, {}, {}
 local overlays, errors, calls, paths, commands = {}, {}, {}, {}, {}
+local osd = {}
 local function read(path)
   local f = io.open(path, "rb")
   if not f then return end
@@ -43,11 +44,14 @@ mp = {
     end,
   },
   get_property = function(name) return props[name] end,
+  get_property_osd = function(name)
+    return ({ ["osd-ass-cc/0"] = "<ASS>", ["osd-ass-cc/1"] = "<TEXT>" })[name]
+  end,
   get_property_native = function(name) return props[name] end,
   get_property_number = function(name) return tonumber(props[name]) end,
   set_property = function(name, value) props[name] = value end,
   commandv = function(...) commands[#commands + 1] = { ... } end,
-  osd_message = function() end,
+  osd_message = function(text) osd[#osd + 1] = text end,
   observe_property = function(name, _, fn) observers[name] = fn end,
   register_event = function(name, fn) events[name] = fn end,
   add_key_binding = function(_, name, fn) bindings[name] = fn end,
@@ -103,7 +107,11 @@ local function complete()
     local stdout = read(outfile); os.remove(outfile)
     job.callback(true, { status = ok and 0 or status, stderr = stderr, stdout = stdout })
   elseif args[2] == "--preview-plan" then
-    local command = { "ffmpeg", "-ss", args[5], "-to", args[6], "-i", args[4], args[8] }
+    local a, b, window = tonumber(args[5]), tonumber(args[6]), tonumber(args[9])
+    if args[3] == "A" then b = math.min(b, a + window)
+    else a = math.max(a, b - window) end
+    local command = { "ffmpeg", "-ss", tostring(a), "-to", tostring(b), "-i", args[4],
+      "-c:v", props.plan_codec or "copy", args[8] }
     job.callback(true, { status = 0, stdout = table.concat(command, "\0") .. "\0\0" })
   elseif option(args, "-f") == "rawvideo" then
     local w, h = option(args, "-vf"):match("scale=(%d+):(%d+)")
@@ -129,6 +137,18 @@ local function cleanup_check()
 end
 
 if real_processes then
+  if mode == "early-export" then
+    mark("end", tonumber(last))
+    bindings.clip_write_copy()
+    assert(#queue == 1 and queue[1].command.args[3] == "0")
+    drain()
+    assert(#errors == 0, table.concat(errors, "\n"))
+    assert(not next(overlays))
+    assert(osd[#osd]:find("DONE"))
+    cleanup_check()
+    print("clip immediate export: passed")
+    return
+  end
   mark("beg", tonumber(first)); mark("end", tonumber(last))
   drain()
   if #errors > 0 then
@@ -150,6 +170,82 @@ if real_processes then
     assert(not next(overlays), "successful export must clear previews")
   end
   cleanup_check()
+elseif mode == "intent" then
+  -- Only B marked; preview debounce has not even fired. One y must export 0..B.
+  mark("end", 10)
+  local command_count = #commands
+  bindings.clip_write_copy()
+  local export = assert(table.remove(queue, 1))
+  assert(export.command.args[3] == "0" and export.command.args[4] == "10")
+  assert(export.command.args[5] == "copy" and #commands == command_count)
+  assert(osd[#osd]:find("ENCODING") and not osd[#osd]:find("DONE"))
+  bindings.clip_write_copy(); assert(#queue == 0)
+  drain()
+  local preview = assert(overlays[2])
+  export.callback(true, { status = 1, stderr = "conversion failed" })
+  assert(overlays[2] == preview, "failure must retain previews")
+  assert(osd[#osd]:find("\\1c&H0000FF&", 1, true) and osd[#osd]:find("FAILED"))
+  assert(not osd[#osd]:find("DONE"))
+  bindings.clip_write_copy()
+  export = assert(table.remove(queue, 1))
+  export.callback(true, { status = 0 })
+  assert(not next(overlays))
+  assert(osd[#osd]:find("\\1c&HFF0000&", 1, true) and osd[#osd]:find("DONE"))
+  -- Preview failure is not an export failure: y still starts the converter.
+  mark("end", 11); flush_timers()
+  local plan = assert(table.remove(queue, 1))
+  plan.callback(true, { status = 1, stderr = "preview failed" })
+  bindings.clip_write_copy()
+  export = assert(table.remove(queue, 1))
+  assert(export.command.args[2] ~= "--preview-plan")
+  export.callback(true, { status = 1, stderr = "export failed too" })
+  -- User-hidden previews must not trigger an OSC show message on export.
+  messages.clip_toggle_previews()
+  command_count = #commands
+  bindings.clip_write_copy()
+  export = assert(table.remove(queue, 1))
+  assert(#commands == command_count)
+  export.callback(true, { status = 0 })
+  cleanup_check()
+  print("clip export intent: passed")
+elseif mode == "incremental" then
+  mark("beg", 5); flush_timers()
+  local pending_a = assert(queue[1])
+  mark("end", 16)
+  assert(not pending_a.aborted, "end mark must preserve unchanged pending A")
+  drain()
+  local a = assert(overlays[1]).file
+  local count = #calls
+  mark("end", 17)
+  assert(overlays[1].file == a)
+  drain()
+  assert(overlays[1].file == a and #calls == count + 3, "only B should be planned/cut/decoded")
+  local b = overlays[2].file
+  count = #calls
+  mark("beg", 6); drain()
+  assert(overlays[2].file == b and #calls == count + 3, "only A should be rebuilt")
+  -- A shorter-than-window range changes the opposite sample too.
+  a = overlays[1].file
+  mark("end", 7); drain()
+  assert(overlays[1].file ~= a)
+  -- Smart mode rechecks the full-selection plan but reuses identical samples.
+  mark("end", 20); drain()
+  messages.clip_preview_mode("smart"); drain()
+  a = overlays[1].file
+  count = #calls
+  mark("end", 21)
+  assert(overlays[1].file == a, "keep A visible while replanning")
+  drain()
+  assert(overlays[1].file == a and #calls == count + 4, "unchanged A plan must not encode")
+  -- If the smart planner changes operations, the cached frame is no longer valid.
+  props.plan_codec = "mpeg4"
+  mark("end", 22); flush_timers()
+  messages.clip_toggle_previews() -- Interrupt revalidation without losing it.
+  drain()
+  messages.clip_toggle_previews(); drain()
+  assert(overlays[1].file ~= a)
+  cleanup_check()
+  print("clip incremental previews: passed")
 else
   -- Cancel after decode was submitted but before its callback.
   mark("beg", 5); flush_timers(); assert(complete()); assert(complete())
@@ -202,14 +298,12 @@ else
   assert(export.command.args[1] == converter)
   export.callback(true, { status = 1, stderr = "export test failure" })
   assert(overlays[1])
-  -- A different export key selects previews first, never starts a full encode.
+  -- Export keys never consume intent by switching preview modes.
+  local before = overlays[1]
   bindings.clip_write_fast()
-  assert(not next(overlays) and #queue == 0)
+  assert(overlays[1] == before and #queue == 1)
   bindings.clip_write_fast()
-  assert(#queue == 0)
-  drain()
-  assert(overlays[1] and overlays[2])
-  bindings.clip_write_fast()
+  assert(#queue == 1, "repeated key must not submit duplicate exports")
   export = table.remove(queue, 1)
   assert(export.command.args[5] == "fast" and export.command.args[2] ~= "--preview-plan")
   export.callback(true, { status = 0 })
@@ -229,12 +323,15 @@ else
   -- Explicit mode selection retries a failed preview.
   messages.clip_preview_mode("fast"); drain()
   assert(overlays[1] and overlays[2])
-  -- Losing layout revokes export readiness without throwing away cached pixels.
+  -- Losing layout must not block export or throw away cached pixels.
   count = #calls
   props["osd-dimensions"] = nil
   observers["osd-dimensions"]()
   assert(not next(overlays))
-  bindings.clip_write_fast(); assert(#calls == count)
+  bindings.clip_write_fast(); assert(#calls == count + 1)
+  export = assert(table.remove(queue, 1))
+  export.callback(true, { status = 1, stderr = "layout-independent export failure" })
+  count = #calls
   props["osd-dimensions"] = { w = 800, h = 450 }
   observers["osd-dimensions"]()
   assert(overlays[1] and overlays[2] and #calls == count)

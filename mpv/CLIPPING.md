@@ -12,11 +12,15 @@ They do not imply that a stream-copy boundary lands exactly on that time.
 | `Ctrl+y` | fast (Intel QSV) |
 | `Alt+y` | cycle preview mode without exporting |
 
-Pressing an export key for a different mode first switches previews.
-Press it again after reviewing both ends to export.
-Export is blocked while either preview is missing or failed.
-An existing pair of visible previews in that mode allows immediate export.
-Exports run asynchronously.
+Each export key starts conversion immediately in its requested mode.
+Preview generation never consumes or blocks an export request.
+An unmarked beginning defaults to zero, unless restored from watch-later.
+Use `Alt+y` to select the preview mode separately when reviewing endpoints.
+Exports run asynchronously; repeated keys cannot submit duplicate active exports.
+`ENCODING` means conversion started, not completion.
+Blue `DONE` appears only after the converter exits successfully.
+Errors appear in red.
+Conversion failure retains the current previews.
 `;` toggles OSC visibility through the preview handler.
 Previews follow OSC's `never`/`always` visibility state.
 One OSD text line is reserved above previews because bitmap overlays cover text.
@@ -61,8 +65,12 @@ Fast mode reports QSV failures; it does not silently substitute software encodin
 
 Each pending job has private temporary files.
 Mark changes immediately cancel obsolete work.
+Only the affected boundary sample is rebuilt for ordinary copy/fast ranges.
+Short ranges can affect both samples.
+Smart mode rechecks the opposite boundary's conversion plan without removing its
+image; an identical plan reuses the frame instead of encoding it again.
 Resize reuses cached pixels.
-An unavailable layout hides previews and blocks export until layout returns.
+An unavailable layout hides previews but does not block export.
 Failed conversion jobs do not restart on resize.
 Change a mark or select a preview mode explicitly to retry.
 File changes and clearing previews invalidate pending callbacks.

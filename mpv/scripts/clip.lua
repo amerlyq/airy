@@ -1,5 +1,5 @@
 -- vim:ft=lua:ts=2:sw=2:sts=2
--- '[' / ']' mark the range. Export keys select a mode before exporting.
+-- '[' / ']' mark the range. Export keys start conversion immediately.
 -- Preview commands come from ffmpeg/run; only short boundary samples are made.
 -- Lossy samples match frame selection, not full-encode compression.
 -- Debug: mpv --msg-level=clip=debug FILE
@@ -30,12 +30,18 @@ local function osd_metrics()
 end
 
 local function status(level, message)
-  mp.msg.log(level, message)
+  mp.msg.log(level == "done" and "info" or level, message)
   local font, _, dims = osd_metrics()
   local text = level .. ": " .. message:gsub("%s+", " ")
   local limit = math.max(20, math.floor(((dims and dims.w or 1280) - 40) / (font * 0.65)))
   if #text > limit then text = text:sub(1, limit - 10) .. "... (log)" end
-  mp.osd_message(text, 2)
+  local color = ({ error = "0000FF", done = "FF0000" })[level] -- ASS uses BGR.
+  if color then
+    local ass = mp.get_property_osd("osd-ass-cc/0")
+    local literal = mp.get_property_osd("osd-ass-cc/1")
+    text = ass .. "{\\1c&H" .. color .. "&}" .. literal .. text .. ass .. "{\\r}" .. literal
+  end
+  mp.osd_message(text, color and 8 or 3)
 end
 
 local function finite(value)
@@ -119,12 +125,12 @@ local function dispose(job)
   jobs[job] = nil
 end
 
-local function cancel(edge, discard)
+local function cancel(edge, discard, keep_visible)
   if edge.timer then edge.timer:kill(); edge.timer = nil end
   if edge.job and edge.job.handle then mp.abort_async_command(edge.job.handle) end
   -- Never delete a running process's files. Its stale callback owns cleanup.
   edge.job = nil
-  remove_overlay(edge)
+  if not keep_visible then remove_overlay(edge) end
   if discard then
     dispose(edge.cache)
     edge.cache, edge.error = nil, nil
@@ -150,6 +156,11 @@ end
 
 local function fail(edge, message)
   dispose(edge.job)
+  if edge.cache and edge.cache.recheck then
+    remove_overlay(edge)
+    dispose(edge.cache)
+    edge.cache = nil
+  end
   edge.job, edge.error = nil, message
   status("error", "preview[" .. edge.name .. "]: " .. message)
 end
@@ -181,6 +192,20 @@ local function parse_plan(data)
     end
   end
   if #commands > 0 and #command == 0 then return commands end
+end
+
+-- Compare actual conversion operations independently of private temp names.
+local function plan_key(job, commands)
+  local parts = {}
+  for _, command in ipairs(commands) do
+    for _, value in ipairs(command) do
+      if value == job.clip then value = "<sample>"
+      elseif value == job.clip .. ".segment.mp4" then value = "<segment>" end
+      parts[#parts + 1] = value
+    end
+    parts[#parts + 1] = ""
+  end
+  return table.concat(parts, "\0")
 end
 
 local function decode_args(job)
@@ -260,6 +285,21 @@ sample_job = function(job)
   }, function(result)
     local commands = parse_plan(result.stdout)
     if not commands then fail(job.edge, "invalid converter preview plan"); return end
+    job.plan = plan_key(job, commands)
+    local edge, cached = job.edge, job.edge.cache
+    if cached and cached.plan == job.plan then
+      cached.a, cached.b, cached.limit = job.a, job.b, job.limit
+      cached.recheck = nil
+      edge.job, edge.error = nil, nil
+      dispose(job)
+      render(edge)
+      return
+    end
+    -- The opposite boundary can change for short ranges or smart-cut plans.
+    -- Keep its old image during planning, but never retain a known-stale image.
+    remove_overlay(edge)
+    dispose(cached)
+    edge.cache = nil
     execute_plan(job, commands, 1)
   end)
 end
@@ -289,19 +329,49 @@ end
 
 local function show_previews()
   for _, edge in ipairs(edges) do
-    if edge.cache then render(edge) else start_preview(edge) end
+    if edge.cache then render(edge) end
+    if not edge.cache or edge.cache.recheck then start_preview(edge) end
   end
 end
 
-local function refresh_previews()
+local function unchanged_sample(edge)
+  if edge.error then return false end
+  local job = edge.job or edge.cache
+  if not job or job.mode ~= state.mode or job.path ~= source_path() then return false end
+  local a, b = edges[1].time, edges[2].time
+  local unchanged
+  if state.mode ~= "smart" then
+    if edge.id == 1 then
+      unchanged = job.a == a and math.min(job.b, a + job.window) == math.min(b, a + job.window)
+    else
+      unchanged = job.b == b and math.max(job.a, b - job.window) == math.max(a, b - job.window)
+    end
+  end
+  if unchanged then
+    -- A pending empty-sample retry must respect the new selection limits.
+    job.a, job.b = a, b
+    job.limit = math.min(b - a, options.preview_window_limit)
+  end
+  return unchanged
+end
+
+local function refresh_previews(changed)
   state.revision = state.revision + 1
   for _, edge in ipairs(edges) do
-    cancel(edge, true)
-    if edge.marked and not state.hidden then
-      edge.timer = mp.add_timeout(DEBOUNCE, function()
-        edge.timer = nil
-        start_preview(edge)
-      end)
+    if not (changed and edge ~= changed and valid_range() and unchanged_sample(edge)) then
+      local cached = edge.cache
+      local keep = changed and edge ~= changed and valid_range() and cached
+        and cached.mode == state.mode and cached.path == source_path()
+        and (edge.id == 1 and cached.a or cached.b) == edge.time
+      if keep then cached.recheck = true end
+      cancel(edge, not keep, keep)
+      edge.error = nil
+      if edge.marked and not state.hidden then
+        edge.timer = mp.add_timeout(DEBOUNCE, function()
+          edge.timer = nil
+          start_preview(edge)
+        end)
+      end
     end
   end
 end
@@ -327,7 +397,7 @@ local function select_mode(mode)
   for _, edge in ipairs(edges) do edge.marked = true end
   refresh_previews()
   mp.commandv("script-message", "osc-visibility", "always")
-  status("info", "Previewing " .. mode .. "; review both ends before exporting")
+  status("info", "Previewing " .. mode .. "; export keys start conversion")
 end
 
 local function mark(edge)
@@ -338,7 +408,7 @@ local function mark(edge)
   other.time = edge.id == 1 and math.max(t, other.time) or math.min(t, other.time)
   mp.set_property("ab-loop-a", edges[1].time)
   mp.set_property("ab-loop-b", edges[2].time)
-  refresh_previews()
+  refresh_previews(edge)
   mp.set_property("osd-align-x", "left")
   mp.set_property("osd-align-y", "top")
   mp.osd_message("duration: " .. timestamp(edges[2].time - edges[1].time), 999999)
@@ -355,27 +425,19 @@ local function export(mode)
   if state.writing or state.moving then status("warn", "file operation already running"); return end
   local path = source_path()
   if not path or not valid_range() then status("error", "clip needs a valid nonempty range"); return end
-  if mode ~= state.mode or state.hidden or not edges[1].marked or not edges[2].marked then
-    select_mode(mode)
-    return
-  end
-  for _, edge in ipairs(edges) do
-    if edge.error then
-      status("error", "preview[" .. edge.name .. "] failed; reselect the mode to retry")
-      return
-    end
-    if not edge.shown then status("warn", "Wait for both " .. mode .. " previews before exporting"); return end
-  end
+  -- Export intent is never consumed by mode switching or preview readiness.
+  -- A missing A mark uses the file-loaded default (zero or watch-later A).
+  -- Keep the current previews untouched, including on conversion failure.
   local revision = state.revision
   state.writing = true
-  status("info", string.format("encoding '%s' dt=%.3f", mode, edges[2].time - edges[1].time))
+  status("info", string.format("ENCODING %s dt=%.3f", mode, edges[2].time - edges[1].time))
   mp.set_property("ab-loop-a", "no")
   mp.set_property("ab-loop-b", "no")
   subprocess({ options.converter, path, tostring(edges[1].time), tostring(edges[2].time), mode },
     false, function(result, err)
       state.writing = false
-      if not result then status("error", "Failed encoding: " .. err); return end
-      status("info", "Success encoding: " .. mode)
+      if not result then status("error", "FAILED " .. mode .. ": " .. err); return end
+      status("done", "DONE " .. mode)
       if path == source_path() and revision == state.revision then clear_previews() end
     end)
 end

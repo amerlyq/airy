@@ -39,6 +39,12 @@ class LifecycleTests(unittest.TestCase):
     def test_callback_lifecycle(self):
         run([LUA, DRIVER, "lifecycle", ROOT / "mpv/scripts/clip.lua"])
 
+    def test_export_intent_and_colors(self):
+        run([LUA, DRIVER, "intent", ROOT / "mpv/scripts/clip.lua"])
+
+    def test_incremental_previews(self):
+        run([LUA, DRIVER, "incremental", ROOT / "mpv/scripts/clip.lua"])
+
 
 @unittest.skipUnless(FFMPEG and shutil.which("ffprobe"), "FFmpeg and ffprobe required")
 class BoundaryTests(unittest.TestCase):
@@ -155,6 +161,17 @@ class BoundaryTests(unittest.TestCase):
            "-fps_mode", "vfr", "-c:v", "libx264", "-g", "60",
            "-keyint_min", "60", "-sc_threshold", "0", "-c:a", "copy", vfr)
         self.compare_frame_identity(vfr, 5.123, 18.456, "smart")
+
+    @unittest.skipUnless(LUA, "Lua required")
+    def test_copy_key_with_only_end_before_preview(self):
+        with tempfile.TemporaryDirectory(dir=self.folder) as td:
+            folder = Path(td)
+            source = folder / "early-key.mp4"
+            shutil.copyfile(self.source, source)
+            run([LUA, DRIVER, "early-export", source, folder, 0, 18.456])
+            outputs = [p for p in folder.glob("*.mp4") if p != source]
+            self.assertEqual(len(outputs), 1)
+            self.assertGreater(len(frames(outputs[0])), 0)
 
     @unittest.skipUnless(LUA, "Lua required")
     def test_copy_key_exports_after_previews(self):
