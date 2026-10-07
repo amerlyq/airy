@@ -10,6 +10,7 @@
 #   [dry_run]:          $ vcvt -d files...
 #   [save_outputs]:     $ vcvt -O files...
 #   [parallel_tmux]:   $ vcvt -j4 *.mp4
+#   [skip_existing]:   $ VCVT_SKIP_EXISTING=1 vcvt ./some_dir/
 #   [codec_dashboard]: $ print -l {22..30} |xargs -t -n1 -P4 sh -c 'time vcvt -c"$0" input.mp4 &>"$0".log'
 #
 # Resolves input to a list of non-AV1 mp4 files, then:
@@ -64,7 +65,7 @@ case $o in :|'?') exit 2
 esac; done; flags=("${@:1:OPTIND-1}"); shift $((OPTIND-1)); unset o
 xt=${-//[^x]}
 
-: "${use:=}" "${qa:=}" "${ifx:=v}"
+: "${use:=}" "${qa:=}" "${ifx:=v}" "${VCVT_SKIP_EXISTING:=1}"
 if [[ -z ${gpu:+x} ]]; then
   # declare use=cpu qa=32 ifx=va
   : ${use:=cpu} ${qa:=32} ${ifx:=v}
@@ -84,6 +85,20 @@ readonly use qa ifx
 
 _dryrun() { cat>/dev/null; printf '[dry-run] %q\n' "$@"; }
 dryrun=${dryrun:+_dryrun}
+
+_output_for() { local fin="$1"
+  if [[ $fin == *.webp ]]; then
+    printf '%s_%s%s.mp4\n' "${fin%.webp}" "$ifx" "$qa"
+  else
+    printf '%s_%s%s.%s\n' "${fin%.*}" "$ifx" "$qa" "${fin##*.}"
+  fi
+}
+
+_skip_discovered() { local fin="$1" out
+  [[ -n ${VCVT_SKIP_EXISTING-} ]] || return 1
+  out=$(_output_for "$fin")
+  [[ -e $out ]]
+}
 
 # Codec-specific concurrency: svt-av1 (cpu) is heavily multithreaded per job
 #   (~16 threads/job), so only a handful of jobs should run at once even on
@@ -124,11 +139,17 @@ _expand_to_mp4s() { local p
   while IFS= read -r -d '' p; do
     [[ -e $p ]] || { >&2 echo "Err: not found: $p"; return 1; }
     [[ -r $p || -d $p ]] || { >&2 echo "Err: not readable: $p"; return 1; }
-    printf '%s\0' "$p"
+    if [[ -d $p ]]; then
+      while IFS= read -r -d '' f; do
+        _skip_discovered "$f" && continue
+        printf '%s\0' "$f"
+      done < <(find -H "$p" -maxdepth 1 \( -type f -o -type l \) -iname '*.mp4' -print0)
+    else
+      printf '%s\0' "$p"
+    fi
   # Include symlinked files explicitly. Do not use realpath: ffmpeg must see
   # the submitted symlink path so its output is created beside the symlink.
-  # MAYBE: use "-xtype f"
-  done | find -H -files0-from - -maxdepth 1 \( -type f -o -type l \) -iname '*.mp4' -print0
+  done
 }
 
 _filter_non_av1() {

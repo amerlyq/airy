@@ -1,5 +1,9 @@
 #!/usr/bin/env python3.14
-"""AV1/HEVC conversion with atomic output publication and persistent tmux batches."""
+"""AV1/HEVC conversion with atomic output publication and persistent tmux batches.
+
+VCVT_SKIP_EXISTING defaults to 1 to skip directory-discovered sources whose output exists.
+Explicit source paths still replace existing outputs with numbered backups.
+"""
 
 from __future__ import annotations
 
@@ -86,6 +90,14 @@ def collect(paths, include_generated=False):
                 seen.add(item)
                 result.append(item)
     return result
+
+
+def output_path(args, source):
+    return source.with_name(f"{source.stem}_{args.tag}{args.c}.mp4")
+
+
+def skip_existing(args, source):
+    return bool(os.environ.get("VCVT_SKIP_EXISTING", "1")) and output_path(args, source).exists()
 
 
 def encoder(args):
@@ -298,7 +310,7 @@ def webp_source(source):
 
 
 def convert(args, source):
-    output = source.with_name(f"{source.stem}_{args.tag}{args.c}.mp4")
+    output = output_path(args, source)
     job = os.environ.get("VCVT_JOB_ID", "")
     job_suffix = f"-job{job}" if re.fullmatch(r"\d+", job) else ""
     temporary = output.with_name(output.name + ".cvt" + job_suffix)
@@ -429,7 +441,9 @@ def watch(args):
         # Single watcher owns moves and submissions for this layout.
         with (queue / ".vcvt-watch.lock").open("a") as handle:
             fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            backlog = eligible(collect([queue]))
+            backlog = [
+                path for path in eligible(collect([queue])) if not skip_existing(args, path)
+            ]
             if backlog:
                 enqueue(args, backlog)
             pending = {
@@ -477,6 +491,7 @@ def watch(args):
                         and path.is_file()
                         and not path.is_symlink()
                         and eligible(collect([path]))
+                        and not skip_existing(args, path)
                     ):
                         target = queue / path.name
                         move_no_replace(path, target)
@@ -535,7 +550,19 @@ def main(argv=None):
             for item in sys.stdin.buffer.read().split(b"\0" if args.nul else b"\n")
             if item
         ]
-    files = eligible(collect(paths, include_generated=args.i), dry=args.d)
+    jobs = {}
+    for raw in paths:
+        root = absolute(raw)
+        for path in collect([root], include_generated=args.i):
+            jobs[path] = jobs.get(path, False) or not root.is_dir()
+    candidates = list(jobs)
+    eligible_files = set(eligible(candidates, dry=args.d))
+    files = [
+        path
+        for path, explicit in jobs.items()
+        if path in eligible_files
+        and (explicit or not skip_existing(args, path))
+    ]
     if not files:
         print("No non-AV1 MP4/WebP inputs.", file=sys.stderr)
         return 0

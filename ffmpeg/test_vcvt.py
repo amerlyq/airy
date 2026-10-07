@@ -88,6 +88,19 @@ class ConversionTests(unittest.TestCase):
             vcvt.convert(self.args, self.source)
         self.assertEqual(run.call_args.args[0][-1], str(self.output) + ".cvt-job8")
 
+    def test_skip_existing_only_applies_to_directory_discovery(self):
+        self.output.touch()
+        with (
+            patch.dict(os.environ, {"VCVT_SKIP_EXISTING": "1"}),
+            patch.object(vcvt, "eligible", return_value=[self.source]),
+            patch.object(vcvt, "convert") as convert,
+        ):
+            vcvt.main(["--encoder", "cpu", "-i", str(self.root)])
+            convert.assert_not_called()
+            vcvt.main(["--encoder", "cpu", "-i", str(self.source)])
+        convert.assert_called_once()
+        self.assertEqual(convert.call_args.args[1], self.source)
+
     def test_changed_input_prevents_publication(self):
         def changed(argv, **kwargs):
             self.encode(argv)
