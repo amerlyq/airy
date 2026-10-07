@@ -53,7 +53,7 @@ DELETE_SCANS_DIRS = True  # :delete also looks for links into directories being 
 # (the first "*" is the date prefix). Those dirs are never listed; for a needle "<dnum>-<idx>"
 # the files "<dnum>-<idx>.<ext>" with 0..PICS_ZEROES zeroes before <idx> are probed instead.
 PICS_PARENTS = ("*-*-pics", "*-*-pics-*")
-PICS_EXTS = ("webp", "gif", "mp4")
+PICS_EXTS = ("mp4", "webp", "gif")
 PICS_ZEROES = 3
 
 LOCK_WAIT = (
@@ -1287,7 +1287,7 @@ class vdsym(Command):
         link, *remaining = links
         current = _safe_readlink(link) or "?"
         self.fm.ui.console.ask(
-            f"Replace ({len(links)} remaining): {link} -> {current}? (y/n/a/l/Q=quit)",
+            f"Replace ({len(links)} remaining): {link} -> {current}? (Quit/Yes/No/All/List)",
             lambda answer: self._replace_one_answer(
                 answer, link, remaining, source, target
             ),
