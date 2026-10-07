@@ -7,7 +7,10 @@ Layout:
 - find_backlinks / make_dashboard
               reusable helpers (what :delete calls)
 - delete      :delete with clip + symlink guards (only for paths inside the VD roots)
-- cd hook     lazy cache warm-up on the first cd() into a VD root, "visited" dir bookkeeping
+- moves       fm.cut / fm.paste / :rename ask about clips + symlinks first and can re-point (U)
+              or replace (R) the symlinks once the files have really moved; every prompt is
+              preceded by a list of the links, also appended to RECOVERY_LOG
+- cd signal   lazy cache warm-up on the first cd() into a VD root, "visited" dir bookkeeping
 """
 
 from __future__ import annotations
@@ -23,13 +26,15 @@ import time
 import types
 from collections.abc import Iterable, Sequence
 from concurrent.futures import ThreadPoolExecutor
+from fnmatch import fnmatchcase
 from fnmatch import translate as glob_translate
 from os import path as fs
-from typing import NamedTuple
+from typing import Callable, NamedTuple
 
 from ranger.api.commands import Command
 from ranger.config.commands import delete as _default_delete
-from ranger.core.tab import Tab
+from ranger.config.commands import rename as _default_rename
+from ranger.ext.safe_path import get_safe_path
 from ranger.ext.shell_escape import shell_quote
 
 DASHBOARD_ROOT = "/t/bnm"
@@ -40,10 +45,26 @@ DASHBOARD_ROOT = "/t/bnm"
 REFRESH = "validate"
 WARM_ON_CD = True  # start the background cache build on the first cd() under a VD root
 DELETE_SCANS_DIRS = True  # :delete also looks for links into directories being deleted
+
+# Pictures live in "<dnum>" or "<dnum>-*" dirs directly under a parent named like one of these
+# (the first "*" is the date prefix). Those dirs are never listed; for a needle "<dnum>-<idx>"
+# the files "<dnum>-<idx>.<ext>" with 0..PICS_ZEROES zeroes before <idx> are probed instead.
+PICS_PARENTS = ("*-*-pics", "*-*-pics-*")
 PICS_EXTS = ("webp", "gif", "mp4")
-PICS_PATH = (
-    "{p1}/{p2}/{p4}"  # inside "<dnum>-/": 1st digit / 1st two digits / zero-padded idx
+PICS_ZEROES = 3
+
+LOCK_WAIT = (
+    3.0  # s a guard waits for the cache lock (warm-up running) before asking blind
 )
+PRINT_BEFORE_PROMPT = (
+    True  # page the symlink list before a move prompt (recovery on cancel/crash)
+)
+RECOVERY_LOG = os.path.join(
+    os.environ.get("XDG_STATE_HOME") or os.path.expanduser("~/.local/state"),
+    "vdsym",
+    "moves.log",
+)
+RACY_NS = 2_000_000_000  # dirs modified < 2s before their scan are re-read next time
 
 # Clip naming: "<stem>_00m33s6", "<stem>_v32", "<stem>_06m44s7_prev29267", any extension.
 _TOKEN = r"(?:\d+m\d+s\d+|v\d+|prev\d+)"
@@ -113,26 +134,34 @@ _GROUPS = {
 class _Dir(NamedTuple):
     mtime: int
     entries: list[str]  # indexed paths: files, links and subdirectories
-    lazy: list[str]  # deferred "-pics" payload (not indexed, expanded on demand)
+    lazy: list[str]  # [directory] for an unlisted pics dir, else []
     subdirs: list[str]  # real subdirectories to descend into
     links: dict[str, str]  # symlink path -> readlink() for symlinks in `entries`
+    racy: bool = (
+        False  # mtime too close to scan time to be trusted: re-read next validation
+    )
 
 
-_SHARDED_PICS = re.compile(r"\d+-")
+_DNUM_DIR = re.compile(r"(\d+)(?:-.*)?", re.S)
 
 
-def _is_pics_payload_dir(directory: str) -> bool:
-    """'<dnum>-' (sharded, probed by predictable path) or '<dnum>' under '*-pics*' (flat)."""
-    name = fs.basename(directory)
-    if _SHARDED_PICS.fullmatch(name):
-        return True
-    return name.isdigit() and "-pics" in fs.basename(fs.dirname(directory))
+def _pics_dnum(directory: str) -> str | None:
+    """'<dnum>' of a '<dnum>' / '<dnum>-*' directory sitting under a pics parent, else None."""
+    match = _DNUM_DIR.fullmatch(fs.basename(directory))
+    if match and any(
+        fnmatchcase(fs.basename(fs.dirname(directory)), pattern)
+        for pattern in PICS_PARENTS
+    ):
+        return match[1]
+    return None
 
 
-def _in_pics(directory: str, root: str) -> bool:
-    return any(
-        part.endswith("-pics") or "-pics-" in part
-        for part in fs.relpath(directory, root).split(os.sep)
+def _same_content(a: _Dir, b: _Dir) -> bool:
+    return (
+        a.entries == b.entries
+        and a.subdirs == b.subdirs
+        and a.lazy == b.lazy
+        and a.links == b.links
     )
 
 
@@ -149,32 +178,26 @@ def _make_rec(
     mtime: int,
     items: Iterable[tuple[str, bool, str | None]],
 ) -> _Dir:
-    """Build a record from (path, is_real_dir, link_target) items."""
-    if _is_pics_payload_dir(directory):
-        return _Dir(mtime, [], [directory], [], {})
-    in_pics = _in_pics(directory, root)
+    racy = time.time_ns() - mtime < RACY_NS
+    if _pics_dnum(directory) is not None:
+        return _Dir(mtime, [], [directory], [], {}, racy)
     entries: list[str] = []
-    lazy: list[str] = []
     subdirs: list[str] = []
     links: dict[str, str] = {}
     for path, is_dir, target in items:
+        entries.append(path)
         if is_dir:
-            entries.append(path)
             subdirs.append(path)
-        elif in_pics:
-            lazy.append(path)
-        else:
-            entries.append(path)
-            if target is not None:
-                links[path] = target
-    return _Dir(mtime, entries, lazy, subdirs, links)
+        elif target is not None:
+            links[path] = target
+    return _Dir(mtime, entries, [], subdirs, links, racy)
 
 
 def _scan_dir(directory: str, root: str, mtime: int | None = None) -> _Dir | None:
     try:
         if mtime is None:
             mtime = os.stat(directory).st_mtime_ns
-        if _is_pics_payload_dir(directory):
+        if _pics_dnum(directory) is not None:
             return _make_rec(directory, root, mtime, ())
         items = []
         with os.scandir(directory) as it:
@@ -317,37 +340,27 @@ class _Cache:
                     index.link(path, target)
                 count += len(rec.entries)
                 if rec.lazy:
-                    pics_dirs.setdefault(fs.basename(directory), []).append(directory)
+                    pics_dirs.setdefault(_pics_dnum(directory) or "", []).append(
+                        directory
+                    )
         return _View(versions, index, pics_dirs, count)
 
     @staticmethod
     def pics(
         view: _View, numeric: tuple[tuple[str, str], ...]
     ) -> list[tuple[str, bool]]:
-        """Probe predictable paths for numeric needles -> [(path, is_symlink)]; nothing is
-        listed or cached, and hits bypass name matching (the file is '0045.mp4', not '123-45').
-
-        flat:    <dnum>/<dnum>-<idx>[padded].<ext>
-        sharded: <dnum>-/<d1>/<d1d2>/<idx:04d>.<ext>   (see PICS_PATH)
-        """
+        """Probe '<dnum>-<0..PICS_ZEROES zeroes><idx>.<ext>' inside every '<dnum>*' pics dir
+        -> [(path, is_symlink)]. Nothing is listed or cached, and hits bypass name matching
+        (the file is '123-0045.mp4', the needle '123-45')."""
         found: list[tuple[str, bool]] = []
-
-        def probe(path: str) -> None:
-            if fs.lexists(path):
-                found.append((path, fs.islink(path)))
-
-        for prefix, number in numeric:
-            n = int(number)
-            widths = dict.fromkeys((number, f"{n:02d}", f"{n:03d}", f"{n:04d}"))
-            for directory in view.pics_dirs.get(prefix, ()):
-                for width in widths:
+        for dnum, idx in numeric:
+            idx = str(int(idx))
+            for directory in view.pics_dirs.get(dnum, ()):
+                for zeros in range(PICS_ZEROES + 1):
                     for ext in PICS_EXTS:
-                        probe(fs.join(directory, f"{prefix}-{width}.{ext}"))
-            p4 = f"{n:04d}"
-            sub = PICS_PATH.format(p1=p4[:1], p2=p4[:2], p4=p4)
-            for directory in view.pics_dirs.get(prefix + "-", ()):
-                for ext in PICS_EXTS:
-                    probe(fs.join(directory, f"{sub}.{ext}"))
+                        path = fs.join(directory, f"{dnum}-{'0' * zeros}{idx}.{ext}")
+                        if fs.lexists(path):
+                            found.append((path, fs.islink(path)))
         return found
 
     # -- scanning ------------------------------------------------------------ #
@@ -357,7 +370,7 @@ class _Cache:
         whose mtime changed are re-read; vanished ones are dropped."""
         start = start or root
         records = self.dirs.setdefault(root, {})
-        changed = False
+        changed = replaced = False
         seen: dict[str, _Dir] = {}
         stack = [start]
         while stack:
@@ -367,21 +380,24 @@ class _Cache:
             except OSError:
                 continue
             rec = records.get(directory)
-            if rec is None or rec.mtime != mtime:
-                rec = _scan_dir(directory, root, mtime)
-                if rec is None:
+            if rec is None or rec.mtime != mtime or rec.racy:
+                fresh = _scan_dir(directory, root, mtime)
+                if fresh is None:
                     continue
-                changed = True
+                replaced = True
+                changed = changed or rec is None or not _same_content(rec, fresh)
+                rec = fresh
             seen[directory] = rec
             stack.extend(rec.subdirs)
         prefix = start + os.sep
         stale = [
             d for d in records if d not in seen and (d == start or d.startswith(prefix))
         ]
-        if changed or stale:
+        if replaced or stale:
             records.update(seen)
             for directory in stale:
                 del records[directory]
+        if changed or stale:
             self._bump(root)
 
     def _flush_visited(self, roots: Iterable[str]) -> None:
@@ -515,6 +531,8 @@ def _shared_cache() -> _Cache:
     except (NameError, OSError):
         stamp = "unknown"
     holder = sys.modules.setdefault("_vdsym_shared", types.ModuleType("_vdsym_shared"))
+    if not hasattr(holder, "orig"):
+        holder.orig = {}  # (owner, name) -> the unpatched ranger method
     cache = getattr(holder, "cache", None)
     if getattr(cache, "stamp", None) != stamp:
         cache = holder.cache = _Cache(stamp)
@@ -558,20 +576,31 @@ def _hops(link: str, limit: int = 40) -> Iterable[str]:
         yield current
 
 
-def _leads_to(link: str, subjects: set[str], trees: list[str]) -> bool:
-    for hop in _hops(link):
-        if hop in subjects or any(hop.startswith(tree + os.sep) for tree in trees):
-            return True
-    return False
+class _Hit(NamedTuple):
+    link: str  # symlink under the VD roots
+    subject: str  # normalized subject path (or directory tree) its chain passes through
+    rest: str  # path below `subject` when that is a directory tree, else ""
+    direct: bool  # the link's first hop already is that place: only such links need re-pointing
 
 
-def find_backlinks(paths: Sequence[str]) -> list[str]:
+def _match(link: str, subjects: set[str], trees: list[str]) -> _Hit | None:
+    for index, hop in enumerate(_hops(link)):
+        if hop in subjects:
+            return _Hit(link, hop, "", index == 0)
+        for tree in trees:
+            if hop.startswith(tree + os.sep):
+                return _Hit(link, tree, hop[len(tree) :], index == 0)
+    return None
+
+
+def find_hits(paths: Sequence[str], wait: float | None = None) -> list[_Hit] | None:
     """Symlinks under the VD roots whose chain passes through any of `paths`.
 
     `paths` may be files, symlinks (then only links going *through* that symlink count, not
     its siblings) or directories (links into anything inside). Candidates come from the shared
     name index, chased through link-to-link chains by name, then verified hop by hop. The cache
     is mtime-validated first, so links created since the last scan are seen.
+    Returns None when the cache lock stays busy for `wait` seconds (warm-up still running).
     """
     subjects = {_norm(path) for path in paths}
     trees = (
@@ -582,7 +611,9 @@ def find_backlinks(paths: Sequence[str]) -> list[str]:
     pending = {fs.basename(path.rstrip("/")) for path in paths}
     done: set[str] = set()
     found: dict[str, None] = {}
-    with _cache.lock:
+    if not _cache.lock.acquire(timeout=-1 if wait is None else wait):
+        return None
+    try:
         index = _cache.ensure(vdsym.roots(), "validate").index
         while pending:
             name = pending.pop()
@@ -594,8 +625,127 @@ def find_backlinks(paths: Sequence[str]) -> list[str]:
                     if base not in done:
                         pending.add(base)
         if trees:  # a link into a directory needn't share any name with it
-            found.update(dict.fromkeys(index.links))
-    return [link for link in found if _leads_to(link, subjects, trees)]
+            found.update(dict.fromkeys(sorted(index.links)))
+    finally:
+        _cache.lock.release()
+    hits = (_match(link, subjects, trees) for link in found)
+    return [hit for hit in hits if hit]
+
+
+def find_backlinks(paths: Sequence[str]) -> list[str]:
+    return [hit.link for hit in find_hits(paths) or []]
+
+
+def _drop_moving(hits: list[_Hit], paths: Sequence[str]) -> list[_Hit]:
+    """Links that travel with (or die with) the selection are not 'pointing back' at it."""
+    moving = [_norm(path) for path in paths]
+    return [
+        hit
+        for hit in hits
+        if not any(
+            _norm(hit.link) == m or _norm(hit.link).startswith(m + os.sep)
+            for m in moving
+        )
+    ]
+
+
+def _brief(items: Iterable[str], limit: int = 3) -> str:
+    items = list(items)
+    more = f" +{len(items) - limit}" if len(items) > limit else ""
+    return " | ".join(items[:limit]) + more
+
+
+def find_clips(paths: Sequence[str]) -> list[str]:
+    """Siblings named '<stem>_<clip tokens>[.ext]' that are not themselves in `paths`."""
+    stems: dict[str, list[str]] = {}
+    for path in paths:
+        stems.setdefault(fs.dirname(path), []).append(fs.splitext(fs.basename(path))[0])
+    selected = set(paths)
+    found: list[str] = []
+    for directory, group in stems.items():
+        pattern = re.compile(
+            f"(?:{'|'.join(map(re.escape, group))})_{_CLIP_SUFFIX}(?:\\..*)?", re.S
+        )
+        try:
+            with os.scandir(directory) as it:
+                found.extend(
+                    e.path
+                    for e in it
+                    if e.path not in selected and pattern.fullmatch(e.name)
+                )
+        except OSError:
+            continue
+    return sorted(found)
+
+
+# --------------------------------------------------------------------------- #
+# writing symlinks
+# --------------------------------------------------------------------------- #
+
+
+def _swap_link(link: str, text: str, dest: str | None = None) -> None:
+    """Atomically make `dest` (default: `link`) a symlink to `text`."""
+    dest = dest or link
+    temporary = fs.join(
+        fs.dirname(link), f".{fs.basename(dest)[:200]}.vdsym-{os.getpid()}"
+    )
+    try:
+        os.symlink(text, temporary)
+        os.replace(temporary, dest)
+    except OSError:
+        if fs.lexists(temporary):
+            os.unlink(temporary)
+        raise
+
+
+def replace_link(link: str, text: str, target: str) -> str | None:
+    """Swap `link` for a link in the same dir named exactly like `target`, holding `text`.
+    Returns an error message (collision / OS error) or None."""
+    new_link = fs.join(fs.dirname(link), fs.basename(target))
+    if new_link != link and fs.lexists(new_link):
+        if not (fs.islink(new_link) and fs.realpath(new_link) == fs.realpath(target)):
+            return f"Collision: {new_link}"
+        try:
+            os.unlink(link)  # an equivalent link is already there
+        except OSError as error:
+            return str(error)
+        return None
+    try:
+        _swap_link(link, text, new_link)
+        if new_link != link:
+            os.unlink(link)
+    except OSError as error:
+        return str(error)
+    return None
+
+
+def _link_text(link: str, old_raw: str, new_raw: str, rest: str) -> str:
+    """Target text for `link` once `old_raw` became `new_raw`: same style (absolute / relative),
+    and the same spelling of the path when the old text was absolute."""
+    raw = _safe_readlink(link) or ""
+    new_abs = _norm(new_raw) + rest
+    if fs.isabs(raw):
+        text, old = fs.normpath(raw), fs.normpath(old_raw)
+        if text == old or text.startswith(old + os.sep):
+            return fs.normpath(new_raw) + text[len(old) :]
+        return new_abs
+    return fs.relpath(new_abs, fs.realpath(fs.dirname(link)))
+
+
+def _recovery(op: str, lines: Iterable[str]) -> None:
+    """Append what is about to happen, so a crash / cancel / error can be undone by hand."""
+    try:
+        os.makedirs(fs.dirname(RECOVERY_LOG), exist_ok=True)
+        if fs.exists(RECOVERY_LOG) and fs.getsize(RECOVERY_LOG) > 2_000_000:
+            os.replace(RECOVERY_LOG, RECOVERY_LOG + ".1")
+        with open(
+            RECOVERY_LOG, "a", encoding="utf-8", errors="surrogateescape"
+        ) as handle:
+            handle.write(f"{time.strftime('%Y-%m-%dT%H:%M:%S')} {op}\n")
+            for line in lines:
+                handle.write(f"  {line}\n")
+    except OSError:
+        _LOG.warning("cannot write %s", RECOVERY_LOG)
 
 
 def make_dashboard(fm, matches: Sequence[str], dest: str) -> str:
@@ -621,6 +771,166 @@ def make_dashboard(fm, matches: Sequence[str], dest: str) -> str:
         _cache.visited.add(fs.dirname(fs.realpath(source)))
     fm.cd(dest)
     return dest
+
+
+# --------------------------------------------------------------------------- #
+# guarded moves: shared by fm.cut / fm.paste / :rename
+# --------------------------------------------------------------------------- #
+
+
+class _MoveJob:
+    """Re-point (U) or replace (R) symlinks once the files they led to have really moved.
+
+    Hits are computed *before* the move (a moved directory can no longer be walked), applied
+    after it: only for files that are gone from `old` and present at `new`, so a cancelled or
+    failed move leaves everything as it was.
+    """
+
+    def __init__(
+        self, fm, moves: dict[str, str], policy: dict[str, str], hits: list[_Hit]
+    ) -> None:
+        self.fm, self.moves, self.policy, self.hits = fm, moves, policy, hits
+        self.by_subject = {_norm(old): old for old in moves}
+        self.done = False
+
+    def finish(self) -> None:
+        if self.done:
+            return
+        self.done = True
+        touched: set[str] = set()
+        updated, replaced, problems = 0, 0, []
+        for hit in self.hits:
+            old = self.by_subject.get(hit.subject)
+            if old is None:
+                continue
+            new = self.moves[old]
+            if fs.lexists(old) or not fs.lexists(new):
+                problems.append(f"not moved: {old} (link {hit.link} left alone)")
+                continue
+            mode = self.policy.get(old)
+            try:
+                text = _link_text(hit.link, old, new, hit.rest)
+                if mode == "U" and hit.direct:
+                    _swap_link(hit.link, text)
+                    updated += 1
+                elif mode == "R":
+                    error = replace_link(hit.link, text, _norm(new) + hit.rest)
+                    if error:
+                        problems.append(f"{hit.link}: {error}")
+                        continue
+                    replaced += 1
+                else:
+                    continue
+            except OSError as error:
+                problems.append(f"{hit.link}: {error}")
+                continue
+            touched.add(hit.link)
+            touched.add(fs.join(fs.dirname(hit.link), fs.basename(new)))
+        if touched:
+            _cache.touch(touched)
+        for old, new in self.moves.items():
+            _cache.visited.update((fs.dirname(old), fs.dirname(new)))
+        _recovery(
+            f"done updated={updated} replaced={replaced} problems={len(problems)}",
+            problems,
+        )
+        if updated or replaced or problems:
+            self.fm.notify(
+                f"symlinks: {updated} updated, {replaced} replaced"
+                + (
+                    f", {len(problems)} problem(s) (see {RECOVERY_LOG})"
+                    if problems
+                    else ""
+                ),
+                bad=bool(problems),
+            )
+
+
+def _print_links(fm, op: str, hits: list[_Hit]) -> None:
+    if not PRINT_BEFORE_PROMPT or not hits:
+        return
+    lines = [f"{op}: {len(hits)} symlink(s) lead here"]
+    lines += [f"{hit.link} -> {_safe_readlink(hit.link) or '?'}" for hit in hits]
+    fm.execute_command("printf '%s\\n' " + shell_quote("\n".join(lines)), flags="-w")
+
+
+def _guard_move(
+    fm,
+    paths: Sequence[str],
+    op: str,
+    done: Callable[[str], None],
+    cancel: Callable[[], None],
+) -> None:
+    """Ask about clips / symlinks before `op` (cut, move, rename) touches `paths`.
+
+    done(policy) with policy "" (nothing found), "y" (go, leave links), "U" (update) or
+    "R" (replace); cancel() otherwise. Enter and Esc both answer "cancel".
+    """
+    ask = fm.ui.console.ask
+    clips = find_clips(paths)
+    subjects = [path for path in paths if _under_roots(path)]
+    hits = find_hits(subjects, LOCK_WAIT) if subjects else []
+    if hits is None:
+        ask(
+            f"link scan unavailable (cache is warming) -- {op} anyway? (y / C=cancel)",
+            lambda ans: done("y") if ans in ("y", "Y") else cancel(),
+            ("c", "C", "y", "Y"),
+        )
+        return
+    hits = _drop_moving(hits, paths)
+    if not hits and not clips:
+        return done("")
+    _recovery(
+        op,
+        [f"path {p}" for p in paths]
+        + [f"link {h.link} -> {_safe_readlink(h.link)}" for h in hits]
+        + [f"clip {c}" for c in clips],
+    )
+    _print_links(fm, op, hits)
+    parts = []
+    if hits:
+        parts.append(f"{len(hits)} symlink(s): {_brief(h.link for h in hits)}")
+    if clips:
+        parts.append(f"{len(clips)} clip(s): {_brief(map(fs.basename, clips))}")
+    if hits:
+        text = (
+            " + ".join(parts)
+            + f" -- {op}? (y=leave / U=update / R=replace / n=dashboard / C=cancel)"
+        )
+        choices: tuple[str, ...] = ("c", "C", "y", "Y", "n", "N", "U", "R")
+    else:
+        text = parts[0] + f" -- {op} anyway? (y / C=cancel)"
+        choices = ("c", "C", "y", "Y")
+
+    def answer(ans: str) -> None:
+        if ans in ("U", "R"):
+            done(ans)
+        elif ans in ("y", "Y"):
+            done("y")
+        else:
+            if ans in ("n", "N"):
+                dest = fs.join(DASHBOARD_ROOT, fs.basename(paths[0]))
+                make_dashboard(fm, [hit.link for hit in hits], dest)
+            cancel()
+
+    ask(text, answer, choices)
+
+
+def _predict_moves(
+    paths: Sequence[str], dest: str, overwrite: bool, make_safe_path
+) -> dict[str, str]:
+    """Where ranger's mover will put each path (same rule as shutil_generatorized.move)."""
+    moves: dict[str, str] = {}
+    taken: set[str] = set()
+    for old in paths:
+        real = fs.join(dest, fs.basename(old))
+        new = real if overwrite else make_safe_path(real)
+        if new in taken:  # same basename twice in one batch: ranger numbers the 2nd one
+            _LOG.warning("cannot predict destination of %s", old)
+            continue
+        taken.add(new)
+        moves[old] = new
+    return moves
 
 
 # --------------------------------------------------------------------------- #
@@ -733,7 +1043,7 @@ class vdsym(Command):
                 return []
             return [fs.basename(line) for line in clipboard.splitlines()]
         if "b" in flags:
-            return [self.fm.thisfile.basename]
+            return [self.fm.thisfile.basename] if self.fm.thisfile else []
         if "y" in flags:
             return [entry.basename for entry in self.fm.copy_buffer]
         return []
@@ -741,9 +1051,10 @@ class vdsym(Command):
     @staticmethod
     def _normalize(name: str, flags: set[str]) -> str:
         if "n" in flags:
-            name = re.sub(r"\.html$", "", name)
-            if match := _NUMERIC.fullmatch(name):
-                name = f"{match[1]}-{match[2]}"
+            exts = "|".join(("html",) + PICS_EXTS)
+            if match := _NUMERIC.fullmatch(re.sub(rf"\.(?:{exts})$", "", name)):
+                return f"{match[1]}-{match[2]}"
+            return re.sub(r"\.html$", "", name)
         return name
 
     def _paths(self, flags: set[str]) -> list[str]:
@@ -814,33 +1125,11 @@ class vdsym(Command):
     def _replace_one(self, link: str, source: str, target: str) -> None:
         if not fs.islink(link) or fs.realpath(link) != source:
             return
-        directory = fs.dirname(link)
-        new_link = fs.join(directory, fs.basename(target))
-        if (
-            fs.lexists(new_link)
-            and (
-                not fs.islink(new_link) or fs.realpath(new_link) != fs.realpath(target)
-            )
-            and new_link != link
-        ):
-            self.fm.notify(f"Collision: {new_link}", bad=True)
-            return
-        if self._touched is not None:
-            self._touched.add(new_link)
-        if fs.lexists(new_link) and fs.realpath(new_link) == fs.realpath(target):
-            if new_link != link:
-                os.unlink(link)
-            return
-        temporary = fs.join(directory, f".{fs.basename(target)}.vdsym-{os.getpid()}")
-        try:
-            os.symlink(fs.relpath(target, directory), temporary)
-            os.replace(temporary, new_link)
-            if new_link != link:
-                os.unlink(link)
-        except OSError as error:
+        error = replace_link(link, fs.relpath(target, fs.dirname(link)), target)
+        if error:
             self.fm.notify(error, bad=True)
-            if fs.lexists(temporary):
-                os.unlink(temporary)
+        elif self._touched is not None:
+            self._touched.add(fs.join(fs.dirname(link), fs.basename(target)))
 
     # -- search ------------------------------------------------------------------ #
 
@@ -893,7 +1182,10 @@ class vdsym(Command):
                     for path, is_link in _cache.pics(view, numeric)
                     if (is_link or "l" not in flags) and path not in known
                 ]
-        matches = [path for path in matches if fs.lexists(path)]
+        if (
+            len(matches) <= 2000
+        ):  # drop paths gone since the last scan (not worth it for huge globs)
+            matches = [path for path in matches if fs.lexists(path)]
         self._kpi = {
             "scan": expanded - started,
             "filter": time.perf_counter() - expanded,
@@ -1012,7 +1304,9 @@ class vdsym(Command):
         else:
             output = "\\033[31;40;1mnotfound\\033[m "
         self.fm.execute_command(
-            "printf '%b\\n' " + shell_quote(output) + "; read -k 1",
+            "printf '%b\\n' "
+            + shell_quote(output)
+            + "; read -k 1 2>/dev/null || read -n 1",
             flags="-w",
         )
 
@@ -1122,7 +1416,7 @@ class delete(_default_delete):
         if not clips:
             return self._check_links(files, paths)
         self._ask(
-            f"{len(clips)} clip(s): {self._brief(map(fs.basename, clips))}"
+            f"{len(clips)} clip(s): {_brief(map(fs.basename, clips))}"
             " -- delete anyway? (y/N)",
             ("n", "N", "y", "Y"),
             lambda ans: ans in ("y", "Y") and self._check_links(files, paths),
@@ -1130,23 +1424,25 @@ class delete(_default_delete):
 
     def _check_links(self, files: Sequence[str], paths: Sequence[str]) -> None:
         subjects = [path for path in paths if _under_roots(path)]
-        links = find_backlinks(subjects) if subjects else []
-        gone = [
-            _norm(path) for path in paths
-        ]  # links dying with the selection don't count
-        links = [
-            link
-            for link in links
-            if not any(
-                _norm(link) == g or _norm(link).startswith(g + os.sep) for g in gone
+        hits = find_hits(subjects, LOCK_WAIT) if subjects else []
+        if hits is None:
+            return self._ask(
+                "link scan unavailable (cache is warming) -- delete anyway? (y / C=cancel)",
+                ("c", "C", "y", "Y"),
+                lambda ans: ans in ("y", "Y") and self._copy_and_delete(files),
             )
-        ]
+        links = [hit.link for hit in _drop_moving(hits, paths)]
         if not links:
             return self._copy_and_delete(files)
+        _recovery(
+            "delete",
+            [f"path {p}" for p in paths]
+            + [f"link {l} -> {_safe_readlink(l)}" for l in links],
+        )
         first = fs.basename(subjects[0])
         # Enter answers choices[0], Esc choices[1]: both must be "cancel"
         self._ask(
-            f"{len(links)} symlink(s): {self._brief(links)}"
+            f"{len(links)} symlink(s): {_brief(links)}"
             " -- delete? (y / n=dashboard / C=cancel)",
             ("c", "C", "y", "Y", "n", "N"),
             lambda ans: self._on_links(ans, files, links, first),
@@ -1172,12 +1468,6 @@ class delete(_default_delete):
     def _ask(self, text: str, choices: tuple[str, ...], callback) -> None:
         self._real_fm.ui.console.ask(text, callback, choices)
 
-    @staticmethod
-    def _brief(items: Iterable[str], limit: int = 3) -> str:
-        items = list(items)
-        more = f" +{len(items) - limit}" if len(items) > limit else ""
-        return " | ".join(items[:limit]) + more
-
     def _copy_names(self, names: Sequence[str]) -> bool:
         try:
             process = subprocess.run(
@@ -1191,34 +1481,45 @@ class delete(_default_delete):
             return False
         return process.returncode == 0
 
-    @staticmethod
-    def _clips(paths: Sequence[str]) -> list[str]:
-        """Siblings named '<stem>_<clip tokens>[.ext]' that are not themselves selected."""
-        stems: dict[str, list[str]] = {}
-        for path in paths:
-            stems.setdefault(fs.dirname(path), []).append(
-                fs.splitext(fs.basename(path))[0]
-            )
-        selected = set(paths)
-        found: list[str] = []
-        for directory, group in stems.items():
-            pattern = re.compile(
-                f"(?:{'|'.join(map(re.escape, group))})_{_CLIP_SUFFIX}(?:\\..*)?", re.S
-            )
-            try:
-                with os.scandir(directory) as it:
-                    found.extend(
-                        e.path
-                        for e in it
-                        if e.path not in selected and pattern.fullmatch(e.name)
-                    )
-            except OSError:
-                continue
-        return sorted(found)
+    _clips = staticmethod(find_clips)
+
+
+class rename(_default_rename):
+    """:rename <newname>
+
+    Asks first when clips or symlinks depend on the old name (see _guard_move).
+    """
+
+    def execute(self) -> None:
+        fm, cursor, new_name = self.fm, self.fm.thisfile, self.rest(1)
+        if (
+            not new_name
+            or not cursor
+            or new_name == cursor.relative_path
+            or fs.lexists(new_name)
+        ):
+            return super().execute()  # stock code reports these itself
+        old = fs.abspath(cursor.path)
+        new = fs.abspath(fs.join(fm.thisdir.path, new_name))
+
+        def done(policy: str) -> None:
+            job = None
+            if policy in ("U", "R"):
+                hits = _drop_moving(find_hits([old], LOCK_WAIT) or [], [old])
+                _recovery("rename", [f"{old} -> {new}"])
+                if hits:
+                    job = _MoveJob(fm, {old: new}, {old: policy}, hits)
+            super(rename, self).execute()
+            if job:
+                job.finish()
+
+        _guard_move(fm, [old], "rename", done, lambda: None)
+        return None
 
 
 # --------------------------------------------------------------------------- #
-# cd hook: lazy warm-up + "visited" bookkeeping
+# cd signal: lazy warm-up + "visited" bookkeeping (a signal, NOT a Tab.enter_dir wrapper:
+# history_navi inspects the caller frame of enter_dir and must stay the outermost wrapper)
 # --------------------------------------------------------------------------- #
 
 
@@ -1241,19 +1542,178 @@ def _on_cd(path: str) -> None:
         threading.Thread(target=_warm, name="vdsym-warm", daemon=True).start()
 
 
-_tab_enter_dir = Tab.enter_dir
-
-
-def _enter_dir_hook(self, path, history=True):
-    result = _tab_enter_dir(self, path, history=history)
-    if result:
+def _on_cd_signal(signal) -> None:
+    new = getattr(signal, "new", None)
+    if new is not None:
         try:
-            _on_cd(self.path)
+            _on_cd(new.path)
         except Exception:  # noqa: BLE001
-            _LOG.exception("vdsym cd hook failed")
-    return result
+            _LOG.exception("vdsym cd handler failed")
 
 
-if not getattr(Tab.enter_dir, "_vdsym_hook", False):
-    _enter_dir_hook._vdsym_hook = True  # type: ignore[attr-defined]
-    Tab.enter_dir = _enter_dir_hook
+def _bind_cd(fm) -> None:
+    if fm is None or getattr(fm, "_vdsym_cd", None) == _cache.stamp:
+        return
+    fm._vdsym_cd = _cache.stamp
+    fm.signal_bind("cd", _on_cd_signal)
+
+
+# --------------------------------------------------------------------------- #
+# patches of ranger internals (idempotent, re-exec safe, skipped if ranger differs)
+# --------------------------------------------------------------------------- #
+
+_STATE = types.SimpleNamespace(job=None, policy={})  # policy: path -> "" | y | U | R
+
+
+def _patch(owner, name: str, make) -> None:
+    originals = sys.modules["_vdsym_shared"].orig
+    original = originals.setdefault((owner, name), getattr(owner, name))
+    setattr(owner, name, make(original))
+
+
+def _make_copy(orig):
+    def copy(self, mode="set", narg=None, dirarg=None):
+        if mode == "set":
+            _STATE.policy.clear()
+        return orig(self, mode=mode, narg=narg, dirarg=dirarg)
+
+    return copy
+
+
+def _make_uncut(orig):
+    def uncut(self):
+        _STATE.policy.clear()
+        return orig(self)
+
+    return uncut
+
+
+def _make_cut(orig):
+    def cut(self, mode="set", narg=None, dirarg=None):
+        orig(
+            self, mode=mode, narg=narg, dirarg=dirarg
+        )  # its self.copy() resets the policy
+        if not self.do_cut:
+            return
+        fresh = [f.path for f in self.copy_buffer if f.path not in _STATE.policy]
+        if not fresh:
+            return
+
+        def done(policy: str) -> None:
+            for path in fresh:
+                _STATE.policy[path] = policy
+
+        def cancel() -> None:
+            gone = set(fresh)
+            self.copy_buffer = {f for f in self.copy_buffer if f.path not in gone}
+            self.do_cut = bool(self.copy_buffer)
+            self.ui.browser.main_column.request_redraw()
+
+        _guard_move(self, fresh, "cut", done, cancel)
+
+    return cut
+
+
+def _make_paste(orig):
+    def paste(
+        self, overwrite=False, append=False, dest=None, make_safe_path=get_safe_path
+    ):
+        target = self.thistab.path if dest is None else dest
+        if not self.do_cut or not self.copy_buffer:
+            return orig(
+                self,
+                overwrite=overwrite,
+                append=append,
+                dest=dest,
+                make_safe_path=make_safe_path,
+            )
+        paths = [f.path for f in self.copy_buffer]
+
+        def go() -> None:
+            wanted = {p: _STATE.policy.pop(p, "") for p in paths}
+            active = {p: pol for p, pol in wanted.items() if pol in ("U", "R")}
+            job = None
+            if active and fs.isdir(target):
+                moves = _predict_moves(list(active), target, overwrite, make_safe_path)
+                hits = _drop_moving(find_hits(list(moves), LOCK_WAIT) or [], paths)
+                _recovery("paste", [f"{old} -> {new}" for old, new in moves.items()])
+                if hits and moves:
+                    job = _MoveJob(self, moves, active, hits)
+            _STATE.job = job
+            try:
+                orig(
+                    self,
+                    overwrite=overwrite,
+                    append=append,
+                    dest=target,
+                    make_safe_path=make_safe_path,
+                )
+            finally:
+                _STATE.job = None
+
+        fresh = [p for p in paths if p not in _STATE.policy]
+        if not fresh:
+            return go()
+
+        def done(policy: str) -> None:
+            for path in fresh:
+                _STATE.policy[path] = policy
+            go()
+
+        _guard_move(self, fresh, "move", done, lambda: None)
+        return None
+
+    return paste
+
+
+def _make_loader_init(orig):
+    def __init__(self, *args, **kwargs):
+        self._vdsym_job = _STATE.job
+        orig(self, *args, **kwargs)
+
+    return __init__
+
+
+def _make_loader_generate(orig):
+    def generate(self):
+        job = getattr(self, "_vdsym_job", None)
+        try:
+            yield from orig(self)
+        finally:  # completion, error or cancel: reconcile what really moved
+            if job is not None:
+                job.finish()
+
+    return generate
+
+
+def _install() -> None:
+    try:
+        import ranger
+        import ranger.api
+        from ranger.core.actions import Actions
+        from ranger.core.loader import CopyLoader
+
+        for owner, name, make in (
+            (Actions, "copy", _make_copy),
+            (Actions, "uncut", _make_uncut),
+            (Actions, "cut", _make_cut),
+            (Actions, "paste", _make_paste),
+            (CopyLoader, "__init__", _make_loader_init),
+            (CopyLoader, "generate", _make_loader_generate),
+        ):
+            _patch(owner, name, make)
+        _bind_cd(getattr(ranger, "fm", None))
+        if not getattr(ranger.api.hook_init, "_vdsym", False):
+            previous = ranger.api.hook_init
+
+            def hook_init(fm):
+                _bind_cd(fm)
+                return previous(fm)
+
+            hook_init._vdsym = True  # type: ignore[attr-defined]
+            ranger.api.hook_init = hook_init
+    except Exception:  # noqa: BLE001 - a different ranger must not break the whole plugin
+        _LOG.exception("vdsym: move guards / cd signal not installed")
+
+
+_install()
