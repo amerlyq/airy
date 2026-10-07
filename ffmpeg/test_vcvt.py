@@ -67,15 +67,26 @@ class ConversionTests(unittest.TestCase):
     def test_success_creates_numbered_backup(self):
         self.output.write_bytes(b"previous output")
         with (
-            patch.object(vcvt, "run", side_effect=self.encode),
+            patch.object(vcvt, "run", side_effect=self.encode) as run,
             patch.object(vcvt, "probe", return_value={"codec_name": "av1"}),
         ):
             vcvt.convert(self.args, self.source)
+        self.assertEqual(run.call_args.args[0][-1], str(self.output) + ".cvt")
         self.assertEqual(self.output.read_bytes(), b"new encoded output")
+        self.assertFalse((self.root / "input_v32.mp4.cvt").exists())
         self.assertEqual(
             (self.root / "input_v32_prev1.mp4").read_bytes(), b"previous output"
         )
         self.assertEqual(self.source.read_bytes(), b"original source")
+
+    def test_job_number_is_added_to_conversion_marker(self):
+        with (
+            patch.dict(os.environ, {"VCVT_JOB_ID": "8"}),
+            patch.object(vcvt, "run", side_effect=self.encode) as run,
+            patch.object(vcvt, "probe", return_value={"codec_name": "av1"}),
+        ):
+            vcvt.convert(self.args, self.source)
+        self.assertEqual(run.call_args.args[0][-1], str(self.output) + ".cvt-job8")
 
     def test_changed_input_prevents_publication(self):
         def changed(argv, **kwargs):

@@ -341,6 +341,7 @@ def execute_job(store, identity, token):
     for name in ("TMUX", "TMUX_PANE", "TERM"):
         if name in os.environ:
             environment[name] = os.environ[name]
+    environment["VCVT_JOB_ID"] = str(identity)
     child = None
 
     def interrupted(signum, frame):

@@ -250,6 +250,7 @@ _wrap() {
 if [[ -n ${run_job_args+x} ]]; then
   set -- "${run_job_args[@]}"
   declare session_dir=$1 jobid=$2; shift 2
+  export VCVT_JOB_ID=$jobid
   capture_outputs=$1; shift
   [[ $1 == -- ]] && shift
   tmux set-option -t "$TMUX_PANE" remain-on-exit failed
@@ -481,10 +482,10 @@ dispatch() { local jobid="$1" pane_id; shift
 
   # Try split-window first (stays in current window)
   pane_id=$(tmux split-window -t "$session" -v -P -F "#{pane_id}" -d -- \
-    "$this" --run-job "$session_dir" "$jobid" "$capture_outputs" -- "$@" 2>/dev/null) || {
+    env "VCVT_JOB_ID=$jobid" "$this" --run-job "$session_dir" "$jobid" "$capture_outputs" -- "$@" 2>/dev/null) || {
     # If split fails (small screen), create a new window
     pane_id=$(tmux new-window -t "$session" -P -F "#{pane_id}" -- \
-      "$this" --run-job "$session_dir" "$jobid" "$capture_outputs" -- "$@" 2>/dev/null) || {
+      env "VCVT_JOB_ID=$jobid" "$this" --run-job "$session_dir" "$jobid" "$capture_outputs" -- "$@" 2>/dev/null) || {
       >&2 echo "Err: split-window and new-window both failed (job $jobid)"
       tmux wait-for -S "slot-release"  # release the slot we acquired
       return 1

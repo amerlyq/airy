@@ -299,6 +299,9 @@ def webp_source(source):
 
 def convert(args, source):
     output = source.with_name(f"{source.stem}_{args.tag}{args.c}.mp4")
+    job = os.environ.get("VCVT_JOB_ID", "")
+    job_suffix = f"-job{job}" if re.fullmatch(r"\d+", job) else ""
+    temporary = output.with_name(output.name + ".cvt" + job_suffix)
     if args.d:
         if source.suffix.lower() == ".webp":
             print(f"[WebP frames] {source}")
@@ -310,34 +313,34 @@ def convert(args, source):
         raise ValueError(f"archiving symlink inputs is unsupported: {source}")
     with output_lock(output):
         before = source.stat()
-        with tempfile.TemporaryDirectory(prefix=".vcvt-", dir=output.parent) as folder:
-            temporary = Path(folder) / output.name
-            if source.suffix.lower() == ".webp":
-                with webp_source(source) as (input_path, concat):
-                    cmd = command(args, input_path, temporary, concat)
-                    if args.x:
-                        print(shlex.join(cmd), flush=True)
-                    run(cmd)
-            else:
-                cmd = command(args, source, temporary)
+        if os.path.lexists(temporary):
+            raise FileExistsError(f"conversion marker already exists: {temporary}")
+        if source.suffix.lower() == ".webp":
+            with webp_source(source) as (input_path, concat):
+                cmd = command(args, input_path, temporary, concat)
                 if args.x:
                     print(shlex.join(cmd), flush=True)
                 run(cmd)
-            info = probe(temporary)
-            expected = "av1" if args.encoder == "cpu" else "hevc"
-            if temporary.stat().st_size == 0 or info["codec_name"] != expected:
-                raise ValueError(f"invalid encoder output: {temporary}")
-            after = source.stat()
-            if (before.st_dev, before.st_ino, before.st_size, before.st_mtime_ns) != (
-                after.st_dev,
-                after.st_ino,
-                after.st_size,
-                after.st_mtime_ns,
-            ):
-                raise ValueError(f"input changed during conversion: {source}")
-            with temporary.open("rb") as handle:
-                os.fsync(handle.fileno())
-            publish(temporary, output)
+        else:
+            cmd = command(args, source, temporary)
+            if args.x:
+                print(shlex.join(cmd), flush=True)
+            run(cmd)
+        info = probe(temporary)
+        expected = "av1" if args.encoder == "cpu" else "hevc"
+        if temporary.stat().st_size == 0 or info["codec_name"] != expected:
+            raise ValueError(f"invalid encoder output: {temporary}")
+        after = source.stat()
+        if (before.st_dev, before.st_ino, before.st_size, before.st_mtime_ns) != (
+            after.st_dev,
+            after.st_ino,
+            after.st_size,
+            after.st_mtime_ns,
+        ):
+            raise ValueError(f"input changed during conversion: {source}")
+        with temporary.open("rb") as handle:
+            os.fsync(handle.fileno())
+        publish(temporary, output)
         if args.D:
             archive(source, output)
         print(f"[converted] {output}", flush=True)

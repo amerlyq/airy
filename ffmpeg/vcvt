@@ -211,17 +211,31 @@ _cvt_webp(){ local fin="$1" out="$2" dtmp
   rm -rf "$dtmp"
 }
 
-_convert_one() { local fin="$1"
-  local out="${fin%.*}_${ifx}${qa}.${fin##*.}"
+_convert_one() { local fin="$1" tmp job_suffix
+  local out
+  if [[ $fin == *.webp ]]; then
+    out="${fin%.webp}_${ifx}${qa}.mp4"
+  else
+    out="${fin%.*}_${ifx}${qa}.${fin##*.}"
+  fi
+  job_suffix=${VCVT_JOB_ID:+-job$VCVT_JOB_ID}
+  tmp="$out.cvt$job_suffix"
   local ffmpeg=($dryrun ffmpeg -hide_banner)  # -v error | -v verbose
   # MAYBE: ffmpeg+=(-y)
+
+  [[ ! -e $tmp ]] || { >&2 echo "Err: conversion marker already exists: $tmp"; return 1; }
 
   if [[ -e $out ]]; then
     # FIXME: use mtime inof RANDOM for deterministic sorting of old variants in !ranger ?
     $dryrun mv -vfT --backup=t -- "$out" "${out%.*}_prev${RANDOM}.${out##*.}"
   fi
 
-  "_cvt_$use" "$fin" "$out"
+  if [[ $fin == *.webp ]]; then
+    _cvt_webp "$fin" "$tmp"
+  else
+    "_cvt_$use" "$fin" "$tmp"
+  fi
+  $dryrun mv -vT -- "$tmp" "$out"
 
   if [[ ${archive-} || ${watch-} ]]; then
     local fdir=${fin%/*}
@@ -333,15 +347,15 @@ if [[ ${watch-} ]]; then
   exit
 fi
 
-# TEMP
-if (($#==1)); then  # && [[ ${inprocess:+x} ]]
-  if [[ $1 == *.webp ]]; then
-    _cvt_webp "$1" "${1%.webp}.mp4"
-  else
-    _convert_one "$1"
-  fi
-  exit
-fi
+## TEMP:(mostly for #hpx testing):
+# if (($#==1)); then  # && [[ ${inprocess:+x} ]]
+#   if [[ $1 == *.webp ]]; then
+#     _cvt_webp "$1" "${1%.webp}.mp4"
+#   else
+#     _convert_one "$1"
+#   fi
+#   exit
+# fi
 
 # Args come from "$@"; empty $# means read paths from stdin.
 # Emits NUL-separated non-AV1 mp4 paths on stdout.

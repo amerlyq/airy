@@ -133,18 +133,21 @@ class QueueTests(unittest.TestCase):
         special = "spaces\n'quotes';$(false)"
         program = (
             "import os,sys,json; "
-            'open(sys.argv[1],"w").write(json.dumps([sys.argv[2],os.getenv("QUEUE_TEST")]))'
+            'open(sys.argv[1],"w").write(json.dumps([sys.argv[2],os.getenv("QUEUE_TEST"),os.getenv("VCVT_JOB_ID")]))'
         )
         with patch.dict(os.environ, {"QUEUE_TEST": "submitted"}):
             self.store.enqueue([[sys.executable, "-c", program, str(output), special]])
         self.store.db.execute("UPDATE jobs SET state='starting',token='abc'")
         with (
-            patch.dict(os.environ, {"TMUX_PANE": "%1", "QUEUE_TEST": "server"}),
+            patch.dict(
+                os.environ,
+                {"TMUX_PANE": "%1", "QUEUE_TEST": "server", "VCVT_JOB_ID": "wrong"},
+            ),
             patch.object(jobs.signal, "signal"),
             patch.object(jobs, "tmux"),
         ):
             jobs.run_job(self.tmp.name, "1", "abc")
-        self.assertEqual(json.loads(output.read_text()), [special, "submitted"])
+        self.assertEqual(json.loads(output.read_text()), [special, "submitted", "1"])
         self.assertEqual(self.store.rows()[0]["rc"], 0)
 
     def test_dry_run_creates_no_cache(self):
