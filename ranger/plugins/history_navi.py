@@ -48,7 +48,27 @@ from ranger.core.tab import Tab
 FORK = "truncate"
 
 
+import os
+
+import ranger
+
+_RANGER_DIR = os.path.dirname(os.path.abspath(ranger.__file__)) + os.sep
+
+
 def _is_step(frame):
+    """Is enter_dir() reached from ranger's own move() / move_parent() (a plain h/l/j/k step)?
+
+    Frames of other plugins that wrap Tab.enter_dir sit in between: they are skipped, the first
+    frame inside the ranger package decides. (Wrapper order is therefore irrelevant.)
+    """
+    for _ in range(8):
+        if frame is None:
+            return False
+        if os.path.abspath(frame.f_code.co_filename).startswith(_RANGER_DIR):
+            break
+        frame = frame.f_back
+    else:
+        return False
     if not frame.f_code.co_filename.endswith("core/actions.py"):
         return False
     name = frame.f_code.co_name
