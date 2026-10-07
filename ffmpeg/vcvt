@@ -32,6 +32,18 @@ set -o errexit -o errtrace -o functrace -o noclobber -o noglob -o nounset -o pip
 shopt -qs inherit_errexit lastpipe
 PS4='+[$BASHPID] ${BASH_SOURCE[0]##*/}:$LINENO:  '
 
+## HACK: auto-send path to #fra queue if you already SSH'd there
+# ALT: ping -c 1 -W 1 192.168.2.4 &>/dev/null && ...
+# ALT: ip route get 192.168.2.4 2>/dev/null | grep -q "dev eth0" && ...
+read -r has_pc </sys/class/net/enp0s13f0u2u3u3/carrier
+if ((has_pc)); then
+  ssh -O check lf &>/dev/null || ssh -fN -o ConnectTimeout=2 lf  # /d/airy/ssh/run-xc lf
+  systemctl is-active --quiet nfs-server || { set -x; sudo systemctl start nfs-server; }
+  ssh -n lf 'test -d /media/pro/vd || { set -x; sudo mount /net/vd; }'
+  { set -x; ssh lf -- vcvt "$@"; }
+  exit
+fi
+
 njobs=4  # workers=(1..4) x16 threads per each AV1
 
 readonly _app_orig_argv=("$@")
