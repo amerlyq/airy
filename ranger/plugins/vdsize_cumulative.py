@@ -4,17 +4,17 @@ dcsize — ranger plugin for recursive size calculation with linemode/sort/filte
 ════════════════════════════════════════════════════════════════════════════════
 MODES
 ────────────────────────────────────────────────────────────────────────────────
-  f  no-symlink  regular files only; all symlinks skipped at every level
-  a  all         regular files + symlinks; file-symlinks counted with target
+  file   no-symlink  regular files only; all symlinks skipped at every level
+  all    all         regular files + symlinks; file-symlinks counted with target
                  size; dir-symlinks descended with (dev,ino) loop guard;
                  broken links counted 1 with link size
-  v  video       only regular (non-link) files in EXTS whose first video
+  video          only regular (non-link) files in EXTS whose first video
                  track format matches SPEC; configured by codec= argument
 
 ════════════════════════════════════════════════════════════════════════════════
 LINEMODES
 ────────────────────────────────────────────────────────────────────────────────
-  dc{f,a,v} applied ONLY to dir entries in current pwd.
+  dc{file,all,video} applied ONLY to dir entries in current pwd.
   Files in pwd: linemode never changed by dc*.
   Contents of subdirs: never touched.
   Format: dirs → "(n) size"   files → "size"   n = matched file count.
@@ -30,15 +30,15 @@ SORTING
 ════════════════════════════════════════════════════════════════════════════════
 FILTERING  (DcFilter — at most one per pwd, mode updated in-place)
 ────────────────────────────────────────────────────────────────────────────────
-  mode f/a — always applied when running dcf/dca:
+  mode file/all — always applied when running dcfile/dcall:
     dirs:  hidden if HIDE_EMPTY and computed count == 0
-    files: always pass  →  unhides any files hidden by a previous dcv
-  mode v — applied only when filter argument given:
+    files: always pass  →  unhides any files hidden by a previous dcvideo
+  mode video — applied only when filter argument given:
     dirs:  hidden if HIDE_EMPTY and computed count == 0
     files: hidden if codec does not match SPEC
-  Switching f/a → v: DcFilter.mode updated, file-hiding reactivated.
-  Switching v → f/a: DcFilter.mode updated, file-hiding cleared.
-  dcv without filter: any existing DcFilter removed.
+  Switching file/all → video: DcFilter.mode updated, file-hiding reactivated.
+  Switching video → file/all: DcFilter.mode updated, file-hiding cleared.
+  dcvideo without filter: any existing DcFilter removed.
 
 ════════════════════════════════════════════════════════════════════════════════
 HIDE_EMPTY
@@ -62,7 +62,7 @@ UNDO  (dcu → :dcsize undo)
 ════════════════════════════════════════════════════════════════════════════════
 CURSOR MODE
 ────────────────────────────────────────────────────────────────────────────────
-  Triggered by cursor argument or count prefix (1dcf, 2dcv, …).
+  Triggered by cursor argument or count prefix (1dcfile, 2dcvideo, …).
   Computes only the item under the cursor; only its linemode is updated.
   If sort or filter is requested, all cwd files are computed too.
 
@@ -85,12 +85,12 @@ PERSISTENT CACHE
 ════════════════════════════════════════════════════════════════════════════════
 MAPPINGS  (rc.conf)
 ────────────────────────────────────────────────────────────────────────────────
-  map dcf  dcsize f sort
-  map dca  dcsize a sort
-  map dcv  dcsize v sort filter codec=AV1
-  map dcF  dcsize f sort cursor
-  map dcA  dcsize a sort cursor
-  map dcV  dcsize v sort filter cursor codec=AV1
+  map dcf  dcsize file sort
+  map dca  dcsize all sort
+  map dcv  dcsize video sort filter codec=AV1
+  map dcF  dcsize file sort cursor
+  map dcA  dcsize all sort cursor
+  map dcV  dcsize video sort filter cursor codec=AV1
   map dcu  dcsize undo
 
 ════════════════════════════════════════════════════════════════════════════════
@@ -98,7 +98,7 @@ KNOWN LIMITATIONS
 ────────────────────────────────────────────────────────────────────────────────
   • Hardlinks double-counted.
   • Only EXTS files codec-checked (default: .mp4).
-  • UI blocks during computation; first dcv on cold cache is slow.
+  • UI blocks during computation; first dcvideo on cold cache is slow.
   • SIZES and SNAP lost on restart.
   • setlocal path restore may break on paths with spaces (ranger cmd parser).
   • fm.settings._local is private; check on ranger upgrades.
@@ -116,7 +116,7 @@ from ranger.container.directory import Directory
 from ranger.core.linemode import LinemodeBase
 from ranger.ext.human_readable import human_readable
 
-MODES = "fav"
+MODES = ("file", "all", "video")
 EXTS = (".mp4",)
 HIDE_EMPTY = True
 CACHE = os.path.join(
@@ -188,7 +188,7 @@ def _match(fmt):
 
 
 def _leaf(p, mode, st):
-    if mode == "v" and not _match(_vfmt(p, st)):
+    if mode == "video" and not _match(_vfmt(p, st)):
         return 0, 0
     return 1, st.st_size
 
@@ -200,10 +200,10 @@ def _scan(path, mode, seen):
             for e in it:
                 try:
                     link = e.is_symlink()
-                    if link and mode != "a":
+                    if link and mode != "all":
                         continue
                     if e.is_dir():
-                        if mode == "a":
+                        if mode == "all":
                             st = e.stat()
                             key = (st.st_dev, st.st_ino)
                             if key in seen:
@@ -217,7 +217,7 @@ def _scan(path, mode, seen):
                             st = e.stat(follow_symlinks=False)
                         c, s = 1, st.st_size
                     else:
-                        if mode == "v" and not e.name.lower().endswith(EXTS):
+                        if mode == "video" and not e.name.lower().endswith(EXTS):
                             continue
                         st = e.stat(follow_symlinks=False)
                         if not stat.S_ISREG(st.st_mode):
@@ -240,12 +240,12 @@ def _tree(path, mode):
         try:
             st = os.stat(path) if link else lst
         except OSError:
-            return (1, lst.st_size) if mode == "a" else (0, 0)
+            return (1, lst.st_size) if mode == "all" else (0, 0)
         if stat.S_ISDIR(st.st_mode):
             return _scan(path, mode, {(st.st_dev, st.st_ino)})
-        if (link and mode != "a") or not stat.S_ISREG(st.st_mode):
+        if (link and mode != "all") or not stat.S_ISREG(st.st_mode):
             return 0, 0
-        if mode == "v" and not path.lower().endswith(EXTS):
+        if mode == "video" and not path.lower().endswith(EXTS):
             return 0, 0
         return _leaf(path, mode, st)
     except OSError:
@@ -265,8 +265,8 @@ def _get(path, mode):
 class DcFilter:
     """
     Single filter instance per pwd; mode swapped in-place on mode switch.
-    f/a: files always pass; dirs hidden if HIDE_EMPTY and count==0.
-    v:   files pass only if codec matches SPEC; dirs hidden if HIDE_EMPTY and count==0.
+    file/all: files always pass; dirs hidden if HIDE_EMPTY and count==0.
+    video:     files pass only if codec matches SPEC; dirs hidden if HIDE_EMPTY and count==0.
     """
 
     def __init__(self, mode):
@@ -278,9 +278,9 @@ class DcFilter:
                 return True
             r = SIZES[self.mode].get(fobj.path)
             return r is None or r[0] > 0  # unknown → pass; computed empty → hide
-        if self.mode == "v":
-            return _get(fobj.path, "v")[0] > 0
-        return True  # f/a: all files pass
+        if self.mode == "video":
+            return _get(fobj.path, "video")[0] > 0
+        return True  # file/all: all files pass
 
     def __str__(self):
         return f"<Filter: dc{self.mode}>"
@@ -360,7 +360,7 @@ def _restore_sort(fm, d, sn):
 
 
 class dcsize(Command):
-    """:dcsize <f|a|v|undo> [sort] [filter] [cursor] [codec=…]
+    """:dcsize <file|all|video|undo> [sort] [filter] [cursor] [codec=…]
     count prefix (1dc*) implies cursor."""
 
     def _undo(self, d):
@@ -397,8 +397,8 @@ class dcsize(Command):
 
         if mode == "undo":
             return self._undo(d)
-        if mode not in MODES or len(mode) != 1:
-            return self.fm.notify("dcsize: mode must be f|a|v or undo", bad=True)
+        if mode not in MODES:
+            return self.fm.notify("dcsize: mode must be file|all|video or undo", bad=True)
         if d.path not in SNAP:
             SNAP[d.path] = _snapshot(self.fm, d)
 
@@ -408,11 +408,11 @@ class dcsize(Command):
                 codec = a[6:]
             else:
                 opts.add(a)
-        if mode == "v" and codec is not None:
+        if mode == "video" and codec is not None:
             new = _parse_spec(codec)
             if new != SPEC:
                 SPEC = new
-                SIZES["v"].clear()
+                SIZES["video"].clear()
 
         name = "dc" + mode
         cursor = self.quantifier is not None or "cursor" in opts
@@ -440,9 +440,9 @@ class dcsize(Command):
         for f in dirs:
             f.linemode = name
 
-        if mode in ("f", "a"):
+        if mode in ("file", "all"):
             _set_filter(d, mode)  # always: hide empty dirs, pass files
-        elif "filter" in opts:  # v with filter
+        elif "filter" in opts:  # video with filter
             _set_filter(d, mode)  # hide empty dirs + filter files by codec
         else:  # v without filter
             _remove_filter(d)
