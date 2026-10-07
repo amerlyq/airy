@@ -13,8 +13,8 @@ FFMPEG = shutil.which("ffmpeg")
 LUA = shutil.which("lua") or shutil.which("luajit")
 
 
-def run(args):
-    return subprocess.run(list(map(str, args)), check=True, capture_output=True).stdout
+def run(args, **kwargs):
+    return subprocess.run(list(map(str, args)), check=True, capture_output=True, **kwargs).stdout
 
 
 def ff(*args):
@@ -161,6 +161,86 @@ class BoundaryTests(unittest.TestCase):
            "-fps_mode", "vfr", "-c:v", "libx264", "-g", "60",
            "-keyint_min", "60", "-sc_threshold", "0", "-c:a", "copy", vfr)
         self.compare_frame_identity(vfr, 5.123, 18.456, "smart")
+
+    @unittest.skipUnless(LUA, "Lua required")
+    def test_end_frame_strip(self):
+        for offset, suffix in ((0, ".mp4"), (3, ".mp4"), (0, ".mkv")):
+            with self.subTest(offset=offset, suffix=suffix), tempfile.TemporaryDirectory(dir=self.folder) as td:
+                folder = Path(td)
+                source = self.source
+                if offset or suffix == ".mkv":
+                    source = folder / ("offset" + suffix)
+                    ff("-i", self.source, "-c", "copy", "-output_ts_offset", offset, source)
+                run([LUA, DRIVER, "strip", source, folder, 5.123, 18.456])
+                exports = folder / "export"
+                run([RUN, source, 5.123, 18.456, "copy", exports])
+                output, = exports.iterdir()
+                exported = frames(output)
+                source_frames = frames(source)
+                anchor = source_frames.index(exported[-1])
+                for index in (-3, -2, -1, 0, 1):
+                    label = "copy B 00\\:18.4" if index == 0 else f"{index:+d}"
+                    vf = (f"scale=160:90,drawtext=text='{label}':"
+                          "x=10:y=h-th-10:fontsize=12:fontcolor=white:borderw=2:bordercolor=black")
+                    expected = (frames(source, vf)[anchor + index] if index > 0 else
+                                frames(output, vf)[len(exported) - 1 + index])
+                    name = "B" if index == 0 else str(index)
+                    self.assertEqual(expected, (folder / (name + ".raw")).read_bytes(), f"offset={offset} index={index}")
+
+    @unittest.skipUnless(LUA, "Lua required")
+    def test_end_frame_strip_smart(self):
+        with tempfile.TemporaryDirectory(dir=self.folder) as td:
+            folder = Path(td)
+            source = folder / "h264.mp4"
+            ff("-i", self.source, "-c:v", "libx264", "-g", "120", "-keyint_min", "120",
+               "-sc_threshold", "0", "-c:a", "copy", source)
+            run([LUA, DRIVER, "strip", source, folder, 5.123, 18.456, "smart"])
+            reference = frames(source)
+            # Ignore the label area when identifying the lossy zero frame.
+            zero = (folder / "B.raw").read_bytes()[:160 * 60 * 4:16]
+            anchor = min(range(len(reference)), key=lambda i:
+                         sum((a-b)**2 for a, b in zip(zero, reference[i][:160 * 60 * 4:16])))
+            vf = "scale=160:90,drawtext=text='+1':x=10:y=h-th-10:fontsize=12:fontcolor=white:borderw=2:bordercolor=black"
+            self.assertEqual(frames(source, vf)[anchor + 1], (folder / "1.raw").read_bytes())
+
+    @unittest.skipUnless(LUA, "Lua required")
+    def test_end_frame_strip_eof(self):
+        with tempfile.TemporaryDirectory(dir=self.folder) as td:
+            folder = Path(td)
+            run([LUA, DRIVER, "strip", self.source, folder, 5.123, 24])
+            self.assertTrue((folder / "B.raw").exists())
+            self.assertTrue((folder / "-3.raw").exists())
+            self.assertFalse((folder / "1.raw").exists(), "EOF must not repeat frame zero as +1")
+
+    @unittest.skipUnless(LUA, "Lua required")
+    def test_end_frame_strip_short_clip_and_custom_range(self):
+        with tempfile.TemporaryDirectory(dir=self.folder) as td:
+            folder = Path(td)
+            run([LUA, DRIVER, "strip", self.source, folder, 0, 0.001])
+            run([RUN, self.source, 0, 0.001, "copy", folder / "export"])
+            output, = (folder / "export").iterdir()
+            count = len(frames(output))
+            for i in (-3, -2, -1):
+                self.assertEqual((folder / f"{i}.raw").exists(), count > -i)
+            self.assertTrue((folder / "1.raw").exists())
+        with tempfile.TemporaryDirectory(dir=self.folder) as td:
+            folder = Path(td)
+            run([LUA, DRIVER, "strip-custom", self.source, folder, 5.123, 18.456])
+            self.assertTrue((folder / "-1.raw").exists())
+            self.assertFalse((folder / "-2.raw").exists())
+            self.assertTrue((folder / "2.raw").exists())
+
+    @unittest.skipUnless(LUA, "Lua required")
+    def test_end_frame_strip_sparse(self):
+        source = self.folder / "sparse-strip.mp4"
+        ff("-f", "lavfi", "-i", "testsrc2=size=160x90:rate=1/5", "-t", "25",
+           "-c:v", "mpeg4", "-g", "2", source)
+        with tempfile.TemporaryDirectory(dir=self.folder) as td:
+            folder = Path(td)
+            run([LUA, DRIVER, "strip", source, folder, 0, 19],
+                env={**os.environ, "CLIP_TEST_ALLOW_RETRY": "1"})
+            self.assertTrue((folder / "-3.raw").exists())
+            self.assertTrue((folder / "1.raw").exists())
 
     @unittest.skipUnless(LUA, "Lua required")
     def test_copy_key_with_only_end_before_preview(self):

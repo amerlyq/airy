@@ -5,6 +5,20 @@ Thumbnails show the selected mode's first/last decoded video frames.
 Labels contain the mode and requested mark time.
 They do not imply that a stream-copy boundary lands exactly on that time.
 
+The end preview shows frame offsets `-3, -2, -1, 0, +1` by default.
+`0` remains the actual last decoded output frame, not the frame at the `]` mark.
+Only `0` has the mode/timestamp label; its neighbors show signed indexes.
+Negative offsets come from the converted boundary sample.
+Positive offsets are following source frames outside the clip, not promised export content.
+Unavailable neighbors are omitted rather than duplicated (EOF, a short selection,
+or a short smart-cut boundary segment).
+All end frames are extracted together in one FFmpeg command per sample attempt.
+The grid wraps to fit the window and keeps the OSD text line clear.
+
+Edit `END_FRAME_RANGE = { -3, 1 }` near the top of `scripts/clip.lua` to change
+the global default, or override it with the options below.
+The range must include zero; each side is limited to 15 frames.
+
 | Key | Mode |
 | --- | --- |
 | `y` | copy |
@@ -36,6 +50,8 @@ For a different installation, set this in `script-opts/clip.conf`:
 converter=/data/aura/airy/ffmpeg/run
 preview_mode=copy
 preview_window_limit=30
+end_frame_first=-3
+end_frame_last=1
 ```
 
 Preview strategy:
@@ -48,10 +64,13 @@ Preview strategy:
   Probe nearby keyframe packets without decoding the complete source.
 - Decode the sample's first frame for A.
   Decode through sample EOF for B, including reordered/delayed frames.
-  Retain only the last frame rather than guessing its timestamp.
+  Retain the requested tail frames rather than guessing their timestamps.
+  Track source timestamps during the sample conversion to locate following
+  source frames without guessing FPS or confusing container timestamp offsets.
 
 Samples normally cover two seconds.
 Empty samples retry with a larger window, up to `preview_window_limit`.
+Sparse end samples also expand when more preceding frames are needed.
 Decoding still needs the preceding keyframe for inter-frame codecs.
 No whole-selection re-encode is performed to make previews of a long selection.
 

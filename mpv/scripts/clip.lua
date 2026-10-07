@@ -5,7 +5,10 @@
 -- Debug: mpv --msg-level=clip=debug FILE
 
 local utils = require 'mp.utils'
-local options = { converter = "r.ffmpeg", preview_mode = "copy", preview_window_limit = 30 }
+-- Inclusive frame offsets around the actual last decoded output frame.
+END_FRAME_RANGE = { -3, 1 }
+local options = { converter = "r.ffmpeg", preview_mode = "copy", preview_window_limit = 30,
+  end_frame_first = END_FRAME_RANGE[1], end_frame_last = END_FRAME_RANGE[2] }
 require('mp.options').read_options(options, 'clip')
 
 local NEXT_MODE = { copy = "fast", fast = "smart", smart = "copy" }
@@ -35,7 +38,7 @@ local function status(level, message)
   local text = level .. ": " .. message:gsub("%s+", " ")
   local limit = math.max(20, math.floor(((dims and dims.w or 1280) - 40) / (font * 0.65)))
   if #text > limit then text = text:sub(1, limit - 10) .. "... (log)" end
-  local color = ({ error = "0000FF", done = "FF0000" })[level] -- ASS uses BGR.
+  local color = ({ error = "0080FF", done = "FF8000" })[level] -- ASS uses BGR.
   if color then
     local ass = mp.get_property_osd("osd-ass-cc/0")
     local literal = mp.get_property_osd("osd-ass-cc/1")
@@ -50,6 +53,12 @@ end
 
 if not finite(options.preview_window_limit) then options.preview_window_limit = 30 end
 options.preview_window_limit = math.max(WINDOW, options.preview_window_limit)
+local first_frame = finite(options.end_frame_first) and math.max(-15, math.min(0, math.floor(options.end_frame_first))) or -3
+local last_frame = finite(options.end_frame_last) and math.max(0, math.min(15, math.floor(options.end_frame_last))) or 1
+local function overlay_id(edge, index)
+  if edge.id == 1 or index == 0 then return edge.id end
+  return 3 + index - first_frame - (index > 0 and 1 or 0)
+end
 
 local function timestamp(t)
   return string.format("%02d:%02d.%d", math.floor(t / 60), math.floor(t % 60),
@@ -87,41 +96,48 @@ local function subprocess(args, playback_only, callback)
 end
 
 -- dwidth/dheight include rotation and sample aspect ratio.
-local function geometry(edge)
+local function geometry(edge, index)
   local dims = mp.get_property_native("osd-dimensions")
   local vw, vh = mp.get_property_number("dwidth"), mp.get_property_number("dheight")
   if not dims or not vw or not vh or vw <= 0 or vh <= 0 then return end
   local aw = dims.w - (dims.ml or 0) - (dims.mr or 0)
   local ah = dims.h - (dims.mt or 0) - (dims.mb or 0)
   local _, top = osd_metrics()
-  local ratio, w, h, x, y = vw / vh
-  if vh > vw then
-    w = math.min(aw * 0.20, (dims.h - top - 2 * PAD) / 2 * ratio)
-    h = w / ratio
-    x, y = dims.w - w - PAD, top + (edge.id - 1) * (h + PAD)
-  else
-    h = math.min(ah * 0.20, (dims.w - 3 * PAD) / 2 / ratio, dims.h - top - PAD)
-    w = h * ratio
-    x, y = PAD + (edge.id - 1) * (w + PAD), top
-  end
+  local ratio = vw / vh
+  local h = vh > vw and aw * 0.20 / ratio or ah * 0.20
+  local w = h * ratio
+  local count = 2 + last_frame - first_frame
+  local columns = math.max(1, math.min(count, math.floor((dims.w - PAD) / (w + PAD))))
+  local rows = math.ceil(count / columns)
+  h = math.min(h, (dims.h - top - rows * PAD) / rows,
+    (dims.w - (columns + 1) * PAD) / columns / ratio)
+  w = h * ratio
+  local slot = edge.id == 1 and 0 or 1 + (index or 0) - first_frame
+  local x = PAD + (slot % columns) * (w + PAD)
+  local y = top + math.floor(slot / columns) * (h + PAD)
   if w < 16 or h < 16 then return end
   return math.floor(x), math.floor(y), math.floor(w), math.floor(h)
 end
 
 local function remove_overlay(edge)
-  if edge.shown then mp.command_native({ name = "overlay-remove", id = edge.id }) end
+  for _, id in ipairs(edge.overlays or {}) do
+    mp.command_native({ name = "overlay-remove", id = id })
+  end
+  edge.overlays = {}
   edge.shown = false
 end
 
 local function remove_samples(job)
   os.remove(job.clip)
   os.remove(job.clip .. ".segment.mp4")
+  os.remove(job.stats)
 end
 
 local function dispose(job)
   if not job then return end
   remove_samples(job)
   os.remove(job.raw)
+  if job.after then os.remove(job.after) end
   jobs[job] = nil
 end
 
@@ -142,12 +158,20 @@ local function render(edge)
   if state.hidden or not cached then return end
   local x, y, w, h = geometry(edge)
   if not x then remove_overlay(edge); return end
-  local _, err = mp.command_native({
-    name = "overlay-add", id = edge.id, x = x, y = y, file = cached.raw,
-    offset = 0, fmt = "bgra", w = cached.w, h = cached.h,
-    stride = cached.w * 4, dw = w, dh = h,
-  })
-  -- overlay-add has no result: nil,nil is success; nil,error is failure.
+  remove_overlay(edge)
+  local err
+  for _, frame in ipairs(cached.frames) do
+    x, y, w, h = geometry(edge, frame.index)
+    local id = overlay_id(edge, frame.index)
+    local _
+    _, err = mp.command_native({
+      name = "overlay-add", id = id, x = x, y = y, file = frame.file,
+      offset = frame.offset, fmt = "bgra", w = cached.w, h = cached.h,
+      stride = cached.w * 4, dw = w, dh = h,
+    })
+    if err then break end
+    edge.overlays[#edge.overlays + 1] = id
+  end
   if err then remove_overlay(edge) end
   edge.shown = err == nil
   edge.error = err and ("overlay: " .. tostring(err)) or nil
@@ -211,37 +235,58 @@ end
 local function decode_args(job)
   local label = string.format("%s %s %s", job.mode, job.edge.name,
     timestamp(job.edge.id == 1 and job.a or job.b)):gsub(":", "\\:")
-  local filter = string.format(
-    "scale=%d:%d,drawtext=text='%s':x=10:y=h-th-10:fontsize=%d:fontcolor=white:borderw=2:bordercolor=black",
-    job.w, job.h, label, math.max(12, math.floor(job.h * 0.14)))
-  local args = { "ffmpeg", "-nostdin", "-hide_banner", "-loglevel", "error", "-y",
-    "-i", job.clip, "-an", "-sn", "-dn", "-vf", filter,
-    "-pix_fmt", "bgra", "-fps_mode", "passthrough" }
-  if job.edge.id == 1 then args[#args + 1] = "-frames:v"; args[#args + 1] = "1" end
-  args[#args + 1], args[#args + 2], args[#args + 3] = "-f", "rawvideo", job.raw
+  local function text_filter(text, n)
+    return string.format("drawtext=text='%s':x=10:y=h-th-10:fontsize=%d:fontcolor=white:borderw=2:bordercolor=black%s",
+      text, math.max(12, math.floor(job.h * 0.14)), n and (":enable='eq(n," .. n .. ")'") or "")
+  end
+  local scale = string.format("scale=%d:%d", job.w, job.h)
+  local filter = scale .. "," .. text_filter(label)
+  local args = { "ffmpeg", "-nostdin", "-hide_banner", "-loglevel", "error", "-y", "-copyts",
+    "-i", job.clip }
+  local function append(values)
+    for _, value in ipairs(values) do args[#args + 1] = value end
+  end
+  if job.edge.id == 2 then
+    filter = scale .. ",reverse,trim=end_frame=" .. (1 - first_frame) .. "," .. text_filter(label, 0)
+    for i = -1, first_frame, -1 do filter = filter .. "," .. text_filter(tostring(i), -i) end
+    if last_frame > 0 and job.anchor then
+      job.context_start = math.max(0, math.floor(job.anchor) - 1)
+      append({ "-ss", tostring(job.context_start), "-i", job.path })
+    end
+  end
+  append({ "-map", "0:v:0", "-an", "-sn", "-dn", "-vf", filter,
+    "-pix_fmt", "bgra", "-fps_mode", "passthrough", "-frames:v",
+    tostring(job.edge.id == 1 and 1 or 1 - first_frame), "-f", "rawvideo", job.raw })
+  if job.edge.id == 2 and last_frame > 0 and job.anchor then
+    -- Source context only: these frames are outside the converted clip.
+    local context = string.format("select='gt(t,%.9f)',%s", job.absolute_anchor + 0.000002, scale)
+    for i = 1, last_frame do context = context .. "," .. text_filter("+" .. i, i - 1) end
+    append({ "-map", "1:" .. job.source_track, "-an", "-sn", "-dn", "-vf", context,
+      "-pix_fmt", "bgra", "-fps_mode", "passthrough", "-frames:v", tostring(last_frame),
+      "-f", "rawvideo", job.after })
+  end
   return args
 end
 
--- Collapse raw output to one complete frame. B includes decoder-delayed frames.
+-- Index complete raw frames without copying or launching per-frame decoders.
 local function retain_frame(job)
   local info, bytes = utils.file_info(job.raw), job.w * job.h * 4
   if info and info.size == 0 then return nil, "empty" end
   if not info or info.size < bytes or info.size % bytes ~= 0 then
     return nil, "incomplete raw frame"
   end
-  local input, err = io.open(job.raw, "rb")
-  if not input then return nil, err end
-  local offset = job.edge.id == 1 and 0 or info.size - bytes
-  local positioned = input:seek("set", offset)
-  local data = positioned and input:read(bytes)
-  input:close()
-  if not data or #data ~= bytes then return nil, "short raw frame" end
-  local output
-  output, err = io.open(job.raw, "wb")
-  if not output then return nil, err end
-  local written = output:write(data)
-  local closed = output:close()
-  if not written or not closed then return nil, "could not cache raw frame" end
+  job.frames = {}
+  for i = 0, math.min(info.size / bytes - 1, job.edge.id == 1 and 0 or -first_frame) do
+    job.frames[#job.frames + 1] = { index = -i, file = job.raw, offset = i * bytes }
+  end
+  if job.edge.id == 2 and last_frame > 0 then
+    if not job.anchor then return nil, "cannot locate final output frame in source" end
+    local after = utils.file_info(job.after)
+    if not after or after.size % bytes ~= 0 then return nil, "incomplete context frame" end
+    for i = 1, math.min(last_frame, after.size / bytes) do
+      job.frames[#job.frames + 1] = { index = i, file = job.after, offset = (i - 1) * bytes }
+    end
+  end
   return true
 end
 
@@ -253,6 +298,15 @@ local function retry_empty(job)
   return true
 end
 
+local function publish(job)
+  remove_samples(job)
+  jobs[job] = nil
+  local edge = job.edge
+  dispose(edge.cache)
+  edge.job, edge.cache, edge.error = nil, job, nil
+  render(edge)
+end
+
 local function decode_job(job)
   run_job(job, decode_args(job), function()
     local ok, err = retain_frame(job)
@@ -261,21 +315,85 @@ local function decode_job(job)
       fail(job.edge, err == "empty" and "no video frame in boundary sample" or err)
       return
     end
-    remove_samples(job)
-    jobs[job] = nil
-    local edge = job.edge
-    dispose(edge.cache)
-    edge.job, edge.cache, edge.error = nil, job, nil
-    render(edge)
+    if job.edge.id == 2 and #job.frames < 1 - first_frame + last_frame then
+      local info = utils.file_info(job.raw)
+      if info.size / (job.w * job.h * 4) < 1 - first_frame and retry_empty(job) then return end
+    end
+    publish(job)
   end, function(err)
     -- Audio may outlast video, leaving the initial sample without a video track.
-    return err:find("does not contain any stream", 1, true) and retry_empty(job)
+    return (err:find("does not contain any stream", 1, true)
+      or err:find("matches no streams", 1, true)) and retry_empty(job)
   end)
 end
 
 local function execute_plan(job, commands, index)
   if index > #commands then decode_job(job); return end
-  run_job(job, commands[index], function() execute_plan(job, commands, index + 1) end)
+  local command = commands[index]
+  local seek
+  if job.edge.id == 2 and last_frame > 0 and index == 1 then
+    -- muxer timestamps precede container timestamp normalization. Track the
+    -- last emitted video packet, including reordered frames beyond the mark.
+    for i, value in ipairs(command) do if value == "-ss" then seek = tonumber(command[i + 1]) end end
+    if not seek then fail(job.edge, "preview plan lacks source seek timestamp"); return end
+    command = { (table.unpack or unpack)(command) }
+    table.insert(command, 2, "-debug_ts")
+    local output = table.remove(command)
+    for _, value in ipairs({ "-stats_enc_pre:v:0", job.stats,
+      "-stats_enc_pre_fmt:v:0", "{ptsi} {tbi}", output }) do command[#command + 1] = value end
+  end
+  run_job(job, command, function(result)
+    if seek then
+      local last, packets, pending = nil, {}, {}
+      for line in (result.stderr or ""):gmatch("[^\r\n]+") do
+        local track = line:match("%[vist#0:(%d+)/")
+        if track then
+          local t = tonumber(line:match("pkt_pts_time:([%d.eE+%-]+)"))
+          if line:find("demuxer ->", 1, true) then pending[track] = t end
+          if line:find("demuxer+ffmpeg ->", 1, true) then
+            local offset = tonumber(line:match("off_time:([%d.eE+%-]+)"))
+            if finite(t) and pending[track] and offset then
+              packets[#packets + 1] = { t = t, source = pending[track] + offset + seek,
+                absolute = pending[track], track = track }
+            end
+          end
+        end
+        if line:find("[vost#", 1, true) and line:find("muxer <-", 1, true) then
+          local t = tonumber(line:match("pts_time:([%d.eE+%-]+)"))
+          if finite(t) and (not last or t > last) then last = t end
+        end
+      end
+      -- Encoders can quantize output PTS to their own frame-rate timebase.
+      -- Use the decoder PTS attached to frames actually submitted for encoding.
+      local stats = io.open(job.stats, "rb")
+      if stats then
+        last = nil
+        for line in stats:lines() do
+          local pts, num, den = line:match("^([%d%-]+) (%d+)/(%d+)$")
+          if pts and tonumber(den) > 0 then
+            local t = tonumber(pts) * tonumber(num) / tonumber(den)
+            if finite(t) and (not last or t > last) then last = t end
+          end
+        end
+        stats:close()
+      end
+      -- Match the emitted packet to its original source PTS. Adding -ss to
+      -- a mux timestamp alone can be off by a container timebase tick (MKV).
+      local match, distance
+      if last then
+        for _, packet in ipairs(packets) do
+          local delta = math.abs(packet.t - last)
+          if not distance or delta < distance then match, distance = packet, delta end
+        end
+      end
+      job.anchor = match and distance < 0.002 and match.source or nil
+      job.absolute_anchor = match and match.absolute
+      job.source_track = match and match.track
+      mp.msg.debug("preview[B] source anchor: mux=" .. tostring(last) ..
+        " delta=" .. tostring(distance) .. " source=" .. tostring(job.anchor))
+    end
+    execute_plan(job, commands, index + 1)
+  end)
 end
 
 sample_job = function(job)
@@ -285,7 +403,10 @@ sample_job = function(job)
   }, function(result)
     local commands = parse_plan(result.stdout)
     if not commands then fail(job.edge, "invalid converter preview plan"); return end
-    job.plan = plan_key(job, commands)
+    local key = plan_key(job, commands)
+    -- A larger window cannot add predecessors beyond a short smart segment.
+    if job.frames and job.plan == key then publish(job); return end
+    job.plan, job.frames = key, nil
     local edge, cached = job.edge, job.edge.cache
     if cached and cached.plan == job.plan then
       cached.a, cached.b, cached.limit = job.a, job.b, job.limit
@@ -319,7 +440,8 @@ local function start_preview(edge)
   local factor = math.min(1, 640 / math.max(w, h))
   local job = {
     edge = edge, path = path, a = edges[1].time, b = edges[2].time, mode = state.mode,
-    raw = raw, clip = raw .. "." .. ext, window = WINDOW,
+    raw = raw, after = raw .. ".after", stats = raw .. ".stats",
+    clip = raw .. "." .. ext, window = WINDOW,
     limit = math.min(edges[2].time - edges[1].time, options.preview_window_limit),
     w = math.max(1, math.floor(w * factor)), h = math.max(1, math.floor(h * factor)),
   }

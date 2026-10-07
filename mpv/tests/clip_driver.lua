@@ -1,7 +1,8 @@
 -- Headless mpv API harness. "frames" executes real FFmpeg; "lifecycle" controls
 -- callback ordering to exercise cancellation without timing-dependent sleeps.
 local mode, source, destination, first, last = table.unpack(arg)
-local real_processes = mode == "frames" or mode == "export" or mode == "early-export"
+local strip_mode = mode:match("^strip")
+local real_processes = mode == "frames" or mode == "export" or mode == "early-export" or strip_mode
 local converter = arg[0]:gsub("mpv/tests/clip_driver.lua$", "ffmpeg/run")
 local props = {
   path = source, ["working-directory"] = ".",
@@ -11,6 +12,7 @@ local props = {
 local queue, timers, events, observers, bindings, messages = {}, {}, {}, {}, {}, {}
 local overlays, errors, calls, paths, commands = {}, {}, {}, {}, {}
 local osd = {}
+local preview_options
 local function read(path)
   local f = io.open(path, "rb")
   if not f then return end
@@ -34,11 +36,19 @@ package.preload["mp.utils"] = function()
   return { file_info = file_info, join_path = function(a, b) return a .. "/" .. b end }
 end
 package.preload["mp.options"] = function()
-  return { read_options = function(opts) opts.converter = converter end }
+  return { read_options = function(opts)
+    opts.converter = converter
+    if strip_mode then opts.preview_mode = arg[6] or "copy"
+    else opts.end_frame_first, opts.end_frame_last = 0, 0 end
+    if mode == "strip-custom" then opts.end_frame_first, opts.end_frame_last = -1, 2 end
+    preview_options = opts
+  end }
 end
 mp = {
   msg = {
-    debug = function() end,
+    debug = function(text)
+      if os.getenv("CLIP_TEST_DEBUG") then io.stderr:write(text .. "\n") end
+    end,
     log = function(level, message)
       if level == "error" then errors[#errors + 1] = message end
     end,
@@ -66,14 +76,20 @@ mp = {
     calls[#calls + 1] = command.args
     local job = { command = command, callback = callback }
     queue[#queue + 1] = job
-    if command.args[1] == "ffmpeg" then paths[command.args[#command.args]] = true end
+    if command.args[1] == "ffmpeg" then
+      paths[command.args[#command.args]] = true
+      for i, value in ipairs(command.args) do
+        if value == "rawvideo" then paths[command.args[i + 1]] = true end
+      end
+    end
     return job
   end,
   command_native = function(command)
     if command.name == "overlay-remove" then overlays[command.id] = nil; return end
     assert(command.name == "overlay-add", "unexpected synchronous command")
     if props.overlay_error then return nil, "overlay test failure" end
-    command.data = assert(read(command.file))
+    command.data = assert(read(command.file)):sub(command.offset + 1,
+      command.offset + command.w * command.h * 4)
     assert(#command.data == command.w * command.h * 4, "invalid raw frame")
     overlays[command.id] = command
     -- Real mpv returns no value for overlay-add, not an empty node map.
@@ -116,8 +132,7 @@ local function complete()
   elseif option(args, "-f") == "rawvideo" then
     local w, h = option(args, "-vf"):match("scale=(%d+):(%d+)")
     local bytes = tonumber(w) * tonumber(h) * 4
-    write(args[#args], string.rep("a", bytes) ..
-      (option(args, "-frames:v") and "" or string.rep("b", bytes)))
+    write(args[#args], string.rep(option(args, "-vf"):find("reverse") and "b" or "a", bytes))
     job.callback(true, { status = 0 })
   else
     job.callback(true, { status = 0 })
@@ -161,6 +176,29 @@ if real_processes then
     write(destination .. "/" .. which .. ".raw", overlay.data)
     print(which, overlay.w, overlay.h)
   end
+  if strip_mode then
+    for index = preview_options.end_frame_first, preview_options.end_frame_last do
+      local id = index == 0 and 2 or 3 + index - preview_options.end_frame_first - (index > 0 and 1 or 0)
+      if index ~= 0 and overlays[id] then write(destination .. "/" .. index .. ".raw", overlays[id].data) end
+    end
+    local decodes = 0
+    for _, args in ipairs(calls) do
+      if args[1] == "ffmpeg" and option(args, "-f") == "rawvideo" then decodes = decodes + 1 end
+    end
+    if os.getenv("CLIP_TEST_ALLOW_RETRY") ~= "1" then
+      assert(decodes == 2, "all B frames must share one extraction command")
+    end
+    local count = #calls
+    props["osd-dimensions"] = { w = 400, h = 450 }
+    props.dwidth, props.dheight = 90, 160
+    observers["osd-dimensions"]()
+    for _, overlay in pairs(overlays) do
+      assert(overlay.x >= 0 and overlay.x + overlay.dw <= 400)
+      assert(overlay.y >= 48 and overlay.y + overlay.dh <= 450)
+    end
+    messages.clip_toggle_previews(); assert(not next(overlays))
+    messages.clip_toggle_previews(); assert(overlays[2] and #calls == count)
+  end
   if mode == "export" then
     bindings.clip_write_copy()
     assert(#queue == 1 and queue[1].command.args[2] ~= "--preview-plan",
@@ -184,13 +222,13 @@ elseif mode == "intent" then
   local preview = assert(overlays[2])
   export.callback(true, { status = 1, stderr = "conversion failed" })
   assert(overlays[2] == preview, "failure must retain previews")
-  assert(osd[#osd]:find("\\1c&H0000FF&", 1, true) and osd[#osd]:find("FAILED"))
+  assert(osd[#osd]:find("\\1c&H0080FF&", 1, true) and osd[#osd]:find("FAILED"))
   assert(not osd[#osd]:find("DONE"))
   bindings.clip_write_copy()
   export = assert(table.remove(queue, 1))
   export.callback(true, { status = 0 })
   assert(not next(overlays))
-  assert(osd[#osd]:find("\\1c&HFF0000&", 1, true) and osd[#osd]:find("DONE"))
+  assert(osd[#osd]:find("\\1c&HFF8000&", 1, true) and osd[#osd]:find("DONE"))
   -- Preview failure is not an export failure: y still starts the converter.
   mark("end", 11); flush_timers()
   local plan = assert(table.remove(queue, 1))
