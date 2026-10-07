@@ -1,3 +1,110 @@
+"""
+dcsize — ranger plugin for recursive size calculation with linemode/sort/filter/undo.
+
+════════════════════════════════════════════════════════════════════════════════
+MODES
+────────────────────────────────────────────────────────────────────────────────
+  f  no-symlink  regular files only; all symlinks skipped at every level
+  a  all         regular files + symlinks; file-symlinks counted with target
+                 size; dir-symlinks descended with (dev,ino) loop guard;
+                 broken links counted 1 with link size
+  v  video       only regular (non-link) files in EXTS whose first video
+                 track format matches SPEC; configured by codec= argument
+
+════════════════════════════════════════════════════════════════════════════════
+LINEMODES
+────────────────────────────────────────────────────────────────────────────────
+  dc{f,a,v} applied ONLY to dir entries in current pwd.
+  Files in pwd: linemode never changed by dc*.
+  Contents of subdirs: never touched.
+  Format: dirs → "(n) size"   files → "size"   n = matched file count.
+  cursor / 1dc*: only the entry under cursor updated; others unchanged.
+
+════════════════════════════════════════════════════════════════════════════════
+SORTING
+────────────────────────────────────────────────────────────────────────────────
+  sort keys dc{f,a,v}: largest first; uncomputed entries sort to end (size 0).
+  Activated by the sort argument; restored by dcu.
+  Restore order: setlocal (if original sort was local) → fallback to set.
+
+════════════════════════════════════════════════════════════════════════════════
+FILTERING  (DcFilter — at most one per pwd, mode updated in-place)
+────────────────────────────────────────────────────────────────────────────────
+  mode f/a — always applied when running dcf/dca:
+    dirs:  hidden if HIDE_EMPTY and computed count == 0
+    files: always pass  →  unhides any files hidden by a previous dcv
+  mode v — applied only when filter argument given:
+    dirs:  hidden if HIDE_EMPTY and computed count == 0
+    files: hidden if codec does not match SPEC
+  Switching f/a → v: DcFilter.mode updated, file-hiding reactivated.
+  Switching v → f/a: DcFilter.mode updated, file-hiding cleared.
+  dcv without filter: any existing DcFilter removed.
+
+════════════════════════════════════════════════════════════════════════════════
+HIDE_EMPTY
+────────────────────────────────────────────────────────────────────────────────
+  HIDE_EMPTY = True  (module-level; False disables dir-hiding globally)
+  Dirs with computed count == 0 hidden in all modes.
+  File-hiding in v mode is independent of HIDE_EMPTY.
+
+════════════════════════════════════════════════════════════════════════════════
+UNDO  (dcu → :dcsize undo)
+────────────────────────────────────────────────────────────────────────────────
+  Snapshot taken before the FIRST dc* run in a pwd; subsequent runs reuse
+  the same snapshot so dcu always reverts to the pre-dc* state.
+  Restores:
+    • pwd sort+sort_reverse (local or global), pwd filter_stack
+    • per-entry linemode and SIZES for every item in pwd (all three modes)
+    • filter_stack of every already-loaded subdir of pwd
+  Clears snapshot on restore; next dc* re-snapshots fresh.
+  Notifies if no snapshot exists for this pwd.
+
+════════════════════════════════════════════════════════════════════════════════
+CURSOR MODE
+────────────────────────────────────────────────────────────────────────────────
+  Triggered by cursor argument or count prefix (1dcf, 2dcv, …).
+  Computes only the item under the cursor; only its linemode is updated.
+  If sort or filter is requested, all cwd files are computed too.
+
+════════════════════════════════════════════════════════════════════════════════
+CODEC ARGUMENT
+────────────────────────────────────────────────────────────────────────────────
+  codec=a,b        match any format in set (case-insensitive)
+  codec=!a,!b      exclude listed formats; pass anything else
+  Mixed:           codec=hevc,!avc
+  Compared against pymediainfo first video track Format field.
+  Changing codec spec clears all cached v SIZES.
+  Default: AV1
+
+════════════════════════════════════════════════════════════════════════════════
+PERSISTENT CACHE
+────────────────────────────────────────────────────────────────────────────────
+  ~/.cache/ranger/dcsize.json  MediaInfo results keyed by path+mtime_ns+size.
+  Survives ranger restarts. SIZES and SNAP are in-memory only.
+
+════════════════════════════════════════════════════════════════════════════════
+MAPPINGS  (rc.conf)
+────────────────────────────────────────────────────────────────────────────────
+  map dcf  dcsize f sort
+  map dca  dcsize a sort
+  map dcv  dcsize v sort filter codec=AV1
+  map dcF  dcsize f sort cursor
+  map dcA  dcsize a sort cursor
+  map dcV  dcsize v sort filter cursor codec=AV1
+  map dcu  dcsize undo
+
+════════════════════════════════════════════════════════════════════════════════
+KNOWN LIMITATIONS
+────────────────────────────────────────────────────────────────────────────────
+  • Hardlinks double-counted.
+  • Only EXTS files codec-checked (default: .mp4).
+  • UI blocks during computation; first dcv on cold cache is slow.
+  • SIZES and SNAP lost on restart.
+  • setlocal path restore may break on paths with spaces (ranger cmd parser).
+  • fm.settings._local is private; check on ranger upgrades.
+════════════════════════════════════════════════════════════════════════════════
+"""
+
 import json
 import os
 import stat
@@ -9,29 +116,27 @@ from ranger.container.directory import Directory
 from ranger.core.linemode import LinemodeBase
 from ranger.ext.human_readable import human_readable
 
-try:
-    from ranger.core.filter_stack import stack_filter
-except ImportError:
-    stack_filter = lambda name: lambda cls: cls
-
-MODES = "fav"  # f: no symlinks, a: with symlinks, v: codec-matching video
+MODES = "fav"
 EXTS = (".mp4",)
-HIDE_EMPTY = True  # codec filter also hides dirs whose computed (v) count/size is 0
+HIDE_EMPTY = True
 CACHE = os.path.join(
     os.environ.get("XDG_CACHE_HOME") or os.path.expanduser("~/.cache"),
     "ranger",
     "dcsize.json",
 )
 SIZES = {m: {} for m in MODES}  # mode -> {path: (nfiles, bytes)}
-SPEC = (frozenset({"av1"}), frozenset())  # (wanted, unwanted) codecs for mode v
-SNAP = {}  # pwd -> state before the first dc* run there
+SPEC = (frozenset({"av1"}), frozenset())  # (wanted, unwanted) codec sets
+SNAP = {}  # pwd.path -> snapshot dict
 
 try:
     with open(CACHE) as fh:
-        _FMT = json.load(fh)  # "path\0mtime_ns\0size" -> first video track format
+        _FMT = json.load(fh)  # "path\0mtime_ns\0size" -> format string
 except (OSError, ValueError):
     _FMT = {}
 _dirty = False
+
+
+# ── MediaInfo cache ───────────────────────────────────────────────────────────
 
 
 def _save():
@@ -61,7 +166,10 @@ def _vfmt(p, st):
     return _FMT[k]
 
 
-def _parse(s):
+# ── codec spec ────────────────────────────────────────────────────────────────
+
+
+def _parse_spec(s):
     pos, neg = set(), set()
     for t in s.lower().split(","):
         t = t.strip()
@@ -74,6 +182,9 @@ def _match(fmt):
     pos, neg = SPEC
     fmt = fmt.lower()
     return bool(fmt) and (not pos or fmt in pos) and fmt not in neg
+
+
+# ── walk ──────────────────────────────────────────────────────────────────────
 
 
 def _leaf(p, mode, st):
@@ -91,15 +202,15 @@ def _scan(path, mode, seen):
                     link = e.is_symlink()
                     if link and mode != "a":
                         continue
-                    if e.is_dir():  # follows links
-                        if mode == "a":  # loop guard
+                    if e.is_dir():
+                        if mode == "a":
                             st = e.stat()
                             key = (st.st_dev, st.st_ino)
                             if key in seen:
                                 continue
                             seen.add(key)
                         c, s = _scan(e.path, mode, seen)
-                    elif link:  # mode a: file or broken link
+                    elif link:
                         try:
                             st = e.stat()
                         except OSError:
@@ -122,13 +233,13 @@ def _scan(path, mode, seen):
 
 
 def _tree(path, mode):
-    """Top-level entry: a symlink to a dir is a dir (descended in every mode)."""
+    """Top-level: symlinked dirs descended in every mode."""
     try:
         lst = os.lstat(path)
         link = stat.S_ISLNK(lst.st_mode)
         try:
             st = os.stat(path) if link else lst
-        except OSError:  # broken link
+        except OSError:
             return (1, lst.st_size) if mode == "a" else (0, 0)
         if stat.S_ISDIR(st.st_mode):
             return _scan(path, mode, {(st.st_dev, st.st_ino)})
@@ -148,46 +259,109 @@ def _get(path, mode):
     return r
 
 
-@stack_filter("codec")
-class CodecFilter:
-    """Files pass if they match SPEC. Dirs pass unless computed as empty (HIDE_EMPTY)."""
+# ── filter ────────────────────────────────────────────────────────────────────
 
-    def __init__(self, args=None):
-        pass
+
+class DcFilter:
+    """
+    Single filter instance per pwd; mode swapped in-place on mode switch.
+    f/a: files always pass; dirs hidden if HIDE_EMPTY and count==0.
+    v:   files pass only if codec matches SPEC; dirs hidden if HIDE_EMPTY and count==0.
+    """
+
+    def __init__(self, mode):
+        self.mode = mode
 
     def __call__(self, fobj):
         if fobj.is_directory:
-            r = SIZES["v"].get(fobj.path)
-            return not (HIDE_EMPTY and r is not None and (r[0] == 0 or r[1] == 0))
-        return _get(fobj.path, "v")[0] > 0
+            if not HIDE_EMPTY:
+                return True
+            r = SIZES[self.mode].get(fobj.path)
+            return r is None or r[0] > 0  # unknown → pass; computed empty → hide
+        if self.mode == "v":
+            return _get(fobj.path, "v")[0] > 0
+        return True  # f/a: all files pass
 
     def __str__(self):
-        return "<Filter: codec>"
+        return f"<Filter: dc{self.mode}>"
 
     def decompose(self):
         return [self]
 
 
-def _unfilter(d):
-    for x in [x for x in d.filter_stack if isinstance(x, CodecFilter)]:
+def _set_filter(d, mode):
+    """Update existing DcFilter in-place or append a new one."""
+    for x in d.filter_stack:
+        if isinstance(x, DcFilter):
+            x.mode = mode
+            return
+    d.filter_stack.append(DcFilter(mode))
+
+
+def _remove_filter(d):
+    for x in [x for x in d.filter_stack if isinstance(x, DcFilter)]:
         d.filter_stack.remove(x)
+
+
+# ── snapshot ──────────────────────────────────────────────────────────────────
+
+
+def _snap_sort(fm, d):
+    """Detect local vs global sort. Returns (sort, rev, is_local).
+    Uses fm.settings._local (private attr — check on ranger upgrades)."""
+    try:
+        local = fm.settings._local.get(d.path, {})
+        if "sort" in local:
+            return (
+                local["sort"],
+                local.get("sort_reverse", fm.settings.sort_reverse),
+                True,
+            )
+    except (AttributeError, KeyError):
+        pass
+    return fm.settings.sort, fm.settings.sort_reverse, False
 
 
 def _snapshot(fm, d):
     files = d.files_all or []
+    sort, rev, is_local = _snap_sort(fm, d)
+    fdirs = getattr(fm, "directories", {})
+    subdirs = {}
+    for f in files:
+        if f.is_directory and f.path in fdirs:
+            sub = fdirs[f.path]
+            subdirs[f.path] = {"filt": list(sub.filter_stack)}
     return dict(
-        sort=fm.settings.sort,
-        rev=fm.settings.sort_reverse,
+        sort=sort,
+        rev=rev,
+        sort_is_local=is_local,
         filt=list(d.filter_stack),
         lm={f.path: f.linemode for f in files},
         sizes={m: {f.path: SIZES[m].get(f.path) for f in files} for m in MODES},
+        subdirs=subdirs,
     )
 
 
+def _restore_sort(fm, d, sn):
+    sort = sn["sort"]
+    rev = str(sn["rev"]).lower()  # 'true' / 'false'
+    if sn.get("sort_is_local"):
+        try:
+            fm.execute_console(f"setlocal path={d.path} sort={sort}")
+            fm.execute_console(f"setlocal path={d.path} sort_reverse={rev}")
+            return
+        except Exception:
+            pass
+    fm.execute_console(f"set sort={sort}")
+    fm.execute_console(f"set sort_reverse={rev}")
+
+
+# ── command ───────────────────────────────────────────────────────────────────
+
+
 class dcsize(Command):
-    """:dcsize <f|a|v|u> [sort] [filter] [cursor] [codec=a,b | codec=!a,!b]
-    u: undo everything dc* did in this pwd. A count prefix implies cursor.
-    codec/filter apply to mode v only."""
+    """:dcsize <f|a|v|undo> [sort] [filter] [cursor] [codec=…]
+    count prefix (1dc*) implies cursor."""
 
     def _undo(self, d):
         sn = SNAP.pop(d.path, None)
@@ -203,8 +377,14 @@ class dcsize(Command):
                 else:
                     SIZES[m][p] = v
         d.filter_stack[:] = sn["filt"]
-        self.fm.execute_console("set sort=%s" % sn["sort"])
-        self.fm.execute_console("set sort_reverse=%s" % sn["rev"])
+        fdirs = getattr(self.fm, "directories", {})
+        for spath, sstate in sn.get("subdirs", {}).items():
+            if spath in fdirs:
+                sub = fdirs[spath]
+                sub.filter_stack[:] = sstate["filt"]
+                if sub.files_all is not None:
+                    sub.refilter()
+        _restore_sort(self.fm, d, sn)
         if d.files_all is not None:
             d.refilter()
         d.sort()
@@ -214,10 +394,11 @@ class dcsize(Command):
         global SPEC
         mode = self.arg(1)
         d = self.fm.thisdir
-        if mode == "u":
+
+        if mode == "undo":
             return self._undo(d)
         if mode not in MODES or len(mode) != 1:
-            return self.fm.notify("dcsize: mode must be f|a|v|u", bad=True)
+            return self.fm.notify("dcsize: mode must be f|a|v or undo", bad=True)
         if d.path not in SNAP:
             SNAP[d.path] = _snapshot(self.fm, d)
 
@@ -228,23 +409,24 @@ class dcsize(Command):
             else:
                 opts.add(a)
         if mode == "v" and codec is not None:
-            new = _parse(codec)
+            new = _parse_spec(codec)
             if new != SPEC:
                 SPEC = new
                 SIZES["v"].clear()
 
         name = "dc" + mode
-        if self.quantifier is not None or "cursor" in opts:
-            items = [self.fm.thisfile] if self.fm.thisfile else []
-        else:
-            items = list(d.files_all or [])
+        cursor = self.quantifier is not None or "cursor" in opts
+        items = (
+            ([self.fm.thisfile] if self.fm.thisfile else [])
+            if cursor
+            else list(d.files_all or [])
+        )
         dirs = [f for f in items if f.is_directory]
-        if (
-            "sort" in opts or "filter" in opts
-        ):  # sort/filter need data for all cwd files
-            files = [f for f in (d.files_all or []) if not f.is_directory]
-        else:
-            files = [f for f in items if not f.is_directory]
+        files = (
+            [f for f in (d.files_all or []) if not f.is_directory]
+            if "sort" in opts or "filter" in opts
+            else [f for f in items if not f.is_directory]
+        )
 
         todo = dirs + files
         if len(todo) > 1:
@@ -255,23 +437,25 @@ class dcsize(Command):
         SIZES[mode].update({f.path: r for f, r in zip(todo, res)})
         _save()
 
-        for f in dirs:  # linemode: cwd dirs only
+        for f in dirs:
             f.linemode = name
 
-        if mode == "v":
-            if "filter" in opts and not any(
-                isinstance(x, CodecFilter) for x in d.filter_stack
-            ):
-                d.filter_stack.append(CodecFilter())
-        else:
-            _unfilter(d)
+        if mode in ("f", "a"):
+            _set_filter(d, mode)  # always: hide empty dirs, pass files
+        elif "filter" in opts:  # v with filter
+            _set_filter(d, mode)  # hide empty dirs + filter files by codec
+        else:  # v without filter
+            _remove_filter(d)
+
         if d.files_all is not None:
             d.refilter()
-
         if "sort" in opts:
             self.fm.execute_console("set sort=" + name)
         d.sort()
         self.fm.ui.redraw_main_column()
+
+
+# ── linemodes + sort keys ─────────────────────────────────────────────────────
 
 
 def _mk(mode):
