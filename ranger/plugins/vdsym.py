@@ -1192,6 +1192,48 @@ class _MoveJob:
             )
 
 
+class _DanglingPasteJob:
+    """Hold dangling destination links aside while non-append overwrite copies replace them."""
+
+    def __init__(self, fm, paths: Sequence[str]) -> None:
+        self.fm = fm
+        suffix = f".vdsym-dangling-{os.getpid()}-{time.time_ns()}"
+        self.stages = [(path, path + suffix) for path in paths]
+        self.done = False
+
+    def stage(self) -> bool:
+        try:
+            for path, backup in self.stages:
+                if not fs.islink(path) or not _dangling(path) or fs.lexists(backup):
+                    raise OSError(f"cannot stage dangling symlink {path}")
+                os.replace(path, backup)
+        except OSError as error:
+            self.finish()
+            self.fm.notify(f"could not stage dangling symlink: {error}", bad=True)
+            return False
+        return True
+
+    def finish(self) -> None:
+        if self.done:
+            return
+        self.done = True
+        problems: list[str] = []
+        for path, backup in self.stages:
+            try:
+                if fs.lexists(path):
+                    if fs.lexists(backup):
+                        os.unlink(backup)
+                elif fs.lexists(backup):
+                    os.replace(backup, path)
+            except OSError as error:
+                problems.append(f"{path}: {error}")
+        _cache.touch(path for stage in self.stages for path in stage)
+        if problems:
+            self.fm.notify(
+                f"{len(problems)} dangling symlink replacement problem(s)", bad=True
+            )
+
+
 def _print_links(fm, op: str, hits: list[_Hit]) -> None:
     if not PRINT_BEFORE_PROMPT or not hits:
         return
@@ -2277,7 +2319,37 @@ def _make_paste(orig):
                     )
                 finally:
                     self.copy_buffer = saved
-        if not self.do_cut or not self.copy_buffer:
+        if not self.do_cut:
+            if overwrite and not append and self.copy_buffer and fs.isdir(target):
+                dangling = [
+                    fs.join(target, entry.basename)
+                    for entry in self.copy_buffer
+                    if fs.islink(fs.join(target, entry.basename))
+                    and _dangling(fs.join(target, entry.basename))
+                ]
+                if dangling:
+                    job = _DanglingPasteJob(self, dangling)
+                    if not job.stage():
+                        return None
+                    _STATE.job = job
+                    try:
+                        return orig(
+                            self,
+                            overwrite=overwrite,
+                            append=append,
+                            dest=dest,
+                            make_safe_path=make_safe_path,
+                        )
+                    finally:
+                        _STATE.job = None
+            return orig(
+                self,
+                overwrite=overwrite,
+                append=append,
+                dest=dest,
+                make_safe_path=make_safe_path,
+            )
+        if not self.copy_buffer:
             return orig(
                 self,
                 overwrite=overwrite,

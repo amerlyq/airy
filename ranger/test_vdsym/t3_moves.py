@@ -410,6 +410,22 @@ fm.copy_buffer = {Entry(copy_target)}
 fm.thisdir.path = d2
 fm.paste_symlink(relative=True)
 assert any("same target already exists" in n for n in fm.notes)
+# po replaces a dangling symlink itself instead of creating its old target file
+overwrite_src = fs.join(d1, "a/overwrite.mp4")
+overwrite_dst = fs.join(d2, "overwrite.mp4")
+missing_target = fs.join(d2, "missing/overwrite.mp4")
+with open(overwrite_src, "w") as handle:
+    handle.write("replacement")
+os.symlink(missing_target, overwrite_dst)
+fm = newfm(fs.join(d1, "a"))
+fm.copy_buffer = {Entry(overwrite_src)}
+fm.thistab.path = d2
+fm.paste(overwrite=True)
+assert fm.queue and not fs.lexists(overwrite_dst)
+assert any(".vdsym-dangling-" in name for name in os.listdir(d2))
+fm.run_loader()
+assert not fs.islink(overwrite_dst) and open(overwrite_dst).read() == "replacement"
+assert not fs.exists(missing_target)
 # outside the VD roots: only clips are checked
 o = fs.join(outside, "x.mp4")
 w(o)
