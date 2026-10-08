@@ -115,6 +115,7 @@ import os
 import re
 import stat
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
+from threading import RLock
 
 from ranger.api import register_linemode
 from ranger.api.commands import Command
@@ -139,7 +140,13 @@ try:
         _FMT = json.load(fh)  # "path\0mtime_ns\0size" -> format string
 except (OSError, ValueError):
     _FMT = {}
+if not isinstance(_FMT, dict):
+    _FMT = {}
 _dirty = False
+_cache_lock = RLock()
+_misses_since_save = 0
+_CACHE_SAVE_EVERY = 128
+_MAX_WORKERS = 8
 
 
 class _DcsizeLoader(Loadable):
@@ -158,7 +165,7 @@ class _DcsizeLoader(Loadable):
         if not self.todo:
             self.on_finish()
             return
-        with ThreadPoolExecutor() as ex:
+        with ThreadPoolExecutor(max_workers=min(_MAX_WORKERS, len(self.todo))) as ex:
             jobs = {ex.submit(_tree, f.path, self.mode, True): f for f in self.todo}
             pending = set(jobs)
             done_count = 0
@@ -179,29 +186,53 @@ class _DcsizeLoader(Loadable):
 
 def _save():
     global _dirty
-    if not _dirty:
-        return
-    os.makedirs(os.path.dirname(CACHE), exist_ok=True)
-    tmp = CACHE + ".tmp"
-    with open(tmp, "w") as fh:
-        json.dump(_FMT, fh)
-    os.replace(tmp, CACHE)
-    _dirty = False
+    with _cache_lock:
+        if not _dirty:
+            return
+        snapshot = dict(_FMT)
+        _dirty = False
+    try:
+        os.makedirs(os.path.dirname(CACHE), exist_ok=True)
+        tmp = CACHE + ".tmp"
+        with open(tmp, "w") as fh:
+            json.dump(snapshot, fh)
+        os.replace(tmp, CACHE)
+    except Exception:
+        with _cache_lock:
+            _dirty = True
+        raise
 
 
 def _vfmt(p, st):
-    global _dirty
+    global _dirty, _misses_since_save
     k = f"{p}\0{st.st_mtime_ns}\0{st.st_size}"
-    if k not in _FMT:
-        try:
-            from pymediainfo import MediaInfo
+    with _cache_lock:
+        cached = _FMT.get(k)
+    if cached is not None:
+        return cached
 
-            v = MediaInfo.parse(p).video_tracks
-            _FMT[k] = (v[0].format or "") if v else ""
-        except Exception:
-            _FMT[k] = ""
+    try:
+        from pymediainfo import MediaInfo
+
+        v = MediaInfo.parse(p).video_tracks
+        fmt = (v[0].format or "") if v else ""
+    except Exception:
+        fmt = ""
+
+    with _cache_lock:
+        # Another worker may have completed this exact key while MediaInfo ran.
+        cached = _FMT.get(k)
+        if cached is not None:
+            return cached
+        _FMT[k] = fmt
         _dirty = True
-    return _FMT[k]
+        _misses_since_save += 1
+        save = _misses_since_save >= _CACHE_SAVE_EVERY
+        if save:
+            _misses_since_save = 0
+    if save:
+        _save()
+    return fmt
 
 
 # ── codec spec ────────────────────────────────────────────────────────────────
@@ -289,7 +320,7 @@ def _scan_video_parallel(path):
     if len(entries) < 2:
         return _scan(path, "video", set())
     n = size = 0
-    with ThreadPoolExecutor() as ex:
+    with ThreadPoolExecutor(max_workers=min(_MAX_WORKERS, len(entries))) as ex:
         for count, value in ex.map(lambda e: _tree(e.path, "video"), entries):
             n += count
             size += value
