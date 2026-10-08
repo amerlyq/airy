@@ -36,6 +36,7 @@ class history_clear(Command):
 
 import sys
 
+from ranger.core.actions import Actions
 from ranger.core.tab import Tab
 
 ## What happens on a jump that is not a plain step (e.g. <cl>) when you are NOT at the end of
@@ -138,6 +139,24 @@ def enter_dir(self, path, history=True):
 
 
 Tab.enter_dir = enter_dir
+
+
+def _sync_parent_cursor(tab):
+    """Match normal directory navigation after history restores a directory directly."""
+    if tab.thisdir:
+        tab.assign_cursor_positions_for_subdirs()
+
+
+_history_go = Actions.history_go
+
+
+def history_go(self, relative):
+    ret = _history_go(self, relative)
+    _sync_parent_cursor(self.thistab)
+    return ret
+
+
+Actions.history_go = history_go
 
 
 import os

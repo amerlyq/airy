@@ -264,6 +264,7 @@ fm.sel = [Entry(fs.join(d1, "a/some video.mp4"))]
 out = run_delete(fm, ["y", "y", "y"])
 print(out)
 assert len(out) == 3 and fm.deleted == [["some video.mp4"]]
+assert "some video_00m33s6.mp4" not in out[1]
 # no clip/no link file: confirm only
 fm = FM(fs.join(d2, "x"))
 fm.sel = [Entry(fs.join(d2, "x/Foo.MP4"))]

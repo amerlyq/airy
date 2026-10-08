@@ -21,6 +21,9 @@ class D:  # Directory stand-in: one object per path, like fm.get_directory()
     def __repr__(s):
         return s.path
 
+    def move_to_obj(s, obj):
+        s.pointed = obj
+
 
 def mk(n):
     h = History(2000, unique=False)
@@ -123,4 +126,13 @@ assert (
 )
 assert chain("cd", True) is False  # another ranger caller: a real jump
 assert H._is_step(sys._getframe(0)) is False  # no ranger frame within reach
+
+# --- history_go must restore the parent cursor like Tab.enter_dir() does
+parent, child = D("/parent"), D("/parent/child")
+tab = type("Tab", (), {})()
+tab.thisdir = child
+tab.pathway = (parent, child)
+tab.assign_cursor_positions_for_subdirs = lambda: Tab.assign_cursor_positions_for_subdirs(tab)
+H._sync_parent_cursor(tab)
+assert parent.pointed is child
 print("OK5")

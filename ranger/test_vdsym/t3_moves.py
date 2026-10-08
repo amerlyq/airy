@@ -268,6 +268,7 @@ def full_cycle(choice, dest, cancel=None, key=None):
 fm, text = full_cycle("U", d2)
 print(text)
 assert "3 symlink(s)" in text and "1 clip(s)" in text and "U=update" in text
+assert "movie_00m33s6.mp4" not in text
 assert (
     fm.cmds
     and "abs" in fm.cmds[0]

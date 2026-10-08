@@ -41,10 +41,29 @@ from ranger.ext.safe_path import get_safe_path
 from ranger.ext.shell_escape import shell_quote
 
 DASHBOARD_ROOT = "/t/bnm"
-# Freshness of the cache before a search (--modifiers=norefresh forces "none", q forces "validate"):
-#   validate  stat-walk every directory, rescan the changed ones (reliable, ms when warm)
-#   visited   rescan only directories visited in ranger or targeted by a dashboard (cheapest)
-#   none      trust the cache as it is
+# Cache freshness before a :vdsym search.
+#
+# "validate" stat-walks every cached directory.
+# It rescans only directories whose mtime changed.
+# This catches changes made outside ranger.
+# It is reliable when directory mtimes are reliable.
+# It costs one stat per cached directory.
+# It is the default.
+#
+# "visited" remembers each VD directory reached by ranger's cd signal.
+# It remembers both the displayed spelling and realpath spelling.
+# The next visited-mode search rescans each remembered directory subtree.
+# Dashboard creation also remembers source directories plus symlink target directories.
+# This cheaply catches work done during this ranger session.
+# It can miss external changes in unvisited directories.
+# It can miss a symlinked directory when ranger keeps an outside symlink-leaf spelling.
+#
+# "none" trusts the index except that gone matched paths are filtered out.
+# "rescan" rebuilds every root from scratch.
+#
+# --modifiers=norefresh forces "none".
+# --action=refresh forces "validate".
+# --action=rescan forces "rescan".
 REFRESH = "validate"
 WARM_ON_CD = True  # start the background cache build on the first cd() under a VD root
 DELETE_SCANS_DIRS = True  # :delete also looks for links into directories being deleted
@@ -1047,7 +1066,7 @@ def _guard_move(
     if hits:
         parts.append(f"{len(hits)} symlink(s): {_brief(h.link for h in hits)}")
     if clips:
-        parts.append(f"{len(clips)} clip(s): {_brief(map(fs.basename, clips))}")
+        parts.append(f"{len(clips)} clip(s)")
     if hits:
         text = (
             " + ".join(parts)
@@ -1651,7 +1670,7 @@ class delete(_default_delete):
         if not clips:
             return self._check_links(files, paths)
         self._ask(
-            f"{len(clips)} clip(s): {_brief(map(fs.basename, clips))}"
+            f"{len(clips)} clip(s)"
             " -- delete anyway? (y/N)",
             ("n", "N", "y", "Y"),
             lambda ans: ans in ("y", "Y") and self._check_links(files, paths),
