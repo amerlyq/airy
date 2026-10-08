@@ -392,6 +392,31 @@ fm.thistab.path = d2
 fm.paste()
 fm.run_loader()
 assert fs.exists(fs.join(d2, "plain.mp4"))
+# pj moves a file then leaves an in-root relative source link
+leave = fs.join(d1, "a/leave.mp4")
+leave_new = fs.join(d1, "b/leave.mp4")
+w(leave)
+os.makedirs(fs.dirname(leave_new), exist_ok=True)
+fm = newfm(fs.join(d1, "a"))
+fm.select(leave)
+fm.cut()
+fm.thistab.path = fs.join(d1, "b")
+fm.paste(leave_symlink=True)
+fm.run_loader()
+assert fs.islink(leave) and os.readlink(leave) == "../b/leave.mp4"
+assert fs.realpath(leave) == leave_new
+# pj crosses a VD-root boundary with an absolute source link
+leave_cross = fs.join(d1, "a/leave-cross.mp4")
+leave_cross_new = fs.join(d2, "leave-cross.mp4")
+w(leave_cross)
+fm = newfm(fs.join(d1, "a"))
+fm.select(leave_cross)
+fm.cut()
+fm.thistab.path = d2
+fm.paste(leave_symlink=True)
+fm.run_loader()
+assert fs.islink(leave_cross) and os.readlink(leave_cross) == leave_cross_new
+assert fs.realpath(leave_cross) == leave_cross_new
 # paste does not create a ranger safe-name duplicate for an equivalent symlink
 copy_target = fs.join(d1, "a/copy-target.mp4")
 copy_link = fs.join(view, "copy.mp4")

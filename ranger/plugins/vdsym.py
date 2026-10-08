@@ -680,6 +680,24 @@ def _under_roots(path: str) -> bool:
     return False
 
 
+def _vd_root(path: str) -> str | None:
+    """Resolved VD root containing `path`, if any."""
+    path = fs.realpath(path)
+    for root in vdsym.roots():
+        root = fs.realpath(root)
+        if path == root or path.startswith(root + os.sep):
+            return root
+    return None
+
+
+def _leave_link_text(old: str, new: str) -> str:
+    """Use a relative link within one VD root.  Do not make cross-root links relative."""
+    new = _norm(new)
+    if _vd_root(old) == _vd_root(new) and _vd_root(new) is not None:
+        return fs.relpath(new, fs.realpath(fs.dirname(old)))
+    return new
+
+
 def _hops(link: str, limit: int = 40) -> Iterable[str]:
     """Successive targets of a symlink chain (each hop: parents resolved, leaf kept)."""
     current = link
@@ -1232,6 +1250,55 @@ class _DanglingPasteJob:
             self.fm.notify(
                 f"{len(problems)} dangling symlink replacement problem(s)", bad=True
             )
+
+
+class _LeaveLinkJob:
+    """After a cut succeeds, put a link at each vacated source path."""
+
+    def __init__(self, fm, moves: dict[str, str]) -> None:
+        self.fm = fm
+        self.moves = moves
+        self.ids: dict[str, tuple[int, int]] = {}
+        for old in moves:
+            try:
+                st = os.lstat(old)
+                self.ids[old] = (st.st_dev, st.st_ino)
+            except OSError:
+                pass
+        self.done = False
+
+    def finish(self) -> None:
+        if self.done:
+            return
+        self.done = True
+        left = problems = 0
+        for old, predicted in self.moves.items():
+            if fs.lexists(old):
+                continue
+            new = _MoveJob._locate(self, old, predicted)
+            if new is None:
+                continue
+            try:
+                os.symlink(_leave_link_text(old, new), old)
+                left += 1
+            except OSError:
+                problems += 1
+        _cache.touch(path for move in self.moves.items() for path in move)
+        if left or problems:
+            self.fm.notify(
+                f"source links: {left} left"
+                + (f", {problems} problem(s)" if problems else ""),
+                bad=bool(problems),
+            )
+
+
+class _JobGroup:
+    def __init__(self, *jobs) -> None:
+        self.jobs = [job for job in jobs if job is not None]
+
+    def finish(self) -> None:
+        for job in self.jobs:
+            job.finish()
 
 
 def _print_links(fm, op: str, hits: list[_Hit]) -> None:
@@ -2294,9 +2361,17 @@ def _make_cut(orig):
 
 def _make_paste(orig):
     def paste(
-        self, overwrite=False, append=False, dest=None, make_safe_path=get_safe_path
+        self,
+        overwrite=False,
+        append=False,
+        dest=None,
+        make_safe_path=get_safe_path,
+        leave_symlink=False,
     ):
         target = self.thistab.path if dest is None else dest
+        if leave_symlink and not self.do_cut:
+            self.notify("source-link paste requires cut", bad=True)
+            return None
         if not self.do_cut and self.copy_buffer and fs.isdir(target):
             duplicates = [
                 entry
@@ -2363,6 +2438,11 @@ def _make_paste(orig):
             wanted = {p: _STATE.policy.pop(p, "") for p in paths}
             active = {p: pol for p, pol in wanted.items() if pol in ("U", "R")}
             job = None
+            leave_job = None
+            moves = {}
+            if leave_symlink and fs.isdir(target):
+                moves = _predict_moves(paths, target, overwrite, make_safe_path)
+                leave_job = _LeaveLinkJob(self, moves)
             if active and fs.isdir(target):
                 moves = _predict_moves(list(active), target, overwrite, make_safe_path)
                 hits = _drop_moving(
@@ -2373,7 +2453,7 @@ def _make_paste(orig):
                     job = _MoveJob(self, moves, active, hits)
                     if not job.stage():
                         return
-            _STATE.job = job
+            _STATE.job = _JobGroup(job, leave_job) if leave_job else job
             try:
                 orig(
                     self,
