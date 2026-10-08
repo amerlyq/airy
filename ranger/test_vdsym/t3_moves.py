@@ -246,6 +246,27 @@ def links():
 
 links()
 
+# ---------- staged links keep an identifiable old spelling until the file moved
+txn_old = fs.join(d1, "a/txn.mp4")
+txn_new = fs.join(d2, "txn.mp4")
+txn_link = fs.join(view, "txn")
+w(txn_old)
+os.symlink(txn_old, txn_link)
+txn_fm = newfm(fs.join(d1, "a"))
+txn_job = M._MoveJob(
+    txn_fm,
+    {txn_old: txn_new},
+    {txn_old: "U"},
+    M.find_hits([txn_old], dashboards=True),
+)
+assert txn_job.stage() and fs.lexists(txn_link) and not fs.exists(txn_link)
+assert any(".vdsym-old-" in name for name in os.listdir(view))
+os.rename(txn_old, txn_new)
+txn_job.finish()
+assert fs.realpath(txn_link) == txn_new
+assert not any(".vdsym-old-" in name for name in os.listdir(view))
+os.unlink(txn_link)
+
 
 def full_cycle(choice, dest, cancel=None, key=None):
     fm = newfm(fs.join(d1, "a"))

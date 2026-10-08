@@ -700,6 +700,16 @@ class _Hit(NamedTuple):
     direct: bool  # the link's first hop already is that place: only such links need re-pointing
 
 
+class _Stage(NamedTuple):
+    hit: _Hit
+    old: str
+    predicted: str
+    backup: str
+    dest: str | None
+    text: str
+    kind: str  # U, R, or K (R collision kept under its old name)
+
+
 def _match(link: str, subjects: set[str], trees: list[str]) -> _Hit | None:
     for index, hop in enumerate(_hops(link)):
         if hop in subjects:
@@ -787,14 +797,12 @@ def _print_dismiss() -> tuple[str, str]:
     keys = set(spec)
     keys = {"" if key in "\n\r" else key for key in keys}
     labels = (["Enter"] if "" in keys else []) + (["space"] if " " in keys else [])
-    labels += sorted(
-        (key for key in keys if key not in ("", " ")), key=str.casefold
-    )
+    labels += sorted((key for key in keys if key not in ("", " ")), key=str.casefold)
     choices = "|".join(shell_quote(key) for key in sorted(keys))
     return (
         " [" + "/".join(labels) + "]",
         "while :; do read -sk 1 key 2>/dev/null || read -rsn 1 key; "
-        + f"case \"$key\" in {choices}) break;; esac; done",
+        + f'case "$key" in {choices}) break;; esac; done',
     )
 
 
@@ -943,6 +951,9 @@ class _MoveJob:
                 self.ids[old] = (st.st_dev, st.st_ino)
             except OSError:
                 pass
+        self.stages: list[_Stage] = []
+        self.staged = False
+        self.tx = f".vdsym-old-{os.getpid()}-{time.time_ns()}"
         self.done = False
 
     def _locate(self, old: str, predicted: str) -> str | None:
@@ -972,6 +983,127 @@ class _MoveJob:
     def _is_dashboard(link: str) -> bool:
         return fs.abspath(link).startswith(fs.abspath(DASHBOARD_ROOT) + os.sep)
 
+    def stage(self) -> bool:
+        """Keep every old link under a recoverable name before making replacement links."""
+        work: list[tuple[_Hit, str, str, str]] = []
+        for hit in self.hits:
+            old = self.by_subject.get(hit.subject)
+            predicted = self.moves.get(old) if old else None
+            if predicted is None:
+                continue
+            mode = "UA" if self._is_dashboard(hit.link) else self.policy.get(old)
+            if mode == "U" and not hit.direct:
+                continue
+            if mode not in ("U", "UA", "R"):
+                continue
+            work.append((hit, old, predicted, mode))
+        if not work:
+            return True
+        work.sort(
+            key=lambda item: (
+                fs.basename(item[0].link) != fs.basename(_norm(item[2]) + item[0].rest)
+            )
+        )
+        sources = {hit.link for hit, _, _, _ in work}
+        owners: set[str] = set()
+        stages: list[_Stage] = []
+        for hit, old, predicted, mode in work:
+            target = _norm(predicted) + hit.rest
+            dest = (
+                hit.link
+                if mode in ("U", "UA")
+                else fs.join(fs.dirname(hit.link), fs.basename(target))
+            )
+            kind = "U" if mode == "UA" else mode
+            if dest in owners:
+                dest = None
+            elif dest not in sources and fs.lexists(dest):
+                if fs.islink(dest) and fs.realpath(dest) == fs.realpath(target):
+                    dest = None
+                elif mode == "R":
+                    dest, kind = hit.link, "K"
+                else:
+                    return False
+            if dest:
+                owners.add(dest)
+            stages.append(
+                _Stage(
+                    hit,
+                    old,
+                    predicted,
+                    hit.link + self.tx,
+                    dest,
+                    _link_text(hit.link, old, predicted, hit.rest),
+                    kind,
+                )
+            )
+        try:
+            for stage in stages:
+                if not fs.islink(stage.hit.link) or fs.lexists(stage.backup):
+                    raise OSError(f"cannot stage {stage.hit.link}")
+                os.replace(stage.hit.link, stage.backup)
+            for stage in stages:
+                if stage.dest:
+                    _swap_link(stage.hit.link, stage.text, stage.dest)
+        except OSError as error:
+            self.stages = stages
+            self._rollback()
+            self.fm.notify(f"could not stage symlinks: {error}", bad=True)
+            return False
+        self.stages = stages
+        self.staged = True
+        _recovery(
+            f"staged {len(stages)} symlink(s)",
+            [f"{stage.backup} -> {stage.hit.link}" for stage in stages],
+        )
+        return True
+
+    def _rollback(self, stages: Sequence[_Stage] | None = None) -> list[str]:
+        """Remove staged links then put surviving old links back under their original names."""
+        problems: list[str] = []
+        for stage in reversed(self.stages if stages is None else stages):
+            try:
+                if (
+                    stage.dest
+                    and fs.islink(stage.dest)
+                    and _safe_readlink(stage.dest) == stage.text
+                ):
+                    os.unlink(stage.dest)
+                if fs.lexists(stage.backup) and not fs.lexists(stage.hit.link):
+                    os.replace(stage.backup, stage.hit.link)
+            except OSError as error:
+                problems.append(f"{stage.hit.link}: {error}")
+        return problems
+
+    def _finish_staged(self, located: dict[str, str | None]) -> None:
+        problems: list[str] = []
+        committed: list[_Stage] = []
+        for stage in self.stages:
+            new = located.get(stage.old)
+            if new is None:
+                continue
+            try:
+                if stage.dest:
+                    text = _link_text(stage.hit.link, stage.old, new, stage.hit.rest)
+                    _swap_link(stage.hit.link, text, stage.dest)
+                if fs.lexists(stage.backup):
+                    os.unlink(stage.backup)
+                committed.append(stage)
+            except OSError as error:
+                problems.append(f"{stage.hit.link}: {error}")
+        failed = [stage for stage in self.stages if stage not in committed]
+        problems += self._rollback(failed)
+        updated = sum(stage.kind == "U" for stage in committed)
+        replaced = sum(stage.kind == "R" for stage in committed)
+        kept = sum(stage.kind == "K" for stage in committed)
+        if committed or problems:
+            self.fm.notify(
+                f"symlinks: {updated} updated, {replaced} replaced"
+                + (f", {kept} re-pointed in place (name taken)" if kept else "")
+                + (f", {len(problems)} problem(s)" if problems else ""),
+                bad=bool(problems),
+            )
+
     def finish(self) -> None:
         if self.done:
             return
@@ -979,6 +1111,16 @@ class _MoveJob:
         located = {
             old: self._locate(old, predicted) for old, predicted in self.moves.items()
         }
+        if self.staged:
+            self._finish_staged(located)
+            _cache.touch(
+                path
+                for stage in self.stages
+                for path in (stage.hit.link, stage.backup, stage.dest)
+                if path
+            )
+            _arm()
+            return
         problems: list[str] = []
         work: list[tuple[_Hit, str, str]] = []
         for hit in self.hits:
@@ -1724,8 +1866,7 @@ class delete(_default_delete):
         if not clips:
             return self._check_links(files, paths)
         self._ask(
-            f"{len(clips)} clip(s)"
-            " -- delete anyway? (y/N)",
+            f"{len(clips)} clip(s) -- delete anyway? (y/N)",
             ("n", "N", "y", "Y"),
             lambda ans: ans in ("y", "Y") and self._check_links(files, paths),
         )
@@ -1819,6 +1960,8 @@ class rename(_default_rename):
                 _recovery("rename", [f"{old} -> {new}"])
                 if hits:
                     job = _MoveJob(fm, {old: new}, {old: policy}, hits)
+                    if not job.stage():
+                        return
             super(rename, self).execute()
             if job:
                 job.finish()
@@ -2117,6 +2260,8 @@ def _make_paste(orig):
                 _recovery("paste", [f"{old} -> {new}" for old, new in moves.items()])
                 if hits and moves:
                     job = _MoveJob(self, moves, active, hits)
+                    if not job.stage():
+                        return
             _STATE.job = job
             try:
                 orig(
