@@ -314,12 +314,17 @@ w(fs.join(d1, "a/back\\slash.mp4"))
 c = mk("vdsym --action=print,refresh --modifiers=glob -- slash", fm)
 c.execute()
 print(fm.cmds[-1][:120])
-assert r"back\\\033[31;1mslash" in fm.cmds[-1], fm.cmds[-1]
+assert r"\033[33;1mback\\" in fm.cmds[-1], fm.cmds[-1]
+assert r"\033[33;1mslash" not in fm.cmds[-1], fm.cmds[-1]
 assert "any key" in fm.cmds[-1] and fm.cmd_flags[-1] == ""
 M.PRINT_DISMISS_KEYS = "\n yqc"
 c.execute()
 assert "Enter/space/c/q/y" in fm.cmds[-1] and 'case "$key" in' in fm.cmds[-1]
 M.PRINT_DISMISS_KEYS = "any"
+M.PRINT_HIGHLIGHT = "needle"
+c.execute()
+assert r"\033[33;1mslash" in fm.cmds[-1], fm.cmds[-1]
+M.PRINT_HIGHLIGHT = "rest"
 
 # --- warm cache persistence over re-exec
 import importlib

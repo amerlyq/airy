@@ -85,6 +85,10 @@ PRINT_BEFORE_PROMPT = (
 # Any other string accepts only its characters.
 # Use "\n yqc" for Enter, space, y, q or c.
 PRINT_DISMISS_KEYS = "any"
+# Print-match emphasis is bold yellow.
+# "rest" emphasizes matching basenames except for the search term.
+# "needle" emphasizes the search term instead.
+PRINT_HIGHLIGHT = "rest"
 RECOVERY_LOG = os.path.join(
     os.environ.get("XDG_STATE_HOME") or os.path.expanduser("~/.local/state"),
     "vdsym",
@@ -1533,14 +1537,35 @@ class vdsym(Command):
         def esc(value: str) -> str:  # printf %b would otherwise eat backslashes
             return value.replace("\\", "\\\\")
 
-        def highlight(value: str) -> str:
+        yellow = "\\033[33;1m"
+
+        def color(value: str) -> str:
+            return f"{yellow}{esc(value)}\\033[m"
+
+        def highlight_needle(value: str) -> str:
             out, last = [], 0
             for match in pattern.finditer(value):
                 out.append(esc(value[last : match.start()]))
-                out.append(f"\\033[31;1m{esc(match[0])}\\033[m")
+                out.append(color(match[0]))
                 last = match.end()
             out.append(esc(value[last:]))
             return "".join(out)
+
+        def highlight_rest(value: str) -> str:
+            base = fs.basename(value)
+            found = tuple(pattern.finditer(base))
+            if not found:
+                return esc(value)
+            prefix = value[: len(value) - len(base)]
+            out, last = [esc(prefix)], 0
+            for match in found:
+                out.append(color(base[last : match.start()]))
+                out.append(esc(match[0]))
+                last = match.end()
+            out.append(color(base[last:]))
+            return "".join(out)
+
+        highlight = highlight_rest if PRINT_HIGHLIGHT == "rest" else highlight_needle
 
         if matches:
             lines = []
