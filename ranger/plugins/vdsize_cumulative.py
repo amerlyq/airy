@@ -25,8 +25,9 @@ LINEMODES
 ════════════════════════════════════════════════════════════════════════════════
 SORTING
 ────────────────────────────────────────────────────────────────────────────────
-  sort keys dc{f,a,v}: largest first; uncomputed entries sort to end (size 0).
-  Activated by the sort argument; restored by dcu.
+  sort keys dc{file,all,video}: largest first; uncomputed entries sort to end (size 0).
+  Activated by the sort argument; setlocal sort is applied to current and visible child dirs.
+  Restored by dcu.
   Restore order: setlocal (if original sort was local) → fallback to set.
 
 ════════════════════════════════════════════════════════════════════════════════
@@ -55,7 +56,7 @@ UNDO  (dcu → :dcsize undo)
   Snapshot taken before the FIRST dc* run in a pwd; subsequent runs reuse
   the same snapshot so dcu always reverts to the pre-dc* state.
   Restores:
-    • pwd sort+sort_reverse (local or global), pwd filter_stack
+    • pwd and visible child sort+sort_reverse settings, pwd filter_stack
     • per-entry linemode and SIZES for every item in pwd (all three modes)
     • filter_stack of every already-loaded subdir of pwd
   Clears snapshot on restore; next dc* re-snapshots fresh.
@@ -109,6 +110,7 @@ KNOWN LIMITATIONS
 
 import json
 import os
+import re
 import stat
 from concurrent.futures import ThreadPoolExecutor
 
@@ -334,9 +336,15 @@ def _snap_sort(fm, d):
     return fm.settings.sort, fm.settings.sort_reverse, False
 
 
+def _snap_local_sort(fm, path):
+    local = getattr(fm.settings, "_localsettings", {}).get(re.escape(path) + "$", {})
+    return {k: local[k] for k in ("sort", "sort_reverse") if k in local}
+
+
 def _snapshot(fm, d):
     files = d.files_all or []
     sort, rev, is_local = _snap_sort(fm, d)
+    paths = [d.path] + [f.path for f in files if f.is_directory]
     fdirs = getattr(fm, "directories", {})
     subdirs = {}
     for f in files:
@@ -347,6 +355,7 @@ def _snapshot(fm, d):
         sort=sort,
         rev=rev,
         sort_is_local=is_local,
+        local_sorts={p: _snap_local_sort(fm, p) for p in paths},
         filt=list(d.filter_stack),
         lm={f.path: f.linemode for f in files},
         sizes={m: {f.path: SIZES[m].get(f.path) for f in files} for m in MODES},
@@ -366,6 +375,25 @@ def _restore_sort(fm, d, sn):
             pass
     fm.execute_console(f"set sort={sort}")
     fm.execute_console(f"set sort_reverse={rev}")
+
+
+def _set_local_sort(fm, path, sort):
+    fm.execute_console(f"setlocal path={path} sort={sort}")
+    fm.execute_console(f"setlocal path={path} sort_reverse=False")
+
+
+def _restore_local_sorts(fm, sn):
+    settings = getattr(fm.settings, "_localsettings", {})
+    for path, saved in sn.get("local_sorts", {}).items():
+        key = re.escape(path) + "$"
+        if saved:
+            local = settings.setdefault(key, {})
+            local.update(saved)
+        elif key in settings:
+            settings[key].pop("sort", None)
+            settings[key].pop("sort_reverse", None)
+            if not settings[key]:
+                settings.pop(key)
 
 
 # ── command ───────────────────────────────────────────────────────────────────
@@ -396,6 +424,7 @@ class dcsize(Command):
                 sub.filter_stack[:] = sstate["filt"]
                 if sub.files_all is not None:
                     sub.refilter()
+        _restore_local_sorts(self.fm, sn)
         _restore_sort(self.fm, d, sn)
         if d.files_all is not None:
             d.refilter()
@@ -410,7 +439,9 @@ class dcsize(Command):
         if mode == "undo":
             return self._undo(d)
         if mode not in MODES:
-            return self.fm.notify("dcsize: mode must be file|all|video or undo", bad=True)
+            return self.fm.notify(
+                "dcsize: mode must be file|all|video or undo", bad=True
+            )
         if d.path not in SNAP:
             SNAP[d.path] = _snapshot(self.fm, d)
 
@@ -462,6 +493,9 @@ class dcsize(Command):
         if d.files_all is not None:
             d.refilter()
         if "sort" in opts:
+            paths = [d.path] + [f.path for f in d.files_all or [] if f.is_directory]
+            for path in paths:
+                _set_local_sort(self.fm, path, name)
             self.fm.execute_console("set sort=" + name)
         d.sort()
         self.fm.ui.redraw_main_column()
