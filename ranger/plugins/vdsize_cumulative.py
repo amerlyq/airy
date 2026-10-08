@@ -36,21 +36,21 @@ SORTING
 FILTERING  (DcFilter — at most one per pwd, mode updated in-place)
 ────────────────────────────────────────────────────────────────────────────────
   mode file/all — always applied when running dcfile/dcall:
-    dirs:  hidden if HIDE_EMPTY and computed count == 0
+    dirs:  hidden only with hide_empty and computed count == 0
     files: always pass  →  unhides any files hidden by a previous dcvideo
   mode video — applied only when filter argument given:
-    dirs:  hidden if HIDE_EMPTY and computed count == 0
+    dirs:  hidden only with hide_empty and computed count == 0
     files: hidden if codec does not match SPEC
   Switching file/all → video: DcFilter.mode updated, file-hiding reactivated.
   Switching video → file/all: DcFilter.mode updated, file-hiding cleared.
   dcvideo without filter: any existing DcFilter removed.
 
 ════════════════════════════════════════════════════════════════════════════════
-HIDE_EMPTY
+EMPTY DIRECTORIES
 ────────────────────────────────────────────────────────────────────────────────
-  HIDE_EMPTY = True  (module-level; False disables dir-hiding globally)
-  Dirs with computed count == 0 hidden in all modes.
-  File-hiding in v mode is independent of HIDE_EMPTY.
+  hide_empty argument enables hiding dirs with computed count == 0.
+  Without hide_empty, zero-size dirs stay visible.
+  File-hiding in video mode is independent of hide_empty.
 
 ════════════════════════════════════════════════════════════════════════════════
 UNDO  (dcu → :dcsize undo)
@@ -93,9 +93,9 @@ MAPPINGS  (rc.conf)
   map dcf  dcsize file sort
   map dca  dcsize all sort
   map dcv  dcsize video sort filter codec=AV1
-  map dcF  dcsize file sort cursor
-  map dcA  dcsize all sort cursor
-  map dcV  dcsize video sort filter cursor codec=AV1
+  map dcF  dcsize file sort hide_empty
+  map dcA  dcsize all sort hide_empty
+  map dcV  dcsize video sort filter hide_empty codec=AV1
   map dcu  dcsize undo
 
 ════════════════════════════════════════════════════════════════════════════════
@@ -125,7 +125,6 @@ from ranger.ext.human_readable import human_readable
 
 MODES = ("file", "all", "video")
 EXTS = (".mp4",)
-HIDE_EMPTY = True
 CACHE = os.path.join(
     os.environ.get("XDG_CACHE_HOME") or os.path.expanduser("~/.cache"),
     "ranger",
@@ -332,16 +331,17 @@ def _get(path, mode):
 class DcFilter:
     """
     Single filter instance per pwd; mode swapped in-place on mode switch.
-    file/all: files always pass; dirs hidden if HIDE_EMPTY and count==0.
-    video:     files pass only if codec matches SPEC; dirs hidden if HIDE_EMPTY and count==0.
+    file/all: files always pass; dirs optionally hidden if count==0.
+    video:     files pass only if codec matches SPEC; dirs optionally hidden if count==0.
     """
 
-    def __init__(self, mode):
+    def __init__(self, mode, hide_empty=False):
         self.mode = mode
+        self.hide_empty = hide_empty
 
     def __call__(self, fobj):
         if fobj.is_directory:
-            if not HIDE_EMPTY:
+            if not self.hide_empty:
                 return True
             r = SIZES[self.mode].get(fobj.path)
             return r is None or r[0] > 0  # unknown → pass; computed empty → hide
@@ -356,13 +356,14 @@ class DcFilter:
         return [self]
 
 
-def _set_filter(d, mode):
+def _set_filter(d, mode, hide_empty):
     """Update existing DcFilter in-place or append a new one."""
     for x in d.filter_stack:
         if isinstance(x, DcFilter):
             x.mode = mode
+            x.hide_empty = hide_empty
             return
-    d.filter_stack.append(DcFilter(mode))
+    d.filter_stack.append(DcFilter(mode, hide_empty))
 
 
 def _remove_filter(d):
@@ -548,10 +549,11 @@ class dcsize(Command):
 
         def on_finish():
             _save()
+            hide_empty = "hide_empty" in opts
             if mode in ("file", "all"):
-                _set_filter(d, mode)  # always: hide empty dirs, pass files
+                _set_filter(d, mode, hide_empty)  # pass files; optionally hide empty dirs
             elif "filter" in opts:  # video with filter
-                _set_filter(d, mode)  # hide empty dirs + filter files by codec
+                _set_filter(d, mode, hide_empty)  # filter files; optionally hide empty dirs
             else:  # video without filter
                 _remove_filter(d)
             if d.files_all is not None:
