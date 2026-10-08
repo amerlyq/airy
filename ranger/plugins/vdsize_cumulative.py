@@ -17,7 +17,9 @@ LINEMODES
   dc{file,all,video} applied ONLY to dir entries in current pwd.
   Files in pwd: linemode never changed by dc*.
   Contents of subdirs: never touched.
-  Format: dirs → "(n) size"   files → "size"   n = matched file count.
+  Format: dcfile dirs → "(*n) size"   dcall dirs → "(n) size".
+  dcvideo dirs → "(n*codec) size" or "(n!codec) size".
+  Files → "size".  n = matched file count.
   cursor / 1dc*: only the entry under cursor updated; others unchanged.
 
 ════════════════════════════════════════════════════════════════════════════════
@@ -182,6 +184,16 @@ def _match(fmt):
     pos, neg = SPEC
     fmt = fmt.lower()
     return bool(fmt) and (not pos or fmt in pos) and fmt not in neg
+
+
+def _codec_label():
+    pos, neg = SPEC
+    parts = []
+    if pos:
+        parts.append("*" + ",".join(sorted(pos)))
+    if neg:
+        parts.append("!" + ",".join(sorted(neg)))
+    return ",".join(parts)
 
 
 # ── walk ──────────────────────────────────────────────────────────────────────
@@ -471,7 +483,15 @@ def _mk(mode):
             if r is None:
                 return ""
             s = human_readable(r[1])
-            return f"({r[0]}) {s}" if fobj.is_directory else s
+            if not fobj.is_directory:
+                return s
+            if mode == "file":
+                label = f"*{r[0]}"
+            elif mode == "video":
+                label = f"{r[0]}{_codec_label()}"
+            else:
+                label = str(r[0])
+            return f"({label}) {s}"
 
     Directory.sort_dict["dc" + mode] = lambda f: -SIZES[mode].get(f.path, (0, 0))[1]
 
