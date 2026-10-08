@@ -114,8 +114,9 @@ import json
 import os
 import re
 import stat
+import sys
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
-from threading import RLock
+from threading import Event, RLock
 
 from ranger.api import register_linemode
 from ranger.api.commands import Command
@@ -160,30 +161,81 @@ class _DcsizeLoader(Loadable):
         self.mode = mode
         self.on_result = on_result
         self.on_finish = on_finish
+        self.cancelled = Event()
+        self._vdsym_monitor = None
         self.percent = 0
         Loadable.__init__(self, self.generate(), "dcsize: calculating")
+
+    def destroy(self):
+        self.cancelled.set()
 
     def generate(self):
         if not self.todo:
             self.on_finish()
             return
-        with ThreadPoolExecutor(max_workers=min(_MAX_WORKERS, len(self.todo))) as ex:
-            jobs = {ex.submit(_tree, f.path, self.mode, True): f for f in self.todo}
+        self._vdsym_monitor = _pause_vdsym_monitor(self.mode)
+        ex = ThreadPoolExecutor(max_workers=min(_MAX_WORKERS, len(self.todo)))
+        try:
+            jobs = {
+                ex.submit(_tree, f.path, self.mode, True, self.cancelled): f
+                for f in self.todo
+            }
             pending = set(jobs)
             done_count = 0
-            while pending:
+            while pending and not self.cancelled.is_set():
                 finished, pending = wait(pending, return_when=FIRST_COMPLETED)
                 for future in finished:
+                    if self.cancelled.is_set():
+                        break
                     f = jobs[future]
                     self.on_result(f, future.result())
                     done_count += 1
                     self.percent = done_count * 100.0 / len(self.todo)
                     self.description = f"dcsize: {done_count}/{len(self.todo)}"
                     yield
-        self.on_finish()
+            if self.cancelled.is_set():
+                for future in pending:
+                    future.cancel()
+                return
+            self.on_finish()
+        finally:
+            ex.shutdown(
+                wait=not self.cancelled.is_set(),
+                cancel_futures=self.cancelled.is_set(),
+            )
+            _restore_vdsym_monitor(self._vdsym_monitor)
 
 
 # ── MediaInfo cache ───────────────────────────────────────────────────────────
+
+
+def _pause_vdsym_monitor(mode):
+    if mode != "video":
+        return None
+    try:
+        vdsym = sys.modules.get("vdsym")
+        if vdsym is None:
+            vdsym = sys.modules.get("ranger.plugins.vdsym")
+        if vdsym is None:
+            return None
+
+        old = vdsym.DANGLING_MONITOR
+        vdsym.DANGLING_MONITOR = False
+        return vdsym, old
+    except Exception:
+        return None
+
+
+def _restore_vdsym_monitor(state):
+    if state is None:
+        return
+    vdsym, old = state
+    vdsym.DANGLING_MONITOR = old
+    if old:
+        try:
+            vdsym._arm(30.0)
+        except Exception:
+            pass
 
 
 def _save():
@@ -276,11 +328,15 @@ def _leaf(p, mode, st):
     return 1, st.st_size
 
 
-def _scan(path, mode, seen):
+def _scan(path, mode, seen, cancelled=None):
     n = size = 0
+    if cancelled is not None and cancelled.is_set():
+        return 0, 0
     try:
         with os.scandir(path) as it:
             for e in it:
+                if cancelled is not None and cancelled.is_set():
+                    break
                 try:
                     link = e.is_symlink()
                     if link and mode != "all":
@@ -292,7 +348,7 @@ def _scan(path, mode, seen):
                             if key in seen:
                                 continue
                             seen.add(key)
-                        c, s = _scan(e.path, mode, seen)
+                        c, s = _scan(e.path, mode, seen, cancelled)
                     elif link:
                         try:
                             st = e.stat()
@@ -315,23 +371,12 @@ def _scan(path, mode, seen):
     return n, size
 
 
-def _scan_video_parallel(path):
-    try:
-        with os.scandir(path) as it:
-            entries = list(it)
-    except OSError:
-        return 0, 0
-    if len(entries) < 2:
-        return _scan(path, "video", set())
-    n = size = 0
-    with ThreadPoolExecutor(max_workers=min(_MAX_WORKERS, len(entries))) as ex:
-        for count, value in ex.map(lambda e: _tree(e.path, "video"), entries):
-            n += count
-            size += value
-    return n, size
+def _scan_video_parallel(path, cancelled=None):
+    """Sequential branch scan; top-level loader already supplies parallelism."""
+    return _scan(path, "video", set(), cancelled)
 
 
-def _tree(path, mode, parallel=False):
+def _tree(path, mode, parallel=False, cancelled=None):
     """Top-level: symlinked dirs descended in every mode."""
     try:
         lst = os.lstat(path)
@@ -342,8 +387,8 @@ def _tree(path, mode, parallel=False):
             return (1, lst.st_size) if mode == "all" else (0, 0)
         if stat.S_ISDIR(st.st_mode):
             if parallel and mode == "video":
-                return _scan_video_parallel(path)
-            return _scan(path, mode, {(st.st_dev, st.st_ino)})
+                return _scan_video_parallel(path, cancelled)
+            return _scan(path, mode, {(st.st_dev, st.st_ino)}, cancelled)
         if (link and mode != "all") or not stat.S_ISREG(st.st_mode):
             return 0, 0
         if mode == "video" and not path.lower().endswith(EXTS):
@@ -580,9 +625,8 @@ class dcsize(Command):
             if f.is_directory:
                 if "sort" in opts:
                     child_sort = "sizeclips" if mode == "video" else name
-                    _set_local_sort(self.fm, f.path, child_sort)
-                    d.sort()
-                self.fm.ui.redraw_main_column()
+                    if f.path in getattr(self.fm, "directories", {}):
+                        _set_local_sort(self.fm, f.path, child_sort)
 
         def on_finish():
             _save()
