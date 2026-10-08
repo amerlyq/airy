@@ -112,11 +112,12 @@ import json
 import os
 import re
 import stat
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 
 from ranger.api import register_linemode
 from ranger.api.commands import Command
 from ranger.container.directory import Directory
+from ranger.core.loader import Loadable
 from ranger.core.linemode import LinemodeBase
 from ranger.ext.human_readable import human_readable
 
@@ -138,6 +139,38 @@ try:
 except (OSError, ValueError):
     _FMT = {}
 _dirty = False
+
+
+class _DcsizeLoader(Loadable):
+    progressbar_supported = True
+
+    def __init__(self, fm, todo, mode, on_result, on_finish):
+        self.fm = fm
+        self.todo = todo
+        self.mode = mode
+        self.on_result = on_result
+        self.on_finish = on_finish
+        self.percent = 0
+        Loadable.__init__(self, self.generate(), "dcsize: calculating")
+
+    def generate(self):
+        if not self.todo:
+            self.on_finish()
+            return
+        with ThreadPoolExecutor() as ex:
+            jobs = {ex.submit(_tree, f.path, self.mode): f for f in self.todo}
+            pending = set(jobs)
+            done_count = 0
+            while pending:
+                finished, pending = wait(pending, return_when=FIRST_COMPLETED)
+                for future in finished:
+                    f = jobs[future]
+                    self.on_result(f, future.result())
+                    done_count += 1
+                    self.percent = done_count * 100.0 / len(self.todo)
+                    self.description = f"dcsize: {done_count}/{len(self.todo)}"
+                    yield
+        self.on_finish()
 
 
 # ── MediaInfo cache ───────────────────────────────────────────────────────────
@@ -472,33 +505,34 @@ class dcsize(Command):
         )
 
         todo = dirs + files
-        if len(todo) > 1:
-            with ThreadPoolExecutor() as ex:
-                res = list(ex.map(lambda f: _tree(f.path, mode), todo))
-        else:
-            res = [_tree(f.path, mode) for f in todo]
-        SIZES[mode].update({f.path: r for f, r in zip(todo, res)})
-        _save()
-
         for f in dirs:
             f.linemode = name
-
-        if mode in ("file", "all"):
-            _set_filter(d, mode)  # always: hide empty dirs, pass files
-        elif "filter" in opts:  # video with filter
-            _set_filter(d, mode)  # hide empty dirs + filter files by codec
-        else:  # v without filter
-            _remove_filter(d)
-
-        if d.files_all is not None:
-            d.refilter()
         if "sort" in opts:
             paths = [d.path] + [f.path for f in d.files_all or [] if f.is_directory]
             for path in paths:
                 _set_local_sort(self.fm, path, name)
             self.fm.execute_console("set sort=" + name)
-        d.sort()
-        self.fm.ui.redraw_main_column()
+
+        def on_result(f, result):
+            SIZES[mode][f.path] = result
+            if "sort" in opts:
+                d.sort()
+            self.fm.ui.redraw_main_column()
+
+        def on_finish():
+            _save()
+            if mode in ("file", "all"):
+                _set_filter(d, mode)  # always: hide empty dirs, pass files
+            elif "filter" in opts:  # video with filter
+                _set_filter(d, mode)  # hide empty dirs + filter files by codec
+            else:  # video without filter
+                _remove_filter(d)
+            if d.files_all is not None:
+                d.refilter()
+            d.sort()
+            self.fm.ui.redraw_main_column()
+
+        self.fm.loader.add(_DcsizeLoader(self.fm, todo, mode, on_result, on_finish))
 
 
 # ── linemodes + sort keys ─────────────────────────────────────────────────────
