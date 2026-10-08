@@ -147,6 +147,8 @@ _cache_lock = RLock()
 _misses_since_save = 0
 _CACHE_SAVE_EVERY = 128
 _MAX_WORKERS = 8
+_CACHE_HITS = 0
+_CACHE_MISSES = 0
 
 
 class _DcsizeLoader(Loadable):
@@ -204,12 +206,14 @@ def _save():
 
 
 def _vfmt(p, st):
-    global _dirty, _misses_since_save
+    global _dirty, _misses_since_save, _CACHE_HITS, _CACHE_MISSES
     k = f"{p}\0{st.st_mtime_ns}\0{st.st_size}"
     with _cache_lock:
         cached = _FMT.get(k)
     if cached is not None:
+        _CACHE_HITS += 1
         return cached
+    _CACHE_MISSES += 1
 
     try:
         from pymediainfo import MediaInfo
@@ -517,7 +521,7 @@ class dcsize(Command):
         self.fm.ui.redraw_main_column()
 
     def execute(self):
-        global SPEC
+        global SPEC, _CACHE_HITS, _CACHE_MISSES
         mode = self.arg(1)
         d = self.fm.thisdir
 
@@ -541,6 +545,8 @@ class dcsize(Command):
             if new != SPEC:
                 SPEC = new
                 SIZES["video"].clear()
+
+        _CACHE_HITS = _CACHE_MISSES = 0
 
         name = "dc" + mode
         cursor = self.quantifier is not None or "cursor" in opts
@@ -580,6 +586,11 @@ class dcsize(Command):
 
         def on_finish():
             _save()
+            if mode == "video":
+                self.fm.notify(
+                    f"dcsize: cache {_CACHE_HITS} hits/{_CACHE_MISSES} misses "
+                    f"({CACHE})"
+                )
             hide_empty = "hide_empty" in opts
             if mode in ("file", "all"):
                 _set_filter(d, mode, hide_empty)  # pass files; optionally hide empty dirs
