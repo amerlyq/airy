@@ -50,6 +50,7 @@ class FM:
         s.sel = []
         s.copy_buffer = set()
         s.cmds = []
+        s.cmd_flags = []
         s.thisdir = types.SimpleNamespace(path=cwd, files=[], marked_items=[])
         s.thistab = types.SimpleNamespace(get_selection=lambda: s.sel)
         s.thisfile = None
@@ -68,6 +69,7 @@ class FM:
 
     def execute_command(s, c, flags=""):
         s.cmds.append(c)
+        s.cmd_flags.append(flags)
 
     def move(s, **k):
         pass
@@ -313,6 +315,11 @@ c = mk("vdsym --action=print,refresh --modifiers=glob -- slash", fm)
 c.execute()
 print(fm.cmds[-1][:120])
 assert r"back\\\033[31;1mslash" in fm.cmds[-1], fm.cmds[-1]
+assert "any key" in fm.cmds[-1] and fm.cmd_flags[-1] == ""
+M.PRINT_DISMISS_KEYS = "\n yqc"
+c.execute()
+assert "Enter/space/c/q/y" in fm.cmds[-1] and 'case "$key" in' in fm.cmds[-1]
+M.PRINT_DISMISS_KEYS = "any"
 
 # --- warm cache persistence over re-exec
 import importlib

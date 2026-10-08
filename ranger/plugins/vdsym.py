@@ -81,6 +81,10 @@ LOCK_WAIT = (
 PRINT_BEFORE_PROMPT = (
     True  # page the symlink list before a move prompt (recovery on cancel/crash)
 )
+# "any" accepts the next key.
+# Any other string accepts only its characters.
+# Use "\n yqc" for Enter, space, y, q or c.
+PRINT_DISMISS_KEYS = "any"
 RECOVERY_LOG = os.path.join(
     os.environ.get("XDG_STATE_HOME") or os.path.expanduser("~/.local/state"),
     "vdsym",
@@ -766,6 +770,28 @@ def _brief(items: Iterable[str], limit: int = 3) -> str:
     items = list(items)
     more = f" +{len(items) - limit}" if len(items) > limit else ""
     return " | ".join(items[:limit]) + more
+
+
+def _print_dismiss() -> tuple[str, str]:
+    """Prompt text plus shell read loop for PRINT_DISMISS_KEYS."""
+    spec = PRINT_DISMISS_KEYS
+    if spec == "any":
+        return " [any key]", "read -sk 1 2>/dev/null || read -rsn 1"
+    if not isinstance(spec, str) or not spec:
+        _LOG.warning("vdsym: invalid PRINT_DISMISS_KEYS=%r; using any", spec)
+        return " [any key]", "read -sk 1 2>/dev/null || read -rsn 1"
+    keys = set(spec)
+    keys = {"" if key in "\n\r" else key for key in keys}
+    labels = (["Enter"] if "" in keys else []) + (["space"] if " " in keys else [])
+    labels += sorted(
+        (key for key in keys if key not in ("", " ")), key=str.casefold
+    )
+    choices = "|".join(shell_quote(key) for key in sorted(keys))
+    return (
+        " [" + "/".join(labels) + "]",
+        "while :; do read -sk 1 key 2>/dev/null || read -rsn 1 key; "
+        + f"case \"$key\" in {choices}) break;; esac; done",
+    )
 
 
 def find_clips(paths: Sequence[str]) -> list[str]:
@@ -1526,11 +1552,14 @@ class vdsym(Command):
             output = "\\n".join(lines)
         else:
             output = "\\033[31;40;1mnotfound\\033[m "
+        dismiss, read = _print_dismiss()
         self.fm.execute_command(
             "printf '%b\\n' "
             + shell_quote(output)
-            + "; read -k 1 2>/dev/null || read -n 1",
-            flags="-w",
+            + "; printf '%s' "
+            + shell_quote(dismiss)
+            + "; "
+            + read
         )
 
     def execute(self) -> None:
