@@ -158,7 +158,7 @@ class _DcsizeLoader(Loadable):
             self.on_finish()
             return
         with ThreadPoolExecutor() as ex:
-            jobs = {ex.submit(_tree, f.path, self.mode): f for f in self.todo}
+            jobs = {ex.submit(_tree, f.path, self.mode, True): f for f in self.todo}
             pending = set(jobs)
             done_count = 0
             while pending:
@@ -279,7 +279,23 @@ def _scan(path, mode, seen):
     return n, size
 
 
-def _tree(path, mode):
+def _scan_video_parallel(path):
+    try:
+        with os.scandir(path) as it:
+            entries = list(it)
+    except OSError:
+        return 0, 0
+    if len(entries) < 2:
+        return _scan(path, "video", set())
+    n = size = 0
+    with ThreadPoolExecutor() as ex:
+        for count, value in ex.map(lambda e: _tree(e.path, "video"), entries):
+            n += count
+            size += value
+    return n, size
+
+
+def _tree(path, mode, parallel=False):
     """Top-level: symlinked dirs descended in every mode."""
     try:
         lst = os.lstat(path)
@@ -289,6 +305,8 @@ def _tree(path, mode):
         except OSError:
             return (1, lst.st_size) if mode == "all" else (0, 0)
         if stat.S_ISDIR(st.st_mode):
+            if parallel and mode == "video":
+                return _scan_video_parallel(path)
             return _scan(path, mode, {(st.st_dev, st.st_ino)})
         if (link and mode != "all") or not stat.S_ISREG(st.st_mode):
             return 0, 0
