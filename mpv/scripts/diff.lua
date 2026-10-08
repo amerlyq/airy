@@ -1,95 +1,24 @@
 local options = require 'mp.options'
 
 -- Define a custom flag. By default, it is 'no' (false)
-local user_configs = {
-    stitch = false
-}
+local user_configs = { stitch = false }
 -- Read variables passed from the command line (--script-opts)
 options.read_options(user_configs, "hstack")
 
--- Persistent cache for track dimensions
-local native_h1 = nil
-local native_h2 = nil
+local G1 = "[vid1] copy [vo]; [aid1] anull [ao]"
+local G2 = "[vid2] copy [vo]; [aid2] anull [ao]"
 
--- Capture track dimensions safely
-local function initialize_dimensions()
-    native_h1 = mp.get_property_number("video-params/h")
-    native_h2 = nil
+---------------------------------------------------------------- helpers
 
-    local track_list = mp.get_property_native("track-list") or {}
-    local video_track_count = 0
-
-    for _, track in ipairs(track_list) do
-        if track.type == "video" then
-            video_track_count = video_track_count + 1
-            if video_track_count == 2 then
-                native_h2 = track["demux-h"] or track["height"]
-                break
-            end
+local function second_video_track()
+    local n = 0
+    for _, t in ipairs(mp.get_property_native("track-list") or {}) do
+        if t.type == "video" then
+            n = n + 1
+            if n == 2 then return t end
         end
     end
-    return (native_h1 ~= nil and native_h2 ~= nil)
 end
-
--- Core layout function
-local function apply_smart_hstack(force_enable)
-    local has_two_tracks = initialize_dimensions()
-
-    if not has_two_tracks then
-        if not force_enable then
-            mp.osd_message("Error: No external video track found")
-        end
-        return false
-    end
-
-    local current_filter = mp.get_property("lavfi-complex") or ""
-
-    -- Toggle logic (unless force_enable is true for startup)
-    if not force_enable and current_filter:find("hstack") then
-        mp.set_property("lavfi-complex", "[vid1] copy [vo]; [aid1] anull [ao]")
-        mp.osd_message("Stitch Disabled (Showing Video 1)")
-    else
-        if native_h1 == native_h2 then
-            -- Zero Performance Cost: Perfect native height match
-            mp.set_property("lavfi-complex", "[vid1][vid2]hstack[vo]; [aid1] anull [ao]")
-        elseif native_h1 > native_h2 then
-            -- Pad smaller Video 2 up to Video 1 height with zero per-frame cost
-            mp.set_property("lavfi-complex", string.format("[vid2]pad=eval=init:w=iw:h=%d:x=0:y=0[v2_p]; [vid1][v2_p]hstack[vo]; [aid1] anull [ao]", native_h1))
-        else
-            -- Pad smaller Video 1 up to Video 2 height with zero per-frame cost
-            mp.set_property("lavfi-complex", string.format("[vid1]pad=eval=init:w=iw:h=%d:x=0:y=0[v1_p]; [v1_p][vid2]hstack[vo]; [aid1] anull [ao]", native_h2))
-        end
-    end
-    return true
-end
-
--- Startup Handler
-mp.register_event("file-loaded", function()
-    native_h1 = nil
-    native_h2 = nil
-
-    -- ONLY auto-activate on startup if the user explicitly provided our custom flag
-    if user_configs.stitch then
-        mp.add_timeout(0.2, function()
-            apply_smart_hstack(true)
-        end)
-    end
-end)
-
--- Bind manual toggle to the 'b' key (always works when 2 tracks exist)
-mp.add_forced_key_binding("b", "smart_hstack_toggle", function()
-    apply_smart_hstack(false)
-end)
-mp.add_forced_key_binding("N", "smart_hstack_toggle", function()
-    apply_smart_hstack(true)
-end)
-
-
-
------------------------------------------------------------------
-
-local offsets = {}       -- [slot] = offset_ms, slot is 1 or 2
-local current_slot = 1
 
 local function has_vf(label)
     for _, f in ipairs(mp.get_property_native("vf") or {}) do
@@ -98,11 +27,26 @@ local function has_vf(label)
     return false
 end
 
+local function set_graph(graph)
+    mp.set_property("lavfi-complex", graph)
+end
+
+-- slow: re-decode from keyframe to current pos (fixes dav1d OBU errors after stitch change)
+local function refresh()
+    local pos = mp.get_property_number("time-pos")
+    if pos then mp.commandv("seek", tostring(pos), "absolute+exact") end
+end
+
+---------------------------------------------------------------- offset
+
+local offsets = {}       -- [slot] = offset_ms
+local current_slot = 1
+
 local function apply_offset()
-    local ms = offsets[current_slot] or 0
     if has_vf("v_offset") then
         mp.commandv("vf", "remove", "@v_offset")
     end
+    local ms = offsets[current_slot] or 0
     if ms ~= 0 then
         -- slow: local expr = string.format("(PTS-STARTPTS)%+.6f/TB", ms / 1000)
         -- WTF: progresses on toggle
@@ -126,21 +70,80 @@ mp.add_key_binding("0", "offset-clear", function()
     mp.osd_message("slot " .. current_slot .. " offset cleared")
 end)
 
-local function switch()
-    mp.command('cycle-values lavfi-complex "[vid2] copy [vo]; [aid2] anull [ao]" "[vid1] copy [vo]; [aid1] anull [ao]"')
-    mp.command('cycle-values force-media-title "(2) ${track-list/2/title}" "(1) ${filename}"')
-    -- mp.command('frame-back-step')
-    -- mp.command('frame-step')
-    -- mp.command('cycle-values vid 2 1')
-    -- mp.command('seek 0 relative+exact')
-    current_slot = (current_slot == 1) and 2 or 1
-    -- local off = (offsets[current_slot] or 0) / 1000
-    -- if off ~= 0 then
-    --     mp.commandv("seek", tostring(off), "relative+exact")
-    -- end
-    -- mp.osd_message(string.format("slot %d, offset %+dms", current_slot, offsets[current_slot] or 0))
+---------------------------------------------------------------- stitch
+
+local function apply_smart_hstack(force_enable)
+    local h1 = mp.get_property_number("video-params/h")
+    local t2 = second_video_track()
+    local h2 = t2 and (t2["demux-h"] or t2["height"])
+
+    if not (h1 and h2) then
+        if not force_enable then
+            mp.osd_message("Error: No external video track found")
+        end
+        return
+    end
+
+    local cur = mp.get_property("lavfi-complex") or ""
+
+    if not force_enable and cur:find("hstack") then
+        set_graph(G1)
+        current_slot = 1
+        mp.osd_message("Stitch Disabled (Showing Video 1)")
+    elseif h1 == h2 then
+        set_graph("[vid1][vid2]hstack[vo]; [aid1] anull [ao]")
+    elseif h1 > h2 then
+        set_graph(string.format(
+            "[vid2]pad=eval=init:w=iw:h=%d:x=0:y=0[v2_p]; [vid1][v2_p]hstack[vo]; [aid1] anull [ao]", h1))
+    else
+        set_graph(string.format(
+            "[vid1]pad=eval=init:w=iw:h=%d:x=0:y=0[v1_p]; [v1_p][vid2]hstack[vo]; [aid1] anull [ao]", h2))
+    end
+    refresh()
     apply_offset()
 end
 
-mp.add_key_binding("v", "toggle-slot-and-offset", switch)
-mp.add_key_binding("n", "toggle-slot-and-offset", switch)
+mp.register_event("file-loaded", function()
+    current_slot = 1
+    if user_configs.stitch then
+        mp.add_timeout(0.2, function() apply_smart_hstack(true) end)
+    end
+end)
+
+mp.add_forced_key_binding("b", "hstack-toggle", function() apply_smart_hstack(false) end)
+mp.add_forced_key_binding("N", "hstack-enable", function() apply_smart_hstack(true) end)
+
+---------------------------------------------------------------- switch
+
+-- local function switch()
+--     mp.command('cycle-values lavfi-complex "[vid2] copy [vo]; [aid2] anull [ao]" "[vid1] copy [vo]; [aid1] anull [ao]"')
+--     mp.command('cycle-values force-media-title "(2) ${track-list/2/title}" "(1) ${filename}"')
+--     -- mp.command('frame-back-step')
+--     -- mp.command('frame-step')
+--     -- mp.command('cycle-values vid 2 1')
+--     -- mp.command('seek 0 relative+exact')
+--     current_slot = (current_slot == 1) and 2 or 1
+--     -- local off = (offsets[current_slot] or 0) / 1000
+--     -- if off ~= 0 then
+--     --     mp.commandv("seek", tostring(off), "relative+exact")
+--     -- end
+--     -- mp.osd_message(string.format("slot %d, offset %+dms", current_slot, offsets[current_slot] or 0))
+--     apply_offset()
+-- end
+
+local function switch()
+    local cur = mp.get_property("lavfi-complex") or ""
+    local to2 = not cur:find("%[vid2%] copy", 1, false)  -- hstack or slot 1 -> slot 2
+    local t2 = second_video_track()
+
+    set_graph(to2 and G2 or G1)
+    mp.set_property("force-media-title",
+        to2 and ("(2) " .. ((t2 and (t2.title or t2["external-filename"])) or "video 2"))
+             or ("(1) " .. (mp.get_property("filename") or "")))
+    current_slot = to2 and 2 or 1
+    apply_offset()
+    mp.osd_message(string.format("slot %d, offset %+d ms", current_slot, offsets[current_slot] or 0))
+end
+
+mp.add_key_binding("v", "switch-v", switch)
+mp.add_key_binding("n", "switch-n", switch)
