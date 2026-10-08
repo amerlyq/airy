@@ -91,11 +91,19 @@ end)
 local offsets = {}       -- [slot] = offset_ms, slot is 1 or 2
 local current_slot = 1
 
+local function has_vf(label)
+    for _, f in ipairs(mp.get_property_native("vf") or {}) do
+        if f.label == label then return true end
+    end
+    return false
+end
+
 local function apply_offset()
     local ms = offsets[current_slot] or 0
-    if ms == 0 then
-        pcall(function() mp.commandv("vf", "remove", "@v_offset") end)
-    else
+    if has_vf("v_offset") then
+        mp.commandv("vf", "remove", "@v_offset")
+    end
+    if ms ~= 0 then
         -- slow: local expr = string.format("(PTS-STARTPTS)%+.6f/TB", ms / 1000)
         -- WTF: progresses on toggle
         local expr = string.format("PTS%+.6f/TB", ms / 1000)

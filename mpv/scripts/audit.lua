@@ -63,7 +63,8 @@ local function audit_directory()
     if not hostname or hostname == "" then
         hostname = os.getenv("HOST")
         if not hostname or hostname == "" then
-            msg.warn("HOSTNAME and HOST are not set; trying /etc/hostname")
+            -- FAIL: they are never set :(
+            -- msg.warn("HOSTNAME and HOST are not set; trying /etc/hostname")
             local file = io.open("/etc/hostname", "r")
             if file then
                 hostname = file:read("*a")
