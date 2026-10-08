@@ -21,6 +21,8 @@ LINEMODES
   dcvideo dirs → "(n*codec) size" or "(n!codec) size".
   Files → "size".  n = matched file count.
   cursor / 1dc*: only the entry under cursor updated; others unchanged.
+  Without explicit selection, only entries visible after current filters are used.
+  Explicit fm.get_selection() overrides the visible-entry set.
 
 ════════════════════════════════════════════════════════════════════════════════
 SORTING
@@ -510,14 +512,19 @@ class dcsize(Command):
 
         name = "dc" + mode
         cursor = self.quantifier is not None or "cursor" in opts
-        items = (
-            ([self.fm.thisfile] if self.fm.thisfile else [])
-            if cursor
-            else list(d.files_all or [])
-        )
+        visible = list(d.files or [])
+        marked = list(getattr(d, "marked_items", ()) or ())
+        selected = list(self.fm.get_selection()) if marked else []
+        base = selected or visible
+        if marked:
+            items = base
+        elif cursor:
+            items = [self.fm.thisfile] if self.fm.thisfile else []
+        else:
+            items = base
         dirs = [f for f in items if f.is_directory]
         files = (
-            [f for f in (d.files_all or []) if not f.is_directory]
+            [f for f in base if not f.is_directory]
             if "sort" in opts or "filter" in opts
             else [f for f in items if not f.is_directory]
         )
@@ -526,7 +533,7 @@ class dcsize(Command):
         for f in dirs:
             f.linemode = name
         if "sort" in opts:
-            paths = [d.path] + [f.path for f in d.files_all or [] if f.is_directory]
+            paths = [d.path] + [f.path for f in dirs]
             for path in paths:
                 _set_local_sort(self.fm, path, name)
             self.fm.execute_console("set sort=" + name)
