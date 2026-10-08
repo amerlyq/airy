@@ -512,6 +512,7 @@ class dcsize(Command):
 
         name = "dc" + mode
         cursor = self.quantifier is not None or "cursor" in opts
+        # d.files is the post-filter view. Never submit d.files_all here.
         visible = list(d.files or [])
         marked = list(getattr(d, "marked_items", ()) or ())
         selected = list(self.fm.get_selection()) if marked else []
@@ -533,16 +534,17 @@ class dcsize(Command):
         for f in dirs:
             f.linemode = name
         if "sort" in opts:
-            paths = [d.path] + [f.path for f in dirs]
-            for path in paths:
-                _set_local_sort(self.fm, path, name)
+            _set_local_sort(self.fm, d.path, name)
             self.fm.execute_console("set sort=" + name)
 
         def on_result(f, result):
             SIZES[mode][f.path] = result
-            if "sort" in opts:
-                d.sort()
-            self.fm.ui.redraw_main_column()
+            if f.is_directory:
+                if "sort" in opts:
+                    child_sort = "sizeclips" if mode == "video" else name
+                    _set_local_sort(self.fm, f.path, child_sort)
+                    d.sort()
+                self.fm.ui.redraw_main_column()
 
         def on_finish():
             _save()
