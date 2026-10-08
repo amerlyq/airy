@@ -392,6 +392,24 @@ fm.thistab.path = d2
 fm.paste()
 fm.run_loader()
 assert fs.exists(fs.join(d2, "plain.mp4"))
+# paste does not create a ranger safe-name duplicate for an equivalent symlink
+copy_target = fs.join(d1, "a/copy-target.mp4")
+copy_link = fs.join(view, "copy.mp4")
+copy_dest = fs.join(d2, "copy.mp4")
+w(copy_target)
+os.symlink(copy_target, copy_link)
+os.symlink(copy_target, copy_dest)
+fm = newfm(view)
+fm.copy_buffer = {Entry(copy_link)}
+fm.thistab.path = d2
+fm.paste()
+assert not fm.queue and any("same target already exists" in n for n in fm.notes)
+# pl and pL use paste_symlink() instead of paste()
+fm = newfm(view)
+fm.copy_buffer = {Entry(copy_target)}
+fm.thisdir.path = d2
+fm.paste_symlink(relative=True)
+assert any("same target already exists" in n for n in fm.notes)
 # outside the VD roots: only clips are checked
 o = fs.join(outside, "x.mp4")
 w(o)

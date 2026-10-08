@@ -683,10 +683,14 @@ class link_orig(Command):
             return fs.relpath(c, d) if fs.commonpath([d, c]) == fs.abspath(d) else c
 
         failed = 0
+        duplicate = 0
         for f in self.fm.thistab.get_selection():
             src: str = linkedpath(f.path)
             target: str = fs.join(d, fs.basename(src))
             if fs.abspath(src) == fs.abspath(target):
+                continue
+            if fs.islink(target) and fs.realpath(target) == fs.realpath(src):
+                duplicate += 1
                 continue
             self.fm.execute_command(
                 f'ln -svt "{d}" --backup=numbered -- "{optrelpath(src)}"'
@@ -696,4 +700,12 @@ class link_orig(Command):
                 failed += 1
 
         self.fm.mark_files(all=True, val=False)
-        self.fm.notify("Copied to -> " + d, bad=bool(failed))
+        if duplicate:
+            note = (
+                "symlink with same target already exists"
+                if duplicate == 1
+                else f"{duplicate} symlinks with same target already exist"
+            )
+            self.fm.notify(note, bad=bool(failed))
+        else:
+            self.fm.notify("Copied to -> " + d, bad=bool(failed))

@@ -1282,6 +1282,23 @@ def _safe_like(dst: str, taken: set[str]) -> str:
     return dst + str(n)
 
 
+def _same_link_target(source: str, dest: str) -> bool:
+    """Both paths are links resolving to the same destination, including dangling links."""
+    return fs.islink(source) and fs.islink(dest) and fs.realpath(source) == fs.realpath(dest)
+
+
+def _link_targets_path(link: str, path: str) -> bool:
+    return fs.islink(link) and fs.realpath(link) == fs.realpath(path)
+
+
+def _duplicate_link_note(count: int) -> str:
+    return (
+        "symlink with same target already exists"
+        if count == 1
+        else f"{count} symlinks with same target already exist"
+    )
+
+
 def _predict_moves(
     paths: Sequence[str], dest: str, overwrite: bool, make_safe_path
 ) -> dict[str, str]:
@@ -2238,6 +2255,28 @@ def _make_paste(orig):
         self, overwrite=False, append=False, dest=None, make_safe_path=get_safe_path
     ):
         target = self.thistab.path if dest is None else dest
+        if not self.do_cut and self.copy_buffer and fs.isdir(target):
+            duplicates = [
+                entry
+                for entry in self.copy_buffer
+                if _same_link_target(entry.path, fs.join(target, entry.basename))
+            ]
+            if duplicates:
+                self.notify(_duplicate_link_note(len(duplicates)))
+                remaining = set(self.copy_buffer) - set(duplicates)
+                if not remaining:
+                    return None
+                saved, self.copy_buffer = self.copy_buffer, remaining
+                try:
+                    return orig(
+                        self,
+                        overwrite=overwrite,
+                        append=append,
+                        dest=dest,
+                        make_safe_path=make_safe_path,
+                    )
+                finally:
+                    self.copy_buffer = saved
         if not self.do_cut or not self.copy_buffer:
             return orig(
                 self,
@@ -2289,6 +2328,29 @@ def _make_paste(orig):
     return paste
 
 
+def _make_paste_symlink(orig):
+    def paste_symlink(self, relative=False, make_safe_path=get_safe_path):
+        target = self.thisdir.path
+        duplicates = [
+            entry
+            for entry in self.copy_buffer
+            if _link_targets_path(fs.join(target, entry.basename), entry.path)
+        ]
+        if not duplicates:
+            return orig(self, relative=relative, make_safe_path=make_safe_path)
+        self.notify(_duplicate_link_note(len(duplicates)))
+        remaining = set(self.copy_buffer) - set(duplicates)
+        if not remaining:
+            return None
+        saved, self.copy_buffer = self.copy_buffer, remaining
+        try:
+            return orig(self, relative=relative, make_safe_path=make_safe_path)
+        finally:
+            self.copy_buffer = saved
+
+    return paste_symlink
+
+
 def _make_work(orig):
     def work(self, *args, **kwargs):
         result = orig(self, *args, **kwargs)
@@ -2330,6 +2392,7 @@ def _install() -> None:
             (Actions, "uncut", _make_uncut),
             (Actions, "cut", _make_cut),
             (Actions, "paste", _make_paste),
+            (Actions, "paste_symlink", _make_paste_symlink),
             (CopyLoader, "__init__", _make_loader_init),
             (CopyLoader, "generate", _make_loader_generate),
             (Loader, "work", _make_work),
