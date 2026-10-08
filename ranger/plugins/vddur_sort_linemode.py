@@ -1,11 +1,13 @@
 import os
+import json
+import stat
+from threading import RLock
 
 from ranger.container.directory import Directory
 from ranger.container.fsobject import FileSystemObject
 
 # ALT:(ffproe):https://github.com/zd4y/ranger-vidlength
 try:
-    from functools import cache
     from typing import cast
 
     from pymediainfo import MediaInfo
@@ -16,13 +18,57 @@ try:
 except Exception:
     pass
 else:
-    # BET:PERF: read durations from /cache/irome_db
-    @cache
+    DURATION_CACHE = os.path.join(
+        os.environ.get("XDG_CACHE_HOME") or os.path.expanduser("~/.cache"),
+        "ranger",
+        "duration.json",
+    )
+    try:
+        with open(DURATION_CACHE) as fh:
+            _DURATION = json.load(fh)
+    except (OSError, ValueError):
+        _DURATION = {}
+    if not isinstance(_DURATION, dict):
+        _DURATION = {}
+    _DURATION_LOCK = RLock()
+    _DURATION_DIRTY = False
+    _DURATION_MISSES = 0
+
+    def _save_durations() -> None:
+        global _DURATION_DIRTY
+        with _DURATION_LOCK:
+            if not _DURATION_DIRTY:
+                return
+            snapshot = dict(_DURATION)
+            _DURATION_DIRTY = False
+        try:
+            os.makedirs(os.path.dirname(DURATION_CACHE), exist_ok=True)
+            tmp = DURATION_CACHE + ".tmp"
+            with open(tmp, "w") as fh:
+                json.dump(snapshot, fh)
+            os.replace(tmp, DURATION_CACHE)
+        except Exception:
+            with _DURATION_LOCK:
+                _DURATION_DIRTY = True
+            raise
+
     def get_duration_mediainfo(path: str) -> int:
         """
         Parses media file duration in milliseconds.
         Returns: -1 on error, 1 if empty/zero, otherwise duration in ms.
         """
+        global _DURATION_DIRTY, _DURATION_MISSES
+        try:
+            st = os.stat(path)
+            if not stat.S_ISREG(st.st_mode):
+                return -1
+        except OSError:
+            return -1
+        key = f"{path}\0{st.st_mtime_ns}\0{st.st_size}"
+        with _DURATION_LOCK:
+            cached = _DURATION.get(key)
+        if cached is not None:
+            return cached
         try:
             # ALT: $ find ... -print0 | xargs -0r mediainfo --Inform="General;%Duration%"$'\t'"%CompleteName%\n" -- >> withdur.txt
             media_info = cast(MediaInfo, MediaInfo.parse(path))
@@ -30,10 +76,25 @@ else:
                 if track.track_type == "General" and track.duration:  # pyright: ignore[reportUnknownMemberType]
                     # MediaInfo returns duration in milliseconds (as a string or int)
                     duration = int(track.duration)  # pyright: ignore[reportUnknownArgumentType, reportUnknownMemberType]
-                    return duration if duration > 0 else 1
+                    value = duration if duration > 0 else 1
+                    break
+            else:
+                value = -1
         except (ValueError, TypeError, AttributeError, Exception):
-            return -1  # corrupt files or missing data
-        return -1
+            value = -1  # corrupt files or missing data
+        with _DURATION_LOCK:
+            cached = _DURATION.get(key)
+            if cached is not None:
+                return cached
+            _DURATION[key] = value
+            _DURATION_DIRTY = True
+            _DURATION_MISSES += 1
+            save = _DURATION_MISSES >= 64
+            if save:
+                _DURATION_MISSES = 0
+        if save:
+            _save_durations()
+        return value
 
     Directory.sort_dict["duration"] = lambda x: get_duration_mediainfo(x.path)
 
