@@ -36,12 +36,32 @@ PS4='+[$BASHPID] ${BASH_SOURCE[0]##*/}:$LINENO:  '
 ## HACK: auto-send path to #fra queue if you already SSH'd there
 # ALT: ping -c 1 -W 1 192.168.2.4 &>/dev/null && ...
 # ALT: ip route get 192.168.2.4 2>/dev/null | grep -q "dev eth0" && ...
-read -r has_pc </sys/class/net/enp0s13f0u2u3u3/carrier
+declare cable=/sys/class/net/enp0s13f0u2u3u3/carrier has_pc=
+[[ -f $cable ]] && read -r has_pc < "$cable"
 if ((has_pc)); then
   ssh -O check lf &>/dev/null || ssh -fN -o ConnectTimeout=2 lf  # /d/airy/ssh/run-xc lf
   systemctl is-active --quiet nfs-server || { set -x; sudo systemctl start nfs-server; }
   ssh -n lf 'test -d /media/pro/vd || { set -x; sudo mount /net/vd; }'
-  { set -x; ssh lf -- vcvt "$@"; }
+  declare _remote_args=() _remote_need_value=0 _remote_after_options=0 _remote_arg
+  for _remote_arg in "$@"; do
+    if ((_remote_need_value)); then
+      _remote_args+=("$_remote_arg")
+      _remote_need_value=0
+      continue
+    fi
+    if ((_remote_after_options)); then
+      _remote_args+=("$(realpath -s -- "$_remote_arg")")
+      continue
+    fi
+    case $_remote_arg in
+    --) _remote_args+=("$_remote_arg"); _remote_after_options=1 ;;
+    -c|-j) _remote_args+=("$_remote_arg"); _remote_need_value=1 ;;
+    -c*|-j*) _remote_args+=("$_remote_arg") ;;
+    -*) _remote_args+=("$_remote_arg") ;;
+    *) _remote_args+=("$(realpath -s -- "$_remote_arg")") ;;
+    esac
+  done
+  { set -x; ssh lf -- vcvt "${_remote_args[@]}"; }
   exit
 fi
 
@@ -95,6 +115,7 @@ _output_for() { local fin="$1"
 }
 
 _skip_discovered() { local fin="$1" out
+  [[ ${fin##*/} =~ _(va|[acnqv])[0-9]+(_prev[0-9]+)?\.mp4$ ]] && return 0
   [[ -n ${VCVT_SKIP_EXISTING-} ]] || return 1
   out=$(_output_for "$fin")
   [[ -e $out ]]
@@ -153,11 +174,13 @@ _expand_to_mp4s() { local p
 }
 
 _filter_non_av1() {
-  # BUG(fixed): mawk's printf "\0" does NOT emit a literal NUL byte (silently
-  #   dropped) -- only gawk supports that. Portable fix: ORS="\0" with plain
-  #   print, which mawk handles correctly.
-  xargs -0r -P4 -L10 mediainfo --Inform="General;%Video_Codec_List% %CompleteName%\n" -- \
-    | awk -vC="AV1" 'BEGIN{ORS=sprintf("%c",0)} NF&&$1!=C{print substr($0,index($0," ")+1)}'
+  xargs -0r -P4 -L10 bash -c '
+    for f do
+      codec=$(mediainfo --Inform="Video;%Format%" "$f") || continue
+      [[ ${codec%%$'"'"'\n'"'"'*} == AV1 ]] && continue
+      printf "%s\0" "$f"
+    done
+  ' bash
 }
 
 # ─────────────────────────────────────────────────────────
@@ -165,6 +188,8 @@ _filter_non_av1() {
 # ─────────────────────────────────────────────────────────
 
 _cvt_nv() { local fin="$1" out="$2"
+  local format=${fin##*.}
+  format=${format,,}
   local nvopts=(  # <CASE:(amv):
     -preset p7 -highbitdepth 1 -multipass qres
     -rc vbr -cq "$qa" -maxrate 8M -bufsize 16M
@@ -174,19 +199,24 @@ _cvt_nv() { local fin="$1" out="$2"
   local vf_scale="scale_cuda=w='trunc(iw*min(1,min(if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih))/2)*2':h='trunc(ih*min(1,min(if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih))/2)*2':format=yuv420p"
   "${ffmpeg[@]:-ffmpeg}" -hwaccel cuda -hwaccel_output_format cuda \
     -i "$fin" -vf "$vf_scale" \
-    -c:v hevc_nvenc "${nvopts[@]}" -c:a copy "$out"
+    -c:v hevc_nvenc "${nvopts[@]}" -c:a copy -f "$format" "$out"
 }
 
 _cvt_qsv() { local fin="$1" out="$2"
+  local format=${fin##*.}
+  format=${format,,}
   local vf_scale="scale_qsv=w='trunc(iw*min(1,min(if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih))/2)*2':h='trunc(ih*min(1,min(if(gt(iw,ih),1920,1080)/iw,if(gt(iw,ih),1080,1920)/ih))/2)*2',format=qsv"
   ## ALT:(qsv variants): -c:v h264_qsv|av1_qsv|hevc_qsv OR:(auto): -init_hw_device qsv=qsv:hw
   # BAD: no "-tune animation" -- only for software-render
   "${ffmpeg[@]:-ffmpeg}" -init_hw_device qsv=qsv:hw -hwaccel qsv -hwaccel_output_format qsv \
     -i "$fin" -vf "$vf_scale" \
-    -c:v hevc_qsv -preset slow -global_quality "$qa" "$out"
+    -c:v hevc_qsv -preset slow -global_quality "$qa" -f "$format" "$out"
 }
 
 _cvt_cpu() { local fin="$1" out="$2"; shift 2
+  local format=${fin##*.}
+  format=${format,,}
+  [[ $format == txt ]] && format=mp4
   ## USE:
   # * tune=0 -- low orse tune=1 makes "detailed boundaries of gradients" somewhat blurry
   #   INFO: tune=1 is PSNR, which rewards smoothing, and thin low-contrast lines contribute almost nothing to it -> tune 0 (VQ) is the perceptual mode
@@ -213,7 +243,7 @@ _cvt_cpu() { local fin="$1" out="$2"; shift 2
   local vf_scale="scale=w='if(gt(iw,ih),min(iw,1920),min(iw,1080))':h='if(gt(iw,ih),min(ih,1080),min(ih,1920))':force_original_aspect_ratio=decrease:force_divisible_by=2:flags=lanczos,format=yuv420p10le"
   "${ffmpeg[@]:-ffmpeg}" \
     -i "$fin" "$@" -vf "$vf_scale" \
-    -c:v libsvtav1 "${cpuopts[@]}" -c:a copy "$out"
+    -c:v libsvtav1 "${cpuopts[@]}" -c:a copy -f "$format" "$out"
 }
 
 _cvt_webp(){ local fin="$1" out="$2" dtmp

@@ -204,7 +204,12 @@ def command(args, source, output, concat=False):
             "-global_quality",
             str(args.c),
         ]
-    return cmd + ["-c:a", "copy", "-movflags", "+faststart", str(output)]
+    muxer = (
+        "mp4"
+        if concat or source.suffix.lower() == ".webp"
+        else source.suffix.removeprefix(".").lower()
+    )
+    return cmd + ["-c:a", "copy", "-movflags", "+faststart", "-f", muxer, str(output)]
 
 
 @contextmanager
