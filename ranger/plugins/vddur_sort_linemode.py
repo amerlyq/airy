@@ -1,102 +1,38 @@
 import os
-import json
-import stat
-from threading import RLock
+from stat import S_ISREG
 
 from ranger.container.directory import Directory
 from ranger.container.fsobject import FileSystemObject
 
 # ALT:(ffproe):https://github.com/zd4y/ranger-vidlength
 try:
-    from typing import cast
-
-    from pymediainfo import MediaInfo
     from ranger.api import register_linemode
     from ranger.core.filter_stack import stack_filter
     from ranger.core.linemode import DEFAULT_LINEMODE, LinemodeBase
     from ranger.core.shared import FileManagerAware
+
+    try:
+        from ranger.plugins import vdprobe  # lives next to this file
+    except ImportError:
+        import vdprobe
 except Exception:
     pass
 else:
-    DURATION_CACHE = os.path.join(
-        os.environ.get("XDG_CACHE_HOME") or os.path.expanduser("~/.cache"),
-        "ranger",
-        "duration.json",
-    )
-    try:
-        with open(DURATION_CACHE) as fh:
-            _DURATION = json.load(fh)
-    except (OSError, ValueError):
-        _DURATION = {}
-    if not isinstance(_DURATION, dict):
-        _DURATION = {}
-    _DURATION_LOCK = RLock()
-    _DURATION_DIRTY = False
-    _DURATION_MISSES = 0
 
-    def _save_durations() -> None:
-        global _DURATION_DIRTY
-        with _DURATION_LOCK:
-            if not _DURATION_DIRTY:
-                return
-            snapshot = dict(_DURATION)
-            _DURATION_DIRTY = False
-        try:
-            os.makedirs(os.path.dirname(DURATION_CACHE), exist_ok=True)
-            tmp = DURATION_CACHE + ".tmp"
-            with open(tmp, "w") as fh:
-                json.dump(snapshot, fh)
-            os.replace(tmp, DURATION_CACHE)
-        except Exception:
-            with _DURATION_LOCK:
-                _DURATION_DIRTY = True
-            raise
+    def _st(f: FileSystemObject):
+        """ranger already stat'ed the file: reuse it, but not a symlink's lstat"""
+        st = getattr(f, "stat", None)
+        return st if st is not None and S_ISREG(st.st_mode) else None
 
-    def get_duration_mediainfo(path: str) -> int:
+    def get_duration_mediainfo(path: str, st=None) -> int:
         """
-        Parses media file duration in milliseconds.
-        Returns: -1 on error, 1 if empty/zero, otherwise duration in ms.
+        Duration in milliseconds (vdprobe: native parse + inode-keyed cache).
+        Returns: -1 if not media, 1 if zero, otherwise duration in ms.
         """
-        global _DURATION_DIRTY, _DURATION_MISSES
-        try:
-            st = os.stat(path)
-            if not stat.S_ISREG(st.st_mode):
-                return -1
-        except OSError:
-            return -1
-        key = f"{path}\0{st.st_mtime_ns}\0{st.st_size}"
-        with _DURATION_LOCK:
-            cached = _DURATION.get(key)
-        if cached is not None:
-            return cached
-        try:
-            # ALT: $ find ... -print0 | xargs -0r mediainfo --Inform="General;%Duration%"$'\t'"%CompleteName%\n" -- >> withdur.txt
-            media_info = cast(MediaInfo, MediaInfo.parse(path))
-            for track in media_info.tracks:  # pyright: ignore[reportUnknownVariableType, reportUnknownMemberType]
-                if track.track_type == "General" and track.duration:  # pyright: ignore[reportUnknownMemberType]
-                    # MediaInfo returns duration in milliseconds (as a string or int)
-                    duration = int(track.duration)  # pyright: ignore[reportUnknownArgumentType, reportUnknownMemberType]
-                    value = duration if duration > 0 else 1
-                    break
-            else:
-                value = -1
-        except (ValueError, TypeError, AttributeError, Exception):
-            value = -1  # corrupt files or missing data
-        with _DURATION_LOCK:
-            cached = _DURATION.get(key)
-            if cached is not None:
-                return cached
-            _DURATION[key] = value
-            _DURATION_DIRTY = True
-            _DURATION_MISSES += 1
-            save = _DURATION_MISSES >= 64
-            if save:
-                _DURATION_MISSES = 0
-        if save:
-            _save_durations()
-        return value
+        ms = vdprobe.duration(path, st)
+        return ms if ms > 0 or ms < 0 else 1
 
-    Directory.sort_dict["duration"] = lambda x: get_duration_mediainfo(x.path)
+    Directory.sort_dict["duration"] = lambda x: get_duration_mediainfo(x.path, _st(x))
 
     @register_linemode
     class DurationLinemode(LinemodeBase):
@@ -111,7 +47,7 @@ else:
             if not (f.is_file and (f.video or f.audio or ".mp4" in f.basename)):
                 return self._get_default_infostring(f, metadata)
 
-            ms = get_duration_mediainfo(f.path)
+            ms = get_duration_mediainfo(f.path, _st(f))
             if ms <= 0:
                 return self._get_default_infostring(f, metadata)
                 # if ms < 0:
@@ -149,17 +85,8 @@ else:
             self._cache = {}  # dirpath -> (len(files_all), set(paired paths))
 
         def _scan(self, files):
-            ms = []
-            for x in files:
-                if x.is_directory:
-                    continue
-                try:
-                    # if not (f.is_file and (f.video or f.audio or ".mp4" in f.basename)):
-                    v = get_duration_mediainfo(x.path)
-                except Exception:
-                    continue
-                if v is not None:
-                    ms.append((v, x.path))
+            res = vdprobe.many([x.path for x in files if not x.is_directory])
+            ms = [(max(r[0], 1), p) for p, r in res.items() if r]
             ms.sort()
             out = set()
             for i, (v, p) in enumerate(ms):

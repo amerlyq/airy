@@ -84,8 +84,9 @@ CODEC ARGUMENT
 ════════════════════════════════════════════════════════════════════════════════
 PERSISTENT CACHE
 ────────────────────────────────────────────────────────────────────────────────
-  ~/.cache/ranger/dcsize.json  MediaInfo results keyed by path+mtime_ns+size.
-  Survives ranger restarts. SIZES and SNAP are in-memory only.
+  sqlite vdprobe.CACHE_PATH, keyed by inode, valid while mtime_ns+size match:
+  survives restarts AND moving/renaming files.
+  Shared with vddur and the vdprobe CLI. SIZES and SNAP are in-memory only.
 
 ════════════════════════════════════════════════════════════════════════════════
 MAPPINGS  (rc.conf)
@@ -110,43 +111,31 @@ KNOWN LIMITATIONS
 ════════════════════════════════════════════════════════════════════════════════
 """
 
-import json
 import os
 import re
 import stat
 import sys
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
-from threading import Event, RLock
+from threading import Event
 
 from ranger.api import register_linemode
 from ranger.api.commands import Command
 from ranger.container.directory import Directory
-from ranger.core.loader import Loadable
 from ranger.core.linemode import LinemodeBase
+from ranger.core.loader import Loadable
 from ranger.ext.human_readable import human_readable
+
+try:
+    from ranger.plugins import vdprobe  # lives next to this file
+except ImportError:
+    import vdprobe
 
 MODES = ("file", "all", "video")
 EXTS = (".mp4",)
-CACHE = os.path.join(
-    os.environ.get("XDG_CACHE_HOME") or os.path.expanduser("~/.cache"),
-    "ranger",
-    "dcsize.json",
-)
 SIZES = {m: {} for m in MODES}  # mode -> {path: (nfiles, bytes)}
 SPEC = (frozenset({"av1"}), frozenset())  # (wanted, unwanted) codec sets
 SNAP = {}  # pwd.path -> snapshot dict
 
-try:
-    with open(CACHE) as fh:
-        _FMT = json.load(fh)  # "path\0mtime_ns\0size" -> format string
-except (OSError, ValueError):
-    _FMT = {}
-if not isinstance(_FMT, dict):
-    _FMT = {}
-_dirty = False
-_cache_lock = RLock()
-_misses_since_save = 0
-_CACHE_SAVE_EVERY = 128
 _MAX_WORKERS = 8
 _CACHE_HITS = 0
 _CACHE_MISSES = 0
@@ -238,57 +227,15 @@ def _restore_vdsym_monitor(state):
             pass
 
 
-def _save():
-    global _dirty
-    with _cache_lock:
-        if not _dirty:
-            return
-        snapshot = dict(_FMT)
-        _dirty = False
-    try:
-        os.makedirs(os.path.dirname(CACHE), exist_ok=True)
-        tmp = CACHE + ".tmp"
-        with open(tmp, "w") as fh:
-            json.dump(snapshot, fh)
-        os.replace(tmp, CACHE)
-    except Exception:
-        with _cache_lock:
-            _dirty = True
-        raise
-
-
 def _vfmt(p, st):
-    global _dirty, _misses_since_save, _CACHE_HITS, _CACHE_MISSES
-    k = f"{p}\0{st.st_mtime_ns}\0{st.st_size}"
-    with _cache_lock:
-        cached = _FMT.get(k)
-    if cached is not None:
+    """first video codec of regular file p ('' if none); st = its stat"""
+    global _CACHE_HITS, _CACHE_MISSES
+    r, hit = vdprobe.lookup(p, st)
+    if hit:
         _CACHE_HITS += 1
-        return cached
-    _CACHE_MISSES += 1
-
-    try:
-        from pymediainfo import MediaInfo
-
-        v = MediaInfo.parse(p).video_tracks
-        fmt = (v[0].format or "") if v else ""
-    except Exception:
-        fmt = ""
-
-    with _cache_lock:
-        # Another worker may have completed this exact key while MediaInfo ran.
-        cached = _FMT.get(k)
-        if cached is not None:
-            return cached
-        _FMT[k] = fmt
-        _dirty = True
-        _misses_since_save += 1
-        save = _misses_since_save >= _CACHE_SAVE_EVERY
-        if save:
-            _misses_since_save = 0
-    if save:
-        _save()
-    return fmt
+    else:
+        _CACHE_MISSES += 1
+    return r[1].partition(" / ")[0] if r else ""
 
 
 # ── codec spec ────────────────────────────────────────────────────────────────
@@ -629,17 +576,21 @@ class dcsize(Command):
                         _set_local_sort(self.fm, f.path, child_sort)
 
         def on_finish():
-            _save()
+            vdprobe.flush()
             if mode == "video":
                 self.fm.notify(
                     f"dcsize: cache {_CACHE_HITS} hits/{_CACHE_MISSES} misses "
-                    f"({CACHE})"
+                    f"({vdprobe.CACHE_PATH})"
                 )
             hide_empty = "hide_empty" in opts
             if mode in ("file", "all"):
-                _set_filter(d, mode, hide_empty)  # pass files; optionally hide empty dirs
+                _set_filter(
+                    d, mode, hide_empty
+                )  # pass files; optionally hide empty dirs
             elif "filter" in opts:  # video with filter
-                _set_filter(d, mode, hide_empty)  # filter files; optionally hide empty dirs
+                _set_filter(
+                    d, mode, hide_empty
+                )  # filter files; optionally hide empty dirs
             else:  # video without filter
                 _remove_filter(d)
             if d.files_all is not None:
