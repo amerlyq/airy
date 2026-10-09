@@ -28,7 +28,7 @@ LINEMODES
 SORTING
 ────────────────────────────────────────────────────────────────────────────────
   sort keys dc{file,all,video}: largest first; uncomputed entries sort to end (size 0).
-  Activated by the sort argument; setlocal sort is applied to current and visible child dirs.
+  Activated by the sort argument; setlocal sort is applied to current dir.
   Restored by dcu.
   Restore order: setlocal (if original sort was local) → fallback to set.
 
@@ -177,6 +177,10 @@ class _DcsizeLoader(Loadable):
 
     def destroy(self):
         self.cancelled.set()
+        super().destroy()
+        generator = self.load_generator
+        if generator is not None:
+            generator.close()
 
     def generate(self):
         if not self.todo:
@@ -192,7 +196,19 @@ class _DcsizeLoader(Loadable):
             pending = set(jobs)
             done_count = 0
             while pending and not self.cancelled.is_set():
-                finished, pending = wait(pending, return_when=FIRST_COMPLETED)
+                finished, pending = wait(
+                    pending, timeout=0.05, return_when=FIRST_COMPLETED
+                )
+                if not finished:
+                    waiting = ", ".join(
+                        os.path.basename(jobs[future].path) for future in list(pending)[:2]
+                    )
+                    self.description = (
+                        f"dcsize: {done_count}/{len(self.todo)}; "
+                        f"pending {len(pending)} ({waiting})"
+                    )
+                    yield
+                    continue
                 for future in finished:
                     if self.cancelled.is_set():
                         break
@@ -249,12 +265,7 @@ def _restore_vdsym_monitor(state):
 
 def _vfmt(p, st):
     """first video codec of regular file p ('' if none); st = its stat"""
-    global _CACHE_HITS, _CACHE_MISSES
-    r, hit = vdprobe.lookup(p, st)
-    if hit:
-        _CACHE_HITS += 1
-    else:
-        _CACHE_MISSES += 1
+    r, _ = vdprobe.lookup(p, st)
     return r[1].partition(" / ")[0] if r else ""
 
 
@@ -303,7 +314,7 @@ def _readdir(path, need_f, prev, cancelled):
         with os.scandir(path) as it:
             for e in it:
                 i += 1
-                if not i & 2047 and cancelled is not None and cancelled.is_set():
+                if not i & 255 and cancelled is not None and cancelled.is_set():
                     raise _Cancel
                 try:
                     if e.is_symlink():  # d_type: no syscall
@@ -371,33 +382,45 @@ def _scan(path, mode, seen, cancelled=None, st=None):
         return 0, 0
     if mode == "video":
         n = size = 0
-        for name in o["v"][1]:  # regular .mp4 names; each still stat'ed => exact
+        media = []
+        for i, name in enumerate(o["v"][1]):  # regular .mp4 names; each still stat'ed => exact
+            if not i & 255 and cancelled is not None and cancelled.is_set():
+                raise _Cancel
             p = path + "/" + name
             try:
                 s = os.lstat(p)
             except OSError:
                 continue
-            if s.st_mode & 0o170000 == 0o100000 and _match(_vfmt(p, s)):
+            if s.st_mode & 0o170000 == 0o100000:
+                media.append((p, s))
+        results = vdprobe.many([p for p, _ in media])
+        for p, s in media:
+            r = results.get(p)
+            fmt = r[1].partition(" / ")[0] if r else ""
+            if _match(fmt):
                 n += 1
                 size += s.st_size
     else:
         n, size = o["f"]
-    for name in o["s"]:
+    for i, name in enumerate(o["s"]):
+        if not i & 255 and cancelled is not None and cancelled.is_set():
+            raise _Cancel
         p = path + "/" + name
         try:
             s = os.stat(p)
         except OSError:
             continue
-        if mode == "all":
-            key = (s.st_dev, s.st_ino)
-            if key in seen:
-                continue
-            seen.add(key)
+        key = (s.st_dev, s.st_ino)
+        if key in seen:
+            continue
+        seen.add(key)
         c, z = _scan(p, mode, seen, cancelled, s)
         n += c
         size += z
     if mode == "all":  # symlinks: re-stat every time (targets live elsewhere)
-        for name in o["l"]:
+        for i, name in enumerate(o["l"]):
+            if not i & 255 and cancelled is not None and cancelled.is_set():
+                raise _Cancel
             p = path + "/" + name
             try:
                 s = os.stat(p)
@@ -572,11 +595,13 @@ def _restore_local_sorts(fm, sn):
         if saved:
             local = settings.setdefault(key, {})
             local.update(saved)
-        elif key in settings:
-            settings[key].pop("sort", None)
-            settings[key].pop("sort_reverse", None)
-            if not settings[key]:
-                settings.pop(key)
+        else:
+            # Keep the empty pattern alive. Settings.get() can otherwise see
+            # the key while this restore removes it and raise KeyError.
+            local = settings.get(key)
+            if local is not None:
+                local.pop("sort", None)
+                local.pop("sort_reverse", None)
 
 
 # ── command ───────────────────────────────────────────────────────────────────
@@ -641,6 +666,8 @@ class dcsize(Command):
                 SIZES["video"].clear()
 
         _CACHE_HITS = _CACHE_MISSES = _DIR_HITS = _DIR_SCANS = 0
+        if mode == "video":
+            vdprobe.stats[:] = [0, 0]
         _FRESH = "fresh" in opts
         t0 = time.perf_counter()
 
@@ -669,18 +696,21 @@ class dcsize(Command):
             f.linemode = name
         if "sort" in opts:
             _set_local_sort(self.fm, d.path, name)
-            self.fm.execute_console("set sort=" + name)
 
         def on_result(f, result):
             SIZES[mode][f.path] = result
-            if f.is_directory:
-                if "sort" in opts:
-                    child_sort = "sizeclips" if mode == "video" else name
-                    if f.path in getattr(self.fm, "directories", {}):
-                        _set_local_sort(self.fm, f.path, child_sort)
+            ## DISABLED: sort-signal-storm
+            ##   8 _set_local_sort calls -> 37,111 Directory.sort calls —> 37,111 signal callbacks
+            # if f.is_directory:
+            #     if "sort" in opts:
+            #         child_sort = "sizeclips" if mode == "video" else name
+            #         if f.path in getattr(self.fm, "directories", {}):
+            #             _set_local_sort(self.fm, f.path, child_sort)
 
         def on_finish():
             vdprobe.flush()
+            if mode == "video":
+                _CACHE_HITS, _CACHE_MISSES = vdprobe.stats
             self.fm.notify(
                 f"dcsize {mode}: {time.perf_counter() - t0:.1f}s  dirs {_DIR_HITS} cached/"
                 f"{_DIR_SCANS} read"
@@ -691,19 +721,26 @@ class dcsize(Command):
                 )
             )
             hide_empty = "hide_empty" in opts
+            had_dc_filter = any(isinstance(x, DcFilter) for x in d.filter_stack)
             if mode in ("file", "all"):
-                _set_filter(
-                    d, mode, hide_empty
-                )  # pass files; optionally hide empty dirs
+                if "filter" in opts or hide_empty:
+                    _set_filter(d, mode, hide_empty)
+                else:
+                    _remove_filter(d)
             elif "filter" in opts:  # video with filter
-                _set_filter(
-                    d, mode, hide_empty
-                )  # filter files; optionally hide empty dirs
+                _set_filter(d, mode, hide_empty)
             else:  # video without filter
                 _remove_filter(d)
-            if d.files_all is not None:
+            refresh = (
+                "sort" in opts
+                or "filter" in opts
+                or hide_empty
+                or had_dc_filter
+            )
+            if refresh and d.files_all is not None:
                 d.refilter()
-            d.sort()
+            if refresh:
+                d.sort()
             self.fm.ui.redraw_main_column()
 
         self.fm.loader.add(_DcsizeLoader(self.fm, todo, mode, on_result, on_finish))

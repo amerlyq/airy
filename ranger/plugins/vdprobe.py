@@ -407,6 +407,20 @@ def flush():
                 _dnew.setdefault(ino, (mt, marshal.loads(blob)))
 
 
+def checkpoint():
+    """Drain the SQLite WAL when possible.
+
+    A concurrent reader or writer may make TRUNCATE return BUSY; the cache is
+    best-effort, so leave the WAL for SQLite to checkpoint later in that case.
+    """
+    try:
+        c = _db()
+        with _wlock:
+            c.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+    except Exception:
+        pass
+
+
 atexit.register(flush)
 
 
@@ -646,6 +660,7 @@ def main(argv):
     args = [a for a in args if a != "-0"]
     root = args[0] if args else "."
     sys.stdout.reconfigure(errors="surrogateescape")
+    checkpoint()
     _load_all()
     _defer = []
     if root == "-":
@@ -661,6 +676,7 @@ def main(argv):
     sys.stdout.write("".join(lines))
     sys.stdout.flush()
     flush()
+    checkpoint()
     print(
         f"vdprobe: files {len(paths)}  probed {stats[1]}  mediainfo {ndefer}  "
         f"{time.perf_counter() - t0:.2f}s",
