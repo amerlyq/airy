@@ -22,7 +22,7 @@ LINEMODES
   Files → "size".  n = matched file count.
   cursor / 1dc*: only the entry under cursor updated; others unchanged.
   Without explicit selection, only entries visible after current filters are used.
-  Explicit fm.get_selection() overrides the visible-entry set.
+  Explicit .get_selection() overrides the visible-entry set.
 
 ════════════════════════════════════════════════════════════════════════════════
 SORTING
@@ -84,9 +84,16 @@ CODEC ARGUMENT
 ════════════════════════════════════════════════════════════════════════════════
 PERSISTENT CACHE
 ────────────────────────────────────────────────────────────────────────────────
-  sqlite vdprobe.CACHE_PATH, keyed by inode, valid while mtime_ns+size match:
-  survives restarts AND moving/renaming files.
-  Shared with vddur and the vdprobe CLI. SIZES and SNAP are in-memory only.
+  vdprobe sqlite cache (vdprobe.CACHE_PATH), shared with vddur + the CLI:
+  • per file (codec/duration): keyed by inode, valid while mtime_ns+size match;
+    survives restarts and moving/renaming files.
+  • per directory (own entries: subdirs, symlinks, .mp4 names, regular-file total):
+    keyed by dir inode, valid while the DIRECTORY mtime is unchanged, so an
+    unchanged directory costs ONE stat instead of a readdir + stat per file.
+    video mode still stats every .mp4 (exact for in-place re-encodes);
+    file/all totals are trusted for TRUST seconds (in-place edits of a file do
+    not change its directory's mtime) -- add `fresh` to bypass the directory cache.
+  SIZES and SNAP are in-memory only.
 
 ════════════════════════════════════════════════════════════════════════════════
 MAPPINGS  (rc.conf)
@@ -103,6 +110,7 @@ MAPPINGS  (rc.conf)
 KNOWN LIMITATIONS
 ────────────────────────────────────────────────────────────────────────────────
   • Hardlinks double-counted.
+  • file/all totals may lag in-place file edits by up to TRUST (use `fresh`).
   • Only EXTS files codec-checked (default: .mp4).
   • UI blocks during computation; first dcvideo on cold cache is slow.
   • SIZES and SNAP lost on restart.
@@ -115,6 +123,7 @@ import os
 import re
 import stat
 import sys
+import time
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from threading import Event
 
@@ -126,9 +135,10 @@ from ranger.core.loader import Loadable
 from ranger.ext.human_readable import human_readable
 
 try:
-    from ranger.plugins import vdprobe  # lives next to this file
+    # ranger imports plugins as `plugins.<name>` with the confdir on sys.path while it loads them
+    from plugins import vdprobe
 except ImportError:
-    import vdprobe
+    import vdprobe  # fallback: vdprobe.py somewhere on PYTHONPATH
 
 MODES = ("file", "all", "video")
 EXTS = (".mp4",)
@@ -137,8 +147,18 @@ SPEC = (frozenset({"av1"}), frozenset())  # (wanted, unwanted) codec sets
 SNAP = {}  # pwd.path -> snapshot dict
 
 _MAX_WORKERS = 8
+TRUST = (
+    24 * 3600
+)  # file/all: cached directory totals are re-verified after this many seconds
+_FRESH = False  # `fresh` argument: ignore cached directory data (still refreshes it)
 _CACHE_HITS = 0
 _CACHE_MISSES = 0
+_DIR_HITS = 0
+_DIR_SCANS = 0
+
+
+class _Cancel(Exception):
+    pass
 
 
 class _DcsizeLoader(Loadable):
@@ -275,52 +295,134 @@ def _leaf(p, mode, st):
     return 1, st.st_size
 
 
-def _scan(path, mode, seen, cancelled=None):
-    n = size = 0
-    if cancelled is not None and cancelled.is_set():
-        return 0, 0
+def _readdir(path, need_f, prev, cancelled):
+    """one directory's own entries. need_f: also total the regular files (one stat each)."""
+    subs, links, vn = [], [], []
+    n = b = i = 0
     try:
         with os.scandir(path) as it:
             for e in it:
-                if cancelled is not None and cancelled.is_set():
-                    break
+                i += 1
+                if not i & 2047 and cancelled is not None and cancelled.is_set():
+                    raise _Cancel
                 try:
-                    link = e.is_symlink()
-                    if link and mode != "all":
-                        continue
-                    if e.is_dir():
-                        if mode == "all":
-                            st = e.stat()
-                            key = (st.st_dev, st.st_ino)
-                            if key in seen:
-                                continue
-                            seen.add(key)
-                        c, s = _scan(e.path, mode, seen, cancelled)
-                    elif link:
-                        try:
-                            st = e.stat()
-                        except OSError:
-                            st = e.stat(follow_symlinks=False)
-                        c, s = 1, st.st_size
-                    else:
-                        if mode == "video" and not e.name.lower().endswith(EXTS):
-                            continue
-                        st = e.stat(follow_symlinks=False)
-                        if not stat.S_ISREG(st.st_mode):
-                            continue
-                        c, s = _leaf(e.path, mode, st)
+                    if e.is_symlink():  # d_type: no syscall
+                        links.append(e.name)
+                    elif e.is_dir(follow_symlinks=False):
+                        subs.append(e.name)
+                    elif e.is_file(follow_symlinks=False):
+                        name = e.name
+                        if name.lower().endswith(EXTS):
+                            vn.append(name)
+                        if need_f:
+                            n += 1
+                            b += e.stat(follow_symlinks=False).st_size
                 except OSError:
                     continue
-                n += c
-                size += s
     except OSError:
         pass
+    if need_f:
+        f, ft = (n, b), time.time()
+    else:  # video pass: keep an earlier (still same-mtime) total
+        f, ft = (prev["f"], prev["ft"]) if prev else (None, 0)
+    return {
+        "s": tuple(subs),
+        "l": tuple(links),
+        "v": (EXTS, tuple(vn)),
+        "f": f,
+        "ft": ft,
+    }
+
+
+def _dir(path, st, mode, cancelled):
+    """cached facts about one directory, valid while its mtime is unchanged"""
+    global _DIR_HITS, _DIR_SCANS
+    ino, mt = st.st_ino, st.st_mtime_ns
+    prev = None
+    if not _FRESH:
+        e = vdprobe.dir_get(ino)
+        if e is not None and e[0] == mt:
+            prev = e[1]
+    need_f = mode != "video"
+    if (
+        prev is not None
+        and prev["v"][0] == EXTS
+        and (not need_f or (prev["f"] is not None and time.time() - prev["ft"] < TRUST))
+    ):
+        _DIR_HITS += 1
+        return prev
+    _DIR_SCANS += 1
+    o = _readdir(path, need_f, prev, cancelled)
+    vdprobe.dir_put(
+        ino, mt, o
+    )  # mt was read BEFORE the listing: a racing change just forces a rescan
+    return o
+
+
+def _scan(path, mode, seen, cancelled=None, st=None):
+    """(count, bytes) of a directory tree. st = os.stat(path) if the caller has it."""
+    if cancelled is not None and cancelled.is_set():
+        return 0, 0
+    try:
+        if st is None:
+            st = os.stat(path)
+        o = _dir(path, st, mode, cancelled)
+    except OSError:
+        return 0, 0
+    if mode == "video":
+        n = size = 0
+        for name in o["v"][1]:  # regular .mp4 names; each still stat'ed => exact
+            p = path + "/" + name
+            try:
+                s = os.lstat(p)
+            except OSError:
+                continue
+            if s.st_mode & 0o170000 == 0o100000 and _match(_vfmt(p, s)):
+                n += 1
+                size += s.st_size
+    else:
+        n, size = o["f"]
+    for name in o["s"]:
+        p = path + "/" + name
+        try:
+            s = os.stat(p)
+        except OSError:
+            continue
+        if mode == "all":
+            key = (s.st_dev, s.st_ino)
+            if key in seen:
+                continue
+            seen.add(key)
+        c, z = _scan(p, mode, seen, cancelled, s)
+        n += c
+        size += z
+    if mode == "all":  # symlinks: re-stat every time (targets live elsewhere)
+        for name in o["l"]:
+            p = path + "/" + name
+            try:
+                s = os.stat(p)
+            except OSError:  # broken: counted once with the link's own size
+                try:
+                    n, size = n + 1, size + os.lstat(p).st_size
+                except OSError:
+                    pass
+                continue
+            if s.st_mode & 0o170000 == 0o040000:
+                key = (s.st_dev, s.st_ino)
+                if key in seen:
+                    continue
+                seen.add(key)
+                c, z = _scan(p, mode, seen, cancelled, s)
+            else:
+                c, z = 1, s.st_size
+            n += c
+            size += z
     return n, size
 
 
-def _scan_video_parallel(path, cancelled=None):
+def _scan_video_parallel(path, cancelled=None, st=None):
     """Sequential branch scan; top-level loader already supplies parallelism."""
-    return _scan(path, "video", set(), cancelled)
+    return _scan(path, "video", set(), cancelled, st)
 
 
 def _tree(path, mode, parallel=False, cancelled=None):
@@ -334,14 +436,14 @@ def _tree(path, mode, parallel=False, cancelled=None):
             return (1, lst.st_size) if mode == "all" else (0, 0)
         if stat.S_ISDIR(st.st_mode):
             if parallel and mode == "video":
-                return _scan_video_parallel(path, cancelled)
-            return _scan(path, mode, {(st.st_dev, st.st_ino)}, cancelled)
+                return _scan_video_parallel(path, cancelled, st)
+            return _scan(path, mode, {(st.st_dev, st.st_ino)}, cancelled, st)
         if (link and mode != "all") or not stat.S_ISREG(st.st_mode):
             return 0, 0
         if mode == "video" and not path.lower().endswith(EXTS):
             return 0, 0
         return _leaf(path, mode, st)
-    except OSError:
+    except (OSError, _Cancel):
         return 0, 0
 
 
@@ -481,7 +583,7 @@ def _restore_local_sorts(fm, sn):
 
 
 class dcsize(Command):
-    """:dcsize <file|all|video|undo> [sort] [filter] [cursor] [codec=…]
+    """:dcsize <file|all|video|undo> [sort] [filter] [cursor] [fresh] [codec=…]
     count prefix (1dc*) implies cursor."""
 
     def _undo(self, d):
@@ -513,7 +615,7 @@ class dcsize(Command):
         self.fm.ui.redraw_main_column()
 
     def execute(self):
-        global SPEC, _CACHE_HITS, _CACHE_MISSES
+        global SPEC, _CACHE_HITS, _CACHE_MISSES, _DIR_HITS, _DIR_SCANS, _FRESH
         mode = self.arg(1)
         d = self.fm.thisdir
 
@@ -538,14 +640,16 @@ class dcsize(Command):
                 SPEC = new
                 SIZES["video"].clear()
 
-        _CACHE_HITS = _CACHE_MISSES = 0
+        _CACHE_HITS = _CACHE_MISSES = _DIR_HITS = _DIR_SCANS = 0
+        _FRESH = "fresh" in opts
+        t0 = time.perf_counter()
 
         name = "dc" + mode
         cursor = self.quantifier is not None or "cursor" in opts
         # d.files is the post-filter view. Never submit d.files_all here.
         visible = list(d.files or [])
         marked = list(getattr(d, "marked_items", ()) or ())
-        selected = list(self.fm.get_selection()) if marked else []
+        selected = list(self.fm.thistab.get_selection()) if marked else []
         base = selected or visible
         if marked:
             items = base
@@ -577,11 +681,15 @@ class dcsize(Command):
 
         def on_finish():
             vdprobe.flush()
-            if mode == "video":
-                self.fm.notify(
-                    f"dcsize: cache {_CACHE_HITS} hits/{_CACHE_MISSES} misses "
-                    f"({vdprobe.CACHE_PATH})"
+            self.fm.notify(
+                f"dcsize {mode}: {time.perf_counter() - t0:.1f}s  dirs {_DIR_HITS} cached/"
+                f"{_DIR_SCANS} read"
+                + (
+                    f"  codec {_CACHE_HITS} hits/{_CACHE_MISSES} probed"
+                    if mode == "video"
+                    else ""
                 )
+            )
             hide_empty = "hide_empty" in opts
             if mode in ("file", "all"):
                 _set_filter(

@@ -31,7 +31,7 @@ from zlib import crc32
 # ── config ────────────────────────────────────────────────────────────────────
 # CACHE_PATH = os.environ.get("VDPROBE_CACHE") or os.path.join(os.environ.get("XDG_CACHE_HOME") or os.path.expanduser("~/.cache"), "vdprobe", "cache.db")
 CACHE_PATH = "/cache/irome_db/mediainfo.sqlite3"
-VERSION = 1  # bump when parser output changes (ALL_VIDEO / WEBP_ANIM are hashed in too)
+VERSION = 2  # bump when parser output changes (ALL_VIDEO / WEBP_ANIM are hashed in too)
 W = 4096  # one page per read; re-window only when the walk leaves it
 ALL_VIDEO = (
     False  # True: walk everything, list every video track (cover-art mjpeg etc.)
@@ -278,7 +278,9 @@ _mem = {}  # ino -> (mtime_ns, size, res)       process memo, validated on every
 _new = {}  # ino -> same, waiting for flush()
 _all = False  # _mem holds the whole table (CLI) -> a memo miss is a real miss
 _defer = None  # CLI: list collecting files for one batched mediainfo call
-_lock = threading.Lock()  # _new
+_dmem = {}  # dir ino -> (mtime_ns, obj)   directory aggregates (see dir_get)
+_dnew = {}  # waiting for flush()
+_lock = threading.Lock()  # _new, _dnew
 _wlock = threading.Lock()  # sqlite writes / schema
 _tl = threading.local()  # one sqlite connection per thread
 stats = [0, 0]  # hits, misses (approximate under threads)
@@ -302,9 +304,13 @@ def _db():
                 c.execute("BEGIN IMMEDIATE")
                 if c.execute("PRAGMA user_version").fetchone()[0] != want:  # raced?
                     c.execute("DROP TABLE IF EXISTS m")
+                    c.execute("DROP TABLE IF EXISTS d")
                     c.execute(
                         "CREATE TABLE m(ino INTEGER PRIMARY KEY, mt INTEGER, sz INTEGER,"
                         " dur INTEGER, codec TEXT)"
+                    )
+                    c.execute(
+                        "CREATE TABLE d(ino INTEGER PRIMARY KEY, mt INTEGER, blob BLOB)"
                     )
                     c.execute(f"PRAGMA user_version={want}")
                 c.execute("COMMIT")
@@ -371,18 +377,21 @@ def _put(ino, mt, sz, res):
 
 def flush():
     with _lock:
-        if not _new:
+        if not _new and not _dnew:
             return
         rows = [
             (i, r[0], r[1], r[2] and r[2][0], r[2] and r[2][1]) for i, r in _new.items()
         ]
+        drows = [(i, mt, marshal.dumps(o)) for i, (mt, o) in _dnew.items()]
         _new.clear()
+        _dnew.clear()
     try:
         with _wlock:
             c = _db()
             c.execute("BEGIN IMMEDIATE")
             try:
                 c.executemany("INSERT OR REPLACE INTO m VALUES (?,?,?,?,?)", rows)
+                c.executemany("INSERT OR REPLACE INTO d VALUES (?,?,?)", drows)
                 c.execute("COMMIT")
             except BaseException:
                 c.execute("ROLLBACK")
@@ -394,6 +403,8 @@ def flush():
                     row[0],
                     (row[1], row[2], None if row[3] is None else (row[3], row[4])),
                 )
+            for ino, mt, blob in drows:
+                _dnew.setdefault(ino, (mt, marshal.loads(blob)))
 
 
 atexit.register(flush)
@@ -404,6 +415,7 @@ def _after_fork():
     _tl = threading.local()  # never share a sqlite connection with the parent
     _lock, _wlock = threading.Lock(), threading.Lock()
     _new.clear()
+    _dnew.clear()
 
 
 os.register_at_fork(after_in_child=_after_fork)
@@ -454,6 +466,26 @@ def codec(path, st=None):
     """first video codec ('' if none / not media)"""
     r = lookup(path, st)[0]
     return r[1].partition(" / ")[0] if r else ""
+
+
+def dir_get(ino):
+    """-> (mtime_ns, obj) | None.  Opaque per-directory aggregate; the caller decides validity
+    (a directory's mtime changes when entries are added/removed/renamed, NOT on in-place edits)."""
+    r = _dmem.get(ino)
+    if r is None:
+        try:
+            row = _db().execute("SELECT mt,blob FROM d WHERE ino=?", (ino,)).fetchone()
+            r = (row[0], marshal.loads(row[1])) if row else (-1, None)
+        except Exception:
+            r = (-1, None)
+        _dmem[ino] = r
+    return r if r[1] is not None else None
+
+
+def dir_put(ino, mt, obj):
+    """obj: anything marshal can dump (tuples/lists/dicts/str/int/None)"""
+    with _lock:
+        _dmem[ino] = _dnew[ino] = (mt, obj)
 
 
 def many(paths):

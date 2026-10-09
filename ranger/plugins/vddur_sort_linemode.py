@@ -10,14 +10,15 @@ try:
     from ranger.core.filter_stack import stack_filter
     from ranger.core.linemode import DEFAULT_LINEMODE, LinemodeBase
     from ranger.core.shared import FileManagerAware
-
-    try:
-        from ranger.plugins import vdprobe  # lives next to this file
-    except ImportError:
-        import vdprobe
 except Exception:
     pass
 else:
+    # outside the try on purpose: a missing vdprobe must be a visible error, not a silent no-op
+    try:
+        # ranger imports plugins as `plugins.<name>`
+        from plugins import vdprobe
+    except ImportError:
+        import vdprobe  # fallback: vdprobe.py somewhere on PYTHONPATH
 
     def _st(f: FileSystemObject):
         """ranger already stat'ed the file: reuse it, but not a symlink's lstat"""
