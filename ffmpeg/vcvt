@@ -41,7 +41,7 @@ declare cable=/sys/class/net/enp0s13f0u2u3u3/carrier has_pc=
 if ((has_pc)); then
   ssh -O check lf &>/dev/null || ssh -fN -o ConnectTimeout=2 lf  # /d/airy/ssh/run-xc lf
   systemctl is-active --quiet nfs-server || { set -x; sudo systemctl start nfs-server; }
-  ssh -n lf 'test -d /media/pro/vd || { set -x; sudo mount /net/vd; }'
+  ssh -t lf 'test -s /media/pro/vd || { set -x; sudo mount /net/vd; }'
   declare _remote_args=() _remote_need_value=0 _remote_after_options=0 _remote_arg
   for _remote_arg in "$@"; do
     if ((_remote_need_value)); then

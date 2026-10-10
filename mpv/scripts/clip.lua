@@ -22,6 +22,7 @@ local WINDOW, DEBOUNCE, PAD = 2, 0.15, 10
 local state = {
   mode = NEXT_MODE[options.preview_mode] and options.preview_mode or "copy",
   hidden = false, revision = 0, loop = false,
+  parked = false, map_requested = false, -- parked: loop-b suspended while at/after the end mark
 }
 -- Each boundary owns its mark, pending work, cached frame and display state.
 local edges = { { name = "A", id = 1, time = 0 }, { name = "B", id = 2, time = 0 } }
@@ -154,7 +155,9 @@ local function timestamp(t)
   return frame_text(sec, math.max(0, math.floor(t * f + 0.5) - math.ceil(sec * f - 1e-6)))
 end
 -- A length in the same notation (FF = whole frames beyond the seconds; constant fps).
-local function duration_text(d)
+local duration_text
+function duration_text(d)
+  if d < 0 then return "-" .. duration_text(-d) end
   local f = fps()
   if not f then return ms_text(d) end
   local sec = math.floor(d + 1e-6)
@@ -346,11 +349,12 @@ end
 local function text_filter(job, text, n, corner)
   return string.format("drawtext=text='%s':x=%s:y=%s:fontsize=%d:fontcolor=%s:borderw=2:bordercolor=black:enable='eq(n,%d)'",
     text, corner and "w-tw-10" or "10", corner and "10" or "h-th-10", math.max(12, math.floor(job.h * 0.14)),
-    corner and "0x00FF00" or "white", n)
+    corner and "0xD0C000" or "white", n)
 end
+local BORDER_OK, BORDER_BAD = "0x008000", "0x800000" -- BAD: zero/negative length clip
 local function box_filter(job, n)
-  return string.format("drawbox=x=0:y=0:w=iw:h=ih:color=0x00FF00:t=%d:enable='eq(n,%d)'",
-    math.max(2, math.floor(job.h * 0.025)), n)
+  return string.format("drawbox=x=0:y=0:w=iw:h=ih:color=%s:t=%d:enable='eq(n,%d)'",
+    job.red and BORDER_BAD or BORDER_OK, math.max(2, math.floor(job.h * 0.025)), n)
 end
 
 local function decode_args(job)
@@ -565,23 +569,25 @@ sample_job = function(job)
   end)
 end
 
--- Beg row straight from the source around the actual clip start: each frame is addressed
--- by its own pts, so every offset press shifts the row by exactly one frame.
+-- Beg row (or either row for a zero/negative length clip, where the converter has nothing to
+-- cut) straight from the source around the actual boundary: each frame is addressed by its
+-- own pts, so every offset press shifts the row by exactly one frame.
 -- ## ALT (options.beg_source=false): converter sample + source context. Shows what the mode
 -- ##   really produces, but copy mode starts at a keyframe, so "0" need not sit at `a` and the
 -- ##   context frames are anchored on the first muxed packet instead -> offsets looked inert.
 local function source_args(job)
-  local first, last = ranges[1].first, ranges[1].last
+  local first, last = ranges[job.edge.id].first, ranges[job.edge.id].last
+  local t = job.edge.id == 1 and job.a or job.b
   local fd = frame_duration() or 0.04
-  local m, i = pts_map, map_index(job.a)
+  local m, i = pts_map, map_index(t)
   local lo, hi, n0, total
   if i then
     local lo_i, hi_i = math.max(1, i + first), math.min(#m.pts, i + last)
     lo, hi = m.pts[lo_i] - m.start - 0.0004, m.pts[hi_i] - m.start + 0.0004
     n0, total = i - lo_i, hi_i - lo_i + 1
   else -- no frame map (yet): constant frame rate guess
-    n0 = math.min(-first, math.max(0, math.floor(job.a / fd + 0.5)))
-    lo, hi, total = job.a - (n0 + 0.5) * fd, job.a + (last + 0.5) * fd, n0 + 1 + last
+    n0 = math.min(-first, math.max(0, math.floor(t / fd + 0.5)))
+    lo, hi, total = t - (n0 + 0.5) * fd, t + (last + 0.5) * fd, n0 + 1 + last
   end
   -- Without -copyts, t restarts at the -ss point; -t keeps the read short.
   local seek = math.max(0, lo - 1)
@@ -602,7 +608,7 @@ local function source_job(job)
   run_job(job, args, function()
     local info, bytes = utils.file_info(job.raw), job.w * job.h * 4
     if not info or info.size < bytes or info.size % bytes ~= 0 then
-      fail(job.edge, info and info.size == 0 and "no video frame near beg" or "incomplete raw frame")
+      fail(job.edge, info and info.size == 0 and "no video frame near " .. job.edge.name or "incomplete raw frame")
       return
     end
     job.frames = {}
@@ -616,7 +622,7 @@ end
 local function start_preview(edge)
   if state.hidden or not edge.marked or edge.job or edge.timer or edge.error then return end
   local _, _, w, h = geometry(edge)
-  if not w or not valid_range() then return end -- Layout observers retry later.
+  if not w then return end -- Layout observers retry later.
   local path = source_path()
   local info, ext = path and utils.file_info(path), path and path:match("%.([^./]+)$")
   if not info or not info.is_file or not ext then
@@ -629,13 +635,15 @@ local function start_preview(edge)
   local a, b = etime(edges[1]), etime(edges[2])
   local job = {
     edge = edge, path = path, a = a, b = b, mode = state.mode, offset = frames_offset(edge),
+    red = not valid_range(),
     raw = raw, after = raw .. ".after", stats = raw .. ".stats",
     clip = raw .. "." .. ext, window = WINDOW,
     limit = math.min(b - a, options.preview_window_limit),
     w = math.max(1, math.floor(w * factor)), h = math.max(1, math.floor(h * factor)),
   }
   edge.job, jobs[job] = job, true
-  if edge.id == 1 and options.beg_source then job.source = true; source_job(job) else sample_job(job) end
+  -- Zero/negative length (red border): the converter can't cut it, so decode from the source.
+  if (edge.id == 1 and options.beg_source) or job.red then job.source = true; source_job(job) else sample_job(job) end
 end
 
 local function show_previews()
@@ -652,7 +660,8 @@ local function unchanged_sample(edge)
   local a, b = etime(edges[1]), etime(edges[2])
   local unchanged
   if job.source then
-    unchanged = job.a == a -- beg source row ignores the mode and the other edge
+    -- Source rows ignore the mode and the other edge; only the border color follows validity.
+    unchanged = (edge.id == 1 and job.a == a or edge.id == 2 and job.b == b) and job.red == not valid_range()
   elseif job.mode ~= state.mode then
     return false
   elseif state.mode ~= "smart" then
@@ -715,15 +724,18 @@ local function select_mode(mode)
   status("info", "Previewing " .. mode .. "; export keys start conversion")
 end
 
+local load_pts_map -- defined near the callbacks
 -- Looping is a switch over the markers: toggling never touches edge times.
 -- Raw marker times (wysiwyg in mpv); offsets only compensate the ffmpeg cut discrepancy.
 local function apply_loop()
   mp.set_property("ab-loop-a", state.loop and edges[1].time or "no")
-  mp.set_property("ab-loop-b", state.loop and edges[2].time or "no")
+  -- Parked (seek to end): stepping/playing forward would cross b and jump to a; b is
+  -- suspended only until time-pos goes back before it, state.loop stays on.
+  mp.set_property("ab-loop-b", state.loop and not state.parked and edges[2].time or "no")
 end
 
 local function toggle_loop()
-  state.loop = not state.loop
+  state.loop, state.parked = not state.loop, false
   apply_loop()
   status("info", "loop " .. (state.loop and "on" or "off"))
 end
@@ -745,7 +757,8 @@ local function mark(edge)
   end
   local other = edges[3 - edge.id]
   other.time = edge.id == 1 and math.max(t, other.time) or math.min(t, other.time)
-  state.loop = true
+  state.loop, state.parked = true, false
+  if not state.map_requested then state.map_requested = true; load_pts_map(source_path()) end
   apply_loop()
   refresh_previews(edge)
   show_duration()
@@ -764,6 +777,7 @@ local function seek(edge, mode)
   mp.set_property("pause", "yes")
   mp.commandv("seek", edge.time, "absolute", mode)
   status("info", string.format("seek %s %s (%s)", edge.name, timestamp(edge.time), mode))
+  if edge.id == 2 and state.loop then state.parked = true; apply_loop() end
 end
 
 local function export(mode)
@@ -801,9 +815,8 @@ local function move_file()
   end)
 end
 
--- Async: ffprobe reads every video packet time (may take a while for big files).
-local function load_pts_map(path)
-  pts_map = nil
+-- Async, on the first "[" or "]" per file: ffprobe reads every video packet time (slow for big files).
+function load_pts_map(path)
   if not path or path:match("^%a[%w+.-]*://") then return end
   subprocess({ "ffprobe", "-v", "error", "-select_streams", "v:0",
     "-show_entries", "packet=pts_time:format=start_time", "-of", "compact", path },
@@ -829,7 +842,7 @@ mp.register_event("file-loaded", function()
   local b = loop_b or mp.get_property_number("duration/full") or mp.get_property_number("duration")
   state.loop = finite(a) or finite(loop_b)
   framesnum_offset_beg, framesnum_offset_end = default_offset_beg, default_offset_end
-  load_pts_map(source_path())
+  pts_map, state.map_requested, state.parked = nil, false, false -- map: lazily on first mark
   edges[1].time = finite(a) and math.max(0, a) or 0
   edges[2].time = finite(b) and math.max(edges[1].time, b) or edges[1].time
   local duration = mp.get_property_number("duration")
@@ -846,6 +859,12 @@ mp.register_event("shutdown", function()
 end)
 mp.observe_property("eof-reached", "bool", function(_, eof)
   if eof then mp.set_property("pause", "yes") end
+end)
+mp.observe_property("time-pos", "number", function(_, pos)
+  if state.parked and finite(pos) and pos < edges[2].time - (frame_duration() or 0.02) * 0.5 then
+    state.parked = false
+    apply_loop()
+  end
 end)
 mp.observe_property("osd-dimensions", "native", show_previews)
 mp.observe_property("video-out-params", "native", show_previews)
