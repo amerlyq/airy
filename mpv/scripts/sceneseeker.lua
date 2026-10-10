@@ -90,6 +90,8 @@ scan_window = function(scan)
       stop()
       seek(found)
       message(string.format("Scene boundary: %.3fs", found))
+      -- @me FIXED: trigger preview frames here COS keybind chaining won't work for async scanning
+      mp.commandv("script-binding", "clip/clip_mark_" .. (scan.direction < 0 and "beg" or "end"))
       return
     end
     scan.cursor = scan.direction == 1 and hi or lo

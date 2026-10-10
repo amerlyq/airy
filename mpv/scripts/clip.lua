@@ -5,10 +5,16 @@
 -- Debug: mpv --msg-level=clip=debug FILE
 
 local utils = require 'mp.utils'
--- Inclusive frame offsets around the boundary output frame (same for beg and end).
+-- Inclusive frame ranges around each boundary's "0" frame.
+BEG_FRAME_RANGE = { -2, 2 }
 END_FRAME_RANGE = { -3, 1 }
 local options = { converter = "r.ffmpeg", preview_mode = "copy", preview_window_limit = 30,
-  end_frame_first = END_FRAME_RANGE[1], end_frame_last = END_FRAME_RANGE[2] }
+  beg_frame_first = BEG_FRAME_RANGE[1], beg_frame_last = BEG_FRAME_RANGE[2],
+  end_frame_first = END_FRAME_RANGE[1], end_frame_last = END_FRAME_RANGE[2],
+  -- Default frames from the marked time to the actual clipping time (ffmpeg vs mpv discrepancy).
+  framesnum_offset_beg = -2, framesnum_offset_end = -3,
+  -- Beg row decoded from the source at exact frame times; false = converter sample (see source_args).
+  beg_source = true }
 require('mp.options').read_options(options, 'clip')
 
 local NEXT_MODE = { copy = "fast", fast = "smart", smart = "copy" }
@@ -53,38 +59,108 @@ end
 
 if not finite(options.preview_window_limit) then options.preview_window_limit = 30 end
 options.preview_window_limit = math.max(WINDOW, options.preview_window_limit)
-local first_frame = finite(options.end_frame_first) and math.max(-15, math.min(0, math.floor(options.end_frame_first))) or -3
-local last_frame = finite(options.end_frame_last) and math.max(0, math.min(15, math.floor(options.end_frame_last))) or 1
+local function frame_limit(value, default, lo, hi)
+  return finite(value) and math.max(lo, math.min(hi, math.floor(value))) or default
+end
+local ranges = {
+  { first = frame_limit(options.beg_frame_first, -2, -15, 0), last = frame_limit(options.beg_frame_last, 2, 0, 15) },
+  { first = frame_limit(options.end_frame_first, -3, -15, 0), last = frame_limit(options.end_frame_last, 1, 0, 15) },
+}
+-- One shared grid: the "0" frames of both rows sit in the same column.
+local grid_first = math.min(ranges[1].first, ranges[2].first)
+local grid_count = 1 + math.max(ranges[1].last, ranges[2].last) - grid_first
 -- "inner" frames come from the clip itself (beg: forward, end: backward),
 -- "outer" frames from the source beyond it (beg: before, end: after).
-local function inner_count(edge) return 1 + (edge.id == 1 and last_frame or -first_frame) end
-local function outer_count(edge) return edge.id == 1 and -first_frame or last_frame end
--- One id per (edge, frame): beg 1..count, end count+1..2*count (mpv allows 0..63).
+local function inner_count(edge) return 1 + (edge.id == 1 and ranges[1].last or -ranges[2].first) end
+local function outer_count(edge) return edge.id == 1 and -ranges[1].first or ranges[2].last end
+-- One id per (edge, frame): beg 1..grid_count, end grid_count+1..2*grid_count (mpv allows 0..63).
 local function overlay_id(edge, index)
-  return (edge.id - 1) * (1 + last_frame - first_frame) + index - first_frame + 1
+  return (edge.id - 1) * grid_count + index - grid_first + 1
 end
 
 -- Frames to move from the marked time to the actual clipping time.
-local framesnum_offset_beg, framesnum_offset_end = 0, 0
+local function offset_option(value, default) return finite(value) and math.floor(value) or default end
+local default_offset_beg = offset_option(options.framesnum_offset_beg, -2)
+local default_offset_end = offset_option(options.framesnum_offset_end, -3)
+local framesnum_offset_beg, framesnum_offset_end = default_offset_beg, default_offset_end
 local function frames_offset(edge) return edge.id == 1 and framesnum_offset_beg or framesnum_offset_end end
 local function fps()
   local v = mp.get_property_number("container-fps") or mp.get_property_number("estimated-vf-fps")
   return finite(v) and v > 0 and v or nil
 end
 local function frame_duration() local f = fps(); return f and 1 / f end
--- Actual clipping time: used by previews, looping and export.
+
+-- Per-file video frame times (absolute pts, ascending) from ffprobe: mpv exposes no frame
+-- time list, and this makes frame-in-second and whole-frame offsets exact for VFR too.
+-- Until loaded (or without ffprobe/local file) everything falls back to constant fps.
+local pts_map -- { pts = {...}, start = container start_time }
+local function lower_bound(list, x) -- first index with list[i] >= x (#list + 1 if none)
+  local lo, hi = 1, #list + 1
+  while lo < hi do
+    local mid = math.floor((lo + hi) / 2)
+    if list[mid] < x then lo = mid + 1 else hi = mid end
+  end
+  return lo
+end
+-- Index of the frame displayed at mpv time t (nearest, within ~half a frame).
+local function map_index(t)
+  local m = pts_map
+  if not m or not finite(t) then return end
+  local x, i = t + m.start, nil
+  local best, dist = nil, (frame_duration() or 0.02) * 0.45
+  i = lower_bound(m.pts, x)
+  for _, k in ipairs({ i - 1, i }) do
+    local p = m.pts[k]
+    if p and math.abs(p - x) <= dist then best, dist = k, math.abs(p - x) end
+  end
+  return best
+end
+
+-- Actual clipping time: used by previews and export (the loop uses raw marks).
 local function etime(edge)
-  local t = edge.time + frames_offset(edge) * (frame_duration() or 0)
+  local t, off = edge.time, frames_offset(edge)
+  if off ~= 0 then
+    local i = map_index(t)
+    local p = i and pts_map.pts[math.max(1, math.min(#pts_map.pts, i + off))]
+    t = p and (p - pts_map.start) or (t + off * (frame_duration() or 0))
+  end
   local duration = mp.get_property_number("duration")
   if finite(duration) then t = math.min(t, duration) end
   return math.max(0, t)
 end
 
-local function timestamp(t, digits)
-  digits = digits or 1
+-- "MM:SS.FF": FF is the 0-based index of the frame inside its integer second, the first one
+-- being the first frame with pts >= that second. :frame-step then moves FF (or the seconds).
+local function ms_text(t) -- ## ALT (old format, now only the no-fps fallback): MM:SS.mmm
   t = math.floor(t * 1000 + 0.5) / 1000
-  return string.format("%02d:%02d.%0" .. digits .. "d", math.floor(t / 60), math.floor(t % 60),
-    math.floor((t - math.floor(t)) * 10 ^ digits + 1e-6))
+  return string.format("%02d:%02d.%03d", math.floor(t / 60), math.floor(t % 60),
+    math.floor((t - math.floor(t)) * 1000 + 1e-6))
+end
+local function frame_text(sec, ff)
+  local f = fps()
+  local digits = f and math.max(2, #tostring(math.ceil(f) - 1)) or 2
+  return string.format("%02d:%02d.%0" .. digits .. "d", math.floor(sec / 60), sec % 60, ff)
+end
+local function timestamp(t)
+  local i = map_index(t)
+  if i then
+    local m = pts_map
+    local sec = math.floor(m.pts[i] - m.start + 1e-5)
+    return frame_text(sec, i - lower_bound(m.pts, m.start + sec - 1e-5))
+  end
+  local f = fps()
+  if not f then return ms_text(t) end
+  local sec = math.floor(t + 1e-6)
+  return frame_text(sec, math.max(0, math.floor(t * f + 0.5) - math.ceil(sec * f - 1e-6)))
+end
+-- A length in the same notation (FF = whole frames beyond the seconds; constant fps).
+local function duration_text(d)
+  local f = fps()
+  if not f then return ms_text(d) end
+  local sec = math.floor(d + 1e-6)
+  local ff = math.floor((d - sec) * f + 0.5)
+  if ff >= math.ceil(f) then sec, ff = sec + 1, 0 end
+  return frame_text(sec, ff)
 end
 
 local function source_path()
@@ -128,10 +204,9 @@ local function geometry(edge, index)
   local ratio = vw / vh
   local h = vh > vw and aw * 0.20 / ratio or ah * 0.20
   -- Fixed grid: one row per edge, one column per frame index (the "0" frames align).
-  local count = 1 + last_frame - first_frame
-  h = math.min(h, (dims.h - top - 2 * PAD) / 2, (dims.w - (count + 1) * PAD) / count / ratio)
+  h = math.min(h, (dims.h - top - 2 * PAD) / 2, (dims.w - (grid_count + 1) * PAD) / grid_count / ratio)
   local w = h * ratio
-  local x = PAD + ((index or 0) - first_frame) * (w + PAD)
+  local x = PAD + ((index or 0) - grid_first) * (w + PAD)
   local y = top + (edge.id - 1) * (h + PAD)
   -- PREV: toggle layout to top-left or top-right for vertical windows
   -- local count = 2 + last_frame - first_frame
@@ -260,33 +335,35 @@ local function plan_key(job, commands)
   return table.concat(parts, "\0")
 end
 
+-- drawtext/drawbox pieces shared by every preview command; `n` = frame number in the filter.
+-- ## ALT label: frame number round(t*fps) instead of MM:SS.FF (a bare integer, no seconds):
+-- ##   tostring(math.floor(t * fps() + 0.5))
+local function stamp_of(t) return (timestamp(t):gsub(":", "\\:")) end
+local function edge_label(job)
+  if job.edge.id == 1 then return "[" .. stamp_of(job.a) end
+  return stamp_of(job.b) .. "]"
+end
+local function text_filter(job, text, n, corner)
+  return string.format("drawtext=text='%s':x=%s:y=%s:fontsize=%d:fontcolor=%s:borderw=2:bordercolor=black:enable='eq(n,%d)'",
+    text, corner and "w-tw-10" or "10", corner and "10" or "h-th-10", math.max(12, math.floor(job.h * 0.14)),
+    corner and "0x00FF00" or "white", n)
+end
+local function box_filter(job, n)
+  return string.format("drawbox=x=0:y=0:w=iw:h=ih:color=0x00FF00:t=%d:enable='eq(n,%d)'",
+    math.max(2, math.floor(job.h * 0.025)), n)
+end
+
 local function decode_args(job)
   local edge = job.edge
   local beg = edge.id == 1
   local inner, outer = inner_count(edge), outer_count(edge)
-  -- Frame number (round(t*fps)) so :frame-step moves it by exactly 1. ## ALT: ms timestamp, kept as no-fps fallback.
-  local function stamp_of(t)
-    local f = fps()
-    if f then return tostring(math.floor(t * f + 0.5)) end
-    return (timestamp(t, 3):gsub(":", "\\:"))
-  end
-  local stamp = stamp_of(beg and job.a or job.b)
-  local label = beg and ("[" .. stamp) or (stamp .. "]")
-  local size = math.max(12, math.floor(job.h * 0.14))
-  local function text_filter(text, n, corner)
-    return string.format("drawtext=text='%s':x=%s:y=%s:fontsize=%d:fontcolor=%s:borderw=2:bordercolor=black:enable='eq(n,%d)'",
-      text, corner and "w-tw-10" or "10", corner and "10" or "h-th-10", size,
-      corner and "0xD0A000" or "white", n)
-  end
   local scale = string.format("scale=%d:%d", job.w, job.h)
-  local box = string.format("drawbox=x=0:y=0:w=iw:h=ih:color=0x008000:t=%d:enable='eq(n,0)'",
-    math.max(2, math.floor(job.h * 0.025)))
   -- Inner frames: beg reads the sample forward, end reads it reversed (nearest first).
   local filter = scale .. (beg and "" or (",reverse,trim=end_frame=" .. inner))
-    .. "," .. box .. "," .. text_filter(label, 0)
-  if job.offset ~= 0 then filter = filter .. "," .. text_filter(string.format("%+d", job.offset), 0, true) end
+    .. "," .. box_filter(job, 0) .. "," .. text_filter(job, edge_label(job), 0)
+  if job.offset ~= 0 then filter = filter .. "," .. text_filter(job, string.format("%+d", job.offset), 0, true) end
   for i = 1, inner - 1 do
-    filter = filter .. "," .. text_filter(string.format("%+d", beg and i or -i), i)
+    filter = filter .. "," .. text_filter(job, string.format("%+d", beg and i or -i), i)
   end
   local args = { "ffmpeg", "-nostdin", "-hide_banner", "-loglevel", "error", "-y", "-copyts",
     "-i", job.clip }
@@ -310,10 +387,10 @@ local function decode_args(job)
     if beg then
       context = string.format("select='lt(t,%.9f)',%s,reverse,trim=end_frame=%d",
         job.absolute_anchor - 0.000002, scale, outer)
-      for i = 1, outer do context = context .. "," .. text_filter(string.format("%+d", -i), i - 1) end
+      for i = 1, outer do context = context .. "," .. text_filter(job, string.format("%+d", -i), i - 1) end
     else
       context = string.format("select='gt(t,%.9f)',%s", job.absolute_anchor + 0.000002, scale)
-      for i = 1, outer do context = context .. "," .. text_filter("+" .. i, i - 1) end
+      for i = 1, outer do context = context .. "," .. text_filter(job, "+" .. i, i - 1) end
     end
     append({ "-map", "1:" .. job.source_track, "-an", "-sn", "-dn", "-vf", context,
       "-pix_fmt", "bgra", "-fps_mode", "passthrough", "-frames:v", tostring(outer),
@@ -488,6 +565,54 @@ sample_job = function(job)
   end)
 end
 
+-- Beg row straight from the source around the actual clip start: each frame is addressed
+-- by its own pts, so every offset press shifts the row by exactly one frame.
+-- ## ALT (options.beg_source=false): converter sample + source context. Shows what the mode
+-- ##   really produces, but copy mode starts at a keyframe, so "0" need not sit at `a` and the
+-- ##   context frames are anchored on the first muxed packet instead -> offsets looked inert.
+local function source_args(job)
+  local first, last = ranges[1].first, ranges[1].last
+  local fd = frame_duration() or 0.04
+  local m, i = pts_map, map_index(job.a)
+  local lo, hi, n0, total
+  if i then
+    local lo_i, hi_i = math.max(1, i + first), math.min(#m.pts, i + last)
+    lo, hi = m.pts[lo_i] - m.start - 0.0004, m.pts[hi_i] - m.start + 0.0004
+    n0, total = i - lo_i, hi_i - lo_i + 1
+  else -- no frame map (yet): constant frame rate guess
+    n0 = math.min(-first, math.max(0, math.floor(job.a / fd + 0.5)))
+    lo, hi, total = job.a - (n0 + 0.5) * fd, job.a + (last + 0.5) * fd, n0 + 1 + last
+  end
+  -- Without -copyts, t restarts at the -ss point; -t keeps the read short.
+  local seek = math.max(0, lo - 1)
+  local filter = string.format("select='between(t,%.6f,%.6f)',scale=%d:%d,%s,%s", lo - seek, hi - seek,
+    job.w, job.h, box_filter(job, n0), text_filter(job, edge_label(job), n0))
+  if job.offset ~= 0 then filter = filter .. "," .. text_filter(job, string.format("%+d", job.offset), n0, true) end
+  for k = 0, total - 1 do
+    if k ~= n0 then filter = filter .. "," .. text_filter(job, string.format("%+d", k - n0), k) end
+  end
+  return { "ffmpeg", "-nostdin", "-hide_banner", "-loglevel", "error", "-y",
+    "-ss", tostring(seek), "-t", tostring(hi - seek + 0.5), "-i", job.path,
+    "-map", "0:v:0", "-an", "-sn", "-dn", "-vf", filter, "-pix_fmt", "bgra",
+    "-fps_mode", "passthrough", "-frames:v", tostring(total), "-f", "rawvideo", job.raw }, n0
+end
+
+local function source_job(job)
+  local args, n0 = source_args(job)
+  run_job(job, args, function()
+    local info, bytes = utils.file_info(job.raw), job.w * job.h * 4
+    if not info or info.size < bytes or info.size % bytes ~= 0 then
+      fail(job.edge, info and info.size == 0 and "no video frame near beg" or "incomplete raw frame")
+      return
+    end
+    job.frames = {}
+    for k = 0, info.size / bytes - 1 do
+      job.frames[#job.frames + 1] = { index = k - n0, file = job.raw, offset = k * bytes }
+    end
+    publish(job)
+  end)
+end
+
 local function start_preview(edge)
   if state.hidden or not edge.marked or edge.job or edge.timer or edge.error then return end
   local _, _, w, h = geometry(edge)
@@ -510,7 +635,7 @@ local function start_preview(edge)
     w = math.max(1, math.floor(w * factor)), h = math.max(1, math.floor(h * factor)),
   }
   edge.job, jobs[job] = job, true
-  sample_job(job)
+  if edge.id == 1 and options.beg_source then job.source = true; source_job(job) else sample_job(job) end
 end
 
 local function show_previews()
@@ -523,10 +648,14 @@ end
 local function unchanged_sample(edge)
   if edge.error then return false end
   local job = edge.job or edge.cache
-  if not job or job.mode ~= state.mode or job.path ~= source_path() then return false end
+  if not job or job.path ~= source_path() then return false end
   local a, b = etime(edges[1]), etime(edges[2])
   local unchanged
-  if state.mode ~= "smart" then
+  if job.source then
+    unchanged = job.a == a -- beg source row ignores the mode and the other edge
+  elseif job.mode ~= state.mode then
+    return false
+  elseif state.mode ~= "smart" then
     if edge.id == 1 then
       unchanged = job.a == a and math.min(job.b, a + job.window) == math.min(b, a + job.window)
     else
@@ -602,7 +731,7 @@ end
 local function show_duration()
   mp.set_property("osd-align-x", "left")
   mp.set_property("osd-align-y", "top")
-  mp.osd_message("duration: " .. timestamp(etime(edges[2]) - etime(edges[1])), 999999)
+  mp.osd_message("duration: " .. duration_text(etime(edges[2]) - etime(edges[1])), 999999)
 end
 
 local function mark(edge)
@@ -634,7 +763,7 @@ end
 local function seek(edge, mode)
   mp.set_property("pause", "yes")
   mp.commandv("seek", edge.time, "absolute", mode)
-  status("info", string.format("seek %s %.3f (%s)", edge.name, edge.time, mode))
+  status("info", string.format("seek %s %s (%s)", edge.name, timestamp(edge.time), mode))
 end
 
 local function export(mode)
@@ -647,7 +776,7 @@ local function export(mode)
   local revision = state.revision
   state.writing = true
   local a, b = etime(edges[1]), etime(edges[2])
-  status("info", string.format("ENCODING %s dt=%.3f", mode, b - a))
+  status("info", string.format("ENCODING %s dt=%s", mode, duration_text(b - a)))
   subprocess({ options.converter, path, tostring(a), tostring(b), mode },
     false, function(result, err)
       state.writing = false
@@ -672,12 +801,35 @@ local function move_file()
   end)
 end
 
+-- Async: ffprobe reads every video packet time (may take a while for big files).
+local function load_pts_map(path)
+  pts_map = nil
+  if not path or path:match("^%a[%w+.-]*://") then return end
+  subprocess({ "ffprobe", "-v", "error", "-select_streams", "v:0",
+    "-show_entries", "packet=pts_time:format=start_time", "-of", "compact", path },
+    false, function(result, err)
+      if path ~= source_path() then return end
+      if not result then mp.msg.warn("frame map unavailable: " .. tostring(err)); return end
+      local pts, start = {}, 0
+      for line in (result.stdout or ""):gmatch("[^\r\n]+") do
+        local p = tonumber(line:match("^packet|pts_time=([%d.eE+%-]+)"))
+        if p then pts[#pts + 1] = p else start = tonumber(line:match("^format|start_time=([%d.eE+%-]+)")) or start end
+      end
+      if #pts == 0 then return end
+      table.sort(pts)
+      pts_map = { pts = pts, start = start }
+      mp.msg.debug("frame map: " .. #pts .. " frames, start " .. start)
+      if edges[1].marked or edges[2].marked then refresh_previews() end
+    end)
+end
+
 -- Register callbacks only after every helper is defined.
 mp.register_event("file-loaded", function()
   local a, loop_b = mp.get_property_number("ab-loop-a"), mp.get_property_number("ab-loop-b")
   local b = loop_b or mp.get_property_number("duration/full") or mp.get_property_number("duration")
   state.loop = finite(a) or finite(loop_b)
-  framesnum_offset_beg, framesnum_offset_end = 0, 0
+  framesnum_offset_beg, framesnum_offset_end = default_offset_beg, default_offset_end
+  load_pts_map(source_path())
   edges[1].time = finite(a) and math.max(0, a) or 0
   edges[2].time = finite(b) and math.max(edges[1].time, b) or edges[1].time
   local duration = mp.get_property_number("duration")
