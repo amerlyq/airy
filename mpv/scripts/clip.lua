@@ -67,10 +67,11 @@ end
 -- Frames to move from the marked time to the actual clipping time.
 local framesnum_offset_beg, framesnum_offset_end = 0, 0
 local function frames_offset(edge) return edge.id == 1 and framesnum_offset_beg or framesnum_offset_end end
-local function frame_duration()
-  local fps = mp.get_property_number("container-fps") or mp.get_property_number("estimated-vf-fps")
-  return finite(fps) and fps > 0 and 1 / fps or nil
+local function fps()
+  local v = mp.get_property_number("container-fps") or mp.get_property_number("estimated-vf-fps")
+  return finite(v) and v > 0 and v or nil
 end
+local function frame_duration() local f = fps(); return f and 1 / f end
 -- Actual clipping time: used by previews, looping and export.
 local function etime(edge)
   local t = edge.time + frames_offset(edge) * (frame_duration() or 0)
@@ -263,7 +264,13 @@ local function decode_args(job)
   local edge = job.edge
   local beg = edge.id == 1
   local inner, outer = inner_count(edge), outer_count(edge)
-  local stamp = timestamp(beg and job.a or job.b, 3):gsub(":", "\\:")
+  -- Frame number (round(t*fps)) so :frame-step moves it by exactly 1. ## ALT: ms timestamp, kept as no-fps fallback.
+  local function stamp_of(t)
+    local f = fps()
+    if f then return tostring(math.floor(t * f + 0.5)) end
+    return (timestamp(t, 3):gsub(":", "\\:"))
+  end
+  local stamp = stamp_of(beg and job.a or job.b)
   local label = beg and ("[" .. stamp) or (stamp .. "]")
   local size = math.max(12, math.floor(job.h * 0.14))
   local function text_filter(text, n, corner)
@@ -288,7 +295,11 @@ local function decode_args(job)
   end
   if outer > 0 and job.anchor then
     job.context_start = math.max(0, math.floor(job.anchor) - 1)
-    append({ "-ss", tostring(job.context_start), "-i", job.path })
+    append({ "-ss", tostring(job.context_start) })
+    -- PERF: beg uses `reverse`, which only emits at input EOF: without -t the whole
+    -- rest of the file is decoded (measured 14s vs 0.2s). End has no reverse, -frames:v stops it.
+    if beg then append({ "-t", tostring(job.anchor - job.context_start + 0.5) }) end
+    append({ "-i", job.path })
   end
   append({ "-map", "0:v:0", "-an", "-sn", "-dn", "-vf", filter,
     "-pix_fmt", "bgra", "-fps_mode", "passthrough", "-frames:v", tostring(inner),
@@ -576,9 +587,10 @@ local function select_mode(mode)
 end
 
 -- Looping is a switch over the markers: toggling never touches edge times.
+-- Raw marker times (wysiwyg in mpv); offsets only compensate the ffmpeg cut discrepancy.
 local function apply_loop()
-  mp.set_property("ab-loop-a", state.loop and etime(edges[1]) or "no")
-  mp.set_property("ab-loop-b", state.loop and etime(edges[2]) or "no")
+  mp.set_property("ab-loop-a", state.loop and edges[1].time or "no")
+  mp.set_property("ab-loop-b", state.loop and edges[2].time or "no")
 end
 
 local function toggle_loop()
@@ -597,6 +609,11 @@ local function mark(edge)
   local t = mp.get_property_number("playback-time")
   if not finite(t) or t < 0 then return end
   edge.time, edge.marked = t, true
+  -- Unmarked end = EOF, so beg alone is a valid range and previews at once.
+  if edge.id == 1 and not edges[2].marked and edges[2].time <= t then
+    local duration = mp.get_property_number("duration")
+    if finite(duration) and duration > t then edges[2].time = duration end
+  end
   local other = edges[3 - edge.id]
   other.time = edge.id == 1 and math.max(t, other.time) or math.min(t, other.time)
   state.loop = true
@@ -605,13 +622,12 @@ local function mark(edge)
   show_duration()
 end
 
--- Shift the actual clipping time by whole frames: both edges, or only beg.
-local function shift_offsets(delta, beg_only)
+-- Shift one edge's actual clipping time by whole frames (loop is unaffected).
+local function shift_offset(edge, delta)
   if not frame_duration() then status("error", "unknown frame rate"); return end
-  framesnum_offset_beg = framesnum_offset_beg + delta
-  if not beg_only then framesnum_offset_end = framesnum_offset_end + delta end
-  if state.loop then apply_loop() end
-  refresh_previews(beg_only and edges[1] or nil)
+  if edge.id == 1 then framesnum_offset_beg = framesnum_offset_beg + delta
+  else framesnum_offset_end = framesnum_offset_end + delta end
+  refresh_previews(edge)
   if edges[1].marked or edges[2].marked then show_duration() end
 end
 
@@ -708,9 +724,9 @@ local bindings = {
   clip_seek_kfb = function() seek(edges[1], "keyframes") end,
   clip_seek_kfe = function() seek(edges[2], "keyframes") end,
   clip_toggle_loop = toggle_loop,
-  clip_offset_dec = function() shift_offsets(-1) end,
-  clip_offset_inc = function() shift_offsets(1) end,
-  clip_offset_beg_dec = function() shift_offsets(-1, true) end,
-  clip_offset_beg_inc = function() shift_offsets(1, true) end,
+  clip_offset_beg_dec = function() shift_offset(edges[1], -1) end,
+  clip_offset_beg_inc = function() shift_offset(edges[1], 1) end,
+  clip_offset_end_dec = function() shift_offset(edges[2], -1) end,
+  clip_offset_end_inc = function() shift_offset(edges[2], 1) end,
 }
 for name, callback in pairs(bindings) do mp.add_key_binding("", name, callback) end
