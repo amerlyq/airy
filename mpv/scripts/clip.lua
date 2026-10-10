@@ -5,7 +5,7 @@
 -- Debug: mpv --msg-level=clip=debug FILE
 
 local utils = require 'mp.utils'
--- Inclusive frame offsets around the actual last decoded output frame.
+-- Inclusive frame offsets around the boundary output frame (same for beg and end).
 END_FRAME_RANGE = { -3, 1 }
 local options = { converter = "r.ffmpeg", preview_mode = "copy", preview_window_limit = 30,
   end_frame_first = END_FRAME_RANGE[1], end_frame_last = END_FRAME_RANGE[2] }
@@ -15,7 +15,7 @@ local NEXT_MODE = { copy = "fast", fast = "smart", smart = "copy" }
 local WINDOW, DEBOUNCE, PAD = 2, 0.15, 10
 local state = {
   mode = NEXT_MODE[options.preview_mode] and options.preview_mode or "copy",
-  hidden = false, revision = 0,
+  hidden = false, revision = 0, loop = false,
 }
 -- Each boundary owns its mark, pending work, cached frame and display state.
 local edges = { { name = "A", id = 1, time = 0 }, { name = "B", id = 2, time = 0 } }
@@ -55,14 +55,35 @@ if not finite(options.preview_window_limit) then options.preview_window_limit = 
 options.preview_window_limit = math.max(WINDOW, options.preview_window_limit)
 local first_frame = finite(options.end_frame_first) and math.max(-15, math.min(0, math.floor(options.end_frame_first))) or -3
 local last_frame = finite(options.end_frame_last) and math.max(0, math.min(15, math.floor(options.end_frame_last))) or 1
+-- "inner" frames come from the clip itself (beg: forward, end: backward),
+-- "outer" frames from the source beyond it (beg: before, end: after).
+local function inner_count(edge) return 1 + (edge.id == 1 and last_frame or -first_frame) end
+local function outer_count(edge) return edge.id == 1 and -first_frame or last_frame end
+-- One id per (edge, frame): beg 1..count, end count+1..2*count (mpv allows 0..63).
 local function overlay_id(edge, index)
-  if edge.id == 1 or index == 0 then return edge.id end
-  return 3 + index - first_frame - (index > 0 and 1 or 0)
+  return (edge.id - 1) * (1 + last_frame - first_frame) + index - first_frame + 1
 end
 
-local function timestamp(t)
-  return string.format("%02d:%02d.%d", math.floor(t / 60), math.floor(t % 60),
-    math.floor((t - math.floor(t)) * 10))
+-- Frames to move from the marked time to the actual clipping time.
+local framesnum_offset_beg, framesnum_offset_end = 0, 0
+local function frames_offset(edge) return edge.id == 1 and framesnum_offset_beg or framesnum_offset_end end
+local function frame_duration()
+  local fps = mp.get_property_number("container-fps") or mp.get_property_number("estimated-vf-fps")
+  return finite(fps) and fps > 0 and 1 / fps or nil
+end
+-- Actual clipping time: used by previews, looping and export.
+local function etime(edge)
+  local t = edge.time + frames_offset(edge) * (frame_duration() or 0)
+  local duration = mp.get_property_number("duration")
+  if finite(duration) then t = math.min(t, duration) end
+  return math.max(0, t)
+end
+
+local function timestamp(t, digits)
+  digits = digits or 1
+  t = math.floor(t * 1000 + 0.5) / 1000
+  return string.format("%02d:%02d.%0" .. digits .. "d", math.floor(t / 60), math.floor(t % 60),
+    math.floor((t - math.floor(t)) * 10 ^ digits + 1e-6))
 end
 
 local function source_path()
@@ -74,8 +95,8 @@ local function source_path()
 end
 
 local function valid_range()
-  return finite(edges[1].time) and finite(edges[2].time)
-    and edges[1].time >= 0 and edges[2].time > edges[1].time
+  local a, b = etime(edges[1]), etime(edges[2])
+  return finite(a) and finite(b) and a >= 0 and b > a
 end
 
 -- Normalize mpv API errors and nonzero process exits in one place.
@@ -105,16 +126,22 @@ local function geometry(edge, index)
   local _, top = osd_metrics()
   local ratio = vw / vh
   local h = vh > vw and aw * 0.20 / ratio or ah * 0.20
+  -- Fixed grid: one row per edge, one column per frame index (the "0" frames align).
+  local count = 1 + last_frame - first_frame
+  h = math.min(h, (dims.h - top - 2 * PAD) / 2, (dims.w - (count + 1) * PAD) / count / ratio)
   local w = h * ratio
-  local count = 2 + last_frame - first_frame
-  local columns = math.max(1, math.min(count, math.floor((dims.w - PAD) / (w + PAD))))
-  local rows = math.ceil(count / columns)
-  h = math.min(h, (dims.h - top - rows * PAD) / rows,
-    (dims.w - (columns + 1) * PAD) / columns / ratio)
-  w = h * ratio
-  local slot = edge.id == 1 and 0 or 1 + (index or 0) - first_frame
-  local x = PAD + (slot % columns) * (w + PAD)
-  local y = top + math.floor(slot / columns) * (h + PAD)
+  local x = PAD + ((index or 0) - first_frame) * (w + PAD)
+  local y = top + (edge.id - 1) * (h + PAD)
+  -- PREV: toggle layout to top-left or top-right for vertical windows
+  -- local count = 2 + last_frame - first_frame
+  -- local columns = math.max(1, math.min(count, math.floor((dims.w - PAD) / (w + PAD))))
+  -- local rows = math.ceil(count / columns)
+  -- h = math.min(h, (dims.h - top - rows * PAD) / rows,
+  --   (dims.w - (columns + 1) * PAD) / columns / ratio)
+  -- w = h * ratio
+  -- local slot = edge.id == 1 and 0 or 1 + (index or 0) - first_frame
+  -- local x = PAD + (slot % columns) * (w + PAD)
+  -- local y = top + math.floor(slot / columns) * (h + PAD)
   if w < 16 or h < 16 then return end
   return math.floor(x), math.floor(y), math.floor(w), math.floor(h)
 end
@@ -233,36 +260,52 @@ local function plan_key(job, commands)
 end
 
 local function decode_args(job)
-  local label = string.format("%s %s %s", job.mode, job.edge.name,
-    timestamp(job.edge.id == 1 and job.a or job.b)):gsub(":", "\\:")
-  local function text_filter(text, n)
-    return string.format("drawtext=text='%s':x=10:y=h-th-10:fontsize=%d:fontcolor=white:borderw=2:bordercolor=black%s",
-      text, math.max(12, math.floor(job.h * 0.14)), n and (":enable='eq(n," .. n .. ")'") or "")
+  local edge = job.edge
+  local beg = edge.id == 1
+  local inner, outer = inner_count(edge), outer_count(edge)
+  local stamp = timestamp(beg and job.a or job.b, 3):gsub(":", "\\:")
+  local label = beg and ("[" .. stamp) or (stamp .. "]")
+  local size = math.max(12, math.floor(job.h * 0.14))
+  local function text_filter(text, n, corner)
+    return string.format("drawtext=text='%s':x=%s:y=%s:fontsize=%d:fontcolor=%s:borderw=2:bordercolor=black:enable='eq(n,%d)'",
+      text, corner and "w-tw-10" or "10", corner and "10" or "h-th-10", size,
+      corner and "0xD0A000" or "white", n)
   end
   local scale = string.format("scale=%d:%d", job.w, job.h)
-  local filter = scale .. "," .. text_filter(label)
+  local box = string.format("drawbox=x=0:y=0:w=iw:h=ih:color=0x008000:t=%d:enable='eq(n,0)'",
+    math.max(2, math.floor(job.h * 0.025)))
+  -- Inner frames: beg reads the sample forward, end reads it reversed (nearest first).
+  local filter = scale .. (beg and "" or (",reverse,trim=end_frame=" .. inner))
+    .. "," .. box .. "," .. text_filter(label, 0)
+  if job.offset ~= 0 then filter = filter .. "," .. text_filter(string.format("%+d", job.offset), 0, true) end
+  for i = 1, inner - 1 do
+    filter = filter .. "," .. text_filter(string.format("%+d", beg and i or -i), i)
+  end
   local args = { "ffmpeg", "-nostdin", "-hide_banner", "-loglevel", "error", "-y", "-copyts",
     "-i", job.clip }
   local function append(values)
     for _, value in ipairs(values) do args[#args + 1] = value end
   end
-  if job.edge.id == 2 then
-    filter = scale .. ",reverse,trim=end_frame=" .. (1 - first_frame) .. "," .. text_filter(label, 0)
-    for i = -1, first_frame, -1 do filter = filter .. "," .. text_filter(tostring(i), -i) end
-    if last_frame > 0 and job.anchor then
-      job.context_start = math.max(0, math.floor(job.anchor) - 1)
-      append({ "-ss", tostring(job.context_start), "-i", job.path })
-    end
+  if outer > 0 and job.anchor then
+    job.context_start = math.max(0, math.floor(job.anchor) - 1)
+    append({ "-ss", tostring(job.context_start), "-i", job.path })
   end
   append({ "-map", "0:v:0", "-an", "-sn", "-dn", "-vf", filter,
-    "-pix_fmt", "bgra", "-fps_mode", "passthrough", "-frames:v",
-    tostring(job.edge.id == 1 and 1 or 1 - first_frame), "-f", "rawvideo", job.raw })
-  if job.edge.id == 2 and last_frame > 0 and job.anchor then
+    "-pix_fmt", "bgra", "-fps_mode", "passthrough", "-frames:v", tostring(inner),
+    "-f", "rawvideo", job.raw })
+  if outer > 0 and job.anchor then
     -- Source context only: these frames are outside the converted clip.
-    local context = string.format("select='gt(t,%.9f)',%s", job.absolute_anchor + 0.000002, scale)
-    for i = 1, last_frame do context = context .. "," .. text_filter("+" .. i, i - 1) end
+    local context
+    if beg then
+      context = string.format("select='lt(t,%.9f)',%s,reverse,trim=end_frame=%d",
+        job.absolute_anchor - 0.000002, scale, outer)
+      for i = 1, outer do context = context .. "," .. text_filter(string.format("%+d", -i), i - 1) end
+    else
+      context = string.format("select='gt(t,%.9f)',%s", job.absolute_anchor + 0.000002, scale)
+      for i = 1, outer do context = context .. "," .. text_filter("+" .. i, i - 1) end
+    end
     append({ "-map", "1:" .. job.source_track, "-an", "-sn", "-dn", "-vf", context,
-      "-pix_fmt", "bgra", "-fps_mode", "passthrough", "-frames:v", tostring(last_frame),
+      "-pix_fmt", "bgra", "-fps_mode", "passthrough", "-frames:v", tostring(outer),
       "-f", "rawvideo", job.after })
   end
   return args
@@ -270,21 +313,23 @@ end
 
 -- Index complete raw frames without copying or launching per-frame decoders.
 local function retain_frame(job)
+  local edge = job.edge
+  local beg = edge.id == 1
   local info, bytes = utils.file_info(job.raw), job.w * job.h * 4
   if info and info.size == 0 then return nil, "empty" end
   if not info or info.size < bytes or info.size % bytes ~= 0 then
     return nil, "incomplete raw frame"
   end
   job.frames = {}
-  for i = 0, math.min(info.size / bytes - 1, job.edge.id == 1 and 0 or -first_frame) do
-    job.frames[#job.frames + 1] = { index = -i, file = job.raw, offset = i * bytes }
+  for i = 0, math.min(info.size / bytes, inner_count(edge)) - 1 do
+    job.frames[#job.frames + 1] = { index = beg and i or -i, file = job.raw, offset = i * bytes }
   end
-  if job.edge.id == 2 and last_frame > 0 then
-    if not job.anchor then return nil, "cannot locate final output frame in source" end
+  if outer_count(edge) > 0 then
+    if not job.anchor then return nil, "cannot locate boundary output frame in source" end
     local after = utils.file_info(job.after)
     if not after or after.size % bytes ~= 0 then return nil, "incomplete context frame" end
-    for i = 1, math.min(last_frame, after.size / bytes) do
-      job.frames[#job.frames + 1] = { index = i, file = job.after, offset = (i - 1) * bytes }
+    for i = 0, math.min(outer_count(edge), after.size / bytes) - 1 do
+      job.frames[#job.frames + 1] = { index = beg and -(i + 1) or i + 1, file = job.after, offset = i * bytes }
     end
   end
   return true
@@ -315,9 +360,9 @@ local function decode_job(job)
       fail(job.edge, err == "empty" and "no video frame in boundary sample" or err)
       return
     end
-    if job.edge.id == 2 and #job.frames < 1 - first_frame + last_frame then
+    if #job.frames < inner_count(job.edge) + outer_count(job.edge) then
       local info = utils.file_info(job.raw)
-      if info.size / (job.w * job.h * 4) < 1 - first_frame and retry_empty(job) then return end
+      if info.size / (job.w * job.h * 4) < inner_count(job.edge) and retry_empty(job) then return end
     end
     publish(job)
   end, function(err)
@@ -327,14 +372,21 @@ local function decode_job(job)
   end)
 end
 
+-- Boundary packet: latest PTS for the end edge, earliest for the beg edge.
+local function extreme(edge, t, best)
+  return not best or (edge.id == 1 and t < best or edge.id == 2 and t > best)
+end
+
 local function execute_plan(job, commands, index)
   if index > #commands then decode_job(job); return end
   local command = commands[index]
   local seek
-  if job.edge.id == 2 and last_frame > 0 and index == 1 then
+  if outer_count(job.edge) > 0 and index == 1 then
     -- muxer timestamps precede container timestamp normalization. Track the
-    -- last emitted video packet, including reordered frames beyond the mark.
+    -- boundary emitted video packet (end: last, beg: first), including
+    -- reordered frames beyond the mark.
     for i, value in ipairs(command) do if value == "-ss" then seek = tonumber(command[i + 1]) end end
+    if not seek and job.edge.id == 1 then seek = 0 end -- Unseeked beg starts at the source start.
     if not seek then fail(job.edge, "preview plan lacks source seek timestamp"); return end
     command = { (table.unpack or unpack)(command) }
     table.insert(command, 2, "-debug_ts")
@@ -360,7 +412,7 @@ local function execute_plan(job, commands, index)
         end
         if line:find("[vost#", 1, true) and line:find("muxer <-", 1, true) then
           local t = tonumber(line:match("pts_time:([%d.eE+%-]+)"))
-          if finite(t) and (not last or t > last) then last = t end
+          if finite(t) and extreme(job.edge, t, last) then last = t end
         end
       end
       -- Encoders can quantize output PTS to their own frame-rate timebase.
@@ -372,7 +424,7 @@ local function execute_plan(job, commands, index)
           local pts, num, den = line:match("^([%d%-]+) (%d+)/(%d+)$")
           if pts and tonumber(den) > 0 then
             local t = tonumber(pts) * tonumber(num) / tonumber(den)
-            if finite(t) and (not last or t > last) then last = t end
+            if finite(t) and extreme(job.edge, t, last) then last = t end
           end
         end
         stats:close()
@@ -389,7 +441,7 @@ local function execute_plan(job, commands, index)
       job.anchor = match and distance < 0.002 and match.source or nil
       job.absolute_anchor = match and match.absolute
       job.source_track = match and match.track
-      mp.msg.debug("preview[B] source anchor: mux=" .. tostring(last) ..
+      mp.msg.debug("preview[" .. job.edge.name .. "] source anchor: mux=" .. tostring(last) ..
         " delta=" .. tostring(distance) .. " source=" .. tostring(job.anchor))
     end
     execute_plan(job, commands, index + 1)
@@ -438,11 +490,12 @@ local function start_preview(edge)
   local ok, raw = pcall(os.tmpname)
   if not ok or not raw then fail(edge, tostring(raw)); return end
   local factor = math.min(1, 640 / math.max(w, h))
+  local a, b = etime(edges[1]), etime(edges[2])
   local job = {
-    edge = edge, path = path, a = edges[1].time, b = edges[2].time, mode = state.mode,
+    edge = edge, path = path, a = a, b = b, mode = state.mode, offset = frames_offset(edge),
     raw = raw, after = raw .. ".after", stats = raw .. ".stats",
     clip = raw .. "." .. ext, window = WINDOW,
-    limit = math.min(edges[2].time - edges[1].time, options.preview_window_limit),
+    limit = math.min(b - a, options.preview_window_limit),
     w = math.max(1, math.floor(w * factor)), h = math.max(1, math.floor(h * factor)),
   }
   edge.job, jobs[job] = job, true
@@ -460,7 +513,7 @@ local function unchanged_sample(edge)
   if edge.error then return false end
   local job = edge.job or edge.cache
   if not job or job.mode ~= state.mode or job.path ~= source_path() then return false end
-  local a, b = edges[1].time, edges[2].time
+  local a, b = etime(edges[1]), etime(edges[2])
   local unchanged
   if state.mode ~= "smart" then
     if edge.id == 1 then
@@ -484,7 +537,7 @@ local function refresh_previews(changed)
       local cached = edge.cache
       local keep = changed and edge ~= changed and valid_range() and cached
         and cached.mode == state.mode and cached.path == source_path()
-        and (edge.id == 1 and cached.a or cached.b) == edge.time
+        and (edge.id == 1 and cached.a or cached.b) == etime(edge)
       if keep then cached.recheck = true end
       cancel(edge, not keep, keep)
       edge.error = nil
@@ -522,25 +575,50 @@ local function select_mode(mode)
   status("info", "Previewing " .. mode .. "; export keys start conversion")
 end
 
+-- Looping is a switch over the markers: toggling never touches edge times.
+local function apply_loop()
+  mp.set_property("ab-loop-a", state.loop and etime(edges[1]) or "no")
+  mp.set_property("ab-loop-b", state.loop and etime(edges[2]) or "no")
+end
+
+local function toggle_loop()
+  state.loop = not state.loop
+  apply_loop()
+  status("info", "loop " .. (state.loop and "on" or "off"))
+end
+
+local function show_duration()
+  mp.set_property("osd-align-x", "left")
+  mp.set_property("osd-align-y", "top")
+  mp.osd_message("duration: " .. timestamp(etime(edges[2]) - etime(edges[1])), 999999)
+end
+
 local function mark(edge)
   local t = mp.get_property_number("playback-time")
   if not finite(t) or t < 0 then return end
   edge.time, edge.marked = t, true
   local other = edges[3 - edge.id]
   other.time = edge.id == 1 and math.max(t, other.time) or math.min(t, other.time)
-  mp.set_property("ab-loop-a", edges[1].time)
-  mp.set_property("ab-loop-b", edges[2].time)
+  state.loop = true
+  apply_loop()
   refresh_previews(edge)
-  mp.set_property("osd-align-x", "left")
-  mp.set_property("osd-align-y", "top")
-  mp.osd_message("duration: " .. timestamp(edges[2].time - edges[1].time), 999999)
+  show_duration()
+end
+
+-- Shift the actual clipping time by whole frames: both edges, or only beg.
+local function shift_offsets(delta, beg_only)
+  if not frame_duration() then status("error", "unknown frame rate"); return end
+  framesnum_offset_beg = framesnum_offset_beg + delta
+  if not beg_only then framesnum_offset_end = framesnum_offset_end + delta end
+  if state.loop then apply_loop() end
+  refresh_previews(beg_only and edges[1] or nil)
+  if edges[1].marked or edges[2].marked then show_duration() end
 end
 
 local function seek(edge, mode)
   mp.set_property("pause", "yes")
   mp.commandv("seek", edge.time, "absolute", mode)
   status("info", string.format("seek %s %.3f (%s)", edge.name, edge.time, mode))
-  if edge.id == 2 then mp.set_property("ab-loop-b", "no") end
 end
 
 local function export(mode)
@@ -552,10 +630,9 @@ local function export(mode)
   -- Keep the current previews untouched, including on conversion failure.
   local revision = state.revision
   state.writing = true
-  status("info", string.format("ENCODING %s dt=%.3f", mode, edges[2].time - edges[1].time))
-  mp.set_property("ab-loop-a", "no")
-  mp.set_property("ab-loop-b", "no")
-  subprocess({ options.converter, path, tostring(edges[1].time), tostring(edges[2].time), mode },
+  local a, b = etime(edges[1]), etime(edges[2])
+  status("info", string.format("ENCODING %s dt=%.3f", mode, b - a))
+  subprocess({ options.converter, path, tostring(a), tostring(b), mode },
     false, function(result, err)
       state.writing = false
       if not result then status("error", "FAILED " .. mode .. ": " .. err); return end
@@ -581,9 +658,10 @@ end
 
 -- Register callbacks only after every helper is defined.
 mp.register_event("file-loaded", function()
-  local a = mp.get_property_number("ab-loop-a")
-  local b = mp.get_property_number("ab-loop-b") or mp.get_property_number("duration/full")
-    or mp.get_property_number("duration")
+  local a, loop_b = mp.get_property_number("ab-loop-a"), mp.get_property_number("ab-loop-b")
+  local b = loop_b or mp.get_property_number("duration/full") or mp.get_property_number("duration")
+  state.loop = finite(a) or finite(loop_b)
+  framesnum_offset_beg, framesnum_offset_end = 0, 0
   edges[1].time = finite(a) and math.max(0, a) or 0
   edges[2].time = finite(b) and math.max(edges[1].time, b) or edges[1].time
   local duration = mp.get_property_number("duration")
@@ -629,5 +707,10 @@ local bindings = {
   clip_seek_end = function() seek(edges[2], "exact") end,
   clip_seek_kfb = function() seek(edges[1], "keyframes") end,
   clip_seek_kfe = function() seek(edges[2], "keyframes") end,
+  clip_toggle_loop = toggle_loop,
+  clip_offset_dec = function() shift_offsets(-1) end,
+  clip_offset_inc = function() shift_offsets(1) end,
+  clip_offset_beg_dec = function() shift_offsets(-1, true) end,
+  clip_offset_beg_inc = function() shift_offsets(1, true) end,
 }
 for name, callback in pairs(bindings) do mp.add_key_binding("", name, callback) end
