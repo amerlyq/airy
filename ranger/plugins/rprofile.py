@@ -9,7 +9,6 @@ import time
 
 from ranger.api.commands import Command
 
-
 _PROFILER = None
 _PROFILE_PATH = None
 _TRACER = None
@@ -22,7 +21,8 @@ _TRACE_LAST_NS = 0
 
 
 def _profile_dir():
-    root = os.environ.get("XDG_CACHE_HOME") or os.path.expanduser("~/.cache")
+    # root = os.environ.get("XDG_CACHE_HOME") or os.path.expanduser("~/.cache")
+    root = os.environ.get("XDG_STATE_HOME") or os.path.expanduser("~/.local/state")
     path = os.path.join(root, "ranger", "profiles")
     os.makedirs(path, exist_ok=True)
     return path
@@ -31,9 +31,7 @@ def _profile_dir():
 def _latest_profile():
     root = _profile_dir()
     paths = [
-        os.path.join(root, name)
-        for name in os.listdir(root)
-        if name.endswith(".prof")
+        os.path.join(root, name) for name in os.listdir(root) if name.endswith(".prof")
     ]
     return max(paths, key=os.path.getmtime) if paths else None
 
@@ -66,7 +64,9 @@ def _markdown_report(path, limit=25):
 
     lines.extend(table("cumulative time", "cumulative"))
     lines.extend(table("self time", "tottime"))
-    lines.extend(("", "Cumulative time includes callees.", "Self time excludes callees."))
+    lines.extend(
+        ("", "Cumulative time includes callees.", "Self time excludes callees.")
+    )
     return "\n".join(lines) + "\n"
 
 
@@ -92,9 +92,17 @@ def _line_trace(frame, event, arg):
             edge = (_TRACE_STACK[-1], key)
             _TRACE_EDGES[edge] = _TRACE_EDGES.get(edge, 0) + 1
         _TRACE_STACK.append(key)
-        _TRACE_CURRENT = (frame.f_code.co_filename, frame.f_lineno, frame.f_code.co_name)
+        _TRACE_CURRENT = (
+            frame.f_code.co_filename,
+            frame.f_lineno,
+            frame.f_code.co_name,
+        )
     elif event == "line":
-        _TRACE_CURRENT = (frame.f_code.co_filename, frame.f_lineno, frame.f_code.co_name)
+        _TRACE_CURRENT = (
+            frame.f_code.co_filename,
+            frame.f_lineno,
+            frame.f_code.co_name,
+        )
     elif event == "return":
         if _TRACE_STACK:
             _TRACE_STACK.pop()
@@ -113,7 +121,9 @@ def _trace_report(path, limit=40):
         "| time | location |",
         "|---:|---|",
     ]
-    for key, ns in sorted(_TRACE_LINES.items(), key=lambda x: x[1], reverse=True)[:limit]:
+    for key, ns in sorted(_TRACE_LINES.items(), key=lambda x: x[1], reverse=True)[
+        :limit
+    ]:
         lines.append(f"| {ns / 1e9:.6f}s | {_trace_label(key)} |")
     lines.extend(("", "## Call edges", "", "| calls | caller → callee |", "|---:|---|"))
     edges = sorted(_TRACE_EDGES.items(), key=lambda x: x[1], reverse=True)[:limit]
@@ -151,7 +161,9 @@ class rprofile(Command):
             profiler.dump_stats(path)
             report_path = path + ".txt"
             stream = io.StringIO()
-            pstats.Stats(profiler, stream=stream).sort_stats("cumulative").print_stats(80)
+            pstats.Stats(profiler, stream=stream).sort_stats("cumulative").print_stats(
+                80
+            )
             with open(report_path, "w") as report:
                 report.write(stream.getvalue())
             return self.fm.notify(f"rprofile: wrote {path} and {report_path}")
@@ -206,6 +218,8 @@ class rprofile(Command):
                 except Exception:
                     copied = ""
                 return self.fm.notify(f"rprofile: wrote {report_path}{copied}")
-            return self.fm.notify("rprofile: trace use start, stop, or toggle", bad=True)
+            return self.fm.notify(
+                "rprofile: trace use start, stop, or toggle", bad=True
+            )
 
         return self.fm.notify("rprofile: use start, stop, toggle, or report", bad=True)
