@@ -407,3 +407,73 @@
       $ ./dev install
   [≈] 03:00 15m Qs INFO anything smart codex/opencode does, which codecompanion don't ?
     https://claude.ai/chat/cb695db0-20db-4671-b75d-9eafd412ab74
+
+
+3h50m 2026-10-10-Sat-W40
+  [X] 01:10 50m #gpt XLR:SEE better models for 2080Ti
+    RTX 2080 Ti 11GB AI Tier List: 243 models ranked | WillItRunAI ⌇⡪⣊⢹⢒
+      https://willitrunai.com/my-results/rtx-2080-ti-11gb
+      Qwen 3.5 9B : 9.7 GB 78 tok/s 26K ctx
+        ctx=100kB=2kL -> VRAM=20kB=400L -> fit=4-5kt=16kB -> gen=8kB=200L
+          ~~ BET? Qwen3.5-9B Q5_K_M at a 64K context
+           ~ use Q4_K_M when you need a longer context.
+          $ ollama pull qwen3.5:9b-instruct-q4_K_M
+      Qwen 3.5 4B : 6.6 GB 56 tok/s 48K ctx
+        ctx=190kB=4kL -> VRAM=38kB=800L -> fit=16kt=64kB -> gen=32kB=750L
+      Qwen 2.5 Coder 7B : 7.1 GB 98 tok/s 89K ctx
+        ctx=350kB=8kL -> VRAM=75kB=1.5kL -> fit=20kt=80kB -> gen=40kB=1kL
+    I'm still using Gemma4 E4B and having a hard time finding anything better for OpenCode (2080ti, 11GB VRAM, 16 GB System RAM) : r/LocalLLM ⌇⡪⣊⢽⢘
+      https://www.reddit.com/r/LocalLLM/comments/1wv7o4s/im_still_using_gemma4_e4b_and_having_a_hard_time/
+      Qwen 9b at k5 runs on my 2080ti at 114k context
+      Gemma 4 E4B (Excellent Fit)
+        OR: ollama pull gemma3:12b-instruct-q4_K_M
+      DeepSeek R1 Distill Qwen 8B (The Debugging Champion)
+        DavidAU/Qwen3.5-9B-The-Defiant-Fable-Uncensored-Heretic-NEO-IMATRIX-MAX-MTP-GGUF · Hugging Face ⌇⡪⣊⢿⠵
+          https://huggingface.co/DavidAU/Qwen3.5-9B-The-Defiant-Fable-Uncensored-Heretic-NEO-IMATRIX-MAX-MTP-GGUF
+        GitHub - Niko1221/Strata: Qwen3.8-Flash-Next on any consumer hardware: one-click install for Windows / Linux. Strata inference engine, OpenAI/Anthropic API on localhost, optional i ⌇⡪⣊⢿⠼
+          https://github.com/Niko1221/Strata
+      Tsinghua/Zhipu CodeGeeX 4 9B (Best alternative developer model)
+      Mistral Codestral Mamba 7B (Best for massive configuration files)
+    Is qwen 2.5 coder still the best? : r/LocalLLaMA ⌇⡪⣊⣀⡮
+      https://www.reddit.com/r/LocalLLaMA/comments/1j2usb0/is_qwen_25_coder_still_the_best/
+  [X] 03:00 1h #gpt CFG ollama other models ⌇⡪⣊⣼⠛
+    Model	Start here	Then try
+      Qwen3.5-9B Q5_K_M	64K	80K, then 96K
+      Qwen3.5-9B Q4_K_M	64K	80–96K
+      Qwen3.5-4B Q4_K_M	64K	96–128K
+      Qwen2.5-Coder-7B Q4_K_M	48K	64K, then higher
+    https://ollama.com/library/qwen3.5
+      $ ollama --version
+      $ ollama pull qwen3.5:9b
+        * downloads Q4_K_M (ctx=4k)
+      $ ollama list
+      $ ollama show qwen3.5:9b
+      $ cd /d/airy/ai
+      $ ollama show --modelfile qwen3.5:9b > Modelfile.qwen35-9b
+      $ nvim Modelfile.qwen35-9b
+        FROM qwen3.5:9b
+        # Context: test 32K first (Q4_K_M), then 64K if VRAM allows.
+        # PARAMETER num_ctx 32768
+        PARAMETER num_ctx 65536
+        # Temperature zero doesn't make a model more correct.
+        # It simply reduces sampling variation, and some runtimes may still have nondeterminism.
+        PARAMETER temperature 0.3
+        PARAMETER top_k 20
+        PARAMETER top_p 0.9
+        # Avoid aggressive repetition suppression.
+        PARAMETER repeat_penalty 1.05
+        PARAMETER repeat_last_n 64
+        # No arbitrary output cap; clients can set their own limit.
+        PARAMETER num_predict -1
+        SYSTEM """
+        ... (your prompt here)
+        """
+          # HACK: run interactively and see how much overthinking model does $ ollama run qwen35-9b-64k
+      $ ollama create qwen35-9b-64k -f Modelfile.qwen35-9b
+      $ ollama show --modelfile qwen35-9b-64k
+      $ ollama run qwen35-9b-64k ""
+      $ ollama ps  # confirm 100% GPU, no CPU offload — 12k ctx at 14b may spill
+      $ nvidia-smi
+  [X] 04:00 2h #gpt CFG make new short system prompt (1.36kB ~350tk)
+    I benchmarked 13 models at 65K-128K context to find out what actually matters for agentic workloads : r/LocalLLaMA ⌇⡪⣊⣻⣶
+      https://www.reddit.com/r/LocalLLaMA/comments/1unrse9/i_benchmarked_13_models_at_65k128k_context_to/

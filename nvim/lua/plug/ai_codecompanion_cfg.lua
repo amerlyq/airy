@@ -133,8 +133,10 @@ CC.setup({
         return require("codecompanion.adapters").extend("ollama", {
           -- name = "qwen_local",
           schema = {
-            model = { default = "qwen2.5-coder:14b" },
-            num_ctx = { default = 12288 },
+            -- model = { default = "qwen2.5-coder:14b" },
+            -- num_ctx = { default = 12288 },
+            model = { default = "qwen35-9b-64k" },
+            num_ctx = { default = 98304 },
             num_predict = { default = -1 },  -- -1 = unbounded, correct for chat/explanation
             -- num_predict = { default = 1024 },
             -- temperature = { default = 0.3 }, -- higher temp, more room for explanation/reasoning
@@ -151,10 +153,12 @@ CC.setup({
           },
           schema = {
             model = {
+              -- INFO:(openroute): 50 free requests per day and 20 per minute
               -- default = "thinkingmachines/inkling:free",
-              -- default = "nvidia/nemotron-3-ultra-550b-a55b:free",
-              default = "nvidia/nemotron-3-super-120b-a12b:free",
-              -- default = "poolside/laguna-s-2.1:free",
+              default = "nvidia/nemotron-3-ultra-550b-a55b:free",  -- #1
+              -- default = "nvidia/nemotron-3-super-120b-a12b:free",
+              -- default = "cohere/north-mini-code:free",  -- #3
+              -- default = "poolside/laguna-s-2.1:free",  -- #2
               -- default = "qwen/qwen-2.5-coder-32b-instruct:free",
               -- default = "anthropic/claude-sonnet-4.6"
               -- swap for any :free-tagged model on openrouter.ai/models

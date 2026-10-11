@@ -76,7 +76,7 @@ M.refresh_ollama_status()  -- fire once at startup, async
 -- cleanly and print the exact line number causing the problem.
 M.has = {
   codecompanion = require('plug.ai_codecompanion_cfg'),
-  minuet = require('plug.ai_minuet_cfg'),
+  minuet = false,  -- require('plug.ai_minuet_cfg'),
 }
 
 return M

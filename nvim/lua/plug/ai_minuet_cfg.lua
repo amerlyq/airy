@@ -59,6 +59,7 @@ require('minuet').setup({
       name = 'Ollama',
       model = 'qwen2.5-coder:14b',
       -- model = 'qwen2.5-coder:14b-12k',  -- use the Modelfile variant
+      -- model = 'qwen35-9b-64k',  -- FAIL: does not support insert
       end_point = 'http://127.0.0.1:11434/v1/completions', -- Must be /v1/completions
       optional = {
         max_tokens = 128,  -- (==num_predict) FIM should stay small/fast, not =256
