@@ -9,7 +9,18 @@ from ranger.container.fsobject import FileSystemObject
 
 Directory.sort_dict["from_end"] = lambda x: x.relative_path[::-1]
 Directory.sort_dict["name_len"] = lambda x: (len(x.relative_path), x.relative_path)
-Directory.sort_dict["lctime"] = lambda x: -(os.lstat(x.path).st_ctime or 1)
+
+
+def lctime_sort(x):
+    try:
+        return -(os.lstat(x.path).st_ctime or 1)
+    except FileNotFoundError:
+        # File no longer exists, use a large negative value to sort it first
+        return -9999999999
+
+
+Directory.sort_dict["lctime"] = lctime_sort
+
 
 _TOKEN = r"(?:\d+m\d+s\d+|v\d+|prev\d+)"
 _CLIP_SUFFIX = re.compile(_TOKEN + r"(?:_" + _TOKEN + r")*$")
@@ -45,7 +56,13 @@ def sort_sizeclips(x: FileSystemObject) -> tuple[int, str, int, int, str]:
     sizes = _dir_sizes(x.path)
     primary_size = sizes.get(primary, 0)
     size = sizes.get(stem, getattr(x, "size", 0) or 0)
-    return (-primary_size, primary.casefold(), int(clip), -size if clip else 0, x.basename.casefold())
+    return (
+        -primary_size,
+        primary.casefold(),
+        int(clip),
+        -size if clip else 0,
+        x.basename.casefold(),
+    )
 
 
 Directory.sort_dict["sizeclips"] = sort_sizeclips
