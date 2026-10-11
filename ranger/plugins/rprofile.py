@@ -13,6 +13,7 @@ _PROFILER = None
 _PROFILE_PATH = None
 _TRACER = None
 _TRACE_PATH = None
+_TRACE_FILE = None
 _TRACE_LINES = {}
 _TRACE_EDGES = {}
 _TRACE_STACK = []
@@ -80,7 +81,7 @@ def _trace_label(item):
 
 
 def _line_trace(frame, event, arg):
-    global _TRACE_CURRENT, _TRACE_LAST_NS
+    global _TRACE_CURRENT, _TRACE_LAST_NS, _TRACE_FILE
     now = time.perf_counter_ns()
     if _TRACE_CURRENT is not None:
         key = _TRACE_CURRENT
@@ -97,16 +98,27 @@ def _line_trace(frame, event, arg):
             frame.f_lineno,
             frame.f_code.co_name,
         )
+        if _TRACE_FILE:
+            _TRACE_FILE.write(f"CALL {now} {_trace_label(key)}\n")
+            _TRACE_FILE.flush()
     elif event == "line":
         _TRACE_CURRENT = (
             frame.f_code.co_filename,
             frame.f_lineno,
             frame.f_code.co_name,
         )
+        if _TRACE_FILE:
+            _TRACE_FILE.write(f"LINE {now} {_trace_label(_TRACE_CURRENT)}\n")
+            _TRACE_FILE.flush()
     elif event == "return":
         if _TRACE_STACK:
             _TRACE_STACK.pop()
         _TRACE_CURRENT = _TRACE_STACK[-1] if _TRACE_STACK else None
+        if _TRACE_FILE:
+            _TRACE_FILE.write(
+                f"RET  {now} {_trace_label(_TRACE_CURRENT) if _TRACE_CURRENT else 'None'}\n"
+            )
+            _TRACE_FILE.flush()
     return _line_trace
 
 
@@ -137,7 +149,7 @@ class rprofile(Command):
 
     def execute(self):
         global _PROFILER, _PROFILE_PATH
-        global _TRACER, _TRACE_PATH, _TRACE_LINES, _TRACE_EDGES
+        global _TRACER, _TRACE_PATH, _TRACE_FILE, _TRACE_LINES, _TRACE_EDGES
         global _TRACE_STACK, _TRACE_CURRENT, _TRACE_LAST_NS
         action = self.arg(1) or "toggle"
         if action == "toggle":
@@ -179,7 +191,8 @@ class rprofile(Command):
             with open(report_path, "w") as report:
                 report.write(text)
             try:
-                self.fm.set_clipboard(text.encode("utf-8"))
+                # self.fm.set_clipboard(text.encode("utf-8"))
+                self.fm.set_clipboard(report_path.encode("utf-8"))
                 copied = "; copied to clipboard"
             except Exception:
                 copied = ""
@@ -194,6 +207,12 @@ class rprofile(Command):
                     return self.fm.notify("rprofile: line trace already running")
                 stamp = time.strftime("%Y%m%d-%H%M%S")
                 _TRACE_PATH = os.path.join(_profile_dir(), f"ranger-{stamp}.trace")
+                _TRACE_FILE = None
+                dump_to_file = self.arg(3) == "dump"
+                if dump_to_file:
+                    _TRACE_FILE = open(_TRACE_PATH, "w")
+                    _TRACE_FILE.write(f"# Ranger line trace started at {stamp}\n")
+                    _TRACE_FILE.flush()
                 _TRACE_LINES = {}
                 _TRACE_EDGES = {}
                 _TRACE_STACK = []
@@ -201,12 +220,23 @@ class rprofile(Command):
                 _TRACE_LAST_NS = time.perf_counter_ns()
                 _TRACER = _line_trace
                 sys.settrace(_TRACER)
-                return self.fm.notify(f"rprofile: line tracing {_TRACE_PATH}")
+                msg = (
+                    f"rprofile: line tracing {_TRACE_PATH}"
+                    if dump_to_file
+                    else "rprofile: line tracing (memory only)"
+                )
+                return self.fm.notify(msg)
             if subaction == "stop":
                 if _TRACER is None:
                     return self.fm.notify("rprofile: line trace not running")
                 sys.settrace(None)
                 trace_path = _TRACE_PATH
+                if _TRACE_FILE:
+                    _TRACE_FILE.write(
+                        f"# Ranger line trace ended at {time.strftime('%Y%m%d-%H%M%S')}\n"
+                    )
+                    _TRACE_FILE.close()
+                    _TRACE_FILE = None
                 _TRACER = _TRACE_PATH = None
                 text = _trace_report(trace_path)
                 report_path = trace_path + ".md"
