@@ -41,7 +41,9 @@ scan_window = function(scan)
   else
     lo, hi = math.max(0, scan.cursor - opts.window), scan.cursor
   end
-  if hi <= lo then stop("No further scene boundary"); return end
+  if hi <= lo then
+    stop("No further scene boundary"); return
+  end
 
   -- Include previous frames even at window seams or a keyframe cut. With
   -- noaccurate_seek the decoder's keyframe preroll reaches the scene filter;
@@ -67,8 +69,11 @@ scan_window = function(scan)
   message(string.format("Scene scan %s: %.1f–%.1fs (repeat key to stop)",
     scan.direction == 1 and "forward" or "backward", lo, hi))
   scan.handle = mp.command_native_async({
-    name = "subprocess", args = args, playback_only = true,
-    capture_stdout = false, capture_stderr = true,
+    name = "subprocess",
+    args = args,
+    playback_only = true,
+    capture_stdout = false,
+    capture_stderr = true,
   }, function(ok, result, err)
     scan.handle = nil
     if active ~= scan then return end
@@ -82,7 +87,7 @@ scan_window = function(scan)
       local relative = tonumber(timestamp)
       local t = relative and start + relative
       if finite(t) and t >= lo - EPSILON and t < hi
-        and (t - scan.origin) * scan.direction > EPSILON then
+          and (t - scan.origin) * scan.direction > EPSILON then
         if not found or (t - found) * scan.direction < 0 then found = t end
       end
     end
@@ -131,8 +136,12 @@ local function start(direction)
     return
   end
   local scan = {
-    path = path, track = track["ff-index"] and ("0:" .. track["ff-index"]) or "0:v:0",
-    origin = position, cursor = position, duration = duration, direction = direction,
+    path = path,
+    track = track["ff-index"] and ("0:" .. track["ff-index"]) or "0:v:0",
+    origin = position,
+    cursor = position,
+    duration = duration,
+    direction = direction,
   }
   -- Exclude the current boundary before forward early-exit can consume it.
   if direction == 1 then scan.cursor = position + EPSILON * 2 end
