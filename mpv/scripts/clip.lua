@@ -17,8 +17,9 @@ local options = {
   end_frame_first = END_FRAME_RANGE[1],
   end_frame_last = END_FRAME_RANGE[2],
   -- Default frames from the marked time to the actual clipping time (ffmpeg vs mpv discrepancy).
-  framesnum_offset_beg = -2,
-  framesnum_offset_end = -3,
+  -- ALT:DFL:(for some videos): framesnum_offset_beg = -2, framesnum_offset_end = -3,
+  framesnum_offset_beg = 0,
+  framesnum_offset_end = 0,
   -- Beg row decoded from the source at exact frame times; false = converter sample (see source_args).
   beg_source = true
 }
