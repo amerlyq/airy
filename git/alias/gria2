@@ -1,0 +1,108 @@
+#!bash
+# gria: interactive autosquash, rebase only from parent of OLDEST commit targeted by a pending fixup!/squash!/amend!
+# SCOPE: on main -> unpushed only (@{u}..HEAD) | on other branch -> fork point from main (pushed or not)
+# WHY func not alias: locals, assoc arrays, early returns, root-commit branch
+# WHY assoc array not awk: subject lookup is exact string match, no regex-escaping of subjects; bash>=4 only
+# INVARIANT: base = oldest non-fixup commit in scope whose subject is a fixup target => minimal rebase range
+# ENV: GRIA_MAIN=<ref> overrides main detection (default: origin/HEAD, else local main|master)
+# DIAG: `bash -x`-trace it, or prefix the final `git rebase` with `echo` to see the chosen base
+# EXTEND: `fixup! <hash>` targets (manual) are NOT resolved -> add rev-parse of stripped subject in pass 1
+# EXTEND: --no-merges drops merge commits from scan; rebase flattens them anyway (probably unwanted to rebase across merges)
+gria() {
+  local cur main m up base line h s range
+  local -A tgt seen
+  local -a log
+  local re='^((fixup|squash|amend)! )+(.*)$'   # greedy: strips stacked "fixup! fixup! foo"
+
+  cur=$(git symbolic-ref -q --short HEAD) || { echo "gria: detached HEAD" >&2; return 1; }
+
+  # main ref detection
+  main=${GRIA_MAIN:-$(git symbolic-ref -q --short refs/remotes/origin/HEAD)}
+  if [[ -z $main ]]; then
+    for m in main master; do
+      git rev-parse -q --verify "refs/heads/$m" >/dev/null && { main=$m; break; }
+    done
+  fi
+  [[ -n $main ]] || { echo "gria: cannot detect main (set GRIA_MAIN)" >&2; return 1; }
+
+  # scope
+  if [[ $cur == "${main#origin/}" ]]; then
+    git rev-parse -q --verify '@{u}' >/dev/null \
+      || { echo "gria: $cur has no upstream" >&2; return 1; }
+    range='@{u}..HEAD'
+  else
+    base=$(git merge-base HEAD "$main") \
+      || { echo "gria: no merge-base with $main" >&2; return 1; }
+    range="$base..HEAD"
+    base=
+  fi
+
+  mapfile -t log < <(git log --reverse --no-merges --format='%H%x09%s' "$range")
+  (( ${#log[@]} )) || { echo "gria: nothing in $range" >&2; return 1; }
+
+  # pass 1: collect targets
+  for line in "${log[@]}"; do
+    s=${line#*$'\t'}
+    [[ $s =~ $re ]] && tgt[${BASH_REMATCH[3]}]=1
+  done
+  (( ${#tgt[@]} )) || { echo "gria: no fixup!/squash!/amend! in $range" >&2; return 1; }
+
+  # pass 2: oldest non-fixup commit that is a target (log is oldest-first)
+  for line in "${log[@]}"; do
+    h=${line%%$'\t'*}; s=${line#*$'\t'}
+    [[ $s == @(fixup|squash|amend)'! '* ]] && continue
+    if [[ -n ${tgt[$s]:-} ]]; then
+      seen[$s]=1
+      [[ -n $base ]] || base=$h
+    fi
+  done
+
+  # DIAG: targets outside scope (already pushed on main / before fork) can't be autosquashed
+  for s in "${!tgt[@]}"; do
+    [[ -n ${seen[$s]:-} ]] || echo "gria: WARN no target in $range for: $s" >&2
+  done
+  [[ -n $base ]] || { echo "gria: no resolvable targets" >&2; return 1; }
+
+  # root commit has no parent -> --root; --autostash so dirty tree doesn't abort
+  if git rev-parse -q --verify "$base^" >/dev/null
+  then git rebase -i --autosquash --autostash "$base^" "$@"
+  else git rebase -i --autosquash --autostash --root "$@"
+  fi
+}
+
+# gria: interactive autosquash from parent of OLDEST commit targeted by a pending fixup!/squash!/amend!
+# SCOPE: main -> @{u}..HEAD | other branch -> merge-base(HEAD, main)..HEAD
+# WHY single newest->oldest pass: a fixup is always newer than its target, so targets are known
+#   before they are met; last assignment to `base` = oldest target. No 2nd loop, no `seen` map.
+# WHY assoc array: exact-string subject match, no regex-escaping; bash>=4
+# INVARIANT: base = oldest non-fixup commit in scope whose subject is a fixup target
+# ENV: GRIA_MAIN=<ref> overrides main (default: origin/HEAD)
+# DIAG: prefix the final `git rebase` with `echo` to see the chosen base
+# EXTEND: `fixup! <hash>` targets not resolved -> rev-parse the stripped subject in the `tgt` branch
+# EXTEND: out-of-scope targets are silent (no match) -> add a tgt-vs-matched diff if warnings are wanted
+gria() {
+  local main=${GRIA_MAIN:-$(git rev-parse --abbrev-ref origin/HEAD 2>/dev/null)} fork base onto h s
+  local -A tgt
+  local re='^((fixup|squash|amend)! )+(.*)$'   # greedy: strips stacked prefixes
+
+  if [[ $(git branch --show-current) == "${main#origin/}" ]]
+  then fork='@{u}'
+  else fork=$(git merge-base HEAD "$main") || return
+  fi
+
+  while IFS=$'\t' read -r h s; do                # newest first (git log default)
+    if   [[ $s =~ $re ]];       then tgt["${BASH_REMATCH[3]}"]=1
+    elif [[ ${tgt["$s"]+x} ]];  then base=$h     # overwritten by older ones => ends oldest
+    fi
+  done < <(git log --no-merges --format='%H%x09%s' "$fork..HEAD")
+
+  [[ $base ]] || { echo "gria: no resolvable fixup targets in $fork..HEAD" >&2; return 1; }
+
+  onto=$base^
+  git rev-parse -q --verify "$onto" >/dev/null || onto=--root   # base is root commit
+  git rebase -i --autosquash --autostash "$onto" "$@"
+}
+
+## ALT: previous 2-pass version with mapfile + `seen` map
+# benefit: explicit per-target WARN for targets outside scope, explicit no-upstream/detached errors
+# (dropped as non-mandatory; git itself errors on a missing @{u} / merge-base)

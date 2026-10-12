@@ -118,13 +118,19 @@ alias gpD.='gpD "$(git branch --show-current)"'
 alias grn='git rebase'
 alias grnm='git rebase origin/main'
 # alias gri='git rebase --interactive'
-gri(){ git rebase --interactive "${@:-$(git merge-base HEAD "@{u}@{1}")}"; }
-alias gria='git rebase --interactive --autosquash "$(git merge-base HEAD "@{u}@{1}")"'
-alias grib='git rebase --interactive "$(git merge-base HEAD "@{u}@{1}")"'
-alias grim='git rebase --interactive "$(git symbolic-ref --short refs/remotes/origin/HEAD)"'
+gri(){ git rebase --interactive "${@:-$(git merge-base HEAD "@{u}")}"; }  # OR="@{u}@{1}"
+# alias gria='git rebase --interactive --autosquash "$(git log -E --grep="^(squash|fixup)!" --format="%H"|tail -1)~"'
+# alias gria='git rebase -i --autostash --autosquash "$(git log --format="%s" HEAD | sed -nE "s/^(fixup|squash)! //p" | while read s; do git log -1 --format=%H --fixed-strings --grep="^$s$" HEAD; done | tail -1)^"'
+alias gria='git rebase -i --autosquash --autostash "$(git merge-base HEAD "$(git rev-parse -q --verify origin/main || git rev-parse --verify origin/master)")"'
+alias grs='GIT_SEQUENCE_EDITOR=true gria'
+alias grim='gri "$(git merge-base HEAD $(git rev-parse --abbrev-ref @{u} 2>/dev/null | grep -E -q "main|master" && echo "origin/main" || echo "@{u}"))"'
+alias griu='gri "@{u}"'
 alias grc='git rebase --continue'
 alias gra='git rebase --abort'
-alias grom='git rebase --onto "@{u}" "$(git merge-base HEAD "@{u}@{1}")"'
+# alias grom='git rebase --onto "@{u}" "$(git merge-base HEAD "@{u}@{1}")"'
+# alias grom='git rebase --onto "origin/main" "$(git merge-base HEAD @{u})"'
+alias grom='git rebase --onto $(git merge-base @{u} origin/main origin/master 2>/dev/null | head -n 1) @{u}'
+
 
 # HACK:(when stash-pop conflicts): cherry-pick only stashed changes as patch
 alias gSa='git stash show -p stash@{0} | git apply --3way'
