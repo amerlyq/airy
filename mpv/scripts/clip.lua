@@ -6,8 +6,8 @@
 
 local utils = require 'mp.utils'
 -- Inclusive frame ranges around each boundary's "0" frame.
-BEG_FRAME_RANGE = { -2, 2 }
-END_FRAME_RANGE = { -3, 1 }
+BEG_FRAME_RANGE = { -3, 2 }
+END_FRAME_RANGE = { -3, 2 }
 local options = { converter = "r.ffmpeg", preview_mode = "copy", preview_window_limit = 30,
   beg_frame_first = BEG_FRAME_RANGE[1], beg_frame_last = BEG_FRAME_RANGE[2],
   end_frame_first = END_FRAME_RANGE[1], end_frame_last = END_FRAME_RANGE[2],
