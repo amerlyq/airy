@@ -59,7 +59,18 @@ end
 
 
 local function ft_lua()
+  require("lazydev").setup({
+    library = {
+      -- See the configuration section for more details
+      -- Load luvit types when the `vim.uv` word is found
+      { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+    },
+  })
+
   require 'lsp.init'
+  -- 2. Bootstrap autoformatting (conform.nvim config detailed in Step 3)
+  -- require("config.format")
+  vim.lsp.enable('lua_ls')
 
   local t = seen_filetypes['lua']
   local p = vim.fn.fnamemodify(t.file, ":p")
@@ -90,20 +101,19 @@ end
 
 local function ft_lisp()
   if vim.bo.filetype == 'lisp' then
-
     local bufnr = seen_filetypes['lisp'].buf
     local KB = vim.api.nvim_buf_set_keymap
 
     KB(bufnr, 'n', '<Space>z', '<Cmd>call vlime#plugin#ConnectREPL("127.0.0.1",7002)<CR>',
-      { noremap = true, desc = 'Connect to a VLIME server'})
+      { noremap = true, desc = 'Connect to a VLIME server' })
 
     KB(bufnr, 'n', '<Space>f', ':call vlime#plugin#SendToREPL(vlime#ui#CurTopExpr())<CR>',
-      { noremap = true, silent = true, desc = 'Run (top-sexp)'})
+      { noremap = true, silent = true, desc = 'Run (top-sexp)' })
     KB(bufnr, 'x', '<Space>f', ':<C-u>call vlime#plugin#SendToREPL(vlime#ui#CurSelection())<CR>',
-      { noremap = true, silent = true, desc = 'Run (vsel)'})
+      { noremap = true, silent = true, desc = 'Run (vsel)' })
 
     KB(bufnr, 'n', '<Space>k', '<Cmd>call vlime#plugin#SendToREPL("(_live)")<CR>',
-      { noremap = true, desc = 'Run (_live)'})
+      { noremap = true, desc = 'Run (_live)' })
 
     KB(bufnr, 'n', '<CR>', ':call vlime#plugin#SendToREPL(vlime#ui#CurTopExpr())<CR>'
       .. '<Cmd>call vlime#plugin#SendToREPL("(if (fboundp \'_live) (_live))")<CR>'
@@ -113,7 +123,7 @@ local function ft_lisp()
 
     -- BET? find outer scope (defun name) -- and exec it inof "symbol under cursor"
     KB(bufnr, 'n', '<BS>', ':call vlime#plugin#SendToREPL("(".vlime#ui#CurAtom().")")<CR>'
-      , { noremap = true, silent = true, desc = 'Eval symbol under cursor as function' })
+    , { noremap = true, silent = true, desc = 'Eval symbol under cursor as function' })
 
 
     vim.g.vlime_force_default_keys = true
@@ -155,7 +165,7 @@ local function ft_qf()
     --   autocmd! FileType qf packadd quickfix-reflector.vim
     -- vim.cmd [[ packadd quickfix-reflector.vim ]]
     KB(bufnr, 'n', '<Bslash>e', '<Cmd>exe "BqfAutoToggle" | packadd quickfix-reflector.vim | copen<CR>'
-      , { noremap = true, silent = true, desc = 'edit [QF] by reflector / disable Bqf' })
+    , { noremap = true, silent = true, desc = 'edit [QF] by reflector / disable Bqf' })
 
     -- SRC: https://github.com/gabrielpoca/replacer.nvim
     -- BAD: line numbers and lnum:col: disappers
@@ -176,7 +186,6 @@ end
 --  WKRND: should wrap everything behind "require" singletons
 --    BUT:FIXME: how to be with buffer-local mappings ?
 local function load_ondemand()
-
   require 'plug.treesitter'
   local parsersInstalled = require("nvim-treesitter.config").get_installed('parsers')
   for _, parser in pairs(parsersInstalled) do
@@ -193,11 +202,11 @@ local function load_ondemand()
     --   FIXED? fn load_ondemand() is already called twice -- on startup, and on each ft once again
     -- MOVE? into plug/treesitter.lua
     if enable then
-      if pcall(vim.treesitter.start) then  -- vim.treesitter.start()
-        vim.o.foldmethod = "expr"  -- <RQ
+      if pcall(vim.treesitter.start) then -- vim.treesitter.start()
+        vim.o.foldmethod = "expr"         -- <RQ
         vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
         -- FIXED: wrong indend for comments in 'ft=sh' ※⡨⣭⡰⢺
-        if not vim.tbl_contains({'sh'}, vim.bo.filetype) then
+        if not vim.tbl_contains({ 'sh' }, vim.bo.filetype) then
           vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
         end
       end
@@ -259,7 +268,6 @@ local function source_after()
 end
 
 local function on_delayed_startup()
-
   --SRC: https://github.com/lewis6991/impatient.nvim
   --require('impatient')
   --USAGE :LuaCacheProfile
