@@ -9,7 +9,7 @@ Layout:
 - delete      :delete with clip + symlink guards (only for paths inside the VD roots)
 - moves       fm.cut / fm.paste / :rename ask about clips + symlinks first and can re-point (U)
               or replace (R) the symlinks once the files have really moved; every prompt is
-              preceded by a list of the links, also appended to RECOVERY_LOG
+              preceded by a list of the links, also appended to C.RECOVERY_LOG
 - dangling   links that start to dangle behind ranger's back (bulkrename, shell mv/rm) are
               reported by the next refreshing :vdsym and, failing that, by a ranger timer
 - cd signal   lazy cache warm-up on the first cd() into a VD root, "visited" dir bookkeeping
@@ -34,78 +34,12 @@ from fnmatch import translate as glob_translate
 from os import path as fs
 from typing import Callable, NamedTuple
 
+from plugins import vdconf as C
 from ranger.api.commands import Command
 from ranger.config.commands import delete as _default_delete
 from ranger.config.commands import rename as _default_rename
 from ranger.ext.safe_path import get_safe_path
 from ranger.ext.shell_escape import shell_quote
-
-DASHBOARD_ROOT = "/t/bnm"
-# Cache freshness before a :vdsym search.
-#
-# "validate" stat-walks every cached directory.
-# It rescans only directories whose mtime changed.
-# This catches changes made outside ranger.
-# It is reliable when directory mtimes are reliable.
-# It costs one stat per cached directory.
-# It is the default.
-#
-# "visited" remembers each VD directory reached by ranger's cd signal.
-# It remembers both the displayed spelling and realpath spelling.
-# The next visited-mode search rescans each remembered directory subtree.
-# Dashboard creation also remembers source directories plus symlink target directories.
-# This cheaply catches work done during this ranger session.
-# It can miss external changes in unvisited directories.
-# It can miss a symlinked directory when ranger keeps an outside symlink-leaf spelling.
-#
-# "none" trusts the index except that gone matched paths are filtered out.
-# "rescan" rebuilds every root from scratch.
-#
-# --modifiers=norefresh forces "none".
-# --action=refresh forces "validate".
-# --action=rescan forces "rescan".
-REFRESH = "validate"
-WARM_ON_CD = True  # start the background cache build on the first cd() under a VD root
-DELETE_SCANS_DIRS = True  # :delete also looks for links into directories being deleted
-
-# Pictures live in "<dnum>" or "<dnum>-*" dirs directly under a parent named like one of these
-# (the first "*" is the date prefix). Those dirs are never listed; for a needle "<dnum>-<idx>"
-# the files "<dnum>-<idx>.<ext>" with 0..PICS_ZEROES zeroes before <idx> are probed instead.
-PICS_PARENTS = ("*-*-pics", "*-*-pics-*")
-PICS_EXTS = ("mp4", "webp", "gif")
-PICS_ZEROES = 3
-
-LOCK_WAIT = (
-    3.0  # s a guard waits for the cache lock (warm-up running) before asking blind
-)
-PRINT_BEFORE_PROMPT = (
-    True  # page the symlink list before a move prompt (recovery on cancel/crash)
-)
-# "any" accepts the next key.
-# Any other string accepts only its characters.
-# Use "\n yqc" for Enter, space, y, q or c.
-PRINT_DISMISS_KEYS = "any"
-# Print-match emphasis is bold yellow.
-# "rest" emphasizes matching basenames except for the search term.
-# "needle" emphasizes the search term instead.
-PRINT_HIGHLIGHT = "rest"
-RECOVERY_LOG = os.path.join(
-    os.environ.get("XDG_STATE_HOME") or os.path.expanduser("~/.local/state"),
-    "vdsym",
-    "moves.log",
-)
-RACY_NS = 2_000_000_000  # dirs modified < 2s before their scan are re-read next time
-
-# Dangling symlinks: bulkrename, shell mv / rm and other tools can't be hooked, so they are
-# caught afterwards. Every :vdsym that refreshes compares the links that dangle now with the
-# previous check and, before doing its job, tells you about new ones. If you then stop using
-# vdsym, a ranger timer repeats the comparison once after DANGLING_QUIET s without VD activity.
-DANGLING_MONITOR = True
-DANGLING_QUIET = 30.0
-
-# Clip naming: "<stem>_00m33s6", "<stem>_v32", "<stem>_06m44s7_prev29267", any extension.
-_TOKEN = r"(?:\d+m\d+s\d+|v\d+|prev\d+)"
-_CLIP_SUFFIX = _TOKEN + "(?:_" + _TOKEN + ")*"
 
 _NUMERIC = re.compile(r"(\d+)-0*(\d+)")
 _LOG = logging.getLogger("ranger.vdsym")
@@ -187,7 +121,7 @@ def _pics_dnum(directory: str) -> str | None:
     match = _DNUM_DIR.fullmatch(fs.basename(directory))
     if match and any(
         fnmatchcase(fs.basename(fs.dirname(directory)), pattern)
-        for pattern in PICS_PARENTS
+        for pattern in C.PICS_PARENTS
     ):
         return match[1]
     return None
@@ -218,7 +152,7 @@ def _make_rec(
 ) -> _Dir:
     """`since`: when the listing the items come from was started; a directory modified after
     that may have changed between fd's separate runs, so it is re-read at the next validation."""
-    racy = time.time_ns() - mtime < RACY_NS or (since is not None and mtime >= since)
+    racy = time.time_ns() - mtime < C.RACY_NS or (since is not None and mtime >= since)
     if _pics_dnum(directory) is not None:
         return _Dir(mtime, [], [directory], [], {}, racy)
     entries: list[str] = []
@@ -428,8 +362,8 @@ class _Cache:
         for dnum, idx in numeric:
             idx = str(int(idx))
             for directory in view.pics_dirs.get(dnum, ()):
-                for zeros in range(PICS_ZEROES + 1):
-                    for ext in PICS_EXTS:
+                for zeros in range(C.PICS_ZEROES + 1):
+                    for ext in C.PICS_EXTS:
                         path = fs.join(directory, f"{dnum}-{'0' * zeros}{idx}.{ext}")
                         if fs.lexists(path):
                             found.append((path, fs.islink(path)))
@@ -747,13 +681,13 @@ def find_hits(
     its siblings) or directories (links into anything inside). Candidates come from the shared
     name index, chased through link-to-link chains by name, then verified hop by hop. The cache
     is mtime-validated first, so links created since the last scan are seen.
-    `dashboards=True` also looks into DASHBOARD_ROOT (generated links; used when re-pointing).
+    `dashboards=True` also looks into C.DASHBOARD_ROOT (generated links; used when re-pointing).
     Returns None when the cache lock stays busy for `wait` seconds (warm-up still running).
     """
     subjects = {_norm(path) for path in paths}
     trees = (
         [s for s in subjects if fs.isdir(s) and not fs.islink(s)]
-        if DELETE_SCANS_DIRS
+        if C.DELETE_SCANS_DIRS
         else []
     )
     pending = {fs.basename(path.rstrip("/")) for path in paths}
@@ -806,7 +740,7 @@ def _brief(items: Iterable[str], limit: int = 3) -> str:
 
 def _print_dismiss() -> tuple[str, str]:
     """Prompt text plus shell read loop for PRINT_DISMISS_KEYS."""
-    spec = PRINT_DISMISS_KEYS
+    spec = C.PRINT_DISMISS_KEYS
     if spec == "any":
         return " [any key]", "read -sk 1 2>/dev/null || read -rsn 1"
     if not isinstance(spec, str) or not spec:
@@ -833,7 +767,7 @@ def find_clips(paths: Sequence[str]) -> list[str]:
     found: list[str] = []
     for directory, group in stems.items():
         pattern = re.compile(
-            f"(?:{'|'.join(map(re.escape, group))})_{_CLIP_SUFFIX}(?:\\..*)?", re.S
+            f"(?:{'|'.join(map(re.escape, group))})_{C.CLIP_SUFFIX}(?:\\..*)?", re.S
         )
         try:
             with os.scandir(directory) as it:
@@ -904,17 +838,17 @@ def _link_text(link: str, old_raw: str, new_raw: str, rest: str) -> str:
 def _recovery(op: str, lines: Iterable[str]) -> None:
     """Append what is about to happen, so a crash / cancel / error can be undone by hand."""
     try:
-        os.makedirs(fs.dirname(RECOVERY_LOG), exist_ok=True)
-        if fs.exists(RECOVERY_LOG) and fs.getsize(RECOVERY_LOG) > 2_000_000:
-            os.replace(RECOVERY_LOG, RECOVERY_LOG + ".1")
+        os.makedirs(fs.dirname(C.RECOVERY_LOG), exist_ok=True)
+        if fs.exists(C.RECOVERY_LOG) and fs.getsize(C.RECOVERY_LOG) > 2_000_000:
+            os.replace(C.RECOVERY_LOG, C.RECOVERY_LOG + ".1")
         with open(
-            RECOVERY_LOG, "a", encoding="utf-8", errors="surrogateescape"
+            C.RECOVERY_LOG, "a", encoding="utf-8", errors="surrogateescape"
         ) as handle:
             handle.write(f"{time.strftime('%Y-%m-%dT%H:%M:%S')} {op}\n")
             for line in lines:
                 handle.write(f"  {line}\n")
     except OSError:
-        _LOG.warning("cannot write %s", RECOVERY_LOG)
+        _LOG.warning("cannot write %s", C.RECOVERY_LOG)
 
 
 def make_dashboard(fm, matches: Sequence[str], dest: str) -> str:
@@ -954,7 +888,7 @@ class _MoveJob:
     after it, and only for files that are gone from `old` and found at their new place, so a
     cancelled or failed move leaves everything as it was. The new place is the predicted
     path, verified (and if needed searched in the destination dir) by inode.
-    Links in DASHBOARD_ROOT are always re-pointed in place.
+    Links in C.DASHBOARD_ROOT are always re-pointed in place.
     """
 
     def __init__(
@@ -999,7 +933,7 @@ class _MoveJob:
 
     @staticmethod
     def _is_dashboard(link: str) -> bool:
-        return fs.abspath(link).startswith(fs.abspath(DASHBOARD_ROOT) + os.sep)
+        return fs.abspath(link).startswith(fs.abspath(C.DASHBOARD_ROOT) + os.sep)
 
     def stage(self) -> bool:
         """Keep every old link under a recoverable name before making replacement links."""
@@ -1202,7 +1136,7 @@ class _MoveJob:
                 f"symlinks: {updated} updated, {replaced} replaced"
                 + (f", {kept} re-pointed in place (name taken)" if kept else "")
                 + (
-                    f", {len(problems)} problem(s) (see {RECOVERY_LOG})"
+                    f", {len(problems)} problem(s) (see {C.RECOVERY_LOG})"
                     if problems
                     else ""
                 ),
@@ -1302,7 +1236,7 @@ class _JobGroup:
 
 
 def _print_links(fm, op: str, hits: list[_Hit]) -> None:
-    if not PRINT_BEFORE_PROMPT or not hits:
+    if not C.PRINT_BEFORE_PROMPT or not hits:
         return
     lines = [f"{op}: {len(hits)} symlink(s) lead here"]
     lines += [f"{hit.link} -> {_safe_readlink(hit.link) or '?'}" for hit in hits]
@@ -1325,7 +1259,7 @@ def _guard_move(
     _arm()
     clips = find_clips(paths)
     subjects = [path for path in paths if _under_roots(path)]
-    hits = find_hits(subjects, LOCK_WAIT) if subjects else []
+    hits = find_hits(subjects, C.LOCK_WAIT) if subjects else []
     if hits is None:
         ask(
             f"link scan unavailable (cache is warming) -- {op} anyway? (y / C=cancel)",
@@ -1366,7 +1300,7 @@ def _guard_move(
             done("y")
         else:
             if ans in ("n", "N"):
-                dest = fs.join(DASHBOARD_ROOT, fs.basename(paths[0]))
+                dest = fs.join(C.DASHBOARD_ROOT, fs.basename(paths[0]))
                 make_dashboard(fm, [hit.link for hit in hits], dest)
             cancel()
 
@@ -1393,7 +1327,11 @@ def _safe_like(dst: str, taken: set[str]) -> str:
 
 def _same_link_target(source: str, dest: str) -> bool:
     """Both paths are links resolving to the same destination, including dangling links."""
-    return fs.islink(source) and fs.islink(dest) and fs.realpath(source) == fs.realpath(dest)
+    return (
+        fs.islink(source)
+        and fs.islink(dest)
+        and fs.realpath(source) == fs.realpath(dest)
+    )
 
 
 def _link_targets_path(link: str, path: str) -> bool:
@@ -1457,7 +1395,7 @@ class vdsym(Command):
     def link_roots(cls) -> tuple[str, ...]:
         """Where links to a file may live: the VD roots plus the generated dashboards."""
         return cls.roots() + (
-            () if DASHBOARD_ROOT in cls.roots() else (DASHBOARD_ROOT,)
+            () if C.DASHBOARD_ROOT in cls.roots() else (C.DASHBOARD_ROOT,)
         )
 
     # -- argument parsing ----------------------------------------------------- #
@@ -1555,7 +1493,7 @@ class vdsym(Command):
     @staticmethod
     def _normalize(name: str, flags: set[str]) -> str:
         if "n" in flags:
-            exts = "|".join(("html",) + PICS_EXTS)
+            exts = "|".join(("html",) + C.PICS_EXTS)
             if match := _NUMERIC.fullmatch(re.sub(rf"\.(?:{exts})$", "", name)):
                 return f"{match[1]}-{match[2]}"
             return re.sub(r"\.html$", "", name)
@@ -1645,7 +1583,7 @@ class vdsym(Command):
             return "none"
         if "q" in flags:
             return "validate"
-        return REFRESH if REFRESH in ("validate", "visited", "none") else "validate"
+        return C.REFRESH if C.REFRESH in ("validate", "visited", "none") else "validate"
 
     def _source_paths(self, flags: set[str]) -> set[str]:
         """Paths the needles were taken from (cursor / selection / yank), if not explicit."""
@@ -1757,7 +1695,7 @@ class vdsym(Command):
         dest = (
             fs.join(root, name)
             if root is not None
-            else fs.join(DASHBOARD_ROOT, self.fm.thisfile.relative_path)
+            else fs.join(C.DASHBOARD_ROOT, self.fm.thisfile.relative_path)
         )
         return make_dashboard(self.fm, matches, dest)
 
@@ -1833,7 +1771,7 @@ class vdsym(Command):
             out.append(color(base[last:]))
             return "".join(out)
 
-        highlight = highlight_rest if PRINT_HIGHLIGHT == "rest" else highlight_needle
+        highlight = highlight_rest if C.PRINT_HIGHLIGHT == "rest" else highlight_needle
 
         if matches:
             lines = []
@@ -2000,7 +1938,7 @@ class delete(_default_delete):
     def _check_links(self, files: Sequence[str], paths: Sequence[str]) -> None:
         _arm()
         subjects = [path for path in paths if _under_roots(path)]
-        hits = find_hits(subjects, LOCK_WAIT) if subjects else []
+        hits = find_hits(subjects, C.LOCK_WAIT) if subjects else []
         if hits is None:
             return self._ask(
                 "link scan unavailable (cache is warming) -- delete anyway? (y / C=cancel)",
@@ -2031,7 +1969,7 @@ class delete(_default_delete):
             _acknowledge(links)
             self._copy_and_delete(files)
         elif answer in ("n", "N"):
-            make_dashboard(self._real_fm, links, fs.join(DASHBOARD_ROOT, first))
+            make_dashboard(self._real_fm, links, fs.join(C.DASHBOARD_ROOT, first))
 
     def _copy_and_delete(self, files: Sequence[str]) -> None:
         names = [fs.basename(file) for file in files]
@@ -2082,7 +2020,7 @@ class rename(_default_rename):
         def done(policy: str) -> None:
             job = None
             if policy in ("U", "R"):
-                hits = _drop_moving(find_hits([old], LOCK_WAIT, True) or [], [old])
+                hits = _drop_moving(find_hits([old], C.LOCK_WAIT, True) or [], [old])
                 _recovery("rename", [f"{old} -> {new}"])
                 if hits:
                     job = _MoveJob(fm, {old: new}, {old: policy}, hits)
@@ -2119,14 +2057,14 @@ def _dangling_now(wait: float) -> set[str] | None:
 
 
 def check_dangling(
-    fm=None, notify: bool = True, wait: float = LOCK_WAIT
+    fm=None, notify: bool = True, wait: float = C.LOCK_WAIT
 ) -> list[str] | None:
     """Compare the dangling links with the previous check; log the new ones (details for
     :display_log) and notify shortly. The first check is the baseline. Returns the new links,
     or None when it could not run now (cache busy / ranger busy): nothing is lost, the next
     check simply compares against the older state."""
     mon = _cache.monitor
-    if not DANGLING_MONITOR or (fm is not None and _busy(fm)):
+    if not C.DANGLING_MONITOR or (fm is not None and _busy(fm)):
         return None
     if not _cache.lock.acquire(timeout=wait):
         return None
@@ -2159,9 +2097,9 @@ def check_dangling(
 
 def _arm(delay: float | None = None) -> None:
     """(Re)start the one-shot timer: it fires after `delay` s without further VD activity."""
-    if DANGLING_MONITOR:
+    if C.DANGLING_MONITOR:
         _cache.monitor.deadline = time.monotonic() + (
-            DANGLING_QUIET if delay is None else delay
+            C.DANGLING_QUIET if delay is None else delay
         )
 
 
@@ -2242,7 +2180,7 @@ class dangling(Command):
         fm, mode = self.fm, self.arg(1)
         if mode not in ("", "update"):
             return fm.notify("Syntax: dangling [update]", bad=True)
-        current = _dangling_now(LOCK_WAIT)
+        current = _dangling_now(C.LOCK_WAIT)
         if current is None:
             return fm.notify("cache is busy (warming), try again in a moment", bad=True)
         links = sorted(current)
@@ -2281,7 +2219,7 @@ def _on_cd(path: str) -> None:
     _cache.visited.add(path)
     _cache.visited.add(fs.realpath(path))
     _arm()
-    if WARM_ON_CD and not _cache.warmed:
+    if C.WARM_ON_CD and not _cache.warmed:
         _cache.warmed = True
         threading.Thread(target=_warm, name="vdsym-warm", daemon=True).start()
 
@@ -2446,7 +2384,7 @@ def _make_paste(orig):
             if active and fs.isdir(target):
                 moves = _predict_moves(list(active), target, overwrite, make_safe_path)
                 hits = _drop_moving(
-                    find_hits(list(moves), LOCK_WAIT, True) or [], paths
+                    find_hits(list(moves), C.LOCK_WAIT, True) or [], paths
                 )
                 _recovery("paste", [f"{old} -> {new}" for old, new in moves.items()])
                 if hits and moves:

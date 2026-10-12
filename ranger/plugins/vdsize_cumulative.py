@@ -122,7 +122,6 @@ KNOWN LIMITATIONS
 import os
 import re
 import stat
-import sys
 import time
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from threading import Event
@@ -201,7 +200,8 @@ class _DcsizeLoader(Loadable):
                 )
                 if not finished:
                     waiting = ", ".join(
-                        os.path.basename(jobs[future].path) for future in list(pending)[:2]
+                        os.path.basename(jobs[future].path)
+                        for future in list(pending)[:2]
                     )
                     self.description = (
                         f"dcsize: {done_count}/{len(self.todo)}; "
@@ -235,18 +235,18 @@ class _DcsizeLoader(Loadable):
 
 
 def _pause_vdsym_monitor(mode):
+    """vddangling's check is switched off through vdconf (it reads C.DANGLING_MONITOR live)."""
     if mode != "video":
         return None
     try:
-        vdsym = sys.modules.get("vdsym")
-        if vdsym is None:
-            vdsym = sys.modules.get("ranger.plugins.vdsym")
-        if vdsym is None:
-            return None
+        try:
+            from plugins import vdconf
+        except ImportError:
+            import vdconf
 
-        old = vdsym.DANGLING_MONITOR
-        vdsym.DANGLING_MONITOR = False
-        return vdsym, old
+        old = vdconf.DANGLING_MONITOR
+        vdconf.DANGLING_MONITOR = False
+        return vdconf, old
     except Exception:
         return None
 
@@ -254,11 +254,16 @@ def _pause_vdsym_monitor(mode):
 def _restore_vdsym_monitor(state):
     if state is None:
         return
-    vdsym, old = state
-    vdsym.DANGLING_MONITOR = old
+    vdconf, old = state
+    vdconf.DANGLING_MONITOR = old
     if old:
         try:
-            vdsym._arm(30.0)
+            try:
+                from plugins import vddangling
+            except ImportError:
+                import vddangling
+
+            vddangling._arm(30.0)
         except Exception:
             pass
 
@@ -383,7 +388,9 @@ def _scan(path, mode, seen, cancelled=None, st=None):
     if mode == "video":
         n = size = 0
         media = []
-        for i, name in enumerate(o["v"][1]):  # regular .mp4 names; each still stat'ed => exact
+        for i, name in enumerate(
+            o["v"][1]
+        ):  # regular .mp4 names; each still stat'ed => exact
             if not i & 255 and cancelled is not None and cancelled.is_set():
                 raise _Cancel
             p = path + "/" + name
@@ -731,12 +738,7 @@ class dcsize(Command):
                 _set_filter(d, mode, hide_empty)
             else:  # video without filter
                 _remove_filter(d)
-            refresh = (
-                "sort" in opts
-                or "filter" in opts
-                or hide_empty
-                or had_dc_filter
-            )
+            refresh = "sort" in opts or "filter" in opts or hide_empty or had_dc_filter
             if refresh and d.files_all is not None:
                 d.refilter()
             if refresh:
