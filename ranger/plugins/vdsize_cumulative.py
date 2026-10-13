@@ -235,9 +235,7 @@ class _DcsizeLoader(Loadable):
 
 
 def _pause_vdsym_monitor(mode):
-    """vddangling's check is switched off through vdconf (it reads C.DANGLING_MONITOR live)."""
-    if mode != "video":
-        return None
+    """Pause the whole-tree dangling-link scan while dcsize walks the tree."""
     try:
         try:
             from plugins import vdconf
@@ -578,19 +576,17 @@ def _restore_sort(fm, d, sn):
     sort = sn["sort"]
     rev = str(sn["rev"]).lower()  # 'true' / 'false'
     if sn.get("sort_is_local"):
-        try:
-            fm.execute_console(f"setlocal path={d.path} sort={sort}")
-            fm.execute_console(f"setlocal path={d.path} sort_reverse={rev}")
-            return
-        except Exception:
-            pass
+        _set_local_sort(fm, d.path, sort, rev == "true")
+        return
     fm.execute_console(f"set sort={sort}")
     fm.execute_console(f"set sort_reverse={rev}")
 
 
-def _set_local_sort(fm, path, sort):
-    fm.execute_console(f"setlocal path={path} sort={sort}")
-    fm.execute_console(f"setlocal path={path} sort_reverse=False")
+def _set_local_sort(fm, path, sort, reverse=False):
+    """Write cwd-local sort settings without signaling every loaded directory."""
+    pattern = re.escape(path) + "$"
+    fm.settings._raw_set("sort", sort, path=pattern)
+    fm.settings._raw_set("sort_reverse", reverse, path=pattern)
 
 
 def _restore_local_sorts(fm, sn):
@@ -704,6 +700,9 @@ class dcsize(Command):
 
         def on_result(f, result):
             SIZES[mode][f.path] = result
+            f.display_data.clear()
+            if f.is_directory:
+                f.set_linemode(name)
             ## DISABLED: sort-signal-storm
             ##   8 _set_local_sort calls -> 37,111 Directory.sort calls —> 37,111 signal callbacks
             # if f.is_directory:
@@ -741,6 +740,10 @@ class dcsize(Command):
                 d.refilter()
             if refresh:
                 d.sort()
+            for f in d.files_all or []:
+                if f.is_directory and f.path in SIZES[mode]:
+                    f.set_linemode(name)
+                    f.display_data.clear()
             self.fm.ui.redraw_main_column()
 
         self.fm.loader.add(_DcsizeLoader(self.fm, todo, mode, on_result, on_finish))
