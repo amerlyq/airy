@@ -17,6 +17,8 @@ Flow of one paste (Paste object `p`):
 
 API for plugins
   guard(key, fn, priority=50)    paste guard; same key replaces (re-exec safe)
+  jump_to_created(fm, dest, before)   jump after a synchronous custom operation
+  run_custom(fm, operation)       snapshot, run operation, then jump to created entries
   on_cut(key, fn)                fn(fm, paths) after :cut filled the buffer
   on_reset(key, fn)              fn(fm) when the buffer is replaced/emptied (:copy set, :uncut)
   unmark(fm, paths)              drop paths from the copy buffer (cancel a cut for them)
@@ -299,6 +301,21 @@ def _jump(p: Paste) -> None:
 
     _STATE.handler = fm.signal_bind("finished_loading_dir", ready)
     d.load_content()  # no-op if a load is already scheduled (CopyLoader's own end-of-copy one)
+
+
+def jump_to_created(fm, dest: str, before: set[str]) -> None:
+    """Jump to the first visible entry created in dest since `before` was captured."""
+    p = Paste(fm, "symlink", dest, (), {}, {}, lambda self: None)
+    p.before = set(before)
+    _jump(p)
+
+
+def run_custom(fm, operation: Callable) -> None:
+    """Run an operation and jump to entries it creates in the current directory."""
+    dest = fm.thistab.path
+    before = _listing(dest)
+    operation(fm)
+    jump_to_created(fm, dest, before)
 
 
 ## ALT: opt-in command in commands.py, no global patching.

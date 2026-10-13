@@ -15,6 +15,11 @@ from os import path as fs
 
 from ranger.api.commands import Command
 
+try:
+    from plugins import pasteflow
+except ImportError:
+    import pasteflow
+
 
 class mvsel(Command):
     """:mvsel %any_path
@@ -84,12 +89,16 @@ class paste_relink(Command):
     def execute(self) -> None:
         fm = self.fm
         dst = fm.thistab.path
-        try:
-            for l in fm.copy_buffer:
-                tgt = fs.join(l.dirname, os.readlink(l.path))
-                os.symlink(fs.relpath(tgt, start=dst), fs.join(dst, l.basename))
-        except OSError as e:
-            fm.notify(f"paste_relink: {e}", bad=True)
+
+        def paste(fm) -> None:
+            try:
+                for l in fm.copy_buffer:
+                    tgt = fs.join(l.dirname, os.readlink(l.path))
+                    os.symlink(fs.relpath(tgt, start=dst), fs.join(dst, l.basename))
+            except OSError as e:
+                fm.notify(f"paste_relink: {e}", bad=True)
+
+        pasteflow.run_custom(fm, paste)
 
 
 # %ONELINE: map py eval for l in fm.copy_buffer: os.symlink(l.path, fm.fs.join(fm.thistab.path, l.path.replace("/", "⁄")))
@@ -99,8 +108,12 @@ class paste_flatlink(Command):
     def execute(self) -> None:
         fm = self.fm
         dst = fm.thistab.path
-        try:
-            for l in fm.copy_buffer:
-                os.symlink(l.path, fs.join(dst, l.path.replace("/", "⁄")))
-        except OSError as e:
-            fm.notify(f"paste_flatlink: {e}", bad=True)
+
+        def paste(fm) -> None:
+            try:
+                for l in fm.copy_buffer:
+                    os.symlink(l.path, fs.join(dst, l.path.replace("/", "⁄")))
+            except OSError as e:
+                fm.notify(f"paste_flatlink: {e}", bad=True)
+
+        pasteflow.run_custom(fm, paste)
