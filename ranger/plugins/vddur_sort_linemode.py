@@ -7,6 +7,7 @@ from ranger.container.fsobject import FileSystemObject
 # ALT:(ffproe):https://github.com/zd4y/ranger-vidlength
 try:
     from ranger.api import register_linemode
+    from ranger.api.commands import Command
     from ranger.core.filter_stack import stack_filter
     from ranger.core.linemode import DEFAULT_LINEMODE, LinemodeBase
     from ranger.core.shared import FileManagerAware
@@ -34,6 +35,43 @@ else:
         return ms if ms > 0 or ms < 0 else 1
 
     Directory.sort_dict["duration"] = lambda x: get_duration_mediainfo(x.path, _st(x))
+
+    ### ALT:FAIL:
+    ## map od eval fm.thisdir.settings['sort'] = 'duration'; fm.thisdir.settings['sort_reverse'] = True; fm.execute_console(f"default_linemode path={fm.thisdir.path} duration")
+    ## map on eval fm.execute_console(f"setlocal path={fm.thisdir.path} sort=natural"); fm.execute_console(f"setlocal path={fm.thisdir.path} sort_reverse=False"); fm.execute_console(f"default_linemode path={fm.thisdir.path} None")
+    ## map on eval fm.thisdir.settings['sort'] = 'natural'; fm.thisdir.settings['sort_reverse'] = False; fm.set_option_from_string('default_linemode', 'None', localpath=fm.thisdir.path); fm.thisdir.unload(); fm.thisdir.load_content()
+    ## map on eval fm.thisdir.settings['sort'] = 'natural'; fm.thisdir.settings['sort_reverse'] = False; from ranger.container.fsobject import FileSystemObject; FileSystemObject.linemode_policies.pop(('path', fm.thisdir.path), None); fm.thisdir.unload(); fm.thisdir.load_content()
+    # %ONELINE:
+    # map od chain setlocal sort=duration;  setlocal sort_reverse=True; eval fm.execute_console(f"default_linemode path={fm.thisdir.path} duration"); linemode duration; filter_stack add duration
+    # map on chain setlocal sort=natural;  setlocal sort_reverse=False; eval fm.execute_console(f"default_linemode path={fm.thisdir.path} devicons"); filter_stack clear; linemode devicons
+    class view_duration(Command):
+        """:view_duration [off]
+
+        on : sort by duration (reverse), linemode duration for cwd, filter duration pairs
+        off: back to natural sort + devicons, clear filter_stack
+        """
+
+        def execute(self):
+            fm = self.fm
+            path = fm.thisdir.path
+            if self.arg(1) == "off":
+                commands = (
+                    "setlocal sort=natural",
+                    "setlocal sort_reverse=False",
+                    f"default_linemode path={path} devicons",  # FIXME: path is a regex, not escaped (as before)
+                    "filter_stack clear",
+                    "linemode devicons",
+                )
+            else:
+                commands = (
+                    "setlocal sort=duration",
+                    "setlocal sort_reverse=True",
+                    f"default_linemode path={path} duration",
+                    "linemode duration",
+                    "filter_stack add duration",
+                )
+            for command in commands:
+                fm.execute_console(command)
 
     @register_linemode
     class DurationLinemode(LinemodeBase):

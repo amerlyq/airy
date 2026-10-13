@@ -1,6 +1,5 @@
-"""cmd_view: view-state commands: flat_inode, unfilter, toggle_preview_images, sort_reset, view_duration.
+"""cmd_view: view-state commands: flat_inode, unfilter, toggle_preview_images, sort_reset.
 
-## DEPS: view_duration needs vddur_sort_linemode.py (sort "duration", linemode "duration", filter "duration")
 ## CONFLICT(treefilter.py): `filter_stack clear` (used by view_duration off, `;c`) does NOT drop tfilter layers:
 ##   treefilter's refilter() re-adds them from its own stack. Use :tfilter_undo [-a].
 ## CONFLICT: `unfilter` clears Directory.filter only (probably not temporary_filter set by `ag -r`)
@@ -13,7 +12,6 @@ import re
 from typing import cast
 
 from ranger.api.commands import Command
-from ranger.container.directory import Directory
 
 from plugins.rutil import FilterableDirectory
 
@@ -107,45 +105,3 @@ class sort_reset(Command):
         s.pop("sort", None)
         s.pop("sort_reverse", None)
         fm.thisdir.sort()
-
-
-### ALT:FAIL:
-## map od eval fm.thisdir.settings['sort'] = 'duration'; fm.thisdir.settings['sort_reverse'] = True; fm.execute_console(f"default_linemode path={fm.thisdir.path} duration")
-## map on eval fm.execute_console(f"setlocal path={fm.thisdir.path} sort=natural"); fm.execute_console(f"setlocal path={fm.thisdir.path} sort_reverse=False"); fm.execute_console(f"default_linemode path={fm.thisdir.path} None")
-## map on eval fm.thisdir.settings['sort'] = 'natural'; fm.thisdir.settings['sort_reverse'] = False; fm.set_option_from_string('default_linemode', 'None', localpath=fm.thisdir.path); fm.thisdir.unload(); fm.thisdir.load_content()
-## map on eval fm.thisdir.settings['sort'] = 'natural'; fm.thisdir.settings['sort_reverse'] = False; from ranger.container.fsobject import FileSystemObject; FileSystemObject.linemode_policies.pop(('path', fm.thisdir.path), None); fm.thisdir.unload(); fm.thisdir.load_content()
-# %ONELINE:
-# map od chain setlocal sort=duration;  setlocal sort_reverse=True; eval fm.execute_console(f"default_linemode path={fm.thisdir.path} duration"); linemode duration; filter_stack add duration
-# map on chain setlocal sort=natural;  setlocal sort_reverse=False; eval fm.execute_console(f"default_linemode path={fm.thisdir.path} devicons"); filter_stack clear; linemode devicons
-class view_duration(Command):
-    """:view_duration [off]
-
-    on : sort by duration (reverse), linemode duration for cwd, filter duration pairs
-    off: back to natural sort + devicons, clear filter_stack
-    """
-
-    def execute(self) -> None:
-        fm = self.fm
-        path = fm.thisdir.path
-        if self.arg(1) == "off":
-            seq = [
-                "setlocal sort=natural",
-                "setlocal sort_reverse=False",
-                f"default_linemode path={path} devicons",  # FIXME: path is a regex, not escaped (as before)
-                "filter_stack clear",
-                "linemode devicons",
-            ]
-        else:
-            if "duration" not in Directory.sort_dict:
-                return fm.notify(
-                    "view_duration: vddur_sort_linemode not loaded", bad=True
-                )
-            seq = [
-                "setlocal sort=duration",
-                "setlocal sort_reverse=True",
-                f"default_linemode path={path} duration",
-                "linemode duration",
-                "filter_stack add duration",
-            ]
-        for c in seq:
-            fm.execute_console(c)
