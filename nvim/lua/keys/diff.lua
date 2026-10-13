@@ -1,4 +1,3 @@
-
 -- TRY: axkirillov/unified.nvim: an inline, unified diff viewer for neovim ⌇⡪⡶⢡⡴
 --   https://github.com/axkirillov/unified.nvim
 -- ALT? mini.diff documentation – MINI ⌇⡪⡶⢡⡚
@@ -46,8 +45,8 @@ local function jump_change_group(direction)
 
     if is_change(text) then
       local previous = line > 1
-        and vim.api.nvim_buf_get_lines(buf, line - 2, line - 1, false)[1]
-        or ""
+          and vim.api.nvim_buf_get_lines(buf, line - 2, line - 1, false)[1]
+          or ""
 
       -- Only stop at the beginning of a consecutive group.
       if not is_change(previous) then
@@ -89,11 +88,11 @@ local function jump_commit_boundary(direction)
 
     if is_commit_boundary(text) then
       local previous = line > 1
-        and vim.api.nvim_buf_get_lines(buf, line - 2, line - 1, false)[1]
-        or ""
+          and vim.api.nvim_buf_get_lines(buf, line - 2, line - 1, false)[1]
+          or ""
       local next = line < count
-        and vim.api.nvim_buf_get_lines(buf, line, line + 1, false)[1]
-        or ""
+          and vim.api.nvim_buf_get_lines(buf, line, line + 1, false)[1]
+          or ""
 
       -- Treat consecutive comments/blank lines as one boundary.  In either
       -- direction, land on the first line of that boundary block.
@@ -125,3 +124,20 @@ vim.api.nvim_create_autocmd("FileType", {
     map("n", "[[", function() jump_commit_boundary(-1) end, { buffer = true, desc = "commit↓ (diff)" })
   end,
 })
+
+
+local K = require 'keys.bind'.K
+-- set diffopt=filler,context:3
+K('n', '<Leader>dr', "<Cmd>set diffopt=internal,filler,closeoff,indent-heuristic,inline:char,linematch:40<CR>")
+K('n', '<Leader>di', "<Cmd>set diffopt=icase<CR>")
+K('n', '<Leader>df', "<Cmd>exe 'set diffopt=filler,context:'.v:count<CR>")
+K('n', '<Leader>d0', "<Cmd>set diffopt=filler,context:0<CR>")
+K('n', '<Leader>d2', "<Cmd>set diffopt=filler,context:2<CR>")
+K('n', '<Leader>d1', "<Cmd>set diffopt=filler,context:1<CR>")
+K('n', '<Leader>d3', "<Cmd>set diffopt=filler,context:3<CR>")
+-- " NOTE:(iwhite) to find what is -common- between buffers
+K('n', '<Leader>dw', "<Cmd>set diffopt=iwhite<CR>")
+
+K('n', '<Leader>dt', "<Cmd>diffthis<CR>")
+K('n', '<Leader>du', "<Cmd>diffupdate<CR>")
+K('n', '<Leader>dx', "<Cmd>diffoff<CR>")
