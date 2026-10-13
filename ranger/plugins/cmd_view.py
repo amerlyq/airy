@@ -11,9 +11,8 @@ from __future__ import annotations
 import re
 from typing import cast
 
-from ranger.api.commands import Command
-
 from plugins.rutil import FilterableDirectory
+from ranger.api.commands import Command
 
 # HACK:FIXME: wide icons (OR: narrow font)
 # os.environ["RANGER_DEVICONS_SEPARATOR"]="  "
@@ -104,4 +103,11 @@ class sort_reset(Command):
         s = fm.settings._localsettings.get(re.escape(fm.thisdir.path) + "$", {})
         s.pop("sort", None)
         s.pop("sort_reverse", None)
+        # "filter_stack clear; setlocal sort=natural; setlocal sort_reverse=False"
+        # FIXME: path is a regex, not escaped (as before)
+        fm.execute_console(
+            f"chain default_linemode path={fm.thisdir.path} devicons; linemode devicons"
+        )
+        fm.thisdir.refilter()
         fm.thisdir.sort()
+        fm.ui.redraw_main_column()

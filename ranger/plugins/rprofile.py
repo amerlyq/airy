@@ -178,6 +178,7 @@ class rprofile(Command):
             )
             with open(report_path, "w") as report:
                 report.write(stream.getvalue())
+            self.fm.set_clipboard(report_path.encode("utf-8"))
             return self.fm.notify(f"rprofile: wrote {path} and {report_path}")
 
         if action == "report":

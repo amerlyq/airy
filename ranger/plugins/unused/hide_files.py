@@ -32,10 +32,9 @@ HIDE_FILES = [
 
 # Define a new one
 def custom_accept_file(file: FileSystemObject, filters: object) -> bool:
-    if not file.fm.settings.show_hidden and file.path in HIDE_FILES:
+    if file.path in HIDE_FILES and not file.fm.settings.show_hidden:
         return False
-    else:
-        return old_accept_file(file, filters)
+    return old_accept_file(file, filters)
 
 
 # Overwrite the old function

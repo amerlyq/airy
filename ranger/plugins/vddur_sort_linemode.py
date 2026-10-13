@@ -43,9 +43,9 @@ else:
     ## map on eval fm.thisdir.settings['sort'] = 'natural'; fm.thisdir.settings['sort_reverse'] = False; from ranger.container.fsobject import FileSystemObject; FileSystemObject.linemode_policies.pop(('path', fm.thisdir.path), None); fm.thisdir.unload(); fm.thisdir.load_content()
     # %ONELINE:
     # map od chain setlocal sort=duration;  setlocal sort_reverse=True; eval fm.execute_console(f"default_linemode path={fm.thisdir.path} duration"); linemode duration; filter_stack add duration
-    # map on chain setlocal sort=natural;  setlocal sort_reverse=False; eval fm.execute_console(f"default_linemode path={fm.thisdir.path} devicons"); filter_stack clear; linemode devicons
+    # map oD chain setlocal sort=natural;  setlocal sort_reverse=False; eval fm.execute_console(f"default_linemode path={fm.thisdir.path} devicons"); filter_stack clear; linemode devicons
     class view_duration(Command):
-        """:view_duration [off]
+        """:view_duration [on|off|toggle]
 
         on : sort by duration (reverse), linemode duration for cwd, filter duration pairs
         off: back to natural sort + devicons, clear filter_stack
@@ -53,13 +53,21 @@ else:
 
         def execute(self):
             fm = self.fm
+            mode = self.arg(1) or "toggle"
+            if mode not in ("on", "off", "toggle") or len(self.args) > 2:
+                return fm.notify("Usage: view_duration [on|off|toggle]", bad=True)
+            if mode == "toggle":
+                active = fm.thisdir.settings.sort == "duration" or any(
+                    isinstance(item, DurationFilter) for item in fm.thisdir.filter_stack
+                )
+                mode = "off" if active else "on"
             path = fm.thisdir.path
-            if self.arg(1) == "off":
+            if mode == "off":
                 commands = (
+                    "filter_stack clear",
                     "setlocal sort=natural",
                     "setlocal sort_reverse=False",
                     f"default_linemode path={path} devicons",  # FIXME: path is a regex, not escaped (as before)
-                    "filter_stack clear",
                     "linemode devicons",
                 )
             else:

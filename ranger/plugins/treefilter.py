@@ -95,9 +95,14 @@ _orig = getattr(Directory.refilter, '_orig', Directory.refilter)
 
 
 def _refilter(self):
+    # Keep Ranger's normal refilter path untouched until a treefilter applies.
+    # Inactive layers are common after searches in other tabs/directories.
+    applicable = _applicable(self.path)
+    if not applicable and not any(isinstance(f, _Session) for f in self.filter_stack):
+        return _orig(self)
     stack = self.filter_stack  # other entries (:filter_stack, ...) are kept
     stack[:] = [f for f in stack if not isinstance(f, _Session)]
-    stack.extend(_applicable(self.path))
+    stack.extend(applicable)
     _orig(self)
 
 
