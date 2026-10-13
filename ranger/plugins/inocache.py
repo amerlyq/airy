@@ -190,12 +190,12 @@ class Store:
     def get_many_records(self, sts) -> dict:
         """-> {key: (stored_mtime, stored_size, value)} for valid requested keys."""
         sts = list(sts)
-        need = [self._key(s) for s in sts if self._key(s) not in self._mem]
+        need = list(dict.fromkeys(self._key(s) for s in sts if self._key(s) not in self._mem))
         if need:
             try:
                 c = self._db()
-                for i in range(0, len(need), 500):
-                    part = need[i : i + 500]
+                for i in range(0, len(need), 900):
+                    part = need[i : i + 900]
                     q = f"SELECT k,mt,sz,blob FROM {self.table} WHERE k IN (%s)" % ",".join(
                         "?" * len(part)
                     )

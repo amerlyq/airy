@@ -311,6 +311,7 @@ stats = [0, 0]  # hits, misses (approximate under threads)
 _pending = 0
 _worker_new = None
 _duration_index_complete = None
+_duration_index_building = False
 
 
 def _duration_index_put(path, st, res, force=False):
@@ -320,6 +321,8 @@ def _duration_index_put(path, st, res, force=False):
     if _duration_index_complete is None:
         marker, found = _duration_store.get_with_status(_DURATION_INDEX_MARKER)
         _duration_index_complete = found and marker == 1
+    if not _duration_index_complete and not _duration_index_building:
+        return
     if _duration_index_complete and not force:
         return
     _duration_store.put(path, (st.st_ino, st.st_mtime_ns, st.st_size, res))
@@ -327,12 +330,13 @@ def _duration_index_put(path, st, res, force=False):
 
 def build_duration_index(roots):
     """Seed the path index once from vdprobe's existing inode cache."""
-    global _duration_index_complete
+    global _duration_index_complete, _duration_index_building
     marker, found = _duration_store.get_with_status(_DURATION_INDEX_MARKER)
     _duration_index_complete = found and marker == 1
     if _duration_index_complete:
         return
     _duration_store.flush_every = 1 << 60
+    _duration_index_building = True
     try:
         for root in roots:
             if os.path.isdir(root):
@@ -341,6 +345,7 @@ def build_duration_index(roots):
         _duration_store.put(_DURATION_INDEX_MARKER, 1)
         _duration_store.flush()
     finally:
+        _duration_index_building = False
         _duration_store.flush_every = inocache.FLUSH_EVERY
     _duration_index_complete = True
 
@@ -496,6 +501,26 @@ def many(paths):
     return {p: lookup(p, s)[0] for p, s in sts.items()}
 
 
+def _prime(paths):
+    """Batch-load persisted hits before a CLI resolve pass."""
+    stats_by_path = []
+    unique = {}
+    for path in paths:
+        try:
+            st = os.stat(path)
+        except OSError:
+            stats_by_path.append(None)
+            continue
+        stats_by_path.append(st)
+        if st.st_mode & 0o170000 == 0o100000 and st.st_ino not in _mem:
+            unique.setdefault(st.st_ino, st)
+    if unique:
+        records = _media_store.get_many_records(unique.values())
+        for ino in unique:
+            _mem[ino] = records.get(ino, _ABSENT)
+    return stats_by_path
+
+
 # ── CLI ───────────────────────────────────────────────────────────────────────
 def _level(t, out, subs):
     """one directory: files -> out, kept subdirs -> subs"""
@@ -617,7 +642,7 @@ def _parallel(paths, n):
     return res
 
 
-def resolve(paths, workers=WORKERS):
+def resolve(paths, workers=WORKERS, stated=None):
     """serial while it's cheap (warm cache = ~6us/file); fork only when it stops being"""
     out = []
     n = len(paths)
@@ -626,10 +651,15 @@ def resolve(paths, workers=WORKERS):
     while i < n:
         t = time.perf_counter()
         j = min(n, i + 256)
-        for p in paths[i:j]:
-            try:
-                s = stat(p)
-            except OSError:
+        for index, p in enumerate(paths[i:j], i):
+            if stated is not None:
+                s = stated[index]
+            else:
+                try:
+                    s = stat(p)
+                except OSError:
+                    s = None
+            if s is None:
                 out.append(None)
                 continue
             if s.st_mode & 0o170000 != 0o100000:
@@ -700,7 +730,8 @@ def main(argv):
         paths = [p for p in sys.stdin.read().split("\0" if nul else "\n") if p]
     else:
         paths = scan(root)
-    out = resolve(paths)
+    stated = _prime(paths)
+    out = resolve(paths, stated=stated)
     ndefer = len(_defer)
     by_path = {}
     for i, p in enumerate(paths):
