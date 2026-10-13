@@ -177,6 +177,8 @@ rargs=(\
   # --mount=type=bind,src=$HOME/.netrc,dst=/home/user/.netrc,ro=true
   # --mount=type=bind,src=$HOME/.docker/config.json,dst=/home/user/.docker/config.json,ro=true
 
+  --mount=type=bind,"src=/usr/lib/python3.14/site-packages/ranger,dst=/usr/lib/python3.14/site-packages/ranger,ro=true"
+
   # BAD: left as dangling mount
   #   $ sudo umount /var/lib/docker/volumes/airydev-data/_data/.config/opencode/opencode.jsonc
   #   BET? copy into volume

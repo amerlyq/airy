@@ -113,6 +113,13 @@ RUN --mount=type=cache,id=pacman-cache,target=/var/cache/pacman/pkg,sharing=lock
 EOF
 
 
+RUN --mount=type=cache,id=pacman-cache,target=/var/cache/pacman/pkg,sharing=locked \
+    --mount=type=cache,id=cargo-cache,target=${myhome:?}/.cargo,uid=${myuid:?},gid=${mygid:?},sharing=locked \
+<<"EOF"
+  sudo pacman -S --noconfirm --needed -- python python-pytest
+EOF
+
+
 # ALT:IDEA: get it from $PWD, as I run from /d/airy anyway
 # ADD --link https://github.com/amerlyq/airy.git /opt/airy
 
