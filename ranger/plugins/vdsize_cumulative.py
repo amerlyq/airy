@@ -27,7 +27,8 @@ LINEMODES
 ════════════════════════════════════════════════════════════════════════════════
 SORTING
 ────────────────────────────────────────────────────────────────────────────────
-  sort keys dc{file,all,video}: largest first; uncomputed entries sort to end (size 0).
+  sort keys dc{file,all,video}: largest first regardless of sort_reverse; uncomputed
+  entries sort to end (size 0).
   Activated by the sort argument; setlocal sort is applied to current dir.
   Restored by dcu.
   Restore order: setlocal (if original sort was local) → fallback to set.
@@ -696,7 +697,7 @@ class dcsize(Command):
         for f in dirs:
             f.linemode = name
         if "sort" in opts:
-            _set_local_sort(self.fm, d.path, name)
+            _set_local_sort(self.fm, d.path, name, reverse=False)
 
         def on_result(f, result):
             SIZES[mode][f.path] = result

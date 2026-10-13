@@ -243,7 +243,8 @@ class rprofile(Command):
                 with open(report_path, "w") as report:
                     report.write(text)
                 try:
-                    self.fm.set_clipboard(text.encode("utf-8"))
+                    # self.fm.set_clipboard(text.encode("utf-8"))
+                    self.fm.set_clipboard(report_path.encode("utf-8"))
                     copied = "; copied to clipboard"
                 except Exception:
                     copied = ""
