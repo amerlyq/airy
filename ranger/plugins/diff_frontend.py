@@ -17,6 +17,7 @@ from ranger.api.commands import Command
 #  ALT: embed comment into command, likewise 'map key cmd  # desc'
 #  ALT:TRY: filter-out '\s*#\s.*$' from ':df' arguments to simulate per-map comments
 ## USAGE:  :df [-FLAGS] CMD [ARGS...]   -- FLAGS = ranger `:shell` flags (w, p, ...)
+##   `%1` / `%2` substitute selected paths; absent placeholders append both.
 #   quantifier N (`3dfd`) = compare with tab number N, else next tab
 # map dfb df -w binwalk -WiU
 # map dfc df -w cmp -l
@@ -124,8 +125,13 @@ class df(Command):
         if fls[0].path == fls[1].path:
             return self._err("refuse to compare the same file")
 
-        # DEV: substitute python-like placeholders -> {}, {1}, {2}
-        cmd += [f.path + ("/" if f.is_directory else "") for f in fls]
+        paths = [f.path + ("/" if f.is_directory else "") for f in fls]
+        has_placeholders = any("%1" in arg or "%2" in arg for arg in cmd)
+        if has_placeholders:
+            # ALT: substitute python-like placeholders -> {}, {1}, {2}
+            cmd = [arg.replace("%1", paths[0]).replace("%2", paths[1]) for arg in cmd]
+        else:
+            cmd += paths
 
         if os.path.basename(cmd[0]) in VERDICT:
             lim = ""
