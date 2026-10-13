@@ -8,11 +8,97 @@
 
 from __future__ import annotations
 
+import os
 import re
+import threading
 from typing import cast
 
 from plugins.rutil import FilterableDirectory
 from ranger.api.commands import Command
+from ranger.container import directory as ranger_directory
+
+
+class _InodeTypeFilter:
+    def __init__(self, types: str) -> None:
+        self.types = types
+
+    def __call__(self, obj) -> bool:
+        return (
+            ("d" in self.types and obj.is_directory)
+            or ("f" in self.types and obj.is_file and not obj.is_link)
+            or ("l" in self.types and obj.is_link)
+        )
+
+    def __str__(self) -> str:
+        return "inode type: " + self.types
+
+
+_flat_context = threading.local()
+_walklevel = getattr(ranger_directory.walklevel, "_flat_inode_original", ranger_directory.walklevel)
+_load_bit_by_bit = getattr(
+    ranger_directory.Directory.load_bit_by_bit,
+    "_flat_inode_original",
+    ranger_directory.Directory.load_bit_by_bit,
+)
+
+
+def _filtered_walklevel(path, level):
+    context = getattr(_flat_context, "value", None)
+    if context is not None and path != context[0].path:
+        context = None
+    prune = context is not None and context[3]
+    if prune:
+        context[3] = False
+    for root, dirs, files in _walklevel(path, level):
+        if prune:
+            directory, visible_entries, hidden, _ = context
+            if root == directory.path and visible_entries is not None:
+                dirs[:] = [
+                    name for name in dirs
+                    if os.path.join(root, name) in visible_entries
+                ]
+                files[:] = [
+                    name for name in files
+                    if os.path.join(root, name) in visible_entries
+                ]
+            if hidden is not None:
+                dirs[:] = [
+                    name for name in dirs
+                    if not hidden.search(name)
+                ]
+        yield root, dirs, files
+
+
+def _filtered_load_bit_by_bit(self):
+    generator = _load_bit_by_bit(self)
+    if not self.flat or not getattr(self, "_flat_inode_active", False):
+        yield from generator
+        return
+    visible_entries = getattr(self, "_flat_inode_entries", None)
+    hidden = None
+    if not self.settings.show_hidden and self.settings.hidden_filter:
+        hidden = re.compile(self.settings.hidden_filter)
+    try:
+        item = next(generator)
+    except StopIteration:
+        return
+    yield item
+
+    _flat_context.value = [self, visible_entries, hidden, True]
+    try:
+        item = next(generator)
+    except StopIteration:
+        return
+    finally:
+        _flat_context.value = None
+    yield item
+    yield from generator
+
+
+ranger_directory.walklevel = _filtered_walklevel
+ranger_directory.Directory.load_bit_by_bit = _filtered_load_bit_by_bit
+_filtered_walklevel._flat_inode_original = _walklevel
+_filtered_load_bit_by_bit._flat_inode_original = _load_bit_by_bit
 
 # HACK:FIXME: wide icons (OR: narrow font)
 # os.environ["RANGER_DEVICONS_SEPARATOR"]="  "
@@ -26,7 +112,7 @@ from ranger.api.commands import Command
 
 
 class flat_inode(Command):
-    """:flat_inode [-t] [<[fdl]>] [<level>]
+    """:flat_inode [-t] [<[dflu]>] [<level>]
 
     Set/Toggle inode flattened view
         <quantifier> augments missing argument: level or [fdl] bitmask
@@ -56,15 +142,44 @@ class flat_inode(Command):
             t = self.arg(1)
             q = self.arg(2) or self.q_flat(self.quantifier)
 
-        if toggle and q == self.fm.thisdir.flat and self.fm.thisdir.inode_type_filter:
+        try:
+            q = int(q)
+        except (TypeError, ValueError):
+            return self.fm.notify("flat_inode: level must be an integer", bad=True)
+        if "u" in t:
             t, q = "", 0
 
-        self.fm.notify(self.fm.thisdir.inode_type_filter)
-        cmd = "chain filter_inode_type " + t + "; flat " + str(q)
-        self.fm.execute_console(cmd)
+        directory = self.fm.thisdir
+        if directory.files_all is None or directory.files is None:
+            previous_flat = directory.flat
+            if directory.loading:
+                directory.unload()
+            directory.flat = 0
+            try:
+                directory.load_content(schedule=False)
+            finally:
+                directory.flat = previous_flat
+            if directory.files_all is None or directory.files is None:
+                return self.fm.notify("flat_inode: directory contents unavailable", bad=True)
+        directory.refilter()
+        prefiltered_entries = getattr(directory, "_flat_inode_entries", None)
+        if prefiltered_entries is None:
+            prefiltered_entries = {item.path for item in directory.files}
+        current = next((f for f in directory.filter_stack if isinstance(f, _InodeTypeFilter)), None)
+        if toggle and q == directory.flat and current:
+            t, q = "", 0
+
+        directory.filter_stack[:] = [f for f in directory.filter_stack if not isinstance(f, _InodeTypeFilter)]
+        if t:
+            directory.filter_stack.append(_InodeTypeFilter(t))
+        directory.inode_type_filter = None
+        directory._flat_inode_active = q != 0
+        directory._flat_inode_entries = prefiltered_entries if q != 0 else None
+        directory.refilter()
+        self.fm.execute_console("flat " + str(q))
 
     def tab(self, tabnum: int) -> list[str]:  # pyright: ignore[reportIncompatibleMethodOverride]
-        return ["flat_inode " + t for t in "dfl"]
+        return ["flat_inode " + t for t in "dflu"]
 
 
 class unfilter(Command):
