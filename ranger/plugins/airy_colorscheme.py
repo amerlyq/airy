@@ -1,9 +1,15 @@
 import os
+import re
 from enum import Enum, auto
 
 import ranger.gui.context as ctx
 import ranger.gui.widgets.browsercolumn as B
 from ranger.container.fsobject import FileSystemObject
+
+try:
+    from plugins import vdconf
+except ImportError:
+    import vdconf
 
 
 class CustomKeys(Enum):
@@ -11,6 +17,8 @@ class CustomKeys(Enum):
     link_link = auto()
     link_annex = auto()
     ext_nou = auto()
+    clip_suffix = auto()
+    clip_v32 = auto()
     wf_log = auto()
     wf_todo = auto()
     wf_ref = auto()
@@ -25,12 +33,22 @@ for key in CustomKeys:
 
 
 OLD_HOOK_BEFORE_DRAWING = B.hook_before_drawing
+_CLIP_SUFFIX_RE = re.compile(r"_(?:" + vdconf.CLIP_SUFFIX + r")$")
+_V32_RE = re.compile(r"(?:^|_)v32(?:_|$)")
 
 
 def new_hook_before_drawing(
     fsobj: FileSystemObject, color_list: list[str]
 ) -> list[str]:
     nm = fsobj.basename
+    if fsobj.is_file and fsobj.video:
+        stem = os.path.splitext(nm)[0]
+        if _CLIP_SUFFIX_RE.search(stem):
+            color_list.append(
+                CustomKeys.clip_v32.name
+                if _V32_RE.search(stem)
+                else CustomKeys.clip_suffix.name
+            )
     if fsobj.is_link:
         try:
             dst = os.readlink(fsobj.path)

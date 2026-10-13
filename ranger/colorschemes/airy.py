@@ -34,7 +34,11 @@ class Scheme(Solarized):
         if ctx.link:
             return fg, bg, attr
 
-        if ctx.ext_nou:
+        if ctx.clip_v32:
+            fg = 208
+        elif ctx.clip_suffix:
+            fg = 94
+        elif ctx.ext_nou:
             fg = 187  # OR: 22 28 BET?=30 31 174
         elif ctx.wf_log:
             fg = 98
