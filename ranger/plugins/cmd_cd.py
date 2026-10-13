@@ -195,8 +195,6 @@ class cd_samedur(Command):
     tolerances: ClassVar[tuple[int, ...]] = (200, 500, 1000, 4000)
 
     def execute(self) -> None:
-        from subprocess import CalledProcessError, check_output
-
         try:
             from plugins import vdconf, vdprobe, vdsym
         except ImportError:
@@ -220,23 +218,12 @@ class cd_samedur(Command):
         if source is None:
             return self.fm.notify(f"No duration available for {f.basename}.", bad=True)
 
+        target_ms = source[0]
         roots = [root for root in vdsym.vdsym.roots() if fs.isdir(root)]
         if not roots:
             return self.fm.notify("No VD cache roots are available.", bad=True)
-        try:
-            out = check_output(
-                ["find", *roots, "(", "-type", "f", "-o", "-type", "l", ")", "-print"],
-                text=True,
-            )
-        except CalledProcessError as e:
-            return self.fm.notify(f"cd_samedur: {e}", bad=True)
-        durations = vdprobe.many(out.splitlines())
-        target_ms = source[0]
-        matches = [
-            path
-            for path, result in durations.items()
-            if result is not None and abs(result[0] - target_ms) <= tolerance
-        ]
+        vdprobe.build_duration_index(roots)
+        matches = vdprobe.duration_matches(target_ms, tolerance)
         if not matches:
             return self.fm.notify(
                 f"No same-duration files within ±{tolerance} ms.", duration=2

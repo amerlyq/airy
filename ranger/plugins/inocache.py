@@ -14,6 +14,7 @@ and its own validity rule:
   s.get(st)            -> value | None        st = os.stat() result (or a path for "path" stores)
   s.get_many(sts)      -> {key: value}        ONE sql query per 500 keys
   s.put(st, value)     value: anything marshal can dump (tuple/list/dict/str/int/None)
+  optional range_index(value) adds an integer index; query_range(lo, hi) returns indexed rows
   s.flush()            persist pending rows (also atexit, and every FLUSH_EVERY puts)
 
 Memo + pending rows live in-process; sqlite connections are per thread; fork drops them.
@@ -54,9 +55,11 @@ class Store:
         version: int = 1,
         validate: str = "file",
         root: str | None = None,
+        range_index=None,
     ) -> None:
         assert validate in ("file", "dir", "none", "path"), validate
         self.name, self.version, self.validate = name, version, validate
+        self.range_index = range_index
         self.path = os.path.join(root or ROOT, name + ".sqlite3")
         self.flush_every = FLUSH_EVERY
         self._mem: dict = {}  # key -> (mt, sz, value) | _MISS marker tuple
@@ -95,16 +98,23 @@ class Store:
             except sqlite3.Error:
                 pass
             c.execute("PRAGMA synchronous=NORMAL")
-            want = crc32(f"{self.version}:{self.validate}".encode()) & 0x7FFFFFFF
+            schema = f"{self.version}:{self.validate}"
+            if self.range_index:
+                schema += ":range"
+            want = crc32(schema.encode()) & 0x7FFFFFFF
             kt = "TEXT" if self.validate == "path" else "INTEGER"
             with self._slock:
                 if c.execute("PRAGMA user_version").fetchone()[0] != want:
                     c.execute("BEGIN IMMEDIATE")
                     if c.execute("PRAGMA user_version").fetchone()[0] != want:  # raced?
                         c.execute("DROP TABLE IF EXISTS v")
-                        c.execute(
-                            f"CREATE TABLE v(k {kt} PRIMARY KEY, mt INTEGER, sz INTEGER, blob BLOB)"
-                        )
+                        columns = "k %s PRIMARY KEY, mt INTEGER, sz INTEGER" % kt
+                        if self.range_index:
+                            columns += ", idx INTEGER"
+                        columns += ", blob BLOB"
+                        c.execute(f"CREATE TABLE v({columns})")
+                        if self.range_index:
+                            c.execute("CREATE INDEX v_idx ON v(idx)")
                         c.execute(f"PRAGMA user_version={want}")
                     c.execute("COMMIT")
             self._tl.c = c
@@ -177,6 +187,23 @@ class Store:
                 out[self._key(s)] = row
         return out
 
+    def query_range(self, low: int, high: int) -> dict:
+        """-> {key: (mt, sz, value)} for values whose configured integer index is in range."""
+        if self.range_index is None:
+            raise ValueError("query_range requires range_index")
+        try:
+            rows = self._db().execute(
+                "SELECT k,mt,sz,blob FROM v WHERE idx BETWEEN ? AND ?", (low, high)
+            )
+            out = {}
+            for key, mt, sz, blob in rows:
+                row = (mt, sz, marshal.loads(blob))
+                self._mem[key] = row
+                out[key] = row
+            return out
+        except sqlite3.Error:
+            return {}
+
     def put(self, st, value) -> None:
         key = self._key(st)
         mt, sz = self._stamp(st)
@@ -191,21 +218,32 @@ class Store:
         with self._lock:
             if not self._new:
                 return
-            rows = [(k, r[0], r[1], marshal.dumps(r[2])) for k, r in self._new.items()]
+            if self.range_index:
+                rows = [
+                    (k, r[0], r[1], self.range_index(r[2]), marshal.dumps(r[2]))
+                    for k, r in self._new.items()
+                ]
+            else:
+                rows = [(k, r[0], r[1], marshal.dumps(r[2])) for k, r in self._new.items()]
             self._new.clear()
         try:
             with self._wlock:
                 c = self._db()
                 c.execute("BEGIN IMMEDIATE")
                 try:
-                    c.executemany("INSERT OR REPLACE INTO v VALUES (?,?,?,?)", rows)
+                    placeholders = "?,?,?,?,?" if self.range_index else "?,?,?,?"
+                    c.executemany(
+                        f"INSERT OR REPLACE INTO v VALUES ({placeholders})", rows
+                    )
                     c.execute("COMMIT")
                 except BaseException:
                     c.execute("ROLLBACK")
                     raise
         except Exception:  # locked / disk full: keep for the next flush
             with self._lock:
-                for k, mt, sz, blob in rows:
+                for row in rows:
+                    k, mt, sz = row[:3]
+                    blob = row[-1]
                     self._new.setdefault(k, (mt, sz, marshal.loads(blob)))
 
     def _after_fork(self) -> None:

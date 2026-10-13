@@ -281,6 +281,24 @@ _media_store = inocache.Store(
     root=_STORE_ROOT,
 )
 _dir_store = inocache.Store("vdprobe-dirs", version=1, validate="dir", root=_STORE_ROOT)
+
+
+def _duration_index_key(value):
+    return (
+        value[3][0]
+        if isinstance(value, tuple) and len(value) == 4 and value[3]
+        else None
+    )
+
+
+_duration_store = inocache.Store(
+    "duration-paths",
+    version=1,
+    validate="path",
+    root=_STORE_ROOT,
+    range_index=_duration_index_key,
+)
+_DURATION_INDEX_MARKER = "\0vdprobe-duration-index-complete"
 _ABSENT = (0, -1, None)  # never matches a real file (size >= 0): "known not in db"
 _mem = {}  # ino -> (mtime_ns, size, res)       process memo, validated on every use
 _defer = None  # CLI: list collecting files for one batched mediainfo call
@@ -289,9 +307,61 @@ _dstats = {}
 stats = [0, 0]  # hits, misses (approximate under threads)
 _pending = 0
 _worker_new = None
+_duration_index_complete = None
 
 
-def _put(ino, mt, sz, res, st=None):
+def _duration_index_put(path, st, res, force=False):
+    global _duration_index_complete
+    if path is None or not res:
+        return
+    if _duration_index_complete is None:
+        marker, found = _duration_store.get_with_status(_DURATION_INDEX_MARKER)
+        _duration_index_complete = found and marker == 1
+    if _duration_index_complete and not force:
+        return
+    _duration_store.put(path, (st.st_ino, st.st_mtime_ns, st.st_size, res))
+
+
+def build_duration_index(roots):
+    """Seed the path index once from vdprobe's existing inode cache."""
+    global _duration_index_complete
+    marker, found = _duration_store.get_with_status(_DURATION_INDEX_MARKER)
+    _duration_index_complete = found and marker == 1
+    if _duration_index_complete:
+        return
+    _duration_store.flush_every = 1 << 60
+    try:
+        for root in roots:
+            if os.path.isdir(root):
+                paths = scan(root)
+                resolve(paths)
+        _duration_store.put(_DURATION_INDEX_MARKER, 1)
+        _duration_store.flush()
+    finally:
+        _duration_store.flush_every = inocache.FLUSH_EVERY
+    _duration_index_complete = True
+
+
+def duration_matches(ms, tolerance):
+    """Return cached media paths within +/- tolerance, validating only indexed candidates."""
+    rows = _duration_store.query_range(ms - tolerance, ms + tolerance)
+    matches = []
+    for path, (_, _, value) in rows.items():
+        ino, mt, sz, cached = value
+        try:
+            st = os.stat(path)
+        except OSError:
+            _duration_store.put(path, None)
+            continue
+        res = info(path, st)
+        if res is not None:
+            _duration_index_put(path, st, res, force=True)
+        if res is not None and abs(res[0] - ms) <= tolerance:
+            matches.append(path)
+    return matches
+
+
+def _put(ino, mt, sz, res, st=None, path=None):
     global _pending
     _mem[ino] = (mt, sz, res)
     if st is not None:
@@ -299,6 +369,7 @@ def _put(ino, mt, sz, res, st=None):
             _worker_new[ino] = (mt, sz, res)
         else:
             _media_store.put(st, res)
+            _duration_index_put(path, st, res, force=True)
             _pending += 1
             if _pending >= FLUSH_EVERY:
                 flush()
@@ -317,6 +388,7 @@ def flush():
     global _pending
     _media_store.flush()
     _dir_store.flush()
+    _duration_store.flush()
     _pending = 0
 
 
@@ -341,6 +413,7 @@ def lookup(path, st=None):
         r = _mem[ino] = (mt, sz, value) if found else _ABSENT
     if r is not None and r[0] == mt and r[1] == sz:
         stats[0] += 1
+        _duration_index_put(path, st, r[2])
         return r[2], True
     stats[1] += 1
     res = probe_path(path)
@@ -352,7 +425,7 @@ def lookup(path, st=None):
         if res is False:  # no pymediainfo / failed: remember for this session only
             _mem[ino] = (mt, sz, None)
             return None, False
-    _put(ino, mt, sz, res, st)
+    _put(ino, mt, sz, res, st, path)
     return res, False
 
 
@@ -476,6 +549,7 @@ def _parallel(paths, n):
                 out = [lookup(p)[0] for p in chunk]
                 with os.fdopen(w, "wb") as f:
                     f.write(marshal.dumps((out, _worker_new, _defer)))
+                _duration_store.flush()
             except BaseException:
                 import traceback
 
@@ -495,16 +569,20 @@ def _parallel(paths, n):
         res.extend(out)
         chunk = paths[worker_index * step : (worker_index + 1) * step]
         stats_by_key = {}
+        path_by_key = {}
         for path in chunk:
             try:
                 st = os.stat(path)
             except OSError:
                 continue
-            stats_by_key[(st.st_ino, st.st_mtime_ns, st.st_size)] = st
+            key = (st.st_ino, st.st_mtime_ns, st.st_size)
+            stats_by_key[key] = st
+            path_by_key[key] = path
         for ino, (mt, sz, value) in new.items():
-            st = stats_by_key.get((ino, mt, sz))
+            key = (ino, mt, sz)
+            st = stats_by_key.get(key)
             if st is not None:
-                _put(ino, mt, sz, value, st)
+                _put(ino, mt, sz, value, st, path_by_key[key])
         if library_mode:
             library_deferred.extend(dfr)
         else:
@@ -528,7 +606,7 @@ def _parallel(paths, n):
                     result = None
                     _mem[ino] = (mt, sz, None)
                 else:
-                    _put(ino, mt, sz, result, st)
+                    _put(ino, mt, sz, result, st, path)
                 got[path] = result
         for path, result in got.items():
             for i in positions.get(path, ()):
@@ -556,6 +634,7 @@ def resolve(paths, workers=WORKERS):
                 continue
             r = get(s.st_ino)
             if r is not None and r[0] == s.st_mtime_ns and r[1] == s.st_size:
+                _duration_index_put(p, s, r[2])
                 out.append(r[2])
             else:
                 out.append(lookup(p, s)[0])
@@ -593,7 +672,7 @@ def _mediainfo_batch(items):
                 continue
             if (st.st_ino, st.st_mtime_ns, st.st_size) != it[1:]:
                 continue
-            _put(it[1], it[2], it[3], res, st)
+            _put(it[1], it[2], it[3], res, st, it[0])
             got.append((it[0], res))
     return got
 
