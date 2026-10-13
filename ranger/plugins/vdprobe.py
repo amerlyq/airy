@@ -274,13 +274,16 @@ def _mediainfo_one(path):
 # ── cache ─────────────────────────────────────────────────────────────────────
 _CACHE_ROOT = os.environ.get("VDPROBE_CACHE_ROOT") or "/cache/irome_db"
 _STORE_ROOT = os.path.join(_CACHE_ROOT, "stores")
+_STORE_DB = os.path.join(_STORE_ROOT, "vdprobe.sqlite3")
 _media_store = inocache.Store(
     "mediainfo",
     version=VERSION + (1 if ALL_VIDEO else 0) + (1 if WEBP_ANIM else 0),
     validate="file",
-    root=_STORE_ROOT,
+    database=_STORE_DB,
 )
-_dir_store = inocache.Store("vdprobe-dirs", version=1, validate="dir", root=_STORE_ROOT)
+_dir_store = inocache.Store(
+    "vdprobe-dirs", version=1, validate="dir", database=_STORE_DB
+)
 
 
 def _duration_index_key(value):
@@ -295,7 +298,7 @@ _duration_store = inocache.Store(
     "duration-paths",
     version=1,
     validate="path",
-    root=_STORE_ROOT,
+    database=_STORE_DB,
     range_index=_duration_index_key,
 )
 _DURATION_INDEX_MARKER = "\0vdprobe-duration-index-complete"

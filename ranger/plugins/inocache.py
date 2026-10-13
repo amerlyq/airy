@@ -1,9 +1,8 @@
-"""inocache: vdprobe's cache scheme as a reusable store; ONE store = ONE sqlite file.
+"""inocache: reusable SQLite stores with independent schemas and validity rules.
 
 Distinct caches (mediainfo, diskinfo, fpcalc, tags, visited...) must not share a schema or a
-version: bumping fpcalc's parser must not drop 300k mediainfo rows.  So each Store owns
-`<ROOT>/<name>.sqlite3`, its own VERSION (-> PRAGMA user_version; mismatch = table recreated)
-and its own validity rule:
+version: bumping fpcalc's parser must not drop 300k mediainfo rows. Stores can use separate files
+or separate tables in one shared database. Each table owns its VERSION and validity rule:
 
   validate="file"   key = inode, row valid while (mtime_ns, size) match   (mediainfo, fpcalc, diskinfo)
   validate="dir"    key = inode, row valid while mtime_ns matches          (directory aggregates)
@@ -19,17 +18,11 @@ and its own validity rule:
 
 Memo + pending rows live in-process; sqlite connections are per thread; fork drops them.
 Best-effort: any sqlite error degrades to a miss, never an exception into ranger.
-ALT: vdprobe.py keeps its own copy of this machinery (+ CLI, forked probing, dir table `d`).
-     benefit: untouched, proven on real data; migrate later by giving it Store("mediainfo", ...)
-     and keeping the schema (ino, mt, sz, dur, codec) as a Store subclass.
-EXTEND: another validity rule -> add a branch in Store._ok and _key (e.g. "mtime" for sidecars).
+EXTEND: another validity rule -> add a branch in Store._stamp and _key.
 """
 
-# WIP:
-# - `inocache.Store(name, version, validate)` gives one sqlite file per cache, each with its own version bump.
-# - Validation modes are `file`, `dir`, `none` (for user tags) and `path` (for visited).
-# - `vdprobe.py` is deliberately untouched; migrating it onto Store is a later step.
-# - `visited` is still an in-memory set in `vdsym.py`, so persisting it would be a behavior change.
+# Stores default to separate sqlite files.
+# Related stores can share a database while retaining independent tables and versions.
 
 from __future__ import annotations
 
@@ -56,11 +49,19 @@ class Store:
         validate: str = "file",
         root: str | None = None,
         range_index=None,
+        database: str | None = None,
     ) -> None:
         assert validate in ("file", "dir", "none", "path"), validate
         self.name, self.version, self.validate = name, version, validate
         self.range_index = range_index
-        self.path = os.path.join(root or ROOT, name + ".sqlite3")
+        self.shared_database = database is not None
+        self.path = database or os.path.join(root or ROOT, name + ".sqlite3")
+        safe_name = "".join(ch if ch.isalnum() or ch == "_" else "_" for ch in name)
+        self.table = (
+            f"s_{safe_name}_{crc32(name.encode()) & 0xFFFFFFFF:08x}"
+            if self.shared_database
+            else "v"
+        )
         self.flush_every = FLUSH_EVERY
         self._mem: dict = {}  # key -> (mt, sz, value) | _MISS marker tuple
         self._new: dict = {}
@@ -91,7 +92,7 @@ class Store:
     def _db(self) -> sqlite3.Connection:
         c = getattr(self._tl, "c", None)
         if c is None:
-            os.makedirs(os.path.dirname(self.path), exist_ok=True)
+            os.makedirs(os.path.dirname(self.path) or ".", exist_ok=True)
             c = sqlite3.connect(self.path, timeout=10, isolation_level=None)
             try:
                 c.execute("PRAGMA journal_mode=WAL")
@@ -104,17 +105,43 @@ class Store:
             want = crc32(schema.encode()) & 0x7FFFFFFF
             kt = "TEXT" if self.validate == "path" else "INTEGER"
             with self._slock:
-                if c.execute("PRAGMA user_version").fetchone()[0] != want:
+                if self.shared_database:
+                    c.execute(
+                        "CREATE TABLE IF NOT EXISTS inocache_schema "
+                        "(name TEXT PRIMARY KEY, version INTEGER NOT NULL)"
+                    )
+                    c.execute("BEGIN IMMEDIATE")
+                    row = c.execute(
+                        "SELECT version FROM inocache_schema WHERE name=?",
+                        (self.name,),
+                    ).fetchone()
+                    if row is None or row[0] != want:
+                        c.execute(f"DROP TABLE IF EXISTS {self.table}")
+                        columns = f"k {kt} PRIMARY KEY, mt INTEGER, sz INTEGER"
+                        if self.range_index:
+                            columns += ", idx INTEGER"
+                        columns += ", blob BLOB"
+                        c.execute(f"CREATE TABLE {self.table}({columns})")
+                        if self.range_index:
+                            c.execute(
+                                f"CREATE INDEX {self.table}_idx ON {self.table}(idx)"
+                            )
+                        c.execute(
+                            "INSERT OR REPLACE INTO inocache_schema VALUES (?,?)",
+                            (self.name, want),
+                        )
+                    c.execute("COMMIT")
+                elif c.execute("PRAGMA user_version").fetchone()[0] != want:
                     c.execute("BEGIN IMMEDIATE")
                     if c.execute("PRAGMA user_version").fetchone()[0] != want:  # raced?
-                        c.execute("DROP TABLE IF EXISTS v")
+                        c.execute(f"DROP TABLE IF EXISTS {self.table}")
                         columns = "k %s PRIMARY KEY, mt INTEGER, sz INTEGER" % kt
                         if self.range_index:
                             columns += ", idx INTEGER"
                         columns += ", blob BLOB"
-                        c.execute(f"CREATE TABLE v({columns})")
+                        c.execute(f"CREATE TABLE {self.table}({columns})")
                         if self.range_index:
-                            c.execute("CREATE INDEX v_idx ON v(idx)")
+                            c.execute(f"CREATE INDEX {self.table}_idx ON {self.table}(idx)")
                         c.execute(f"PRAGMA user_version={want}")
                     c.execute("COMMIT")
             self._tl.c = c
@@ -132,8 +159,9 @@ class Store:
         if row is None:
             try:
                 r = (
-                    self._db()
-                    .execute("SELECT mt,sz,blob FROM v WHERE k=?", (key,))
+                    self._db().execute(
+                        f"SELECT mt,sz,blob FROM {self.table} WHERE k=?", (key,)
+                    )
                     .fetchone()
                 )
             except sqlite3.Error:
@@ -168,7 +196,7 @@ class Store:
                 c = self._db()
                 for i in range(0, len(need), 500):
                     part = need[i : i + 500]
-                    q = "SELECT k,mt,sz,blob FROM v WHERE k IN (%s)" % ",".join(
+                    q = f"SELECT k,mt,sz,blob FROM {self.table} WHERE k IN (%s)" % ",".join(
                         "?" * len(part)
                     )
                     for k, mt, sz, blob in c.execute(q, part):
@@ -193,7 +221,8 @@ class Store:
             raise ValueError("query_range requires range_index")
         try:
             rows = self._db().execute(
-                "SELECT k,mt,sz,blob FROM v WHERE idx BETWEEN ? AND ?", (low, high)
+                f"SELECT k,mt,sz,blob FROM {self.table} WHERE idx BETWEEN ? AND ?",
+                (low, high),
             )
             out = {}
             for key, mt, sz, blob in rows:
@@ -233,7 +262,7 @@ class Store:
                 try:
                     placeholders = "?,?,?,?,?" if self.range_index else "?,?,?,?"
                     c.executemany(
-                        f"INSERT OR REPLACE INTO v VALUES ({placeholders})", rows
+                        f"INSERT OR REPLACE INTO {self.table} VALUES ({placeholders})", rows
                     )
                     c.execute("COMMIT")
                 except BaseException:
