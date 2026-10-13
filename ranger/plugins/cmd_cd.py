@@ -158,10 +158,8 @@ class cda(Command):
             self.fm.select_file(path)
 
 
-# [_] TODO:ENH: make :cd_samedur use vdprobe db and make dashboard for ±200ms
-# [_] ALSO: allow 1-4 count to pick 1s..4s bidir span (to include -ph prolog)
 # %ONELINE: map cz eval import subprocess; lines = subprocess.check_output(f"find /t/samedur0 -name '*／{fm.thisfile.basename}' -print", shell=True, text=True).splitlines(); fm.select_file(lines[0]) if lines else fm.notify("No /t/samedur0/ name found.")
-class cd_samedur(Command):
+class cd_samedur_ji(Command):
     """:cd_samedur
 
     Select first /t/samedur0/**/*／<basename of cursor file>  (U+FF0F in the name = flattened path separator).
@@ -186,3 +184,62 @@ class cd_samedur(Command):
             self.fm.select_file(lines[0])
         else:
             self.fm.notify("No /t/samedur0/ name found.")
+
+
+class cd_samedur(Command):
+    """:cd_samedur — dashboard files within duration tolerance across VD cache
+
+    Count 1–4 selects ±200/500/1000/4000 ms; larger counts use ±200 ms.
+    """
+
+    tolerances: ClassVar[tuple[int, ...]] = (200, 500, 1000, 4000)
+
+    def execute(self) -> None:
+        from subprocess import CalledProcessError, check_output
+
+        try:
+            from plugins import vdconf, vdprobe, vdsym
+        except ImportError:
+            import vdconf
+            import vdprobe
+            import vdsym
+
+        f = self.fm.thisfile
+        if f is None:
+            return
+        count = self.quantifier or 1
+        tolerance = (
+            self.tolerances[count - 1]
+            if 1 <= count <= len(self.tolerances)
+            else self.tolerances[0]
+        )
+        try:
+            source = vdprobe.info(f.path, os.stat(f.path))
+        except OSError:
+            source = None
+        if source is None:
+            return self.fm.notify(f"No duration available for {f.basename}.", bad=True)
+
+        roots = [root for root in vdsym.vdsym.roots() if fs.isdir(root)]
+        if not roots:
+            return self.fm.notify("No VD cache roots are available.", bad=True)
+        try:
+            out = check_output(
+                ["find", *roots, "(", "-type", "f", "-o", "-type", "l", ")", "-print"],
+                text=True,
+            )
+        except CalledProcessError as e:
+            return self.fm.notify(f"cd_samedur: {e}", bad=True)
+        durations = vdprobe.many(out.splitlines())
+        target_ms = source[0]
+        matches = [
+            path
+            for path, result in durations.items()
+            if result is not None and abs(result[0] - target_ms) <= tolerance
+        ]
+        if not matches:
+            return self.fm.notify(
+                f"No same-duration files within ±{tolerance} ms.", duration=2
+            )
+        dest = fs.join(vdconf.DASHBOARD_ROOT, "samedur", str(tolerance), f.basename)
+        vdsym.make_dashboard(self.fm, matches, dest)
