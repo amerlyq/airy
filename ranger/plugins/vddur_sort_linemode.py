@@ -72,6 +72,9 @@ else:
                 )
             for command in commands:
                 fm.execute_console(command)
+            fm.thisdir.refilter()
+            fm.thisdir.sort()
+            fm.ui.redraw_main_column()
 
     @register_linemode
     class DurationLinemode(LinemodeBase):
