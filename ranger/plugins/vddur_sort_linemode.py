@@ -11,6 +11,8 @@ try:
     from ranger.core.filter_stack import stack_filter
     from ranger.core.linemode import DEFAULT_LINEMODE, LinemodeBase
     from ranger.core.shared import FileManagerAware
+    import ranger.gui.context as gui_context
+    import ranger.gui.widgets.browsercolumn as browsercolumn
 except Exception:
     pass
 else:
@@ -45,17 +47,23 @@ else:
     # map od chain setlocal sort=duration;  setlocal sort_reverse=True; eval fm.execute_console(f"default_linemode path={fm.thisdir.path} duration"); linemode duration; filter_stack add duration
     # map oD chain setlocal sort=natural;  setlocal sort_reverse=False; eval fm.execute_console(f"default_linemode path={fm.thisdir.path} devicons"); filter_stack clear; linemode devicons
     class view_duration(Command):
-        """:view_duration [on|off|toggle]
+        """:view_duration [on|off|toggle] [grayout]
 
-        on : sort by duration (reverse), linemode duration for cwd, filter duration pairs
+        on : sort by duration (reverse), use duration linemode, filter duration pairs
+        grayout: keep unpaired files visible in dim gray
         off: back to natural sort + devicons, clear filter_stack
         """
 
         def execute(self):
             fm = self.fm
             mode = self.arg(1) or "toggle"
-            if mode not in ("on", "off", "toggle") or len(self.args) > 2:
-                return fm.notify("Usage: view_duration [on|off|toggle]", bad=True)
+            grayout = len(self.args) > 2 and self.arg(2) == "grayout"
+            if (
+                mode not in ("on", "off", "toggle")
+                or len(self.args) > 3
+                or (len(self.args) > 2 and not grayout)
+            ):
+                return fm.notify("Usage: view_duration [on|off|toggle] [grayout]", bad=True)
             if mode == "toggle":
                 active = fm.thisdir.settings.sort == "duration" or any(
                     isinstance(item, DurationFilter) for item in fm.thisdir.filter_stack
@@ -76,10 +84,15 @@ else:
                     "setlocal sort_reverse=True",
                     f"default_linemode path={path} duration",
                     "linemode duration",
-                    "filter_stack add duration",
                 )
             for command in commands:
                 fm.execute_console(command)
+            if mode == "on":
+                fm.thisdir.filter_stack[:] = [
+                    item for item in fm.thisdir.filter_stack
+                    if not isinstance(item, DurationFilter)
+                ]
+                fm.thisdir.filter_stack.append(DurationFilter("", grayout=grayout))
             fm.thisdir.refilter()
             fm.thisdir.sort()
             fm.ui.redraw_main_column()
@@ -130,8 +143,9 @@ else:
 
     @stack_filter("duration")
     class DurationFilter(FileManagerAware):
-        def __init__(self, arg):
+        def __init__(self, arg, grayout=False):
             self.tol = int(arg) if arg else 500
+            self.grayout = grayout
             self._cache = {}  # dirpath -> (len(files_all), set(paired paths))
 
         def _scan(self, files):
@@ -149,15 +163,47 @@ else:
                     out.add(p)
             return out
 
-        def __call__(self, f):
-            if f.is_directory:
-                return True
-            d = os.path.dirname(f.path)
+        def paired(self, directory, f):
+            d = directory.path
             files = self.fm.get_directory(d).files_all or []
             hit = self._cache.get(d)
             if hit is None or hit[0] != len(files):  # rescan if listing changed
                 hit = self._cache[d] = (len(files), self._scan(files))
             return f.path in hit[1]
 
+        def __call__(self, f):
+            if f.is_directory:
+                return True
+            directory = self.fm.get_directory(os.path.dirname(f.path))
+            return self.paired(directory, f) or self.grayout
+
         def __str__(self):
-            return f"<Filter: duration pairs ±{self.tol}ms>"
+            suffix = "; unpaired dim" if self.grayout else ""
+            return f"<Filter: duration pairs ±{self.tol}ms{suffix}>"
+
+    if "duration_unpaired" not in gui_context.CONTEXT_KEYS:
+        gui_context.CONTEXT_KEYS.append("duration_unpaired")
+    setattr(gui_context.Context, "duration_unpaired", False)
+    _old_hook_before_drawing = getattr(
+        browsercolumn.hook_before_drawing,
+        "_duration_original",
+        browsercolumn.hook_before_drawing,
+    )
+
+    def _duration_color_hook(fsobj, colors):
+        fsobj, colors = _old_hook_before_drawing(fsobj, colors)
+        if fsobj.is_file:
+            directory = FileManagerAware.fm.thisdir
+            if os.path.dirname(fsobj.path) == directory.path:
+                for item in directory.filter_stack:
+                    if (
+                        isinstance(item, DurationFilter)
+                        and item.grayout
+                        and not item.paired(directory, fsobj)
+                    ):
+                        colors.append("duration_unpaired")
+                        break
+        return fsobj, colors
+
+    browsercolumn.hook_before_drawing = _duration_color_hook
+    _duration_color_hook._duration_original = _old_hook_before_drawing

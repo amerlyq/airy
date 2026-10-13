@@ -24,6 +24,9 @@ class Scheme(Solarized):
         if ctx.inactive_pane:  # or ctx.marked
             return fg, bg, attr
 
+        if ctx.duration_unpaired:
+            return 244, bg, attr | curses.A_DIM
+
         if ctx.link_link:
             return 31, bg, attr
         if ctx.link_annex:
