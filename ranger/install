@@ -43,6 +43,8 @@ if distro arch; then
   pkg_inst perl-image-exiftool
   # aur_inst wav2png-git'
 
+  pkg_inst trash-cli  # :trash ... (safe :delete)
+
 else
   pkg_build() { sudo python3 setup.py install; }
   git_inst 'hut/ranger'  # 'amerlyq/ranger'

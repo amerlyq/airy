@@ -21,6 +21,7 @@ from typing import NamedTuple
 
 from ranger.config.commands import delete as _default_delete
 from ranger.config.commands import rename as _default_rename
+from ranger.config.commands import trash as _default_trash
 from ranger.ext.shell_escape import shell_quote
 
 try:  # ranger imports plugins as `plugins.<name>` with the confdir on sys.path
@@ -640,6 +641,59 @@ class delete(_default_delete):
         return process.returncode == 0
 
     _clips = staticmethod(find_clips)
+
+
+class trash(_default_trash):
+    """:trash keeps Ranger's confirmation and Rifle execution, with VD guards.
+
+    Trashing moves paths to a backend-chosen destination, so symlinks cannot be re-pointed
+    predictably. Ask before breaking clips/back-references; dashboard option preserves links.
+    """
+
+    def _trash_files_catch_arg_list_error(self, files) -> None:
+        paths = [f.path for f in files]
+        clips = find_clips(paths)
+        subjects = [path for path in paths if _core._under_roots(path)]
+        _dang._arm()
+        hits = _core.find_hits(subjects, C.LOCK_WAIT) if subjects else []
+        if hits is None:
+            return self.fm.ui.console.ask(
+                "link scan unavailable (cache is warming) -- trash anyway? (y / C=cancel)",
+                lambda ans: super(trash, self)._trash_files_catch_arg_list_error(files)
+                if ans in ("y", "Y") else None,
+                ("c", "C", "y", "Y"),
+            )
+        hits = _core._drop_moving(hits, paths)
+        if not hits and not clips:
+            return super()._trash_files_catch_arg_list_error(files)
+
+        links = [hit.link for hit in hits]
+        _recovery(
+            "trash",
+            [f"path {p}" for p in paths]
+            + [f"link {h.link} -> {_safe_readlink(h.link)}" for h in hits]
+            + [f"clip {c}" for c in clips],
+        )
+        _print_links(self.fm, "trash", hits)
+        details = []
+        if clips:
+            details.append(f"{len(clips)} clip(s)")
+        if links:
+            details.append(f"{len(links)} symlink(s): {_brief(links)}")
+        prompt = " + ".join(details)
+        prompt += " -- trash? (y / n=dashboard / C=cancel)" if links else " -- trash? (y / C=cancel)"
+
+        def answer(ans: str) -> None:
+            if ans in ("y", "Y"):
+                _dang._acknowledge(links)
+                super(trash, self)._trash_files_catch_arg_list_error(files)
+            elif ans in ("n", "N") and links:
+                _core.make_dashboard(
+                    self.fm, links, fs.join(C.DASHBOARD_ROOT, fs.basename(paths[0]))
+                )
+
+        choices = ("c", "C", "y", "Y", "n", "N") if links else ("c", "C", "y", "Y")
+        self.fm.ui.console.ask(prompt, answer, choices)
 
 
 class rename(_default_rename):
