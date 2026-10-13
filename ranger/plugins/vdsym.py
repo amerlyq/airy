@@ -1,23 +1,20 @@
-"""VD symlink search and replacement command, plus a link-aware :delete.
+"""vdsym: VD symlink search / replacement, centered around ONE shared directory cache.
 
-Layout:
-- _Cache      process-wide directory cache + per-roots search views (shared by
-              :vdsym, :delete and the replace flow; survives module re-exec)
+Layout (the rest of the former vdsym.py lives in sibling plugins):
+- _Cache      process-wide directory cache + per-roots search views (shared by :vdsym and by the
+              link scans of vdguard / vddangling; survives module re-exec)
 - vdsym       the command
-- find_backlinks / make_dashboard
-              reusable helpers (what :delete calls)
-- delete      :delete with clip + symlink guards (only for paths inside the VD roots)
-- moves       fm.cut / fm.paste / :rename ask about clips + symlinks first and can re-point (U)
-              or replace (R) the symlinks once the files have really moved; every prompt is
-              preceded by a list of the links, also appended to C.RECOVERY_LOG
-- dangling   links that start to dangle behind ranger's back (bulkrename, shell mv/rm) are
-              reported by the next refreshing :vdsym and, failing that, by a ranger timer
+- find_hits / find_backlinks / make_dashboard      reusable helpers
+- HOOKS       preflight / cd / warm callbacks other plugins register (hook())
 - cd signal   lazy cache warm-up on the first cd() into a VD root, "visited" dir bookkeeping
+
+Siblings: vdconf (settings)  vdutil (symlink/fs helpers)  pasteflow (generic paste wrapper)
+          vdguard (clip + symlink guards for cut / paste / rename / delete)
+          vddangling (links that dangle behind ranger's back)
 """
 
 from __future__ import annotations
 
-import errno
 import hashlib
 import logging
 import os
@@ -32,17 +29,39 @@ from concurrent.futures import ThreadPoolExecutor
 from fnmatch import fnmatchcase
 from fnmatch import translate as glob_translate
 from os import path as fs
-from typing import Callable, NamedTuple
+from typing import NamedTuple
 
-from plugins import vdconf as C
 from ranger.api.commands import Command
-from ranger.config.commands import delete as _default_delete
-from ranger.config.commands import rename as _default_rename
-from ranger.ext.safe_path import get_safe_path
 from ranger.ext.shell_escape import shell_quote
 
-_NUMERIC = re.compile(r"(\d+)-0*(\d+)")
+try:  # ranger imports plugins as `plugins.<name>` with the confdir on sys.path
+    from plugins import rhooks
+    from plugins import vdconf as C
+    from plugins.vdutil import _gone, _hops, _norm, _safe_readlink, replace_link
+except ImportError:  # fallback: the plugin files somewhere on PYTHONPATH
+    import rhooks
+    import vdconf as C
+    from vdutil import _gone, _hops, _norm, _safe_readlink, replace_link
+
 _LOG = logging.getLogger("ranger.vdsym")
+
+
+# --------------------------------------------------------------------------- #
+# hooks other VD plugins register (kept in rhooks.shared: survive a re-exec of this module)
+#   preflight  fn(cmd, flags, proceed)   before :vdsym runs (vddangling)
+#   cd         fn(path)                  cd() into a VD root
+#   warm       fn()                      end of the background cache warm-up
+# --------------------------------------------------------------------------- #
+
+HOOKS = rhooks.shared("vdsym.hooks", lambda: {"preflight": {}, "cd": {}, "warm": {}})
+
+
+def hook(kind: str, key: str, fn) -> None:
+    HOOKS[kind][key] = fn  # same key replaces: re-exec safe
+
+
+_NUMERIC = re.compile(r"(\d+)-0*(\d+)")
+
 
 _LONG_FLAGS = {
     "autojump1": "a",
@@ -66,6 +85,8 @@ _LONG_FLAGS = {
     "xclip": "x",
     "yanked": "y",
 }
+
+
 _GROUPS = {
     "action": {
         "dashboard": "d",
@@ -134,13 +155,6 @@ def _same_content(a: _Dir, b: _Dir) -> bool:
         and a.lazy == b.lazy
         and a.links == b.links
     )
-
-
-def _safe_readlink(path: str) -> str | None:
-    try:
-        return os.readlink(path)
-    except OSError:
-        return None
 
 
 def _make_rec(
@@ -248,24 +262,6 @@ class _View:
         self.count = count
 
 
-# --------------------------------------------------------------------------- #
-# shared cache
-# --------------------------------------------------------------------------- #
-
-
-class _Monitor:
-    """Dangling-symlink bookkeeping (see check_dangling)."""
-
-    def __init__(self) -> None:
-        self.known: set[str] | None = (
-            None  # dangling at the previous check; None = no baseline yet
-        )
-        self.deadline: float | None = (
-            None  # monotonic time of the pending one-shot check
-        )
-        self.total = 0
-
-
 class _Cache:
     """Directory records per root, validated by directory mtime; views per roots tuple."""
 
@@ -283,8 +279,7 @@ class _Cache:
         )  # dirs that could not be listed: results may be incomplete
         self.reported_unreadable: frozenset[str] = frozenset()
         self.warmed = False
-        self.fm = None
-        self.monitor = _Monitor()
+        ## MOVED: self.fm -> rhooks.fm(); self.monitor -> vddangling (_mon)
 
     def _bump(self, root: str) -> None:
         self.rootver[root] = self.rootver.get(root, 0) + 1
@@ -488,7 +483,7 @@ class _Cache:
         try:
             with ThreadPoolExecutor(min(len(jobs), 6)) as pool:
                 out = list(pool.map(run, jobs))
-        except (OSError, subprocess.SubprocessError):
+        except OSError, subprocess.SubprocessError:
             return None
         return {
             root: (out[3 * i], out[3 * i + 1], out[3 * i + 2])
@@ -548,11 +543,10 @@ def _shared_cache() -> _Cache:
     try:
         with open(__file__, "rb") as handle:
             stamp = hashlib.sha1(handle.read()).hexdigest()
-    except (NameError, OSError):
+    except NameError, OSError:
         stamp = "unknown"
     holder = sys.modules.setdefault("_vdsym_shared", types.ModuleType("_vdsym_shared"))
-    if not hasattr(holder, "orig"):
-        holder.orig = {}  # (owner, name) -> the unpatched ranger method
+    ## MOVED: the (owner, name) -> unpatched ranger method registry lives in rhooks.patch
     cache = getattr(holder, "cache", None)
     if getattr(cache, "stamp", None) != stamp:
         cache = holder.cache = _Cache(stamp)
@@ -560,48 +554,6 @@ def _shared_cache() -> _Cache:
 
 
 _cache = _shared_cache()
-
-
-# --------------------------------------------------------------------------- #
-# reusable helpers
-# --------------------------------------------------------------------------- #
-
-
-def _gone(path: str) -> bool:
-    """Definitely not there (ENOENT / ENOTDIR). Unreadable or erroring paths count as present:
-    a result is only dropped when we are sure it no longer exists."""
-    try:
-        os.lstat(path)
-    except (FileNotFoundError, NotADirectoryError):
-        return True
-    except OSError:
-        return False
-    return False
-
-
-def _dangling(link: str) -> bool:
-    """The link leads nowhere (or loops). Errors that say nothing about that (EACCES, EIO,
-    a hung mount) are not 'dangling'."""
-    try:
-        os.stat(link)
-    except (FileNotFoundError, NotADirectoryError):
-        return True
-    except OSError as error:
-        return error.errno == errno.ELOOP
-    return False
-
-
-def _acknowledge(links: Iterable[str]) -> None:
-    """The user knowingly leaves these links dangling ("y" at a prompt): not news later."""
-    known = _cache.monitor.known
-    if known is not None:
-        known.update(links)
-
-
-def _norm(path: str) -> str:
-    """Absolute path with parent directories resolved but the leaf kept (so a symlink stays itself)."""
-    head, tail = fs.split(fs.abspath(path))
-    return fs.join(fs.realpath(head), tail)
 
 
 def _under_roots(path: str) -> bool:
@@ -624,42 +576,11 @@ def _vd_root(path: str) -> str | None:
     return None
 
 
-def _leave_link_text(old: str, new: str) -> str:
-    """Use a relative link within one VD root.  Do not make cross-root links relative."""
-    new = _norm(new)
-    if _vd_root(old) == _vd_root(new) and _vd_root(new) is not None:
-        return fs.relpath(new, fs.realpath(fs.dirname(old)))
-    return new
-
-
-def _hops(link: str, limit: int = 40) -> Iterable[str]:
-    """Successive targets of a symlink chain (each hop: parents resolved, leaf kept)."""
-    current = link
-    for _ in range(limit):
-        if not fs.islink(current):
-            return
-        target = _safe_readlink(current)
-        if target is None:
-            return
-        current = _norm(fs.join(fs.dirname(current), target))
-        yield current
-
-
 class _Hit(NamedTuple):
     link: str  # symlink under the VD roots
     subject: str  # normalized subject path (or directory tree) its chain passes through
     rest: str  # path below `subject` when that is a directory tree, else ""
     direct: bool  # the link's first hop already is that place: only such links need re-pointing
-
-
-class _Stage(NamedTuple):
-    hit: _Hit
-    old: str
-    predicted: str
-    backup: str
-    dest: str | None
-    text: str
-    kind: str  # U, R, or K (R collision kept under its old name)
 
 
 def _match(link: str, subjects: set[str], trees: list[str]) -> _Hit | None:
@@ -681,7 +602,7 @@ def find_hits(
     its siblings) or directories (links into anything inside). Candidates come from the shared
     name index, chased through link-to-link chains by name, then verified hop by hop. The cache
     is mtime-validated first, so links created since the last scan are seen.
-    `dashboards=True` also looks into C.DASHBOARD_ROOT (generated links; used when re-pointing).
+    `dashboards=True` also looks into DASHBOARD_ROOT (generated links; used when re-pointing).
     Returns None when the cache lock stays busy for `wait` seconds (warm-up still running).
     """
     subjects = {_norm(path) for path in paths}
@@ -732,12 +653,6 @@ def _drop_moving(hits: list[_Hit], paths: Sequence[str]) -> list[_Hit]:
     ]
 
 
-def _brief(items: Iterable[str], limit: int = 3) -> str:
-    items = list(items)
-    more = f" +{len(items) - limit}" if len(items) > limit else ""
-    return " | ".join(items[:limit]) + more
-
-
 def _print_dismiss() -> tuple[str, str]:
     """Prompt text plus shell read loop for PRINT_DISMISS_KEYS."""
     spec = C.PRINT_DISMISS_KEYS
@@ -756,99 +671,6 @@ def _print_dismiss() -> tuple[str, str]:
         "while :; do read -sk 1 key 2>/dev/null || read -rsn 1 key; "
         + f'case "$key" in {choices}) break;; esac; done',
     )
-
-
-def find_clips(paths: Sequence[str]) -> list[str]:
-    """Siblings named '<stem>_<clip tokens>[.ext]' that are not themselves in `paths`."""
-    stems: dict[str, list[str]] = {}
-    for path in paths:
-        stems.setdefault(fs.dirname(path), []).append(fs.splitext(fs.basename(path))[0])
-    selected = set(paths)
-    found: list[str] = []
-    for directory, group in stems.items():
-        pattern = re.compile(
-            f"(?:{'|'.join(map(re.escape, group))})_{C.CLIP_SUFFIX}(?:\\..*)?", re.S
-        )
-        try:
-            with os.scandir(directory) as it:
-                found.extend(
-                    e.path
-                    for e in it
-                    if e.path not in selected and pattern.fullmatch(e.name)
-                )
-        except OSError:
-            continue
-    return sorted(found)
-
-
-# --------------------------------------------------------------------------- #
-# writing symlinks
-# --------------------------------------------------------------------------- #
-
-
-def _swap_link(link: str, text: str, dest: str | None = None) -> None:
-    """Atomically make `dest` (default: `link`) a symlink to `text`."""
-    dest = dest or link
-    temporary = fs.join(
-        fs.dirname(link), f".{fs.basename(dest)[:200]}.vdsym-{os.getpid()}"
-    )
-    try:
-        os.symlink(text, temporary)
-        os.replace(temporary, dest)
-    except OSError:
-        if fs.lexists(temporary):
-            os.unlink(temporary)
-        raise
-
-
-def replace_link(link: str, text: str, target: str) -> str | None:
-    """Swap `link` for a link in the same dir named exactly like `target`, holding `text`.
-    Returns an error message (collision / OS error) or None."""
-    new_link = fs.join(fs.dirname(link), fs.basename(target))
-    if new_link != link and fs.lexists(new_link):
-        if not (fs.islink(new_link) and fs.realpath(new_link) == fs.realpath(target)):
-            return f"Collision: {new_link}"
-        try:
-            os.unlink(link)  # an equivalent link is already there
-        except OSError as error:
-            return str(error)
-        return None
-    try:
-        _swap_link(link, text, new_link)
-        if new_link != link:
-            os.unlink(link)
-    except OSError as error:
-        return str(error)
-    return None
-
-
-def _link_text(link: str, old_raw: str, new_raw: str, rest: str) -> str:
-    """Target text for `link` once `old_raw` became `new_raw`: same style (absolute / relative),
-    and the same spelling of the path when the old text was absolute."""
-    raw = _safe_readlink(link) or ""
-    new_abs = _norm(new_raw) + rest
-    if fs.isabs(raw):
-        text, old = fs.normpath(raw), fs.normpath(old_raw)
-        if text == old or text.startswith(old + os.sep):
-            return fs.normpath(new_raw) + text[len(old) :]
-        return new_abs
-    return fs.relpath(new_abs, fs.realpath(fs.dirname(link)))
-
-
-def _recovery(op: str, lines: Iterable[str]) -> None:
-    """Append what is about to happen, so a crash / cancel / error can be undone by hand."""
-    try:
-        os.makedirs(fs.dirname(C.RECOVERY_LOG), exist_ok=True)
-        if fs.exists(C.RECOVERY_LOG) and fs.getsize(C.RECOVERY_LOG) > 2_000_000:
-            os.replace(C.RECOVERY_LOG, C.RECOVERY_LOG + ".1")
-        with open(
-            C.RECOVERY_LOG, "a", encoding="utf-8", errors="surrogateescape"
-        ) as handle:
-            handle.write(f"{time.strftime('%Y-%m-%dT%H:%M:%S')} {op}\n")
-            for line in lines:
-                handle.write(f"  {line}\n")
-    except OSError:
-        _LOG.warning("cannot write %s", C.RECOVERY_LOG)
 
 
 def make_dashboard(fm, matches: Sequence[str], dest: str) -> str:
@@ -874,498 +696,6 @@ def make_dashboard(fm, matches: Sequence[str], dest: str) -> str:
         _cache.visited.add(fs.dirname(fs.realpath(source)))
     fm.cd(dest)
     return dest
-
-
-# --------------------------------------------------------------------------- #
-# guarded moves: shared by fm.cut / fm.paste / :rename
-# --------------------------------------------------------------------------- #
-
-
-class _MoveJob:
-    """Re-point (U) or replace (R) symlinks once the files they led to have really moved.
-
-    Hits are computed *before* the move (a moved directory can no longer be walked), applied
-    after it, and only for files that are gone from `old` and found at their new place, so a
-    cancelled or failed move leaves everything as it was. The new place is the predicted
-    path, verified (and if needed searched in the destination dir) by inode.
-    Links in C.DASHBOARD_ROOT are always re-pointed in place.
-    """
-
-    def __init__(
-        self, fm, moves: dict[str, str], policy: dict[str, str], hits: list[_Hit]
-    ) -> None:
-        self.fm, self.moves, self.policy, self.hits = fm, moves, policy, hits
-        self.by_subject = {_norm(old): old for old in moves}
-        self.ids: dict[str, tuple[int, int]] = {}
-        for old in moves:
-            try:
-                st = os.lstat(old)
-                self.ids[old] = (st.st_dev, st.st_ino)
-            except OSError:
-                pass
-        self.stages: list[_Stage] = []
-        self.staged = False
-        self.tx = f".vdsym-old-{os.getpid()}-{time.time_ns()}"
-        self.done = False
-
-    def _locate(self, old: str, predicted: str) -> str | None:
-        if fs.lexists(old):
-            return None  # still there: not moved (cancelled, failed, copy not finished)
-        ident = self.ids.get(old)
-        if fs.lexists(predicted):
-            if ident is None:
-                return predicted
-            st = os.lstat(predicted)
-            if (st.st_dev, st.st_ino) == ident or st.st_dev != ident[0]:
-                return predicted  # same inode, or copied across filesystems (inode can't tell)
-        if (
-            ident
-        ):  # predicted name was wrong (name clash in the batch, race): find by inode
-            try:
-                with os.scandir(fs.dirname(predicted)) as it:
-                    for entry in it:
-                        st = entry.stat(follow_symlinks=False)
-                        if (st.st_dev, st.st_ino) == ident:
-                            return entry.path
-            except OSError:
-                pass
-        return None
-
-    @staticmethod
-    def _is_dashboard(link: str) -> bool:
-        return fs.abspath(link).startswith(fs.abspath(C.DASHBOARD_ROOT) + os.sep)
-
-    def stage(self) -> bool:
-        """Keep every old link under a recoverable name before making replacement links."""
-        work: list[tuple[_Hit, str, str, str]] = []
-        for hit in self.hits:
-            old = self.by_subject.get(hit.subject)
-            predicted = self.moves.get(old) if old else None
-            if predicted is None:
-                continue
-            mode = "UA" if self._is_dashboard(hit.link) else self.policy.get(old)
-            if mode == "U" and not hit.direct:
-                continue
-            if mode not in ("U", "UA", "R"):
-                continue
-            work.append((hit, old, predicted, mode))
-        if not work:
-            return True
-        work.sort(
-            key=lambda item: (
-                fs.basename(item[0].link) != fs.basename(_norm(item[2]) + item[0].rest)
-            )
-        )
-        sources = {hit.link for hit, _, _, _ in work}
-        owners: set[str] = set()
-        stages: list[_Stage] = []
-        for hit, old, predicted, mode in work:
-            target = _norm(predicted) + hit.rest
-            dest = (
-                hit.link
-                if mode in ("U", "UA")
-                else fs.join(fs.dirname(hit.link), fs.basename(target))
-            )
-            kind = "U" if mode == "UA" else mode
-            if dest in owners:
-                dest = None
-            elif dest not in sources and fs.lexists(dest):
-                if fs.islink(dest) and fs.realpath(dest) == fs.realpath(target):
-                    dest = None
-                elif mode == "R":
-                    dest, kind = hit.link, "K"
-                else:
-                    return False
-            if dest:
-                owners.add(dest)
-            stages.append(
-                _Stage(
-                    hit,
-                    old,
-                    predicted,
-                    hit.link + self.tx,
-                    dest,
-                    _link_text(hit.link, old, predicted, hit.rest),
-                    kind,
-                )
-            )
-        try:
-            for stage in stages:
-                if not fs.islink(stage.hit.link) or fs.lexists(stage.backup):
-                    raise OSError(f"cannot stage {stage.hit.link}")
-                os.replace(stage.hit.link, stage.backup)
-            for stage in stages:
-                if stage.dest:
-                    _swap_link(stage.hit.link, stage.text, stage.dest)
-        except OSError as error:
-            self.stages = stages
-            self._rollback()
-            self.fm.notify(f"could not stage symlinks: {error}", bad=True)
-            return False
-        self.stages = stages
-        self.staged = True
-        _recovery(
-            f"staged {len(stages)} symlink(s)",
-            [f"{stage.backup} -> {stage.hit.link}" for stage in stages],
-        )
-        return True
-
-    def _rollback(self, stages: Sequence[_Stage] | None = None) -> list[str]:
-        """Remove staged links then put surviving old links back under their original names."""
-        problems: list[str] = []
-        for stage in reversed(self.stages if stages is None else stages):
-            try:
-                if (
-                    stage.dest
-                    and fs.islink(stage.dest)
-                    and _safe_readlink(stage.dest) == stage.text
-                ):
-                    os.unlink(stage.dest)
-                if fs.lexists(stage.backup) and not fs.lexists(stage.hit.link):
-                    os.replace(stage.backup, stage.hit.link)
-            except OSError as error:
-                problems.append(f"{stage.hit.link}: {error}")
-        return problems
-
-    def _finish_staged(self, located: dict[str, str | None]) -> None:
-        problems: list[str] = []
-        committed: list[_Stage] = []
-        for stage in self.stages:
-            new = located.get(stage.old)
-            if new is None:
-                continue
-            try:
-                if stage.dest:
-                    text = _link_text(stage.hit.link, stage.old, new, stage.hit.rest)
-                    _swap_link(stage.hit.link, text, stage.dest)
-                if fs.lexists(stage.backup):
-                    os.unlink(stage.backup)
-                committed.append(stage)
-            except OSError as error:
-                problems.append(f"{stage.hit.link}: {error}")
-        failed = [stage for stage in self.stages if stage not in committed]
-        problems += self._rollback(failed)
-        updated = sum(stage.kind == "U" for stage in committed)
-        replaced = sum(stage.kind == "R" for stage in committed)
-        kept = sum(stage.kind == "K" for stage in committed)
-        if committed or problems:
-            self.fm.notify(
-                f"symlinks: {updated} updated, {replaced} replaced"
-                + (f", {kept} re-pointed in place (name taken)" if kept else "")
-                + (f", {len(problems)} problem(s)" if problems else ""),
-                bad=bool(problems),
-            )
-
-    def finish(self) -> None:
-        if self.done:
-            return
-        self.done = True
-        located = {
-            old: self._locate(old, predicted) for old, predicted in self.moves.items()
-        }
-        if self.staged:
-            self._finish_staged(located)
-            _cache.touch(
-                path
-                for stage in self.stages
-                for path in (stage.hit.link, stage.backup, stage.dest)
-                if path
-            )
-            _arm()
-            return
-        problems: list[str] = []
-        work: list[tuple[_Hit, str, str]] = []
-        for hit in self.hits:
-            old = self.by_subject.get(hit.subject)
-            if old is None:
-                continue
-            new = located.get(old)
-            if new is None:
-                note = f"not moved: {old} (links to it left alone)"
-                if note not in problems:
-                    problems.append(note)
-                continue
-            work.append((hit, old, new))
-        # a link that already has the final name goes first, the others then find it in place
-        # and are simply removed (otherwise they would collide with it)
-        work.sort(
-            key=lambda w: fs.basename(w[0].link) != fs.basename(_norm(w[2]) + w[0].rest)
-        )
-        touched: set[str] = set()
-        updated = replaced = kept = 0
-        for hit, old, new in work:
-            mode = "UA" if self._is_dashboard(hit.link) else self.policy.get(old)
-            try:
-                text = _link_text(hit.link, old, new, hit.rest)
-                if mode == "UA" or (mode == "U" and hit.direct):
-                    _swap_link(hit.link, text)
-                    updated += 1
-                elif mode == "R":
-                    error = replace_link(hit.link, text, _norm(new) + hit.rest)
-                    if error and error.startswith("Collision"):
-                        # a foreign file owns the wanted name: never overwrite it, but don't
-                        # leave the old link dangling either - re-point it under its old name
-                        _swap_link(hit.link, text)
-                        kept += 1
-                        problems.append(f"{error} - kept {hit.link} (re-pointed)")
-                    elif error:
-                        problems.append(f"{hit.link}: {error}")
-                        continue
-                    else:
-                        replaced += 1
-                else:
-                    continue
-            except OSError as error:
-                problems.append(f"{hit.link}: {error}")
-                continue
-            touched.add(hit.link)
-            touched.add(fs.join(fs.dirname(hit.link), fs.basename(new)))
-        if touched:
-            _cache.touch(touched)
-        _arm()
-        for old, new in located.items():
-            _cache.visited.add(fs.dirname(old))
-            if new:
-                _cache.visited.add(fs.dirname(new))
-        _recovery(
-            f"done updated={updated} replaced={replaced} kept={kept} problems={len(problems)}",
-            problems,
-        )
-        if updated or replaced or kept or problems:
-            self.fm.notify(
-                f"symlinks: {updated} updated, {replaced} replaced"
-                + (f", {kept} re-pointed in place (name taken)" if kept else "")
-                + (
-                    f", {len(problems)} problem(s) (see {C.RECOVERY_LOG})"
-                    if problems
-                    else ""
-                ),
-                bad=bool(problems),
-            )
-
-
-class _DanglingPasteJob:
-    """Hold dangling destination links aside while non-append overwrite copies replace them."""
-
-    def __init__(self, fm, paths: Sequence[str]) -> None:
-        self.fm = fm
-        suffix = f".vdsym-dangling-{os.getpid()}-{time.time_ns()}"
-        self.stages = [(path, path + suffix) for path in paths]
-        self.done = False
-
-    def stage(self) -> bool:
-        try:
-            for path, backup in self.stages:
-                if not fs.islink(path) or not _dangling(path) or fs.lexists(backup):
-                    raise OSError(f"cannot stage dangling symlink {path}")
-                os.replace(path, backup)
-        except OSError as error:
-            self.finish()
-            self.fm.notify(f"could not stage dangling symlink: {error}", bad=True)
-            return False
-        return True
-
-    def finish(self) -> None:
-        if self.done:
-            return
-        self.done = True
-        problems: list[str] = []
-        for path, backup in self.stages:
-            try:
-                if fs.lexists(path):
-                    if fs.lexists(backup):
-                        os.unlink(backup)
-                elif fs.lexists(backup):
-                    os.replace(backup, path)
-            except OSError as error:
-                problems.append(f"{path}: {error}")
-        _cache.touch(path for stage in self.stages for path in stage)
-        if problems:
-            self.fm.notify(
-                f"{len(problems)} dangling symlink replacement problem(s)", bad=True
-            )
-
-
-class _LeaveLinkJob:
-    """After a cut succeeds, put a link at each vacated source path."""
-
-    def __init__(self, fm, moves: dict[str, str]) -> None:
-        self.fm = fm
-        self.moves = moves
-        self.ids: dict[str, tuple[int, int]] = {}
-        for old in moves:
-            try:
-                st = os.lstat(old)
-                self.ids[old] = (st.st_dev, st.st_ino)
-            except OSError:
-                pass
-        self.done = False
-
-    def finish(self) -> None:
-        if self.done:
-            return
-        self.done = True
-        left = problems = 0
-        for old, predicted in self.moves.items():
-            if fs.lexists(old):
-                continue
-            new = _MoveJob._locate(self, old, predicted)
-            if new is None:
-                continue
-            try:
-                os.symlink(_leave_link_text(old, new), old)
-                left += 1
-            except OSError:
-                problems += 1
-        _cache.touch(path for move in self.moves.items() for path in move)
-        if left or problems:
-            self.fm.notify(
-                f"source links: {left} left"
-                + (f", {problems} problem(s)" if problems else ""),
-                bad=bool(problems),
-            )
-
-
-class _JobGroup:
-    def __init__(self, *jobs) -> None:
-        self.jobs = [job for job in jobs if job is not None]
-
-    def finish(self) -> None:
-        for job in self.jobs:
-            job.finish()
-
-
-def _print_links(fm, op: str, hits: list[_Hit]) -> None:
-    if not C.PRINT_BEFORE_PROMPT or not hits:
-        return
-    lines = [f"{op}: {len(hits)} symlink(s) lead here"]
-    lines += [f"{hit.link} -> {_safe_readlink(hit.link) or '?'}" for hit in hits]
-    fm.execute_command("printf '%s\\n' " + shell_quote("\n".join(lines)), flags="-w")
-
-
-def _guard_move(
-    fm,
-    paths: Sequence[str],
-    op: str,
-    done: Callable[[str], None],
-    cancel: Callable[[], None],
-) -> None:
-    """Ask about clips / symlinks before `op` (cut, move, rename) touches `paths`.
-
-    done(policy) with policy "" (nothing found), "y" (go, leave links), "U" (update) or
-    "R" (replace); cancel() otherwise. Enter and Esc both answer "cancel".
-    """
-    ask = fm.ui.console.ask
-    _arm()
-    clips = find_clips(paths)
-    subjects = [path for path in paths if _under_roots(path)]
-    hits = find_hits(subjects, C.LOCK_WAIT) if subjects else []
-    if hits is None:
-        ask(
-            f"link scan unavailable (cache is warming) -- {op} anyway? (y / C=cancel)",
-            lambda ans: done("y") if ans in ("y", "Y") else cancel(),
-            ("c", "C", "y", "Y"),
-        )
-        return
-    hits = _drop_moving(hits, paths)
-    if not hits and not clips:
-        return done("")
-    _recovery(
-        op,
-        [f"path {p}" for p in paths]
-        + [f"link {h.link} -> {_safe_readlink(h.link)}" for h in hits]
-        + [f"clip {c}" for c in clips],
-    )
-    _print_links(fm, op, hits)
-    parts = []
-    if hits:
-        parts.append(f"{len(hits)} symlink(s): {_brief(h.link for h in hits)}")
-    if clips:
-        parts.append(f"{len(clips)} clip(s)")
-    if hits:
-        text = (
-            " + ".join(parts)
-            + f" -- {op}? (y=leave / U=update / R=replace / n=dashboard / C=cancel)"
-        )
-        choices: tuple[str, ...] = ("c", "C", "y", "Y", "n", "N", "U", "R")
-    else:
-        text = parts[0] + f" -- {op} anyway? (y / C=cancel)"
-        choices = ("c", "C", "y", "Y")
-
-    def answer(ans: str) -> None:
-        if ans in ("U", "R"):
-            done(ans)
-        elif ans in ("y", "Y"):
-            _acknowledge(hit.link for hit in hits)
-            done("y")
-        else:
-            if ans in ("n", "N"):
-                dest = fs.join(C.DASHBOARD_ROOT, fs.basename(paths[0]))
-                make_dashboard(fm, [hit.link for hit in hits], dest)
-            cancel()
-
-    ask(text, answer, choices)
-
-
-def _safe_like(dst: str, taken: set[str]) -> str:
-    """ranger's get_safe_path(), also treating names taken earlier in the same batch as existing."""
-
-    def exists(path: str) -> bool:
-        return fs.exists(path) or path in taken
-
-    if not exists(dst):
-        return dst
-    if not dst.endswith("_"):
-        dst += "_"
-        if not exists(dst):
-            return dst
-    n = 0
-    while exists(dst + str(n)):
-        n += 1
-    return dst + str(n)
-
-
-def _same_link_target(source: str, dest: str) -> bool:
-    """Both paths are links resolving to the same destination, including dangling links."""
-    return (
-        fs.islink(source)
-        and fs.islink(dest)
-        and fs.realpath(source) == fs.realpath(dest)
-    )
-
-
-def _link_targets_path(link: str, path: str) -> bool:
-    return fs.islink(link) and fs.realpath(link) == fs.realpath(path)
-
-
-def _duplicate_link_note(count: int) -> str:
-    return (
-        "symlink with same target already exists"
-        if count == 1
-        else f"{count} symlinks with same target already exist"
-    )
-
-
-def _predict_moves(
-    paths: Sequence[str], dest: str, overwrite: bool, make_safe_path
-) -> dict[str, str]:
-    """Where ranger's mover will put each path (same rule as shutil_generatorized.move)."""
-    moves: dict[str, str] = {}
-    taken: set[str] = set()
-    for old in paths:
-        real = fs.join(dest, fs.basename(old))
-        if overwrite:
-            new = real
-        elif make_safe_path is get_safe_path:
-            new = _safe_like(real, taken)
-        else:
-            new = make_safe_path(real)
-            if new in taken:
-                _LOG.warning("cannot predict destination of %s", old)
-                continue
-        taken.add(new)
-        moves[old] = new
-    return moves
 
 
 # --------------------------------------------------------------------------- #
@@ -1794,35 +1124,63 @@ class vdsym(Command):
         )
 
     def execute(self) -> None:
-        """Compare dangling links with the previous check first (when the cache is refreshed
-        anyway), tell about new ones, then run the command."""
+        """Run the PREFLIGHT hooks (vddangling: tell about newly dangling links; each calls
+        proceed() to go on, maybe after a prompt, or not at all to abort), then the command."""
         try:
             flags, _ = self._args()
         except ValueError as error:
             self.fm.notify(f"vdsym: {error}", bad=True)
             return
-        _arm()
-        new = None
-        if "N" not in flags and self._mode(flags) in ("validate", "rescan"):
-            new = check_dangling(self.fm, notify=False)
-        if not new:
-            return self._execute()
-        # Enter = continue, Esc = abort the command
-        self.fm.ui.console.ask(
-            f"{len(new)} symlink(s) newly dangling: {_brief(map(fs.basename, new))}"
-            " (:display_log) -- Enter=continue / Esc=abort / l=list / U=re-point",
-            lambda ans: self._after_dangling(ans, new),
-            ("c", "q", "l", "U"),
-        )
+        pending = list(HOOKS["preflight"].values())
 
-    def _after_dangling(self, answer: str, new: list[str]) -> None:
-        if answer == "q":
-            return
-        if answer == "l":
-            _list_dangling(self.fm, new)
-        elif answer == "U":
-            _repoint_unique(self.fm, new)
-        self._execute()
+        def step() -> None:
+            if not pending:
+                return self._execute()
+            fn = pending.pop(0)
+            called: list[bool] = []
+
+            def proceed() -> None:
+                if not called:  # a prompt answered twice must not run the command twice
+                    called.append(True)
+                    step()
+
+            fn(self, flags, proceed)
+
+        step()
+
+    ## ALT: dangling check hard-wired into :vdsym (before the PREFLIGHT hooks existed)
+    ##      benefit: one file, no hook indirection; cost: vdsym core had to know the monitor
+    #     def execute(self) -> None:
+    #         """Compare dangling links with the previous check first (when the cache is refreshed
+    #         anyway), tell about new ones, then run the command."""
+    #         try:
+    #             flags, _ = self._args()
+    #         except ValueError as error:
+    #             self.fm.notify(f"vdsym: {error}", bad=True)
+    #             return
+    #         _arm()
+    #         new = None
+    #         if "N" not in flags and self._mode(flags) in ("validate", "rescan"):
+    #             new = check_dangling(self.fm, notify=False)
+    #         if not new:
+    #             return self._execute()
+    #         # Enter = continue, Esc = abort the command
+    #         self.fm.ui.console.ask(
+    #             f"{len(new)} symlink(s) newly dangling: {_brief(map(fs.basename, new))}"
+    #             " (:display_log) -- Enter=continue / Esc=abort / l=list / U=re-point",
+    #             lambda ans: self._after_dangling(ans, new),
+    #             ("c", "q", "l", "U"),
+    #         )
+    #
+    #     def _after_dangling(self, answer: str, new: list[str]) -> None:
+    #         if answer == "q":
+    #             return
+    #         if answer == "l":
+    #             _list_dangling(self.fm, new)
+    #         elif answer == "U":
+    #             _repoint_unique(self.fm, new)
+    #         self._execute()
+    #
 
     def _execute(self) -> None:
         started = time.perf_counter()
@@ -1889,316 +1247,9 @@ class vdsym(Command):
 
 
 # --------------------------------------------------------------------------- #
-# :delete
-# --------------------------------------------------------------------------- #
-
-
-class _FmProxy:
-    """fm as seen by one :delete instance: delete() redirected, rest passed through."""
-
-    def __init__(self, fm, delete) -> None:
-        self._fm = fm
-        self.delete = delete
-
-    def __getattr__(self, name):
-        return getattr(self._fm, name)
-
-
-# OR: map dD eval fm.set_clipboard(fm.thisfile.basename.encode('utf-8')); cmd('delete')
-class delete(_default_delete):
-    """:delete
-
-    Copy selected file names to the clipboard before deleting them.
-    Deletion is skipped when clipboard copy fails.
-    Asks first when the files have sibling clips or symlinks leading to them (files, symlinks
-    and directories inside the VD roots). Enter/Esc on the prompts always cancel.
-    """
-
-    def execute(self) -> None:
-        self._real_fm = self.fm
-        self.fm = _FmProxy(self._real_fm, self._guarded_delete)  # this command only
-        super().execute()
-
-    # -- steps ---------------------------------------------------------------- #
-
-    def _guarded_delete(self, files: Sequence[str] | None = None) -> None:
-        if files is None:
-            files = [f.path for f in self._real_fm.thistab.get_selection()]
-        cwd = self._real_fm.thisdir.path
-        paths = [fs.join(cwd, f) for f in files]
-        clips = self._clips(paths)
-        if not clips:
-            return self._check_links(files, paths)
-        self._ask(
-            f"{len(clips)} clip(s) -- delete anyway? (y/N)",
-            ("n", "N", "y", "Y"),
-            lambda ans: ans in ("y", "Y") and self._check_links(files, paths),
-        )
-
-    def _check_links(self, files: Sequence[str], paths: Sequence[str]) -> None:
-        _arm()
-        subjects = [path for path in paths if _under_roots(path)]
-        hits = find_hits(subjects, C.LOCK_WAIT) if subjects else []
-        if hits is None:
-            return self._ask(
-                "link scan unavailable (cache is warming) -- delete anyway? (y / C=cancel)",
-                ("c", "C", "y", "Y"),
-                lambda ans: ans in ("y", "Y") and self._copy_and_delete(files),
-            )
-        links = [hit.link for hit in _drop_moving(hits, paths)]
-        if not links:
-            return self._copy_and_delete(files)
-        _recovery(
-            "delete",
-            [f"path {p}" for p in paths]
-            + [f"link {l} -> {_safe_readlink(l)}" for l in links],
-        )
-        first = fs.basename(subjects[0])
-        # Enter answers choices[0], Esc choices[1]: both must be "cancel"
-        self._ask(
-            f"{len(links)} symlink(s): {_brief(links)}"
-            " -- delete? (y / n=dashboard / C=cancel)",
-            ("c", "C", "y", "Y", "n", "N"),
-            lambda ans: self._on_links(ans, files, links, first),
-        )
-
-    def _on_links(
-        self, answer: str, files: Sequence[str], links: list[str], first: str
-    ) -> None:
-        if answer in ("y", "Y"):
-            _acknowledge(links)
-            self._copy_and_delete(files)
-        elif answer in ("n", "N"):
-            make_dashboard(self._real_fm, links, fs.join(C.DASHBOARD_ROOT, first))
-
-    def _copy_and_delete(self, files: Sequence[str]) -> None:
-        names = [fs.basename(file) for file in files]
-        if self._copy_names(names):
-            self._real_fm.delete(files)
-        else:
-            self._real_fm.notify("Could not copy file name to clipboard", bad=True)
-
-    # -- helpers ---------------------------------------------------------------- #
-
-    def _ask(self, text: str, choices: tuple[str, ...], callback) -> None:
-        self._real_fm.ui.console.ask(text, callback, choices)
-
-    def _copy_names(self, names: Sequence[str]) -> bool:
-        try:
-            process = subprocess.run(
-                ["xci"],
-                input="\n".join(names),
-                text=True,
-                capture_output=True,
-                check=False,
-            )
-        except OSError:
-            return False
-        return process.returncode == 0
-
-    _clips = staticmethod(find_clips)
-
-
-class rename(_default_rename):
-    """:rename <newname>
-
-    Asks first when clips or symlinks depend on the old name (see _guard_move).
-    """
-
-    def execute(self) -> None:
-        fm, cursor, new_name = self.fm, self.fm.thisfile, self.rest(1)
-        if (
-            not new_name
-            or not cursor
-            or new_name == cursor.relative_path
-            or fs.lexists(new_name)
-        ):
-            return super().execute()  # stock code reports these itself
-        old = fs.abspath(cursor.path)
-        new = fs.abspath(fs.join(fm.thisdir.path, new_name))
-
-        def done(policy: str) -> None:
-            job = None
-            if policy in ("U", "R"):
-                hits = _drop_moving(find_hits([old], C.LOCK_WAIT, True) or [], [old])
-                _recovery("rename", [f"{old} -> {new}"])
-                if hits:
-                    job = _MoveJob(fm, {old: new}, {old: policy}, hits)
-                    if not job.stage():
-                        return
-            super(rename, self).execute()
-            if job:
-                job.finish()
-
-        _guard_move(fm, [old], "rename", done, lambda: None)
-        return None
-
-
-# --------------------------------------------------------------------------- #
-# dangling symlinks (what can't be hooked is caught afterwards)
-# --------------------------------------------------------------------------- #
-
-
-def _busy(fm) -> bool:
-    """ranger is copying / moving / deleting: links may dangle for a moment, check later."""
-    loader = getattr(fm, "loader", None)
-    return bool(loader and loader.has_work())
-
-
-def _dangling_now(wait: float) -> set[str] | None:
-    """Every symlink under the VD roots that leads nowhere (None: cache busy for `wait` s)."""
-    if not _cache.lock.acquire(timeout=wait):
-        return None
-    try:
-        links = _cache.ensure(vdsym.roots(), "validate", "links").index.links
-        return {link for link in links if _dangling(link)}
-    finally:
-        _cache.lock.release()
-
-
-def check_dangling(
-    fm=None, notify: bool = True, wait: float = C.LOCK_WAIT
-) -> list[str] | None:
-    """Compare the dangling links with the previous check; log the new ones (details for
-    :display_log) and notify shortly. The first check is the baseline. Returns the new links,
-    or None when it could not run now (cache busy / ranger busy): nothing is lost, the next
-    check simply compares against the older state."""
-    mon = _cache.monitor
-    if not C.DANGLING_MONITOR or (fm is not None and _busy(fm)):
-        return None
-    if not _cache.lock.acquire(timeout=wait):
-        return None
-    try:  # one step: snapshot + comparison (the lock is re-entrant)
-        current = _dangling_now(wait)
-        if current is None:
-            return None
-        previous, mon.known = mon.known, current
-        mon.total = len(current)
-    finally:
-        _cache.lock.release()
-    if previous is None:
-        _LOG.info("vdsym: %d dangling symlink(s) at start", len(current))
-        return []
-    new = sorted(current - previous)
-    if new:
-        _LOG.warning(
-            "%d symlink(s) newly dangling (%d in total):", len(new), len(current)
-        )
-        for link in new[:200]:
-            _LOG.warning("  %s -> %s", link, _safe_readlink(link))
-        if len(new) > 200:
-            _LOG.warning("  ... and %d more", len(new) - 200)
-        if notify and fm is not None:
-            fm.notify(
-                f"{len(new)} symlink(s) newly dangling -- see :display_log", bad=True
-            )
-    return new
-
-
-def _arm(delay: float | None = None) -> None:
-    """(Re)start the one-shot timer: it fires after `delay` s without further VD activity."""
-    if C.DANGLING_MONITOR:
-        _cache.monitor.deadline = time.monotonic() + (
-            C.DANGLING_QUIET if delay is None else delay
-        )
-
-
-def _tick() -> None:
-    """Ranger's only timer: its main loop calls Loader.work() at least every idle_delay (2 s)."""
-    mon = _cache.monitor
-    if mon.deadline is None or time.monotonic() < mon.deadline:
-        return
-    mon.deadline = None
-    try:
-        if check_dangling(_cache.fm) is None:
-            _arm(5.0)  # ranger or the cache was busy: try again shortly
-    except Exception:  # noqa: BLE001 - never break ranger's main loop
-        _LOG.exception("vdsym dangling check failed")
-
-
-def _candidates(links: Iterable[str]) -> dict[str, list[str]]:
-    """Real files (not links) with the basename a dangling link used to point at."""
-    with _cache.lock:
-        index = _cache.ensure(vdsym.roots(), "none").index
-        return {
-            link: [
-                path
-                for path in index.names.get(
-                    fs.basename((_safe_readlink(link) or "").rstrip("/")), ()
-                )
-                if path not in index.links and not _gone(path)
-            ]
-            for link in links
-        }
-
-
-def _repoint_unique(fm, links: Iterable[str]) -> None:
-    """Re-point every link that has exactly one candidate to it."""
-    todo = {
-        link: found[0] for link, found in _candidates(links).items() if len(found) == 1
-    }
-    _recovery(
-        "dangling-update",
-        [f"{link} -> {candidate}" for link, candidate in todo.items()],
-    )
-    done = failed = 0
-    for link, candidate in todo.items():
-        try:
-            _swap_link(
-                link, _link_text(link, _safe_readlink(link) or "", candidate, "")
-            )
-            done += 1
-        except OSError as error:
-            failed += 1
-            _LOG.warning("dangling update %s: %s", link, error)
-    _cache.touch(todo)
-    _cache.monitor.known = (_cache.monitor.known or set()) - set(todo)
-    fm.notify(
-        f"re-pointed {done} dangling link(s)"
-        + (f", {failed} failed" if failed else ""),
-        bad=bool(failed),
-    )
-
-
-def _list_dangling(fm, links: list[str]) -> None:
-    lines = [f"{len(links)} dangling symlink(s):"]
-    for link, found in _candidates(links).items():
-        lines.append(f"{link} -> {_safe_readlink(link)}")
-        lines += [f"    candidate: {path}" for path in found[:3]]
-    fm.execute_command("printf '%s\\n' " + shell_quote("\n".join(lines)), flags="-w")
-
-
-class dangling(Command):
-    """:dangling [update]
-
-    Lists the symlinks under the VD roots that lead nowhere, each with the real files of the
-    same basename (candidates). `update` re-points every link that has exactly one candidate,
-    after asking.
-    """
-
-    def execute(self) -> None:
-        fm, mode = self.fm, self.arg(1)
-        if mode not in ("", "update"):
-            return fm.notify("Syntax: dangling [update]", bad=True)
-        current = _dangling_now(C.LOCK_WAIT)
-        if current is None:
-            return fm.notify("cache is busy (warming), try again in a moment", bad=True)
-        links = sorted(current)
-        if not links:
-            return fm.notify("no dangling symlinks")
-        if mode == "":
-            return _list_dangling(fm, links)
-        return fm.ui.console.ask(
-            f"re-point the dangling links that have exactly one candidate ({len(links)} dangling)?"
-            " (y / C=cancel)",
-            lambda ans: ans in ("y", "Y") and _repoint_unique(fm, links),
-            ("c", "C", "y", "Y"),
-        )
-
-
-# --------------------------------------------------------------------------- #
-# cd signal: lazy warm-up + "visited" bookkeeping (a signal, NOT a Tab.enter_dir wrapper:
-# history_navi inspects the caller frame of enter_dir and must stay the outermost wrapper)
+# cd signal: lazy warm-up + "visited" bookkeeping (a signal via rhooks.on_cd, NOT a
+# Tab.enter_dir wrapper: history_navi inspects the caller frame of enter_dir and must stay the
+# outermost wrapper)
 # --------------------------------------------------------------------------- #
 
 
@@ -2207,9 +1258,11 @@ def _warm() -> None:
         roots = vdsym.roots()
         _cache.ensure(roots)
         _cache.ensure(roots[:1])  # view-only index used by --modifiers=view
-        if _cache.monitor.known is None:
-            check_dangling(None)  # baseline: what dangles already is not news
-    except Exception:  # noqa: BLE001 - never break ranger
+        for fn in list(
+            HOOKS["warm"].values()
+        ):  # was: dangling baseline (see vddangling)
+            fn()
+    except Exception:
         _LOG.exception("vdsym warm-up failed")
 
 
@@ -2218,288 +1271,27 @@ def _on_cd(path: str) -> None:
         return
     _cache.visited.add(path)
     _cache.visited.add(fs.realpath(path))
-    _arm()
+    for fn in list(HOOKS["cd"].values()):  # was: _arm() of the dangling timer
+        fn(path)
     if C.WARM_ON_CD and not _cache.warmed:
         _cache.warmed = True
         threading.Thread(target=_warm, name="vdsym-warm", daemon=True).start()
 
 
-def _on_cd_signal(signal) -> None:
-    new = getattr(signal, "new", None)
-    if new is not None:
-        try:
-            _on_cd(new.path)
-        except Exception:  # noqa: BLE001
-            _LOG.exception("vdsym cd handler failed")
+rhooks.on_cd("vdsym", _on_cd)
 
-
-def _bind_cd(fm) -> None:
-    if fm is None or getattr(fm, "_vdsym_cd", None) == _cache.stamp:
-        return
-    fm._vdsym_cd = _cache.stamp
-    _cache.fm = fm
-    fm.signal_bind("cd", _on_cd_signal)
-
-
-# --------------------------------------------------------------------------- #
-# patches of ranger internals (idempotent, re-exec safe, skipped if ranger differs)
-# --------------------------------------------------------------------------- #
-
-_STATE = types.SimpleNamespace(job=None, policy={})  # policy: path -> "" | y | U | R
-
-
-def _patch(owner, name: str, make) -> None:
-    originals = sys.modules["_vdsym_shared"].orig
-    original = originals.setdefault((owner, name), getattr(owner, name))
-    setattr(owner, name, make(original))
-
-
-def _make_copy(orig):
-    def copy(self, mode="set", narg=None, dirarg=None):
-        if mode == "set":
-            _STATE.policy.clear()
-        return orig(self, mode=mode, narg=narg, dirarg=dirarg)
-
-    return copy
-
-
-def _make_uncut(orig):
-    def uncut(self):
-        _STATE.policy.clear()
-        return orig(self)
-
-    return uncut
-
-
-def _make_cut(orig):
-    def cut(self, mode="set", narg=None, dirarg=None):
-        orig(
-            self, mode=mode, narg=narg, dirarg=dirarg
-        )  # its self.copy() resets the policy
-        if not self.do_cut:
-            return
-        fresh = [f.path for f in self.copy_buffer if f.path not in _STATE.policy]
-        if not fresh:
-            return
-
-        def done(policy: str) -> None:
-            for path in fresh:
-                _STATE.policy[path] = policy
-
-        def cancel() -> None:
-            gone = set(fresh)
-            self.copy_buffer = {f for f in self.copy_buffer if f.path not in gone}
-            self.do_cut = bool(self.copy_buffer)
-            self.ui.browser.main_column.request_redraw()
-
-        _guard_move(self, fresh, "cut", done, cancel)
-
-    return cut
-
-
-def _make_paste(orig):
-    def paste(
-        self,
-        overwrite=False,
-        append=False,
-        dest=None,
-        make_safe_path=get_safe_path,
-        leave_symlink=False,
-    ):
-        target = self.thistab.path if dest is None else dest
-        if leave_symlink and not self.do_cut:
-            self.notify("source-link paste requires cut", bad=True)
-            return None
-        if not self.do_cut and self.copy_buffer and fs.isdir(target):
-            duplicates = [
-                entry
-                for entry in self.copy_buffer
-                if _same_link_target(entry.path, fs.join(target, entry.basename))
-            ]
-            if duplicates:
-                self.notify(_duplicate_link_note(len(duplicates)))
-                remaining = set(self.copy_buffer) - set(duplicates)
-                if not remaining:
-                    return None
-                saved, self.copy_buffer = self.copy_buffer, remaining
-                try:
-                    return orig(
-                        self,
-                        overwrite=overwrite,
-                        append=append,
-                        dest=dest,
-                        make_safe_path=make_safe_path,
-                    )
-                finally:
-                    self.copy_buffer = saved
-        if not self.do_cut:
-            if overwrite and not append and self.copy_buffer and fs.isdir(target):
-                dangling = [
-                    fs.join(target, entry.basename)
-                    for entry in self.copy_buffer
-                    if fs.islink(fs.join(target, entry.basename))
-                    and _dangling(fs.join(target, entry.basename))
-                ]
-                if dangling:
-                    job = _DanglingPasteJob(self, dangling)
-                    if not job.stage():
-                        return None
-                    _STATE.job = job
-                    try:
-                        return orig(
-                            self,
-                            overwrite=overwrite,
-                            append=append,
-                            dest=dest,
-                            make_safe_path=make_safe_path,
-                        )
-                    finally:
-                        _STATE.job = None
-            return orig(
-                self,
-                overwrite=overwrite,
-                append=append,
-                dest=dest,
-                make_safe_path=make_safe_path,
-            )
-        if not self.copy_buffer:
-            return orig(
-                self,
-                overwrite=overwrite,
-                append=append,
-                dest=dest,
-                make_safe_path=make_safe_path,
-            )
-        paths = [f.path for f in self.copy_buffer]
-
-        def go() -> None:
-            wanted = {p: _STATE.policy.pop(p, "") for p in paths}
-            active = {p: pol for p, pol in wanted.items() if pol in ("U", "R")}
-            job = None
-            leave_job = None
-            moves = {}
-            if leave_symlink and fs.isdir(target):
-                moves = _predict_moves(paths, target, overwrite, make_safe_path)
-                leave_job = _LeaveLinkJob(self, moves)
-            if active and fs.isdir(target):
-                moves = _predict_moves(list(active), target, overwrite, make_safe_path)
-                hits = _drop_moving(
-                    find_hits(list(moves), C.LOCK_WAIT, True) or [], paths
-                )
-                _recovery("paste", [f"{old} -> {new}" for old, new in moves.items()])
-                if hits and moves:
-                    job = _MoveJob(self, moves, active, hits)
-                    if not job.stage():
-                        return
-            _STATE.job = _JobGroup(job, leave_job) if leave_job else job
-            try:
-                orig(
-                    self,
-                    overwrite=overwrite,
-                    append=append,
-                    dest=target,
-                    make_safe_path=make_safe_path,
-                )
-            finally:
-                _STATE.job = None
-
-        fresh = [p for p in paths if p not in _STATE.policy]
-        if not fresh:
-            return go()
-
-        def done(policy: str) -> None:
-            for path in fresh:
-                _STATE.policy[path] = policy
-            go()
-
-        _guard_move(self, fresh, "move", done, lambda: None)
-        return None
-
-    return paste
-
-
-def _make_paste_symlink(orig):
-    def paste_symlink(self, relative=False, make_safe_path=get_safe_path):
-        target = self.thisdir.path
-        duplicates = [
-            entry
-            for entry in self.copy_buffer
-            if _link_targets_path(fs.join(target, entry.basename), entry.path)
-        ]
-        if not duplicates:
-            return orig(self, relative=relative, make_safe_path=make_safe_path)
-        self.notify(_duplicate_link_note(len(duplicates)))
-        remaining = set(self.copy_buffer) - set(duplicates)
-        if not remaining:
-            return None
-        saved, self.copy_buffer = self.copy_buffer, remaining
-        try:
-            return orig(self, relative=relative, make_safe_path=make_safe_path)
-        finally:
-            self.copy_buffer = saved
-
-    return paste_symlink
-
-
-def _make_work(orig):
-    def work(self, *args, **kwargs):
-        result = orig(self, *args, **kwargs)
-        _tick()
-        return result
-
-    return work
-
-
-def _make_loader_init(orig):
-    def __init__(self, *args, **kwargs):
-        self._vdsym_job = _STATE.job
-        orig(self, *args, **kwargs)
-
-    return __init__
-
-
-def _make_loader_generate(orig):
-    def generate(self):
-        job = getattr(self, "_vdsym_job", None)
-        try:
-            yield from orig(self)
-        finally:  # completion, error or cancel: reconcile what really moved
-            if job is not None:
-                job.finish()
-
-    return generate
-
-
-def _install() -> None:
-    try:
-        import ranger
-        import ranger.api
-        from ranger.core.actions import Actions
-        from ranger.core.loader import CopyLoader, Loader
-
-        for owner, name, make in (
-            (Actions, "copy", _make_copy),
-            (Actions, "uncut", _make_uncut),
-            (Actions, "cut", _make_cut),
-            (Actions, "paste", _make_paste),
-            (Actions, "paste_symlink", _make_paste_symlink),
-            (CopyLoader, "__init__", _make_loader_init),
-            (CopyLoader, "generate", _make_loader_generate),
-            (Loader, "work", _make_work),
-        ):
-            _patch(owner, name, make)
-        _bind_cd(getattr(ranger, "fm", None))
-        if not getattr(ranger.api.hook_init, "_vdsym", False):
-            previous = ranger.api.hook_init
-
-            def hook_init(fm):
-                _bind_cd(fm)
-                return previous(fm)
-
-            hook_init._vdsym = True  # type: ignore[attr-defined]
-            ranger.api.hook_init = hook_init
-    except Exception:  # noqa: BLE001 - a different ranger must not break the whole plugin
-        _LOG.exception("vdsym: move guards / cd signal not installed")
-
-
-_install()
+## ALT: own cd-signal binding + hook_init wrapper (now rhooks.on_cd, shared by all plugins)
+##      benefit: self-contained; cost: every plugin binding "cd" repeats the same dance
+# def _on_cd_signal(signal) -> None:
+#     new = getattr(signal, "new", None)
+#     if new is not None:
+#         try:
+#             _on_cd(new.path)
+#         except Exception:
+#             _LOG.exception("vdsym cd handler failed")
+# def _bind_cd(fm) -> None:
+#     if fm is None or getattr(fm, "_vdsym_cd", None) == _cache.stamp:
+#         return
+#     fm._vdsym_cd = _cache.stamp
+#     _cache.fm = fm
+#     fm.signal_bind("cd", _on_cd_signal)

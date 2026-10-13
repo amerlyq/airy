@@ -1,0 +1,459 @@
+"""pasteflow: the ONE wrapper around ranger's copy / cut / paste family.
+
+WARN? `paste_symlink` jump uses a directory diff, so it assumes nobody else writes to the destination during the paste.
+
+Other plugins (vdguard, ...) register callbacks here instead of patching Actions themselves,
+so they cannot clash.  Built-in feature: after a paste the cursor jumps to the first pasted
+entry (JUMP) -- for :paste, :paste_symlink, :paste_hardlink, :paste_hardlinked_subtree.
+
+Flow of one paste (Paste object `p`):
+  Actions.paste*(...)            wrapper: normalize args -> Paste(kind, dest, entries, call, opts)
+    guards, in priority order    fn(p, proceed): edit p (p.drop(paths), p.after(cb)), then call
+                                 proceed() -- now or later (prompt) -- or never (= cancel)
+    launch                       snapshot dest listing, run the ORIGINAL method on p.entries
+    finish (exactly once)        async kinds: when CopyLoader.generate ends (done / error / cancel)
+                                 sync kinds (symlink, hardlink): right after the call
+                                 -> p.after callbacks in registration order, jump last
+
+API for plugins
+  guard(key, fn, priority=50)    paste guard; same key replaces (re-exec safe)
+  on_cut(key, fn)                fn(fm, paths) after :cut filled the buffer
+  on_reset(key, fn)              fn(fm) when the buffer is replaced/emptied (:copy set, :uncut)
+  unmark(fm, paths)              drop paths from the copy buffer (cancel a cut for them)
+  predict_moves(paths, dest, overwrite, make_safe_path)   where ranger's mover will put them
+  p.kind  "copy" | "move" | "symlink" | "hardlink" | "hardlink_tree"
+  p.dest, p.entries {path: fobj}, p.call (kwargs of the original), p.opts (unknown kwargs,
+  e.g. fm.paste(leave_symlink=True, jump=False)), p.landed() -> set of new basenames in dest
+
+TROUBLESHOOT
+  no jump: (a) pasted entry hidden by filter/dotfiles (not in d.files), (b) JUMP/opts jump off,
+           (c) cursor dir != dest at the end, (d) signal "finished_loading_dir" never came
+               (freeze_files?) -> see :display_log, logger ranger.pasteflow
+  guard crashed: paste is ABORTED (never run unguarded), traceback in :display_log
+  another plugin wrapped Actions.paste *args/**kw without functools.wraps: signature cannot be
+  normalized -> that call passes through UNGUARDED (logged once)
+EXTEND: new paste-like Action -> add its name + kind to _KINDS; jump to LAST -> reversed(d.files)
+"""
+
+from __future__ import annotations
+
+import inspect
+import logging
+import os
+import types
+from collections.abc import Callable
+from os import path as fs
+
+from ranger.core.actions import Actions
+from ranger.core.loader import CopyLoader
+from ranger.ext.safe_path import get_safe_path
+
+try:
+    from plugins import rhooks  # ranger imports plugins as `plugins.<name>`
+except ImportError:
+    import rhooks  # fallback: rhooks.py somewhere on PYTHONPATH
+
+_LOG = logging.getLogger("ranger.pasteflow")
+
+JUMP = True  # cursor -> first pasted entry (in current sort order); per call: fm.paste(jump=False)
+JUMP_KINDS = ("copy", "move", "symlink", "hardlink", "hardlink_tree")
+JUMP_RETRIES = (
+    3  # re-read dest this many times if the listing still lacks the pasted names
+)
+
+# Actions method -> how to name the kind; "paste" is copy or move depending on fm.do_cut
+_KINDS = {
+    "paste": None,
+    "paste_symlink": "symlink",
+    "paste_hardlink": "hardlink",
+    "paste_hardlinked_subtree": "hardlink_tree",
+}
+
+_REG = rhooks.shared("pasteflow.reg", lambda: {"guard": {}, "cut": {}, "reset": {}})
+_STATE = rhooks.shared(
+    "pasteflow.state", lambda: types.SimpleNamespace(current=None, handler=None)
+)
+
+
+def _register(kind: str, key: str, fn, priority: int) -> None:
+    _REG[kind][key] = (priority, fn)
+
+
+def _ordered(kind: str) -> list[Callable]:
+    # stable: equal priority keeps registration order (dict order; same key keeps its slot)
+    return [fn for _, fn in sorted(_REG[kind].values(), key=lambda item: item[0])]
+
+
+def guard(key: str, fn, priority: int = 50) -> None:
+    _register("guard", key, fn, priority)
+
+
+def on_cut(key: str, fn, priority: int = 50) -> None:
+    _register("cut", key, fn, priority)
+
+
+def on_reset(key: str, fn, priority: int = 50) -> None:
+    _register("reset", key, fn, priority)
+
+
+def _call_all(kind: str, *args) -> None:
+    for fn in _ordered(kind):
+        try:
+            fn(*args)
+        except Exception:
+            _LOG.exception("pasteflow %s hook %r failed", kind, fn)
+
+
+def unmark(fm, paths) -> None:
+    """Cancel a cut for `paths`: they leave the buffer; nothing left -> not a cut anymore."""
+    gone = set(paths)
+    fm.copy_buffer = {f for f in fm.copy_buffer if f.path not in gone}
+    fm.do_cut = bool(fm.copy_buffer) and fm.do_cut
+    fm.ui.browser.main_column.request_redraw()
+
+
+# --------------------------------------------------------------------------- #
+# prediction of ranger's mover (same rule as shutil_generatorized.move/copy2)
+# --------------------------------------------------------------------------- #
+
+
+def _safe_like(dst: str, taken: set[str]) -> str:
+    """ranger's get_safe_path(), also treating names taken earlier in the same batch as existing."""
+
+    def exists(path: str) -> bool:
+        return fs.exists(path) or path in taken
+
+    if not exists(dst):
+        return dst
+    if not dst.endswith("_"):
+        dst += "_"
+        if not exists(dst):
+            return dst
+    n = 0
+    while exists(dst + str(n)):
+        n += 1
+    return dst + str(n)
+
+
+def predict_moves(
+    paths, dest: str, overwrite: bool, make_safe_path=get_safe_path
+) -> dict[str, str]:
+    """Where ranger's mover will put each path (same rule as shutil_generatorized.move)."""
+    moves: dict[str, str] = {}
+    taken: set[str] = set()
+    for old in paths:
+        real = fs.join(dest, fs.basename(old))
+        if overwrite:
+            new = real
+        elif make_safe_path is get_safe_path:
+            new = _safe_like(real, taken)
+        else:
+            new = make_safe_path(real)
+            if new in taken:
+                _LOG.warning("cannot predict destination of %s", old)
+                continue
+        taken.add(new)
+        moves[old] = new
+    return moves
+
+
+# --------------------------------------------------------------------------- #
+# one paste request
+# --------------------------------------------------------------------------- #
+
+
+def _listing(directory: str) -> set[str]:
+    try:
+        return set(os.listdir(directory))
+    except OSError:
+        return set()
+
+
+class Paste:
+    def __init__(self, fm, kind, dest, entries, call, opts, orig) -> None:
+        self.fm, self.kind, self.dest = fm, kind, dest
+        self.call, self.opts, self.orig = call, opts, orig
+        self._objs = {f.path: f for f in entries}  # everything that was in the buffer
+        self.entries = dict(self._objs)  # what will be pasted (guards may drop)
+        self.had_entries = bool(self.entries)
+        self.before: set[str] = set()
+        self.loader_seen = False
+        self._after: list[Callable[[Paste], None]] = []
+        self._finished = False
+        self._landed: set[str] | None = None
+
+    # -- for guards ---------------------------------------------------------- #
+
+    @property
+    def paths(self) -> list[str]:
+        return list(self.entries)
+
+    @property
+    def overwrite(self) -> bool:
+        return bool(self.call.get("overwrite"))
+
+    @property
+    def make_safe_path(self):
+        return self.call.get("make_safe_path") or get_safe_path
+
+    def drop(self, paths) -> None:
+        for path in paths:
+            self.entries.pop(path, None)
+
+    def after(self, fn: Callable[[Paste], None]) -> None:
+        """fn(p) once the files have really landed (or the paste ended early)."""
+        self._after.append(fn)
+
+    # -- results ------------------------------------------------------------ #
+
+    def landed(self) -> set[str]:
+        """Basenames that appeared in dest. Overwrite creates nothing new by name: then the
+        source basenames that exist in dest count."""
+        if self._landed is None:
+            now = _listing(self.dest)
+            new = now - self.before
+            if not new:
+                new = {fs.basename(path) for path in self.entries} & now
+            self._landed = new
+        return self._landed
+
+    # -- run ------------------------------------------------------------------ #
+
+    def launch(self) -> None:
+        fm = self.fm
+        if self.had_entries and not self.entries:
+            return  # guards dropped everything: nothing left to do
+        self.before = _listing(self.dest)
+        if JUMP and self.kind in JUMP_KINDS and self.opts.get("jump", True):
+            self.after(_jump)  # registered last: runs after the guards' jobs
+        saved = fm.copy_buffer
+        swapped = len(self.entries) != len(self._objs)
+        kept = {self._objs[path] for path in self.entries}
+        if swapped:  # the original reads fm.copy_buffer: hand it the reduced set
+            fm.copy_buffer = kept
+        kwargs = dict(self.call)
+        if "dest" in kwargs:
+            kwargs["dest"] = self.dest
+        _STATE.current = self
+        try:
+            self.orig(fm, **kwargs)
+        finally:
+            _STATE.current = None
+            if swapped:
+                # ranger clears the set it was given when it moves; keep what we did not paste
+                fm.copy_buffer = saved if self.kind != "move" else saved - kept
+        if (
+            not self.loader_seen
+        ):  # sync kinds, invalid dest, empty buffer: nothing will call finish()
+            self.finish()
+
+    def finish(self) -> None:
+        if self._finished:
+            return
+        self._finished = True
+        for fn in self._after:
+            try:
+                fn(self)
+            except Exception:
+                _LOG.exception("pasteflow after-callback %r failed", fn)
+
+
+# --------------------------------------------------------------------------- #
+# jump to the first pasted entry
+# --------------------------------------------------------------------------- #
+
+
+def _unbind(fm) -> None:
+    handler, _STATE.handler = _STATE.handler, None
+    if handler is not None:
+        fm.signal_unbind(handler)
+
+
+def _jump(p: Paste) -> None:
+    fm = p.fm
+    new = p.landed()
+    if not new:
+        return
+    d = fm.get_directory(p.dest)
+    _unbind(fm)  # a newer paste supersedes a jump that is still waiting
+    tries = [0]
+
+    def ready(signal) -> None:
+        if getattr(signal, "directory", None) is not d:
+            return
+        if not (new & {f.basename for f in d.files_all or ()}):
+            if tries[0] < JUMP_RETRIES:  # that load started before the files landed
+                tries[0] += 1
+                d.load_content()
+                return
+        _unbind(fm)
+        cur = fm.thisdir
+        if cur is None or cur.path != d.path:  # NOTE user may have cd'd away meanwhile
+            return
+        for f in d.files or ():  # d.files = visible, sorted => "first" is what you see
+            if f.basename in new:
+                d.move_to_obj(f.path)
+                break
+        else:
+            _LOG.debug("pasteflow: no visible pasted entry among %s", sorted(new)[:5])
+
+    _STATE.handler = fm.signal_bind("finished_loading_dir", ready)
+    d.load_content()  # no-op if a load is already scheduled (CopyLoader's own end-of-copy one)
+
+
+## ALT: opt-in command in commands.py, no global patching.
+##      benefit: only mappings that use it jump; breaks with vdsym's old async guards (queued
+##      Loadable ran BEFORE the CopyLoader existed) and cannot cover :paste_symlink
+# class paste_jump(Command):
+#     def execute(self):
+#         fm = self.fm; d = fm.thisdir
+#         names = {f.basename for f in fm.copy_buffer}
+#         before = {f.basename for f in (d.files_all or ())}
+#         fm.paste(overwrite='overwrite' in self.args[1:])
+#         def gen():
+#             yield
+#             d.load_content(schedule=False)
+#             new = {f.basename for f in d.files_all} - before or names
+#             for f in d.files:
+#                 if f.basename in new:
+#                     if fm.thisdir is d: d.move_to_obj(f)
+#                     break
+#         fm.loader.add(Loadable(gen(), 'paste_jump'), append=True)
+
+
+# --------------------------------------------------------------------------- #
+# guard chain
+# --------------------------------------------------------------------------- #
+
+
+def _run(p: Paste) -> None:
+    chain = _ordered("guard")
+
+    def step(i: int = 0) -> None:
+        if i >= len(chain):
+            return p.launch()
+        answered: list[bool] = []
+
+        def proceed() -> None:
+            if answered:  # a prompt answered twice must not paste twice
+                return
+            answered.append(True)
+            step(i + 1)
+
+        try:
+            chain[i](p, proceed)
+        except Exception:
+            _LOG.exception("pasteflow: %r failed; paste aborted", chain[i])
+            p.fm.notify("paste aborted: a guard failed (:display_log)", bad=True)
+
+    step()
+
+
+# --------------------------------------------------------------------------- #
+# wrappers (installed once, re-exec safe, skipped for unknown ranger shapes)
+# --------------------------------------------------------------------------- #
+
+
+def _make_paste_like(name: str):
+    def make(orig):
+        sig = inspect.signature(orig)
+        params = list(sig.parameters.values())
+        if any(
+            q.kind in (q.VAR_POSITIONAL, q.VAR_KEYWORD) for q in params
+        ):  # someone else's *a/**kw wrapper: cannot normalize
+            _LOG.warning(
+                "pasteflow: Actions.%s has an opaque signature; not guarded", name
+            )
+            return orig
+        known = {q.name for q in params}
+
+        def wrapper(self, *args, **kw):
+            opts = {k: kw.pop(k) for k in list(kw) if k not in known}
+            try:
+                bound = sig.bind(self, *args, **kw)
+            except TypeError:
+                return orig(self, *args, **kw)  # let ranger raise its own error
+            bound.apply_defaults()
+            call = dict(bound.arguments)
+            call.pop(params[0].name)  # self
+            kind = _KINDS[name] or ("move" if self.do_cut else "copy")
+            if name == "paste":
+                dest = call.get("dest") or self.thistab.path
+            else:
+                dest = self.thisdir.path
+            _run(Paste(self, kind, dest, self.copy_buffer, call, opts, orig))
+
+        wrapper.__wrapped__ = orig
+        wrapper.__doc__ = orig.__doc__
+        return wrapper
+
+    return make
+
+
+def _make_copy(orig):
+    def copy(self, *args, **kw):
+        mode = kw.get("mode", args[0] if args else "set")
+        if mode == "set":
+            _call_all("reset", self)
+        return orig(self, *args, **kw)
+
+    return copy
+
+
+def _make_uncut(orig):
+    def uncut(self):
+        _call_all("reset", self)
+        return orig(self)
+
+    return uncut
+
+
+def _make_cut(orig):
+    def cut(self, *args, **kw):
+        orig(self, *args, **kw)  # its self.copy() fires the reset hooks
+        if self.do_cut:
+            _call_all("cut", self, [f.path for f in self.copy_buffer])
+
+    return cut
+
+
+def _make_loader_init(orig):
+    def __init__(self, *args, **kwargs):
+        p = (
+            _STATE.current
+        )  # the Paste whose orig() is creating this loader (sync hand-off)
+        self._pasteflow = p
+        if p is not None:
+            p.loader_seen = True
+        orig(self, *args, **kwargs)
+
+    return __init__
+
+
+def _make_loader_generate(orig):
+    def generate(self):
+        p = getattr(self, "_pasteflow", None)
+        try:
+            yield from orig(self)
+        finally:  # completion, error or cancel: reconcile what really landed
+            if p is not None:
+                p.finish()
+
+    return generate
+
+
+def _install() -> None:
+    try:
+        for name in _KINDS:
+            if hasattr(Actions, name):
+                rhooks.patch(Actions, name, _make_paste_like(name))
+        rhooks.patch(Actions, "copy", _make_copy)
+        rhooks.patch(Actions, "uncut", _make_uncut)
+        rhooks.patch(Actions, "cut", _make_cut)
+        rhooks.patch(CopyLoader, "__init__", _make_loader_init)
+        rhooks.patch(CopyLoader, "generate", _make_loader_generate)
+    except Exception:
+        _LOG.exception("pasteflow: wrappers not installed")
+
+
+_install()
