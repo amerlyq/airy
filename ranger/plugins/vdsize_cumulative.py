@@ -356,7 +356,7 @@ def _dir(path, st, mode, cancelled):
     ino, mt = st.st_ino, st.st_mtime_ns
     prev = None
     if not _FRESH:
-        e = vdprobe.dir_get(ino)
+        e = vdprobe.dir_get_stat(st)
         if e is not None and e[0] == mt:
             prev = e[1]
     need_f = mode != "video"
@@ -369,9 +369,7 @@ def _dir(path, st, mode, cancelled):
         return prev
     _DIR_SCANS += 1
     o = _readdir(path, need_f, prev, cancelled)
-    vdprobe.dir_put(
-        ino, mt, o
-    )  # mt was read BEFORE the listing: a racing change just forces a rescan
+    vdprobe.dir_put(ino, mt, o, st)  # mt predates listing; racing changes force a rescan
     return o
 
 

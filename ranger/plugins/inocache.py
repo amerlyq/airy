@@ -58,6 +58,7 @@ class Store:
         assert validate in ("file", "dir", "none", "path"), validate
         self.name, self.version, self.validate = name, version, validate
         self.path = os.path.join(root or ROOT, name + ".sqlite3")
+        self.flush_every = FLUSH_EVERY
         self._mem: dict = {}  # key -> (mt, sz, value) | _MISS marker tuple
         self._new: dict = {}
         self._lock = threading.Lock()  # _new
@@ -112,6 +113,10 @@ class Store:
     # -- api ------------------------------------------------------------------ #
 
     def get(self, st):
+        return self.get_with_status(st)[0]
+
+    def get_with_status(self, st):
+        """-> (value, found); found distinguishes a cached None from a miss."""
         key = self._key(st)
         row = self._mem.get(key)
         if row is None:
@@ -126,7 +131,12 @@ class Store:
             row = self._mem[key] = (
                 (r[0], r[1], marshal.loads(r[2])) if r else (None, None, _MISS)
             )
-        return self._valid(row, st)
+        mt, sz, value = row
+        if value is _MISS:
+            return None, False
+        if self.validate in ("file", "dir") and (mt, sz) != self._stamp(st):
+            return None, False
+        return value, True
 
     def _valid(self, row, st):
         mt, sz, value = row
@@ -137,6 +147,10 @@ class Store:
         return value
 
     def get_many(self, sts) -> dict:
+        return {k: row[2] for k, row in self.get_many_records(sts).items()}
+
+    def get_many_records(self, sts) -> dict:
+        """-> {key: (stored_mtime, stored_size, value)} for valid requested keys."""
         sts = list(sts)
         need = [self._key(s) for s in sts if self._key(s) not in self._mem]
         if need:
@@ -155,9 +169,12 @@ class Store:
                 self._mem.setdefault(k, (None, None, _MISS))
         out = {}
         for s in sts:
-            v = self._valid(self._mem[self._key(s)], s)
-            if v is not None:
-                out[self._key(s)] = v
+            row = self._mem[self._key(s)]
+            mt, sz, value = row
+            if value is not _MISS and (
+                self.validate not in ("file", "dir") or (mt, sz) == self._stamp(s)
+            ):
+                out[self._key(s)] = row
         return out
 
     def put(self, st, value) -> None:
@@ -166,7 +183,7 @@ class Store:
         row = self._mem[key] = (mt, sz, value)
         with self._lock:
             self._new[key] = row
-            full = len(self._new) >= FLUSH_EVERY
+            full = len(self._new) >= self.flush_every
         if full:
             self.flush()
 
@@ -194,6 +211,7 @@ class Store:
     def _after_fork(self) -> None:
         self._tl = threading.local()  # never share a sqlite connection with the parent
         self._lock, self._wlock, self._slock = (threading.Lock() for _ in range(3))
+        self._mem.clear()
         self._new.clear()
 
 

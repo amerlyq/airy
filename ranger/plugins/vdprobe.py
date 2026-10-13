@@ -11,26 +11,25 @@ lib   from ranger.plugins import vdprobe        (or: import vdprobe)
         many(paths)                              dir-sized batch: ONE sql query, probe misses only
         flush()                                  persist pending rows (also runs atexit)
 
-cache  sqlite; key = inode, valid while (mtime_ns, size) still match
-         -> survives mv/rename, and symlink + target share one entry
-         -> lib users never load it whole: point lookups + an in-process memo
-       the CLI bulk-loads it once (a full tree walk touches nearly every row anyway)
+cache  inocache.Store; media keyed by inode, valid while (mtime_ns, size) match
+       directory aggregates use a separate directory-validity store
 formats  mp4/mov, mkv/webm, animated webp natively; anything else odd -> mediainfo
 """
 
-import atexit
-import marshal
 import os
+import marshal
 import subprocess
 import sys
-import threading
 import time
+import threading
 from struct import Struct
-from zlib import crc32
+
+try:
+    from plugins import inocache
+except ImportError:
+    import inocache
 
 # ── config ────────────────────────────────────────────────────────────────────
-# CACHE_PATH = os.environ.get("VDPROBE_CACHE") or os.path.join(os.environ.get("XDG_CACHE_HOME") or os.path.expanduser("~/.cache"), "vdprobe", "cache.db")
-CACHE_PATH = "/cache/irome_db/mediainfo.sqlite3"
 VERSION = 2  # bump when parser output changes (ALL_VIDEO / WEBP_ANIM are hashed in too)
 W = 4096  # one page per read; re-window only when the walk leaves it
 ALL_VIDEO = (
@@ -273,166 +272,56 @@ def _mediainfo_one(path):
 
 
 # ── cache ─────────────────────────────────────────────────────────────────────
+_CACHE_ROOT = os.environ.get("VDPROBE_CACHE_ROOT") or "/cache/irome_db"
+_STORE_ROOT = os.path.join(_CACHE_ROOT, "stores")
+_media_store = inocache.Store(
+    "mediainfo",
+    version=VERSION + (1 if ALL_VIDEO else 0) + (1 if WEBP_ANIM else 0),
+    validate="file",
+    root=_STORE_ROOT,
+)
+_dir_store = inocache.Store("vdprobe-dirs", version=1, validate="dir", root=_STORE_ROOT)
 _ABSENT = (0, -1, None)  # never matches a real file (size >= 0): "known not in db"
 _mem = {}  # ino -> (mtime_ns, size, res)       process memo, validated on every use
-_new = {}  # ino -> same, waiting for flush()
-_all = False  # _mem holds the whole table (CLI) -> a memo miss is a real miss
 _defer = None  # CLI: list collecting files for one batched mediainfo call
 _dmem = {}  # dir ino -> (mtime_ns, obj)   directory aggregates (see dir_get)
-_dnew = {}  # waiting for flush()
-_lock = threading.Lock()  # _new, _dnew
-_wlock = threading.Lock()  # sqlite writes / schema
-_tl = threading.local()  # one sqlite connection per thread
+_dstats = {}
 stats = [0, 0]  # hits, misses (approximate under threads)
+_pending = 0
+_worker_new = None
 
 
-def _db():
-    c = getattr(_tl, "c", None)
-    if c is None:
-        import sqlite3
-
-        os.makedirs(os.path.dirname(CACHE_PATH), exist_ok=True)
-        c = sqlite3.connect(CACHE_PATH, timeout=10, isolation_level=None)
-        try:
-            c.execute("PRAGMA journal_mode=WAL")
-        except sqlite3.Error:
-            pass
-        c.execute("PRAGMA synchronous=NORMAL")
-        want = crc32(f"{VERSION}:{ALL_VIDEO}:{WEBP_ANIM}".encode()) & 0x7FFFFFFF
-        with _wlock:
-            if c.execute("PRAGMA user_version").fetchone()[0] != want:
-                c.execute("BEGIN IMMEDIATE")
-                if c.execute("PRAGMA user_version").fetchone()[0] != want:  # raced?
-                    c.execute("DROP TABLE IF EXISTS m")
-                    c.execute("DROP TABLE IF EXISTS d")
-                    c.execute(
-                        "CREATE TABLE m(ino INTEGER PRIMARY KEY, mt INTEGER, sz INTEGER,"
-                        " dur INTEGER, codec TEXT)"
-                    )
-                    c.execute(
-                        "CREATE TABLE d(ino INTEGER PRIMARY KEY, mt INTEGER, blob BLOB)"
-                    )
-                    c.execute(f"PRAGMA user_version={want}")
-                c.execute("COMMIT")
-        _tl.c = c
-    return c
-
-
-def _row(ino, mt, sz, dur, codec):
-    _mem[ino] = (mt, sz, None if dur is None else (dur, codec))
-
-
-def _db_get(ino):
-    try:
-        row = (
-            _db()
-            .execute("SELECT mt,sz,dur,codec FROM m WHERE ino=?", (ino,))
-            .fetchone()
-        )
-    except Exception:  # sqlite3.Error: the cache is best-effort
-        row = None
-    if row is None:
-        _mem[ino] = r = _ABSENT
-    else:
-        _row(ino, *row)
-        r = _mem[ino]
-    return r
-
-
-def _load(inos):
-    """memoize rows for these inodes: one query per 500"""
-    try:
-        c = _db()
-        for i in range(0, len(inos), 500):
-            part = inos[i : i + 500]
-            q = "SELECT ino,mt,sz,dur,codec FROM m WHERE ino IN (%s)" % ",".join(
-                "?" * len(part)
-            )
-            for row in c.execute(q, part):
-                _row(*row)
-    except Exception:
-        pass
-    for ino in inos:
-        _mem.setdefault(ino, _ABSENT)
-
-
-def _load_all():
-    global _all
-    try:
-        for row in _db().execute("SELECT ino,mt,sz,dur,codec FROM m"):
-            _row(*row)
-    except Exception:
-        pass
-    _all = True
-
-
-def _put(ino, mt, sz, res):
-    r = _mem[ino] = (mt, sz, res)
-    with _lock:
-        _new[ino] = r
-        full = len(_new) >= FLUSH_EVERY
-    if full:
-        flush()
-
-
-def flush():
-    with _lock:
-        if not _new and not _dnew:
-            return
-        rows = [
-            (i, r[0], r[1], r[2] and r[2][0], r[2] and r[2][1]) for i, r in _new.items()
-        ]
-        drows = [(i, mt, marshal.dumps(o)) for i, (mt, o) in _dnew.items()]
-        _new.clear()
-        _dnew.clear()
-    try:
-        with _wlock:
-            c = _db()
-            c.execute("BEGIN IMMEDIATE")
-            try:
-                c.executemany("INSERT OR REPLACE INTO m VALUES (?,?,?,?,?)", rows)
-                c.executemany("INSERT OR REPLACE INTO d VALUES (?,?,?)", drows)
-                c.execute("COMMIT")
-            except BaseException:
-                c.execute("ROLLBACK")
-                raise
-    except Exception:  # locked / disk full: keep for the next flush
-        with _lock:
-            for row in rows:
-                _new.setdefault(
-                    row[0],
-                    (row[1], row[2], None if row[3] is None else (row[3], row[4])),
-                )
-            for ino, mt, blob in drows:
-                _dnew.setdefault(ino, (mt, marshal.loads(blob)))
-
-
-def checkpoint():
-    """Drain the SQLite WAL when possible.
-
-    A concurrent reader or writer may make TRUNCATE return BUSY; the cache is
-    best-effort, so leave the WAL for SQLite to checkpoint later in that case.
-    """
-    try:
-        c = _db()
-        with _wlock:
-            c.execute("PRAGMA wal_checkpoint(TRUNCATE)")
-    except Exception:
-        pass
-
-
-atexit.register(flush)
+def _put(ino, mt, sz, res, st=None):
+    global _pending
+    _mem[ino] = (mt, sz, res)
+    if st is not None:
+        if _worker_new is not None:
+            _worker_new[ino] = (mt, sz, res)
+        else:
+            _media_store.put(st, res)
+            _pending += 1
+            if _pending >= FLUSH_EVERY:
+                flush()
 
 
 def _after_fork():
-    global _tl, _lock, _wlock
-    _tl = threading.local()  # never share a sqlite connection with the parent
-    _lock, _wlock = threading.Lock(), threading.Lock()
-    _new.clear()
-    _dnew.clear()
+    global _pending
+    _mem.clear()
+    _pending = 0
 
 
 os.register_at_fork(after_in_child=_after_fork)
+
+
+def flush():
+    global _pending
+    _media_store.flush()
+    _dir_store.flush()
+    _pending = 0
+
+
+def checkpoint():
+    """Compatibility no-op; Store owns SQLite connections and checkpoints."""
 
 
 # ── library API ───────────────────────────────────────────────────────────────
@@ -447,8 +336,9 @@ def lookup(path, st=None):
         return None, True
     ino, mt, sz = st.st_ino, st.st_mtime_ns, st.st_size
     r = _mem.get(ino)
-    if r is None and not _all:
-        r = _db_get(ino)
+    if r is None:
+        value, found = _media_store.get_with_status(st)
+        r = _mem[ino] = (mt, sz, value) if found else _ABSENT
     if r is not None and r[0] == mt and r[1] == sz:
         stats[0] += 1
         return r[2], True
@@ -462,7 +352,7 @@ def lookup(path, st=None):
         if res is False:  # no pymediainfo / failed: remember for this session only
             _mem[ino] = (mt, sz, None)
             return None, False
-    _put(ino, mt, sz, res)
+    _put(ino, mt, sz, res, st)
     return res, False
 
 
@@ -485,21 +375,27 @@ def codec(path, st=None):
 def dir_get(ino):
     """-> (mtime_ns, obj) | None.  Opaque per-directory aggregate; the caller decides validity
     (a directory's mtime changes when entries are added/removed/renamed, NOT on in-place edits)."""
-    r = _dmem.get(ino)
+    return _dmem.get(ino)
+
+
+def dir_get_stat(st):
+    _dstats[st.st_ino] = st
+    r = _dmem.get(st.st_ino)
     if r is None:
-        try:
-            row = _db().execute("SELECT mt,blob FROM d WHERE ino=?", (ino,)).fetchone()
-            r = (row[0], marshal.loads(row[1])) if row else (-1, None)
-        except Exception:
-            r = (-1, None)
-        _dmem[ino] = r
+        obj = _dir_store.get(st)
+        r = _dmem[st.st_ino] = (st.st_mtime_ns, obj) if obj is not None else None
+    if r is None:
+        return None
     return r if r[1] is not None else None
 
 
-def dir_put(ino, mt, obj):
+def dir_put(ino, mt, obj, st=None):
     """obj: anything marshal can dump (tuples/lists/dicts/str/int/None)"""
-    with _lock:
-        _dmem[ino] = _dnew[ino] = (mt, obj)
+    _dmem[ino] = (mt, obj)
+    st = st or _dstats.get(ino)
+    if st is not None:
+        _dstats[ino] = st
+        _dir_store.put(st, obj)
 
 
 def many(paths):
@@ -515,9 +411,12 @@ def many(paths):
             continue
         sts[p] = s
         if s.st_ino not in _mem:
-            need.append(s.st_ino)
-    if need and not _all:
-        _load(need)
+            need.append(s)
+    if need:
+        for ino, row in _media_store.get_many_records(need).items():
+            _mem[ino] = row
+        for st in need:
+            _mem.setdefault(st.st_ino, _ABSENT)
     return {p: lookup(p, s)[0] for p, s in sts.items()}
 
 
@@ -558,7 +457,10 @@ def scan(root):
 
 
 def _parallel(paths, n):
+    global _defer, _worker_new
     """fork n workers over paths; they only read _mem and probe, the parent owns sqlite"""
+    library_mode = _defer is None
+    library_deferred = []
     step = -(-len(paths) // n)
     kids = []
     for k in range(n):
@@ -567,9 +469,13 @@ def _parallel(paths, n):
         if pid == 0:
             try:
                 os.close(r)
-                out = [lookup(p)[0] for p in paths[k * step : (k + 1) * step]]
+                _worker_new = {}
+                if library_mode:
+                    _defer = []
+                chunk = paths[k * step : (k + 1) * step]
+                out = [lookup(p)[0] for p in chunk]
                 with os.fdopen(w, "wb") as f:
-                    f.write(marshal.dumps((out, _new, _defer)))
+                    f.write(marshal.dumps((out, _worker_new, _defer)))
             except BaseException:
                 import traceback
 
@@ -579,16 +485,54 @@ def _parallel(paths, n):
         os.close(w)
         kids.append((pid, r))
     res = []
-    for pid, r in kids:
+    for worker_index, (pid, r) in enumerate(kids):
         with os.fdopen(r, "rb") as f:
             data = f.read()
         if os.waitpid(pid, 0)[1] or not data:
             sys.exit("vdprobe: worker failed (traceback above); nothing written")
         out, new, dfr = marshal.loads(data)
-        res += out
-        _mem.update(new)
-        _new.update(new)
-        _defer.extend(dfr)
+        offset = len(res)
+        res.extend(out)
+        chunk = paths[worker_index * step : (worker_index + 1) * step]
+        stats_by_key = {}
+        for path in chunk:
+            try:
+                st = os.stat(path)
+            except OSError:
+                continue
+            stats_by_key[(st.st_ino, st.st_mtime_ns, st.st_size)] = st
+        for ino, (mt, sz, value) in new.items():
+            st = stats_by_key.get((ino, mt, sz))
+            if st is not None:
+                _put(ino, mt, sz, value, st)
+        if library_mode:
+            library_deferred.extend(dfr)
+        else:
+            _defer.extend(dfr)
+    if library_mode and library_deferred:
+        got = dict(_mediainfo_batch(library_deferred))
+        positions = {}
+        for i, path in enumerate(paths):
+            positions.setdefault(path, []).append(i)
+        for item in library_deferred:
+            path, ino, mt, sz = item
+            if path not in got:
+                result = _mediainfo_one(path)
+                try:
+                    st = os.stat(path)
+                except OSError:
+                    continue
+                if (st.st_ino, st.st_mtime_ns, st.st_size) != (ino, mt, sz):
+                    continue
+                if result is False:
+                    result = None
+                    _mem[ino] = (mt, sz, None)
+                else:
+                    _put(ino, mt, sz, result, st)
+                got[path] = result
+        for path, result in got.items():
+            for i in positions.get(path, ()):
+                res[i] = result
     return res
 
 
@@ -643,7 +587,13 @@ def _mediainfo_batch(items):
                 continue
             d, c = f[0].decode(), f[1].decode("utf-8", "surrogateescape")
             res = (int(d), c) if d.isdigit() else ((0, c) if c else None)
-            _put(it[1], it[2], it[3], res)
+            try:
+                st = os.stat(it[0])
+            except OSError:
+                continue
+            if (st.st_ino, st.st_mtime_ns, st.st_size) != it[1:]:
+                continue
+            _put(it[1], it[2], it[3], res, st)
             got.append((it[0], res))
     return got
 
@@ -655,24 +605,28 @@ def main(argv):
     gc.disable()
     t0 = time.perf_counter()
     FLUSH_EVERY = 1 << 60  # one transaction at the end; workers never touch sqlite
+    _media_store.flush_every = FLUSH_EVERY
+    _dir_store.flush_every = FLUSH_EVERY
     args = argv[1:]
     nul = "-0" in args
     args = [a for a in args if a != "-0"]
     root = args[0] if args else "."
     sys.stdout.reconfigure(errors="surrogateescape")
     checkpoint()
-    _load_all()
     _defer = []
     if root == "-":
         paths = [p for p in sys.stdin.read().split("\0" if nul else "\n") if p]
     else:
         paths = scan(root)
     out = resolve(paths)
-    lines = [f"{r[0]}\t{r[1]}\t{p}\n" for p, r in zip(paths, out) if r and r[1]]
     ndefer = len(_defer)
+    by_path = {}
+    for i, p in enumerate(paths):
+        by_path.setdefault(p, []).append(i)
     for p, r in _mediainfo_batch(_defer):
-        if r and r[1]:
-            lines.append(f"{r[0]}\t{r[1]}\t{p}\n")
+        for i in by_path.get(p, ()):
+            out[i] = r
+    lines = [f"{r[0]}\t{r[1]}\t{p}\n" for p, r in zip(paths, out) if r and r[1]]
     sys.stdout.write("".join(lines))
     sys.stdout.flush()
     flush()
