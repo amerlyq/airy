@@ -47,7 +47,7 @@ from collections.abc import Callable
 from os import path as fs
 
 from ranger.core.actions import Actions
-from ranger.core.loader import CopyLoader
+from ranger.core.loader import CopyLoader, Loadable
 from ranger.ext.safe_path import get_safe_path
 
 try:
@@ -64,6 +64,20 @@ JUMP_RETRIES = (
 )
 
 # Actions method -> how to name the kind; "paste" is copy or move depending on fm.do_cut
+DEBUG = False  # :eval import plugins.pasteflow as p; p.DEBUG = True  -> trace in :display_log
+
+
+def _dbg(msg: str, *args) -> None:
+    if DEBUG:
+        _LOG.warning("pasteflow: " + msg, *args)
+
+
+# positional order of stock ranger, used only for someone else's *a/**kw wrapper
+_STOCK_ARGS = {
+    "paste": ("overwrite", "append", "dest", "make_safe_path"),
+    "paste_symlink": ("relative", "make_safe_path"),
+}
+
 _KINDS = {
     "paste": None,
     "paste_symlink": "symlink",
@@ -226,6 +240,8 @@ class Paste:
         if self.had_entries and not self.entries:
             return  # guards dropped everything: nothing left to do
         self.before = _listing(self.dest)
+        _dbg("launch kind=%s dest=%s entries=%d before=%d", self.kind, self.dest,
+             len(self.entries), len(self.before))
         if JUMP and self.kind in JUMP_KINDS and self.opts.get("jump", True):
             self.after(_jump)  # registered last: runs after the guards' jobs
         saved = fm.copy_buffer
@@ -253,6 +269,8 @@ class Paste:
         if self._finished:
             return
         self._finished = True
+        _dbg("finish kind=%s loader_seen=%s after-callbacks=%d", self.kind,
+             self.loader_seen, len(self._after))
         for fn in self._after:
             try:
                 fn(self)
@@ -271,33 +289,55 @@ def _unbind(fm) -> None:
         fm.signal_unbind(handler)
 
 
+def _later(fm, fn) -> None:
+    """Run fn after everything queued in the loader NOW has finished. A directory load that
+    emitted finished_loading_dir is still `load_generator`-pending until the loader notices
+    StopIteration, so d.load_content() from inside the signal would be a silent no-op."""
+
+    def gen():
+        yield
+        fn()
+
+    fm.loader.add(Loadable(gen(), "pasteflow"), append=True)
+
+
 def _jump(p: Paste) -> None:
     fm = p.fm
     new = p.landed()
     if not new:
+        _dbg("jump: nothing landed in %s", p.dest)
         return
     d = fm.get_directory(p.dest)
+    follow = p.opts.get("jump") == "follow"  # fm.paste(dest=other, jump="follow"): cd there too
     _unbind(fm)  # a newer paste supersedes a jump that is still waiting
     tries = [0]
+    _dbg("jump: waiting for %s to load, new=%s follow=%s", d.path, sorted(new)[:5], follow)
 
     def ready(signal) -> None:
         if getattr(signal, "directory", None) is not d:
             return
-        if not (new & {f.basename for f in d.files_all or ()}):
+        have = {f.basename for f in d.files_all or ()}
+        if not (new & have):
             if tries[0] < JUMP_RETRIES:  # that load started before the files landed
                 tries[0] += 1
-                d.load_content()
+                _dbg("jump: listing lacks %s, retry %d", sorted(new)[:3], tries[0])
+                _later(fm, d.load_content)
                 return
         _unbind(fm)
         cur = fm.thisdir
+        if (cur is None or cur.path != d.path) and follow:
+            fm.cd(d.path)
+            cur = fm.thisdir
         if cur is None or cur.path != d.path:  # NOTE user may have cd'd away meanwhile
+            _dbg("jump: cursor dir %s != dest %s (no jump)", getattr(cur, "path", None), d.path)
             return
         for f in d.files or ():  # d.files = visible, sorted => "first" is what you see
             if f.basename in new:
                 d.move_to_obj(f.path)
+                _dbg("jump: -> %s", f.basename)
                 break
         else:
-            _LOG.debug("pasteflow: no visible pasted entry among %s", sorted(new)[:5])
+            _dbg("jump: no visible pasted entry among %s (filtered/hidden?)", sorted(new)[:5])
 
     _STATE.handler = fm.signal_bind("finished_loading_dir", ready)
     d.load_content()  # no-op if a load is already scheduled (CopyLoader's own end-of-copy one)
@@ -375,29 +415,39 @@ def _make_paste_like(name: str):
     def make(orig):
         sig = inspect.signature(orig)
         params = list(sig.parameters.values())
-        if any(
-            q.kind in (q.VAR_POSITIONAL, q.VAR_KEYWORD) for q in params
-        ):  # someone else's *a/**kw wrapper: cannot normalize
+        opaque = any(q.kind in (q.VAR_POSITIONAL, q.VAR_KEYWORD) for q in params)
+        if opaque:  # someone else's *a/**kw wrapper (e.g. clipboard plugin loaded before us)
             _LOG.warning(
-                "pasteflow: Actions.%s has an opaque signature; not guarded", name
+                "pasteflow: Actions.%s has an opaque signature; guessing stock argument names",
+                name,
             )
-            return orig
         known = {q.name for q in params}
 
         def wrapper(self, *args, **kw):
-            opts = {k: kw.pop(k) for k in list(kw) if k not in known}
-            try:
-                bound = sig.bind(self, *args, **kw)
-            except TypeError:
-                return orig(self, *args, **kw)  # let ranger raise its own error
-            bound.apply_defaults()
-            call = dict(bound.arguments)
-            call.pop(params[0].name)  # self
+            if opaque:
+                # ALT:BUG: cannot tell which kwargs the other wrapper understands: only ours
+                # ("jump") is taken out, the rest (leave_symlink...) is passed through AND peeked
+                opts = {k: kw.pop(k) for k in ("jump",) if k in kw}
+                call = dict(zip(_STOCK_ARGS.get(name, ()), args))
+                call.update(kw)
+                if "leave_symlink" in call:
+                    opts["leave_symlink"] = call["leave_symlink"]
+            else:
+                opts = {k: kw.pop(k) for k in list(kw) if k not in known}
+                try:
+                    bound = sig.bind(self, *args, **kw)
+                except TypeError:
+                    return orig(self, *args, **kw)  # let ranger raise its own error
+                bound.apply_defaults()
+                call = dict(bound.arguments)
+                call.pop(params[0].name)  # self
             kind = _KINDS[name] or ("move" if self.do_cut else "copy")
             if name == "paste":
                 dest = call.get("dest") or self.thistab.path
             else:
                 dest = self.thisdir.path
+            _dbg("%s kind=%s dest=%s n=%d call=%s opts=%s", name, kind, dest,
+                 len(self.copy_buffer), sorted(call), opts)
             _run(Paste(self, kind, dest, self.copy_buffer, call, opts, orig))
 
         wrapper.__wrapped__ = orig

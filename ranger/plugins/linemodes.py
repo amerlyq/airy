@@ -20,7 +20,7 @@ class BytesizeLinemode(LinemodeBase):
 
     def infostring(self, f: FileSystemObject, metadata: object) -> str:
         if not f.is_directory:
-            return str(f.stat.st_size)
+            return str(f.stat.st_size) if f.stat else ""
         else:
             raise NotImplementedError
 
