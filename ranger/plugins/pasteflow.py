@@ -64,7 +64,7 @@ JUMP_RETRIES = (
 )
 
 # Actions method -> how to name the kind; "paste" is copy or move depending on fm.do_cut
-DEBUG = False  # :eval import plugins.pasteflow as p; p.DEBUG = True  -> trace in :display_log
+DEBUG = True  # :eval import plugins.pasteflow as p; p.DEBUG = True  -> trace in :display_log
 
 
 def _dbg(msg: str, *args) -> None:
@@ -240,8 +240,13 @@ class Paste:
         if self.had_entries and not self.entries:
             return  # guards dropped everything: nothing left to do
         self.before = _listing(self.dest)
-        _dbg("launch kind=%s dest=%s entries=%d before=%d", self.kind, self.dest,
-             len(self.entries), len(self.before))
+        _dbg(
+            "launch kind=%s dest=%s entries=%d before=%d",
+            self.kind,
+            self.dest,
+            len(self.entries),
+            len(self.before),
+        )
         if JUMP and self.kind in JUMP_KINDS and self.opts.get("jump", True):
             self.after(_jump)  # registered last: runs after the guards' jobs
         saved = fm.copy_buffer
@@ -269,8 +274,12 @@ class Paste:
         if self._finished:
             return
         self._finished = True
-        _dbg("finish kind=%s loader_seen=%s after-callbacks=%d", self.kind,
-             self.loader_seen, len(self._after))
+        _dbg(
+            "finish kind=%s loader_seen=%s after-callbacks=%d",
+            self.kind,
+            self.loader_seen,
+            len(self._after),
+        )
         for fn in self._after:
             try:
                 fn(self)
@@ -308,10 +317,17 @@ def _jump(p: Paste) -> None:
         _dbg("jump: nothing landed in %s", p.dest)
         return
     d = fm.get_directory(p.dest)
-    follow = p.opts.get("jump") == "follow"  # fm.paste(dest=other, jump="follow"): cd there too
+    follow = (
+        p.opts.get("jump") == "follow"
+    )  # fm.paste(dest=other, jump="follow"): cd there too
     _unbind(fm)  # a newer paste supersedes a jump that is still waiting
     tries = [0]
-    _dbg("jump: waiting for %s to load, new=%s follow=%s", d.path, sorted(new)[:5], follow)
+    _dbg(
+        "jump: waiting for %s to load, new=%s follow=%s",
+        d.path,
+        sorted(new)[:5],
+        follow,
+    )
 
     def ready(signal) -> None:
         if getattr(signal, "directory", None) is not d:
@@ -329,7 +345,11 @@ def _jump(p: Paste) -> None:
             fm.cd(d.path)
             cur = fm.thisdir
         if cur is None or cur.path != d.path:  # NOTE user may have cd'd away meanwhile
-            _dbg("jump: cursor dir %s != dest %s (no jump)", getattr(cur, "path", None), d.path)
+            _dbg(
+                "jump: cursor dir %s != dest %s (no jump)",
+                getattr(cur, "path", None),
+                d.path,
+            )
             return
         for f in d.files or ():  # d.files = visible, sorted => "first" is what you see
             if f.basename in new:
@@ -337,7 +357,10 @@ def _jump(p: Paste) -> None:
                 _dbg("jump: -> %s", f.basename)
                 break
         else:
-            _dbg("jump: no visible pasted entry among %s (filtered/hidden?)", sorted(new)[:5])
+            _dbg(
+                "jump: no visible pasted entry among %s (filtered/hidden?)",
+                sorted(new)[:5],
+            )
 
     _STATE.handler = fm.signal_bind("finished_loading_dir", ready)
     d.load_content()  # no-op if a load is already scheduled (CopyLoader's own end-of-copy one)
@@ -416,7 +439,9 @@ def _make_paste_like(name: str):
         sig = inspect.signature(orig)
         params = list(sig.parameters.values())
         opaque = any(q.kind in (q.VAR_POSITIONAL, q.VAR_KEYWORD) for q in params)
-        if opaque:  # someone else's *a/**kw wrapper (e.g. clipboard plugin loaded before us)
+        if (
+            opaque
+        ):  # someone else's *a/**kw wrapper (e.g. clipboard plugin loaded before us)
             _LOG.warning(
                 "pasteflow: Actions.%s has an opaque signature; guessing stock argument names",
                 name,
@@ -446,8 +471,15 @@ def _make_paste_like(name: str):
                 dest = call.get("dest") or self.thistab.path
             else:
                 dest = self.thisdir.path
-            _dbg("%s kind=%s dest=%s n=%d call=%s opts=%s", name, kind, dest,
-                 len(self.copy_buffer), sorted(call), opts)
+            _dbg(
+                "%s kind=%s dest=%s n=%d call=%s opts=%s",
+                name,
+                kind,
+                dest,
+                len(self.copy_buffer),
+                sorted(call),
+                opts,
+            )
             _run(Paste(self, kind, dest, self.copy_buffer, call, opts, orig))
 
         wrapper.__wrapped__ = orig
