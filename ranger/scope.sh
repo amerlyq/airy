@@ -563,7 +563,19 @@ handle_fallback() {
 }
 
 
+## @amerlyq: animated webp are too slow to preview => no preview (collapses the pane).
+## WHY: ANIM chunk is at byte offset 30; bash `read` builtin => zero extra spawns.
+## INVARIANT: same probe as rifle.conf and image_preview_imv2.py (ANIM_PROBE_BYTES).
+if [[ $FILE_EXTENSION_LOWER == webp ]]; then
+    ANIM_HEAD=
+    read -rN40 ANIM_HEAD 2>/dev/null <"$FILE_PATH"  # unreadable => empty => not ANIM
+    [[ $ANIM_HEAD == *ANIM* ]] && exit 1
+fi
+
 MIMETYPE="$( file --dereference --brief --mime-type -- "${FILE_PATH}" )"
+## ALT: hide image preview while imv sync is active via env var -- replaced by the plugin
+##   setting `preview_files=False` (no spawn, manual `zp` still works, cache kept)
+# [[ -n ${RANGER_IMV_SYNC-} && $MIMETYPE == image/* ]] && exit 1
 if [[ "${PV_IMAGE_ENABLED}" == 'True' ]]; then
     handle_image "${MIMETYPE}"
 fi

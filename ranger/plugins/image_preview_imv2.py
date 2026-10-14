@@ -28,6 +28,7 @@ import stat
 import tempfile
 import time
 from concurrent.futures import ThreadPoolExecutor
+from functools import lru_cache
 from pathlib import Path
 from typing import NamedTuple
 
@@ -43,6 +44,31 @@ IMV_HOLD_THRESHOLD_MS = 120
 IPC_TIMEOUT = 0.15
 IPC_MAX_BYTES = 1023
 SOCKET_GLOB = "imv-*.sock"
+# OPTION: while imv tracking is active -- set ranger `preview_files=False`: no scope.sh
+#   spawns, preview column collapses (more room for filenames), cached previews stay intact.
+#   Restored when tracking ends. Manual `zp` (toggle_option preview_files) still works
+#   while tracking, to verify that imv shows the same image as ranger.
+# REQUIRES: ranger `set collapse_preview true` (default) for the column to collapse.
+IMV_HIDE_PREVIEW = True
+## ALT: env var RANGER_IMV_SYNC + `exit 1` for image/* in scope.sh -- still spawns scope.sh
+##   per viewed image, caches "no preview" verdicts in fm.previews (needs clear to revert),
+##   and blocks manual preview unconditionally.
+# IMV_COLLAPSE_IMAGE_PREVIEW = True
+# IMV_PREVIEW_ENV = "RANGER_IMV_SYNC"
+# OPTION: keep animated webp out of the playlist (imv drops them => indexes shift).
+#   Probing costs one 40-byte read per candidate, so only webp bigger than the threshold
+#   are probed (cached by path+mtime). TRADEOFF: smaller animated webp are NOT detected
+#   (-> use IMV_SYNC_MODE="name"). Set IMV_SKIP_ANIM=False to remove all probing cost.
+IMV_SKIP_ANIM = True
+IMV_ANIM_MIN_SIZE = 500_000  # bytes; sanity threshold, adjust to your animated/still split
+# OPTION: how ranger selection is mapped to imv position
+#   "index": goto <ranger index>; requires imv list == playlist (see _imv_can_show). 1 IPC.
+#   "name":  goto <guess>, verify landed path via snapshot, shift guess, repeat. Tolerates
+#            any files imv drops; costs >=1 extra snapshot round-trip per move (~5-15 ms).
+IMV_SYNC_MODE = "index"
+IMV_NAME_SYNC_STEPS = 4  # max goto+verify passes per move in "name" mode
+# WHY: ANIM chunk sits at offset 30 (RIFF hdr 12 + VP8X chunk 18); keep in sync with rifle.conf/scope.sh
+ANIM_PROBE_BYTES = 40
 TRACKING_MAPS = {
     "i": "tag_toggle",
     "I": "sync_imv_position",
@@ -69,6 +95,37 @@ def _looks_like_image(path: str) -> bool:
         ".qoi",
         ".jxl",
     }
+
+
+@lru_cache(maxsize=65536)
+def _is_animated_webp(path: str, mtime_ns: int) -> bool:
+    """imv can't load animated webp and silently drops it from its list.
+
+    WHY: cache key has mtime so a rewritten file is re-probed; only 40 bytes read.
+    DEBUG: unreadable file => False (treated as showable; imv count check will flag it).
+    """
+    try:
+        with open(path, "rb") as f:
+            return b"ANIM" in f.read(ANIM_PROBE_BYTES)
+    except OSError:
+        return False
+
+
+def _imv_can_show(entry) -> bool:
+    """Playlist membership == what imv will really keep in its own list.
+
+    INVARIANT: ranger index N in playlist <=> imv index N; any file imv skips
+      MUST be excluded here, else goto/back-sync shift by one and self-oscillate.
+    EXTEND: add other imv-unloadable formats here (single place).
+    """
+    if entry.is_directory or not _looks_like_image(entry.path):
+        return False
+    if IMV_SKIP_ANIM and entry.path.lower().endswith(".webp"):
+        stat_ = entry.stat
+        # WHY: size gate first -- stat is already loaded by ranger, the probe opens a file
+        if stat_ and stat_.st_size > IMV_ANIM_MIN_SIZE:
+            return not _is_animated_webp(entry.path, stat_.st_mtime_ns)
+    return True
 
 
 class SocketInfo(NamedTuple):
@@ -174,6 +231,10 @@ class ImvSync:
         self.socket = None
         self.hunt_until = 0.0
         self.playlist = ()
+        self.imv_index = {}  # realpath -> imv index as last observed ("name" mode hint)
+        self.saved_preview = None  # preview_files value to restore; None = not hidden by us
+        self._positions_src = None
+        self._positions_map = {}
         self.directory = ""
         self.playlist_tab = None
         self.last_tab = fm.thistab
@@ -239,12 +300,14 @@ class ImvSync:
         self.generation += 1
         self.socket = selected
         self.playlist = ()
+        self.imv_index = {}
         self.directory = getattr(self.fm.thisdir, "path", "")
         self.playlist_tab = self.fm.thistab
         self.observed_selection = None
         # self.pending = False
         self.pending = selected is not None  # new viewer: push ranger's playlist once
         self.last_poll = 0.0
+        self.apply_preview_mode(selected is not None)
         maps = self.fm.ui.keymaps
         if selected and not self.saved_maps:
             for key, command in TRACKING_MAPS.items():
@@ -260,6 +323,46 @@ class ImvSync:
                 else:
                     maps.bind("browser", key, original)
             self.saved_maps.clear()
+
+    def apply_preview_mode(self, tracking):
+        """Hide ranger's preview while imv is tracked; restore afterwards.
+
+        WHY preview_files: ranger then never spawns scope.sh and collapses the column;
+          fm.previews cache is untouched so previews reappear instantly on restore.
+        INVARIANT: only the first activation saves the value, so socket A -> B switches
+          don't override a manual `zp` done during tracking.
+        PROBABLY: redraw_window drops an already-drawn image overlay.
+        """
+        if not IMV_HIDE_PREVIEW:
+            return
+        settings = self.fm.settings
+        if tracking:
+            if self.saved_preview is not None:
+                return
+            self.saved_preview = bool(settings.preview_files)
+            settings.preview_files = False
+        elif self.saved_preview is not None:
+            settings.preview_files = self.saved_preview
+            self.saved_preview = None
+        self.fm.ui.redraw_window()
+
+    ## ALT: env-var variant (see IMV_COLLAPSE_IMAGE_PREVIEW above); scope.sh counterpart disabled too
+    # def apply_preview_mode(self, tracking):
+    #     """Tracking on => scope.sh refuses image previews => ranger collapses preview column.
+
+    #     WHY env: ranger spawns scope.sh from its own process, so os.environ is inherited.
+    #     DEBUG: ranger caches per-path preview verdicts (fm.previews); clear on every
+    #       transition or stale "has preview"/"no preview" stays until file mtime changes.
+    #     PROBABLY: redraw_window is needed to drop an already-drawn image overlay.
+    #     """
+    #     if not IMV_COLLAPSE_IMAGE_PREVIEW:
+    #         return
+    #     if tracking:
+    #         os.environ[IMV_PREVIEW_ENV] = "1"
+    #     else:
+    #         os.environ.pop(IMV_PREVIEW_ENV, None)
+    #     self.fm.previews.clear()
+    #     self.fm.ui.redraw_window()
 
     def discover(self):
         current = _sockets()
@@ -337,6 +440,7 @@ class ImvSync:
         )
         rebuild = entering or not self.playlist or deleted
         if rebuild:
+            self.imv_index = {}
             self.last_forward_index = None
             self.last_forward_time = None
             self.held_steps = 0
@@ -346,7 +450,10 @@ class ImvSync:
             paths = tuple(
                 entry.path
                 for entry in (directory_files or ())
-                if not entry.is_directory and _looks_like_image(entry.path)
+                # if not entry.is_directory and _looks_like_image(entry.path)
+                # ## ALT: plain extension filter -- simpler/faster, but includes
+                # ##   animated webp which imv skips => index shift + sync loop
+                if _imv_can_show(entry)
             )
             if paths or deleted:
                 self.playlist = paths
@@ -406,10 +513,20 @@ class ImvSync:
                     return
             if rebuild:
                 snapshot = _snapshot(self.socket.path)
-                if snapshot is None or snapshot.count != len(paths):
+                # DEBUG: "index" mode needs imv list == playlist; "name" tolerates dropped files
+                if snapshot is None or (
+                    IMV_SYNC_MODE == "index" and snapshot.count != len(paths)
+                ):
                     self.pending = False
                     return
-            if not _send_command(self.socket.path, f"goto {index}"):
+            observed = os.path.realpath(selected)
+            if IMV_SYNC_MODE == "name":
+                landed = self._goto_by_name(selected, index, paths)
+                if landed is None:
+                    self.playlist = ()
+                    return
+                observed = landed  # may be a neighbour; keeps back-sync from fighting ranger
+            elif not _send_command(self.socket.path, f"goto {index}"):
                 self.playlist = ()
                 return
         except ValueError as error:
@@ -421,8 +538,53 @@ class ImvSync:
         self.playlist_tab = self.fm.thistab
         self.last_forward_index = index
         self.last_forward_time = time.monotonic()
-        self.observed_selection = os.path.realpath(selected)
+        self.observed_selection = observed
         self.pending = False
+
+    def _positions(self, paths):
+        """realpath -> 1-based ranger playlist position; rebuilt only when the playlist changes."""
+        if self._positions_src is not paths:
+            self._positions_src = paths
+            self._positions_map = {os.path.realpath(p): i for i, p in enumerate(paths, 1)}
+        return self._positions_map
+
+    def _goto_by_name(self, selected, index, paths):
+        """Land imv on `selected` by verified path; return realpath where imv ended, None on IPC failure.
+
+        ALGO: goto guess -> snapshot -> if landed elsewhere: guess = imv_index + (wanted_pos - landed_pos); repeat.
+        WHY: imv list = playlist minus unloadable files, so imv index <= ranger index and every
+          pass crosses >=1 dropped file => converges; `seen` stops oscillation when `selected`
+          itself is dropped by imv (we then end on a neighbour).
+        DEBUG: steps exhausted => imv stays on the last landed file; caller records it as
+          observed_selection so back-sync sees no change (no scroll-by-itself loop).
+        EXTEND: `imv_index` hint (path -> last seen imv index) makes repeated visits 1 pass.
+        ALT: query imv for its path list up front -- probably impossible (no list command,
+          and imv prunes failed files lazily after load attempts), so not implemented.
+        """
+        wanted = os.path.realpath(selected)
+        positions = self._positions(paths)
+        guess = self.imv_index.get(wanted, index)
+        seen = set()
+        landed = wanted
+        for _ in range(IMV_NAME_SYNC_STEPS):
+            guess = max(1, guess)
+            if guess in seen:
+                break
+            seen.add(guess)
+            if not _send_command(self.socket.path, f"goto {guess}"):
+                return None
+            snapshot = _snapshot(self.socket.path)
+            if snapshot is None:
+                return None
+            landed = os.path.realpath(snapshot.path)
+            self.imv_index[landed] = snapshot.index
+            if landed == wanted:
+                break
+            at = positions.get(landed)
+            if at is None:
+                break  # imv shows a foreign file; nothing to correct against
+            guess = min(snapshot.index + (index - at), snapshot.count or guess)
+        return landed
 
     def sync_from_imv(self):
         if not self.socket or self.pending or self.applying_snapshot:
@@ -472,7 +634,13 @@ class ImvSync:
         if not matches:
             return  # Never leave ranger's current visible directory.
         selected = matches[0]
-        if self.playlist and 0 < snapshot.index <= len(self.playlist):
+        self.imv_index[path] = snapshot.index
+        # INVARIANT: only "index" mode guarantees imv index == playlist index
+        if (
+            IMV_SYNC_MODE == "index"
+            and self.playlist
+            and 0 < snapshot.index <= len(self.playlist)
+        ):
             indexed = self.playlist[snapshot.index - 1]
             selected = next(
                 (entry for entry in matches if entry.path == indexed), selected
