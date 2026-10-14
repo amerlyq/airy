@@ -1,0 +1,8 @@
+#!/bin/bash
+
+d="$(date +/d/irome/view/%Y/%Y-%m-%d/pics)"
+mkdir -p "$d"
+
+ln -st "$d" -- "$@" && rc= || rc=$?
+
+notify-send ${rc:+--urgency=critical} "qigmv/${0##*/}" "$*"
