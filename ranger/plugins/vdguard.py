@@ -569,10 +569,17 @@ class _GuardedRemoval:
         subjects = [path for path in paths if _core._under_roots(path)]
         hits = _core.find_hits(subjects, C.LOCK_WAIT) if subjects else []
         if hits is None:
+            items = [f"clip {path}" for path in clips]
+            items += [f"item {path}" for path in paths]
+            names = ", ".join(fs.basename(path) for path in clips)
+            prompt = f"link scan unavailable (cache warming) -- {action} anyway? ({len(clips)} clip(s): {names}; y / l=list / C=cancel)"
+            compact_prompt = f"link scan unavailable (cache warming) -- {action} anyway? ({len(clips)} clip(s); y / l=list / C=cancel)"
             return self._ask_remove(
                 fm,
-                f"link scan unavailable (cache is warming) -- {action} anyway? (y / C=cancel)",
+                prompt,
+                compact_prompt,
                 ("c", "C", "y", "Y"),
+                items,
                 lambda ans: (
                     ans in ("y", "Y")
                     and self._copy_and_remove(fm, files, paths, perform)
@@ -591,11 +598,24 @@ class _GuardedRemoval:
         )
         _print_links(fm, action, hits)
         details = []
+        compact_details = []
         if clips:
-            details.append(f"{len(clips)} clip(s)")
+            details.append(
+                f"{len(clips)} clip(s): {', '.join(fs.basename(path) for path in clips)}"
+            )
+            compact_details.append(f"{len(clips)} clip(s)")
         if links:
-            details.append(f"{len(links)} symlink(s): {_brief(links)}")
-        prompt = " + ".join(details) + f" -- {action}? (y / n=dashboard / C=cancel)"
+            details.append(
+                f"{len(links)} symlink(s): {', '.join(fs.basename(path) for path in links)}"
+            )
+            compact_details.append(f"{len(links)} symlink(s)")
+        suffix = f" -- {action}? (y / n=dashboard / l=list / C=cancel)"
+        prompt = " + ".join(details) + suffix
+        compact_prompt = " + ".join(compact_details) + suffix
+        items = [f"clip {path}" for path in clips]
+        items += [
+            f"symlink {link} -> {_safe_readlink(link) or '?'}" for link in links
+        ]
 
         def answer(ans: str) -> None:
             if ans in ("y", "Y"):
@@ -606,7 +626,10 @@ class _GuardedRemoval:
                     fm, links, fs.join(C.DASHBOARD_ROOT, fs.basename(paths[0]))
                 )
 
-        self._ask_remove(fm, prompt, ("c", "C", "y", "Y", "n", "N"), answer)
+        self._ask_remove(
+            fm, prompt, compact_prompt, ("c", "C", "y", "Y", "n", "N"), items,
+            answer,
+        )
 
     def _copy_and_remove(self, fm, files, paths, perform) -> None:
         if self._copy_names([fs.basename(path) for path in paths]):
@@ -615,8 +638,24 @@ class _GuardedRemoval:
             fm.notify("Could not copy file name to clipboard", bad=True)
 
     @staticmethod
-    def _ask_remove(fm, text, choices, callback) -> None:
-        fm.ui.console.ask(text, callback, choices)
+    def _ask_remove(fm, full_text, compact_text, choices, items, callback) -> None:
+        console = fm.ui.console
+        text = full_text if len(full_text) <= max(20, getattr(console, "wid", 80)) else compact_text
+        choices = tuple(choices)
+        if items and "l" not in choices:
+            choices += ("l", "L")
+
+        def answer(value):
+            if value in ("l", "L"):
+                listing = "\n".join(items)
+                command = "printf '%s\\n' " + shell_quote(listing)
+                fm.execute_command(command, flags="-w")
+                return _GuardedRemoval._ask_remove(
+                    fm, full_text, compact_text, choices, items, callback
+                )
+            callback(value)
+
+        console.ask(text, answer, choices)
 
     @staticmethod
     def _copy_names(names: Sequence[str]) -> bool:
