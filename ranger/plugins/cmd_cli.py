@@ -1,4 +1,4 @@
-"""cmd_cli: console/editor helpers overriding ranger builtins: console, edit, mkdircd (:md), reload_rc.
+"""cmd_cli: overrides for console, edit, touch, mkdir, mkdircd (:md), reload_rc.
 
 ## WHY override: `console -pN` (cursor position), quantifier = history jump; `edit` w/o args edits cursor file
 ## ARCH: later registration wins => these shadow ranger.config.commands builtins of the same name
@@ -8,9 +8,16 @@
 
 from __future__ import annotations
 
+from os import makedirs
+from os.path import dirname, expanduser, join, lexists
 from typing import cast
 
 from ranger.api.commands import Command
+
+try:
+    from plugins import pasteflow
+except ImportError:
+    import pasteflow
 
 try:
     from plugins.base_util import CompletionResult
@@ -55,6 +62,54 @@ class edit(Command):
             self.fm.edit_file("")
         else:
             self.fm.edit_file(self.rest(1))
+
+    def tab(self, tabnum: int) -> CompletionResult:  # pyright: ignore[reportIncompatibleMethodOverride]
+        return cast(CompletionResult, self._tab_directory_content())
+
+
+class mkdir(Command):
+    """:mkdir <dirname>
+
+    Create directory and move cursor to it.
+    """
+
+    def execute(self) -> None:
+        fm = self.fm
+        path = join(fm.thisdir.path, expanduser(self.rest(1)))
+
+        def create(_fm) -> None:
+            if not lexists(path):
+                makedirs(path)
+            else:
+                fm.notify("file/directory exists!", bad=True)
+
+        pasteflow.run_custom(fm, create)
+
+    def tab(self, tabnum: int) -> CompletionResult:  # pyright: ignore[reportIncompatibleMethodOverride]
+        return cast(CompletionResult, self._tab_directory_content())
+
+
+class touch(Command):
+    """:touch <fname>
+
+    Create file and move cursor to it.
+    """
+
+    def execute(self) -> None:
+        fm = self.fm
+        path = join(fm.thisdir.path, expanduser(self.rest(1)))
+        parent = dirname(path)
+
+        def create(_fm) -> None:
+            if lexists(path):
+                fm.notify("file/directory exists!", bad=True)
+                return
+            if not lexists(parent):
+                makedirs(parent)
+            with open(path, "a", encoding="utf-8"):
+                pass
+
+        pasteflow.run_custom(fm, create)
 
     def tab(self, tabnum: int) -> CompletionResult:  # pyright: ignore[reportIncompatibleMethodOverride]
         return cast(CompletionResult, self._tab_directory_content())
