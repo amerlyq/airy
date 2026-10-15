@@ -40,16 +40,18 @@ local function ft_python()
   require 'lsp.lint'
 
   --FAIL: should load mappings only inside buffer
-  if vim.bo.filetype == 'python' then
-    vim.cmd [[
-      augroup MyAutoCmd | autocmd! | augroup END
-      runtime seize/jupyter-vim.vim
-      packadd jupyter-vim
-      let b:jupyter_kernel_type = &filetype
-      call jupyter#load#MakeStandardCommands()
-      call BufMap_jupyter_vim()
-    ]]
-  end
+  --DISABLED:WTF: it loads mappings into QuickFix when trying to save <Tab r> edits
+  --  ~~ I don't use Jupyter already for some time, so let's ignore it
+  -- if vim.bo.filetype == 'python' then
+  --   vim.cmd [[
+  --     augroup MyAutoCmd | autocmd! | augroup END
+  --     runtime seize/jupyter-vim.vim
+  --     packadd jupyter-vim
+  --     let b:jupyter_kernel_type = &filetype
+  --     call jupyter#load#MakeStandardCommands()
+  --     call BufMap_jupyter_vim()
+  --   ]]
+  -- end
 end
 
 
