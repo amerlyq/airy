@@ -42,6 +42,8 @@ from __future__ import annotations
 import inspect
 import logging
 import os
+import sys
+import traceback
 import types
 from collections.abc import Callable
 from os import path as fs
@@ -64,10 +66,20 @@ JUMP_RETRIES = (
 )
 
 # Actions method -> how to name the kind; "paste" is copy or move depending on fm.do_cut
-DEBUG = True  # :eval import plugins.pasteflow as p; p.DEBUG = True  -> trace in :display_log
+DEBUG = False  # :eval import plugins.pasteflow as p; p.DEBUG = True  -> trace in :display_log
+
+
+def _trace(msg: str, *args) -> None:
+    if not DEBUG:
+        return
+    try:
+        rhooks.trace("pasteflow: " + (msg % args if args else msg))
+    except Exception:
+        _LOG.exception("pasteflow: persistent trace failed")
 
 
 def _dbg(msg: str, *args) -> None:
+    _trace(msg, *args)
     if DEBUG:
         _LOG.warning("pasteflow: " + msg, *args)
 
@@ -115,8 +127,10 @@ def on_reset(key: str, fn, priority: int = 50) -> None:
 def _call_all(kind: str, *args) -> None:
     for fn in _ordered(kind):
         try:
+            _trace("hook start kind=%s fn=%r", kind, fn)
             fn(*args)
         except Exception:
+            _trace("hook failed kind=%s fn=%r", kind, fn)
             _LOG.exception("pasteflow %s hook %r failed", kind, fn)
 
 
@@ -240,6 +254,17 @@ class Paste:
         if self.had_entries and not self.entries:
             return  # guards dropped everything: nothing left to do
         self.before = _listing(self.dest)
+        _trace(
+            "launch state=%#x fm=%#x orig=%s.%s kind=%s dest=%s entries=%s jump=%r",
+            id(_STATE),
+            id(fm),
+            getattr(self.orig, "__module__", None),
+            getattr(self.orig, "__qualname__", repr(self.orig)),
+            self.kind,
+            self.dest,
+            list(self.entries)[:12],
+            self.opts.get("jump", True),
+        )
         _dbg(
             "launch kind=%s dest=%s entries=%d before=%d",
             self.kind,
@@ -258,9 +283,15 @@ class Paste:
         if "dest" in kwargs:
             kwargs["dest"] = self.dest
         _STATE.current = self
+        _trace("launch state.current <- paste=%#x", id(self))
         try:
             self.orig(fm, **kwargs)
         finally:
+            _trace(
+                "launch original returned paste=%#x loader_seen=%r",
+                id(self),
+                self.loader_seen,
+            )
             _STATE.current = None
             if swapped:
                 # ranger clears the set it was given when it moves; keep what we did not paste
@@ -274,6 +305,7 @@ class Paste:
         if self._finished:
             return
         self._finished = True
+        _trace("finish paste=%#x state=%#x", id(self), id(_STATE))
         _dbg(
             "finish kind=%s loader_seen=%s after-callbacks=%d",
             self.kind,
@@ -330,9 +362,21 @@ def _jump(p: Paste) -> None:
     )
 
     def ready(signal) -> None:
+        _trace(
+            "ready signal_dir=%s expected_dir=%s state.handler=%#x",
+            getattr(getattr(signal, "directory", None), "path", None),
+            d.path,
+            id(_STATE.handler) if _STATE.handler is not None else 0,
+        )
         if getattr(signal, "directory", None) is not d:
             return
         have = {f.basename for f in d.files_all or ()}
+        _trace(
+            "ready listing have=%s wanted=%s visible=%s",
+            sorted(have)[:20],
+            sorted(new)[:20],
+            [f.basename for f in (d.files or ())[:20]],
+        )
         if not (new & have):
             if tries[0] < JUMP_RETRIES:  # that load started before the files landed
                 tries[0] += 1
@@ -363,6 +407,14 @@ def _jump(p: Paste) -> None:
             )
 
     _STATE.handler = fm.signal_bind("finished_loading_dir", ready)
+    _trace(
+        "jump bound handler=%#x dir=%s loading=%r generator=%r freeze=%r",
+        id(_STATE.handler),
+        d.path,
+        d.loading,
+        d.load_generator is not None,
+        getattr(d.settings, "freeze_files", None),
+    )
     d.load_content()  # no-op if a load is already scheduled (CopyLoader's own end-of-copy one)
 
 
@@ -449,6 +501,17 @@ def _make_paste_like(name: str):
         known = {q.name for q in params}
 
         def wrapper(self, *args, **kw):
+            _trace(
+                "action enter name=%s module=%s self=%#x module_obj=%#x state=%#x current=%r args=%r kwargs=%r",
+                name,
+                __name__,
+                id(self),
+                id(sys.modules[__name__]),
+                id(_STATE),
+                id(_STATE.current) if _STATE.current is not None else None,
+                args,
+                kw,
+            )
             if opaque:
                 # ALT:BUG: cannot tell which kwargs the other wrapper understands: only ours
                 # ("jump") is taken out, the rest (leave_symlink...) is passed through AND peeked
@@ -521,7 +584,56 @@ def _make_loader_init(orig):
         p = (
             _STATE.current
         )  # the Paste whose orig() is creating this loader (sync hand-off)
+        callers = " > ".join(
+            f"{fs.basename(frame.filename)}:{frame.lineno}:{frame.name}"
+            for frame in traceback.extract_stack(limit=12)[:-1]
+        )
+        if p is None:
+            fm = getattr(self, "fm", None)
+            entries = args[0] if args else kwargs.get("copy_buffer", ())
+            dest = kwargs.get("dest") or getattr(
+                getattr(fm, "thistab", None), "path", None
+            )
+            if fm is not None and dest:
+                kind = "move" if kwargs.get("do_cut", False) else "copy"
+                p = Paste(
+                    fm,
+                    kind,
+                    dest,
+                    entries,
+                    {
+                        key: kwargs[key]
+                        for key in ("overwrite", "make_safe_path")
+                        if key in kwargs
+                    },
+                    {},
+                    lambda _fm, **_kw: None,
+                )
+                p.before = _listing(dest)
+                if JUMP and kind in JUMP_KINDS:
+                    p.after(_jump)
+                p.loader_seen = True
+                _trace(
+                    "CopyLoader.__init__ synthesized paste=%#x kind=%s dest=%s before=%d",
+                    id(p),
+                    kind,
+                    dest,
+                    len(p.before),
+                )
         self._pasteflow = p
+        _trace(
+            "CopyLoader.__init__ module=%s loader=%#x state=%#x current=%r copy_buffer=%r kwargs=%r callers=%s",
+            __name__,
+            id(self),
+            id(_STATE),
+            id(p) if p is not None else None,
+            [
+                getattr(f, "path", repr(f))
+                for f in (args[0] if args else kwargs.get("copy_buffer", ()))
+            ][:12],
+            kwargs,
+            callers,
+        )
         if p is not None:
             p.loader_seen = True
         orig(self, *args, **kwargs)
@@ -532,9 +644,21 @@ def _make_loader_init(orig):
 def _make_loader_generate(orig):
     def generate(self):
         p = getattr(self, "_pasteflow", None)
+        _trace(
+            "CopyLoader.generate enter module=%s loader=%#x state=%#x paste=%r",
+            __name__,
+            id(self),
+            id(_STATE),
+            id(p) if p is not None else None,
+        )
         try:
             yield from orig(self)
         finally:  # completion, error or cancel: reconcile what really landed
+            _trace(
+                "CopyLoader.generate finally loader=%#x paste=%r",
+                id(self),
+                id(p) if p is not None else None,
+            )
             if p is not None:
                 p.finish()
 
@@ -542,6 +666,20 @@ def _make_loader_generate(orig):
 
 
 def _install() -> None:
+    _trace(
+        "install begin module=%s file=%s module_obj=%#x rhooks=%s rhooks_obj=%#x "
+        "Actions=%s.%s CopyLoader=%s.%s state=%#x",
+        __name__,
+        __file__,
+        id(sys.modules[__name__]),
+        getattr(rhooks, "__file__", None),
+        id(rhooks),
+        Actions.__module__,
+        Actions.__name__,
+        CopyLoader.__module__,
+        CopyLoader.__name__,
+        id(_STATE),
+    )
     try:
         for name in _KINDS:
             if hasattr(Actions, name):
@@ -552,7 +690,28 @@ def _install() -> None:
         rhooks.patch(CopyLoader, "__init__", _make_loader_init)
         rhooks.patch(CopyLoader, "generate", _make_loader_generate)
     except Exception:
+        _trace("install exception module=%s", __name__)
         _LOG.exception("pasteflow: wrappers not installed")
+
+
+# rnvimr loads plugin files as bare modules, while Ranger loads them as
+# `plugins.<name>`. Keep both import names attached to this one module instance.
+_module = sys.modules[__name__]
+if __name__ == "pasteflow":
+    sys.modules.setdefault("plugins.pasteflow", _module)
+elif __name__ == "plugins.pasteflow":
+    sys.modules.setdefault("pasteflow", _module)
+_trace(
+    "module ready name=%s file=%s module_obj=%#x aliases=(%r,%r) rhooks=%s rhooks_obj=%#x state=%#x",
+    __name__,
+    __file__,
+    id(_module),
+    sys.modules.get("pasteflow") is _module,
+    sys.modules.get("plugins.pasteflow") is _module,
+    getattr(rhooks, "__file__", None),
+    id(rhooks),
+    id(_STATE),
+)
 
 
 _install()

@@ -17,10 +17,36 @@ Registering again under the same key REPLACES the callback (re-exec safe, no dup
 from __future__ import annotations
 
 import logging
+import os
 import sys
 import types
+from datetime import datetime, timezone
 
 _LOG = logging.getLogger("ranger.rhooks")
+
+
+def trace(message: str) -> None:
+    """Append diagnostics shared by plugin import names to one per-user log."""
+    pasteflow = sys.modules.get("plugins.pasteflow") or sys.modules.get("pasteflow")
+    if pasteflow is not None and not getattr(pasteflow, "DEBUG", True):
+        return
+    runtime = os.environ.get("XDG_RUNTIME_DIR", "/tmp")
+    directory = os.environ.get("RANGER_TMPDIR", os.path.join(runtime, "ranger"))
+    try:
+        os.makedirs(directory, exist_ok=True)
+        path = os.path.join(directory, "pasteflow-debug.log")
+        with open(path, "a", encoding="utf-8") as stream:
+            stream.write(
+                f"{datetime.now(timezone.utc).isoformat()} pid={os.getpid()} {message}\n"
+            )
+    except OSError:
+        try:
+            with open("/tmp/pasteflow-debug.log", "a", encoding="utf-8") as stream:
+                stream.write(
+                    f"{datetime.now(timezone.utc).isoformat()} pid={os.getpid()} {message}\n"
+                )
+        except OSError:
+            _LOG.exception("Could not write pasteflow debug log")
 
 
 def shared(key: str, factory):
@@ -31,6 +57,11 @@ def shared(key: str, factory):
     state = holder.__dict__.setdefault("state", {})
     if key not in state:
         state[key] = factory()
+        if key.startswith("pasteflow."):
+            trace(
+                f"rhooks.shared create key={key!r} holder={id(holder):#x} "
+                f"value={id(state[key]):#x} module={__name__!r}"
+            )
     return state[key]
 
 
@@ -40,7 +71,15 @@ def patch(owner, name: str, make) -> None:
     ALT:BUG: a wrapper from a *different* plugin installed before us is taken as 'original'."""
     originals = shared("orig", dict)
     original = originals.setdefault((owner, name), getattr(owner, name))
-    setattr(owner, name, make(original))
+    wrapper = make(original)
+    setattr(owner, name, wrapper)
+    if name in {"paste", "paste_symlink", "paste_hardlink", "paste_hardlinked_subtree", "__init__", "generate"}:
+        trace(
+            f"rhooks.patch owner={owner.__module__}.{owner.__name__} name={name} "
+            f"original={original.__module__}.{original.__qualname__} "
+            f"wrapper={wrapper.__module__}.{wrapper.__qualname__} "
+            f"module={__name__!r} original_id={id(original):#x} wrapper_id={id(wrapper):#x}"
+        )
 
 
 # --------------------------------------------------------------------------- #
