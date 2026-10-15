@@ -1,6 +1,8 @@
 import os
 import shlex
 
+from collections.abc import Callable
+
 from ranger.api.commands import Command
 
 # DEV: df cidx!=tidx: search file with same name in tidx
@@ -73,8 +75,72 @@ def _is_cmp_list(cmd: list[str]) -> bool:
     )
 
 
-def _pick(cur, tgt, cross: bool):
+FALLBACKS: dict[str, Callable] = {}
+FRONTEND_FLAGS = {"m": "same", "M": "other"}
+FALLBACK_FLAGS = {"F": "duration"}
+
+
+def _duration_next(cur, tgt, cross, current, target):
+    """Advance to the next member of each current duration group."""
+    try:
+        from plugins.vddur_sort_linemode import duration_groups
+    except ImportError:
+        return None
+
+    def next_in_group(directory, origin):
+        group = next(
+            (
+                group
+                for group in duration_groups(directory.files_all or [])
+                if any(f.path == origin.path for f in group)
+            ),
+            (),
+        )
+        index = next((i for i, file in enumerate(group) if file.path == origin.path), -1)
+        if index < 0 or len(group) < 2:
+            return None
+        return group[index - 1] if index else group[1]
+
+    if current is None:
+        return None
+    left = next_in_group(cur.thisdir, current)
+    if not cross:
+        return [current, left] if left else None
+    right = next_in_group(tgt.thisdir, target) if target is not None else None
+    return [left or current, right or target] if left or right else None
+
+
+FALLBACKS["duration"] = _duration_next
+
+
+def _pick(cur, tgt, cross: bool, policy: str | None = None, fallback: str | None = None):
     """-> two files to compare, else ValueError(msg)"""
+    if policy == "same" and cross:
+        raise ValueError("comparison requires current tab")
+    if policy == "other" and not cross:
+        raise ValueError("comparison requires another tab")
+    no_selection = False
+    try:
+        picked = _pick_selection(cur, tgt, cross)
+    except ValueError as exc:
+        no_selection = str(exc) == "curr_tab: select one or two files"
+        picked = None
+    if picked and None in picked:
+        no_selection = True
+        picked = None
+    if picked is None and fallback and no_selection:
+        resolver = FALLBACKS.get(fallback)
+        if resolver is None:
+            raise ValueError(f"unknown fallback {fallback}")
+        picked = resolver(cur, tgt, cross, cur.thisfile, tgt.thisfile if cross else None)
+    if picked is not None:
+        return picked
+    if picked is None and fallback and no_selection:
+        raise ValueError(f"no {fallback} fallback candidate")
+    return _pick_selection(cur, tgt, cross)
+
+
+def _pick_selection(cur, tgt, cross: bool):
     cm, tm = cur.thisdir.marked_items, tgt.thisdir.marked_items
     if cross and not cm and not tm:
         return [cur.thisfile, tgt.thisfile]
@@ -96,8 +162,17 @@ class df(Command):
     def execute(self) -> int | None:  # pyright: ignore[reportIncompatibleMethodOverride]
         fm = self.fm
         flags = ""
+        policy = None
+        fallback = None
         if self.arg(1).startswith("-"):
-            flags = self.arg(1).lstrip("-")
+            raw = self.arg(1).lstrip("-")
+            flags = "".join(ch for ch in raw if ch not in FRONTEND_FLAGS and ch not in FALLBACK_FLAGS)
+            policies = {FRONTEND_FLAGS[ch] for ch in raw if ch in FRONTEND_FLAGS}
+            fallbacks = {FALLBACK_FLAGS[ch] for ch in raw if ch in FALLBACK_FLAGS}
+            if len(policies) > 1 or len(fallbacks) > 1:
+                return self._err("conflicting frontend flags")
+            policy = next(iter(policies), None)
+            fallback = next(iter(fallbacks), None)
             self.shift()
         try:
             cmd = shlex.split(self.rest(1))
@@ -113,11 +188,16 @@ class df(Command):
             if self.quantifier is not None
             else keys[(keys.index(cur) + 1) % len(keys)]
         )
+        if policy == "same" and self.quantifier is None:
+            tgt = cur
         if tgt not in fm.tabs:
             return self._err(f"no tab {tgt}")
 
         try:
-            fls = _pick(fm.tabs[cur], fm.tabs[tgt], cross=cur != tgt)
+            fls = _pick(
+                fm.tabs[cur], fm.tabs[tgt], cross=cur != tgt,
+                policy=policy, fallback=fallback,
+            )
         except ValueError as e:
             return self._err(str(e))
         if None in fls:

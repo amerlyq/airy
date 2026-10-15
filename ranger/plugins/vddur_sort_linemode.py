@@ -38,6 +38,22 @@ else:
 
     Directory.sort_dict["duration"] = lambda x: get_duration_mediainfo(x.path, _st(x))
 
+    def duration_groups(files, tolerance=500):
+        """Group media entries whose adjacent durations differ by at most tolerance."""
+        by_path = {f.path: f for f in files if not f.is_directory}
+        durations = vdprobe.many(list(by_path))
+        rows = sorted(
+            (max(result[0], 1), path, by_path[path])
+            for path, result in durations.items()
+            if result and path in by_path
+        )
+        groups = []
+        for ms, _, file in rows:
+            if not groups or ms - groups[-1][-1][0] > tolerance:
+                groups.append([])
+            groups[-1].append((ms, file))
+        return [[file for _, file in group] for group in groups]
+
     ### ALT:FAIL:
     ## map od eval fm.thisdir.settings['sort'] = 'duration'; fm.thisdir.settings['sort_reverse'] = True; fm.execute_console(f"default_linemode path={fm.thisdir.path} duration")
     ## map on eval fm.execute_console(f"setlocal path={fm.thisdir.path} sort=natural"); fm.execute_console(f"setlocal path={fm.thisdir.path} sort_reverse=False"); fm.execute_console(f"default_linemode path={fm.thisdir.path} None")
@@ -149,19 +165,12 @@ else:
             self._cache = {}  # dirpath -> (len(files_all), set(paired paths))
 
         def _scan(self, files):
-            res = vdprobe.many([x.path for x in files if not x.is_directory])
-            ms = [(max(r[0], 1), p) for p, r in res.items() if r]
-            ms.sort()
-            out = set()
-            for i, (v, p) in enumerate(ms):
-                if (
-                    i
-                    and v - ms[i - 1][0] <= self.tol
-                    or i + 1 < len(ms)
-                    and ms[i + 1][0] - v <= self.tol
-                ):
-                    out.add(p)
-            return out
+            return {
+                f.path
+                for group in duration_groups(files, self.tol)
+                if len(group) > 1
+                for f in group
+            }
 
         def paired(self, directory, f):
             d = directory.path
