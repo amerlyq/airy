@@ -29,7 +29,8 @@ try:  # ranger imports plugins as `plugins.<name>` with the confdir on sys.path
     from plugins import vdconf as C
     from plugins import vddangling as _dang
     from plugins import vdsym as _core
-    from plugins.vdutil import (_brief, _dangling, _link_text, _norm, _recovery, _safe_readlink, _swap_link,
+    from plugins.vdutil import (_brief, _dangling, _link_text, _norm,
+                                _recovery, _safe_readlink, _swap_link,
                                 replace_link)
 except ImportError:  # fallback: the plugin files somewhere on PYTHONPATH
     import pasteflow
@@ -37,7 +38,8 @@ except ImportError:  # fallback: the plugin files somewhere on PYTHONPATH
     import vdconf as C
     import vddangling as _dang
     import vdsym as _core
-    from vdutil import _brief, _dangling, _link_text, _norm, _recovery, _safe_readlink, _swap_link, replace_link
+    from vdutil import (_brief, _dangling, _link_text, _norm, _recovery,
+                        _safe_readlink, _swap_link, replace_link)
 
 _LOG = logging.getLogger("ranger.vdsym")
 
@@ -549,7 +551,89 @@ class _FmProxy:
 
 
 # OR: map dD eval fm.set_clipboard(fm.thisfile.basename.encode('utf-8')); cmd('delete')
-class delete(_default_delete):
+class _GuardedRemoval:
+    """Shared clip/link guards and clipboard behavior for delete and trash."""
+
+    def _guarded_remove(self, files, action: str, perform) -> None:
+        fm = getattr(self, "_real_fm", self.fm)
+        if files is None:
+            files = [f.path for f in fm.thistab.get_selection()]
+        paths = [
+            fs.abspath(
+                item.path if hasattr(item, "path") else fs.join(fm.thisdir.path, item)
+            )
+            for item in files
+        ]
+        clips = find_clips(paths)
+        _dang._arm()
+        subjects = [path for path in paths if _core._under_roots(path)]
+        hits = _core.find_hits(subjects, C.LOCK_WAIT) if subjects else []
+        if hits is None:
+            return self._ask_remove(
+                fm,
+                f"link scan unavailable (cache is warming) -- {action} anyway? (y / C=cancel)",
+                ("c", "C", "y", "Y"),
+                lambda ans: (
+                    ans in ("y", "Y")
+                    and self._copy_and_remove(fm, files, paths, perform)
+                ),
+            )
+        hits = _core._drop_moving(hits, paths)
+        links = [hit.link for hit in hits]
+        if not clips and not links:
+            return self._copy_and_remove(fm, files, paths, perform)
+
+        _recovery(
+            action,
+            [f"path {path}" for path in paths]
+            + [f"link {hit.link} -> {_safe_readlink(hit.link)}" for hit in hits]
+            + [f"clip {clip}" for clip in clips],
+        )
+        _print_links(fm, action, hits)
+        details = []
+        if clips:
+            details.append(f"{len(clips)} clip(s)")
+        if links:
+            details.append(f"{len(links)} symlink(s): {_brief(links)}")
+        prompt = " + ".join(details) + f" -- {action}? (y / n=dashboard / C=cancel)"
+
+        def answer(ans: str) -> None:
+            if ans in ("y", "Y"):
+                _dang._acknowledge(links)
+                self._copy_and_remove(fm, files, paths, perform)
+            elif ans in ("n", "N") and links:
+                _core.make_dashboard(
+                    fm, links, fs.join(C.DASHBOARD_ROOT, fs.basename(paths[0]))
+                )
+
+        self._ask_remove(fm, prompt, ("c", "C", "y", "Y", "n", "N"), answer)
+
+    def _copy_and_remove(self, fm, files, paths, perform) -> None:
+        if self._copy_names([fs.basename(path) for path in paths]):
+            perform(files)
+        else:
+            fm.notify("Could not copy file name to clipboard", bad=True)
+
+    @staticmethod
+    def _ask_remove(fm, text, choices, callback) -> None:
+        fm.ui.console.ask(text, callback, choices)
+
+    @staticmethod
+    def _copy_names(names: Sequence[str]) -> bool:
+        try:
+            process = subprocess.run(
+                ["xci"],
+                input="\n".join(names),
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+        except OSError:
+            return False
+        return process.returncode == 0
+
+
+class delete(_GuardedRemoval, _default_delete):
     """:delete
 
     Copy selected file names to the clipboard before deleting them.
@@ -563,87 +647,11 @@ class delete(_default_delete):
         self.fm = _FmProxy(self._real_fm, self._guarded_delete)  # this command only
         super().execute()
 
-    # -- steps ---------------------------------------------------------------- #
-
     def _guarded_delete(self, files: Sequence[str] | None = None) -> None:
-        if files is None:
-            files = [f.path for f in self._real_fm.thistab.get_selection()]
-        cwd = self._real_fm.thisdir.path
-        paths = [fs.join(cwd, f) for f in files]
-        clips = self._clips(paths)
-        if not clips:
-            return self._check_links(files, paths)
-        self._ask(
-            f"{len(clips)} clip(s) -- delete anyway? (y/N)",
-            ("n", "N", "y", "Y"),
-            lambda ans: ans in ("y", "Y") and self._check_links(files, paths),
-        )
-
-    def _check_links(self, files: Sequence[str], paths: Sequence[str]) -> None:
-        _dang._arm()
-        subjects = [path for path in paths if _core._under_roots(path)]
-        hits = _core.find_hits(subjects, C.LOCK_WAIT) if subjects else []
-        if hits is None:
-            return self._ask(
-                "link scan unavailable (cache is warming) -- delete anyway? (y / C=cancel)",
-                ("c", "C", "y", "Y"),
-                lambda ans: ans in ("y", "Y") and self._copy_and_delete(files),
-            )
-        links = [hit.link for hit in _core._drop_moving(hits, paths)]
-        if not links:
-            return self._copy_and_delete(files)
-        _recovery(
-            "delete",
-            [f"path {p}" for p in paths]
-            + [f"link {l} -> {_safe_readlink(l)}" for l in links],
-        )
-        first = fs.basename(subjects[0])
-        # Enter answers choices[0], Esc choices[1]: both must be "cancel"
-        self._ask(
-            f"{len(links)} symlink(s): {_brief(links)}"
-            " -- delete? (y / n=dashboard / C=cancel)",
-            ("c", "C", "y", "Y", "n", "N"),
-            lambda ans: self._on_links(ans, files, links, first),
-        )
-
-    def _on_links(
-        self, answer: str, files: Sequence[str], links: list[str], first: str
-    ) -> None:
-        if answer in ("y", "Y"):
-            _dang._acknowledge(links)
-            self._copy_and_delete(files)
-        elif answer in ("n", "N"):
-            _core.make_dashboard(self._real_fm, links, fs.join(C.DASHBOARD_ROOT, first))
-
-    def _copy_and_delete(self, files: Sequence[str]) -> None:
-        names = [fs.basename(file) for file in files]
-        if self._copy_names(names):
-            self._real_fm.delete(files)
-        else:
-            self._real_fm.notify("Could not copy file name to clipboard", bad=True)
-
-    # -- helpers ---------------------------------------------------------------- #
-
-    def _ask(self, text: str, choices: tuple[str, ...], callback) -> None:
-        self._real_fm.ui.console.ask(text, callback, choices)
-
-    def _copy_names(self, names: Sequence[str]) -> bool:
-        try:
-            process = subprocess.run(
-                ["xci"],
-                input="\n".join(names),
-                text=True,
-                capture_output=True,
-                check=False,
-            )
-        except OSError:
-            return False
-        return process.returncode == 0
-
-    _clips = staticmethod(find_clips)
+        self._guarded_remove(files, "delete", self._real_fm.delete)
 
 
-class trash(_default_trash):
+class trash(_GuardedRemoval, _default_trash):
     """:trash keeps Ranger's confirmation and Rifle execution, with VD guards.
 
     Trashing moves paths to a backend-chosen destination, so symlinks cannot be re-pointed
@@ -651,49 +659,13 @@ class trash(_default_trash):
     """
 
     def _trash_files_catch_arg_list_error(self, files) -> None:
-        paths = [f.path for f in files]
-        clips = find_clips(paths)
-        subjects = [path for path in paths if _core._under_roots(path)]
-        _dang._arm()
-        hits = _core.find_hits(subjects, C.LOCK_WAIT) if subjects else []
-        if hits is None:
-            return self.fm.ui.console.ask(
-                "link scan unavailable (cache is warming) -- trash anyway? (y / C=cancel)",
-                lambda ans: super(trash, self)._trash_files_catch_arg_list_error(files)
-                if ans in ("y", "Y") else None,
-                ("c", "C", "y", "Y"),
-            )
-        hits = _core._drop_moving(hits, paths)
-        if not hits and not clips:
-            return super()._trash_files_catch_arg_list_error(files)
-
-        links = [hit.link for hit in hits]
-        _recovery(
+        self._guarded_remove(
+            files,
             "trash",
-            [f"path {p}" for p in paths]
-            + [f"link {h.link} -> {_safe_readlink(h.link)}" for h in hits]
-            + [f"clip {c}" for c in clips],
+            lambda selected: super(trash, self)._trash_files_catch_arg_list_error(
+                selected
+            ),
         )
-        _print_links(self.fm, "trash", hits)
-        details = []
-        if clips:
-            details.append(f"{len(clips)} clip(s)")
-        if links:
-            details.append(f"{len(links)} symlink(s): {_brief(links)}")
-        prompt = " + ".join(details)
-        prompt += " -- trash? (y / n=dashboard / C=cancel)" if links else " -- trash? (y / C=cancel)"
-
-        def answer(ans: str) -> None:
-            if ans in ("y", "Y"):
-                _dang._acknowledge(links)
-                super(trash, self)._trash_files_catch_arg_list_error(files)
-            elif ans in ("n", "N") and links:
-                _core.make_dashboard(
-                    self.fm, links, fs.join(C.DASHBOARD_ROOT, fs.basename(paths[0]))
-                )
-
-        choices = ("c", "C", "y", "Y", "n", "N") if links else ("c", "C", "y", "Y")
-        self.fm.ui.console.ask(prompt, answer, choices)
 
 
 class rename(_default_rename):
