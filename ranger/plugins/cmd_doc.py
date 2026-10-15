@@ -1,10 +1,11 @@
 """cmd_doc: `:doc [<name>]` -- open/create metafile (todo, worklog, ...) in the nearest of doc/ docs/ _doc/ todo/ .
 
-## USAGE: :doc  |  :doc .  (today's date name; hour offset in rutil.today_date)  |  <N>:doc  (suffix _NN)
+## USAGE: :doc  |  :doc .  (today's date name; hour offset in base_util.today_date)  |  <N>:doc  (suffix _NN)
 ## MAPS: `O<k>` generated in rc.conf from `doc.lst` (see rc.conf: `eval for k,nm in ...doc.lst`)
 ## ARCH: lst = key->name table (single source for maps AND <Tab>), ext/loci = lookup order (first hit wins)
 ## EXT: add a kind = one line in `lst`; add a dir/extension = one line in `loci`/`ext`
 """
+
 from __future__ import annotations
 
 from collections.abc import Callable
@@ -13,7 +14,10 @@ from typing import ClassVar
 
 from ranger.api.commands import Command
 
-from plugins.rutil import today_date
+try:
+    from plugins.base_util import today_date
+except ModuleNotFoundError:
+    from base_util import today_date
 
 
 class doc(Command):

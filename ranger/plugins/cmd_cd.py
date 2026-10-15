@@ -6,7 +6,7 @@
 ## CONFLICT(vdsym*): `cz` (cd_samedur) and `cg` (rc.conf: /t/dupnm/<name>) are the same family as vdsym's
 ##   dashboard jumps (`--dashboard=/t/bnm`). ALT: fold both into vdsym as `--source=...` actions.
 ##   cda's ":lnum:lpos:" stripping probably duplicates vdsym `--modifiers=numeric` (unverified).
-## DEBUG: cd_shelldir reads+truncates rutil.tmpfile("cwd"), written by shell trap (see NOTE:NEED below)
+## DEBUG: cd_shelldir reads+truncates base_util.tmpfile("cwd"), written by shell trap (see NOTE:NEED below)
 """
 
 from __future__ import annotations
@@ -19,7 +19,10 @@ from typing import ClassVar, cast
 
 from ranger.api.commands import Command
 
-from plugins.rutil import CompletionResult, tmpfile, today_date
+try:
+    from plugins.base_util import CompletionResult, tmpfile, today_date
+except ModuleNotFoundError:
+    from base_util import CompletionResult, tmpfile, today_date
 
 
 # NOTE:NEED: in ~/.bashrc or ~/.zshrc save $PWD (not pwd) on trap EXIT

@@ -13,7 +13,10 @@ import re
 import threading
 from typing import cast
 
-from plugins.rutil import FilterableDirectory
+try:
+    from plugins.base_util import FilterableDirectory
+except ModuleNotFoundError:
+    from base_util import FilterableDirectory
 from ranger.api.commands import Command
 from ranger.container import directory as ranger_directory
 

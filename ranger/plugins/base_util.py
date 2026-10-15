@@ -1,11 +1,14 @@
-"""rutil: shared helpers for cmd_*.py plugins (no commands, no side effects).
+"""base_util: shared helpers for cmd_*.py plugins (no commands, no side effects).
 
 ## ARCH: ranger imports plugins as `plugins.<name>` (see vddur_sort_linemode.py: `from plugins import vdprobe`)
-##   => siblings do `from plugins.rutil import ...`
+##   => siblings do `from plugins.base_util import ...`
 ## WHY: today_date()/tmpfile() were used by several former commands.py classes (doc, cda, cd_shelldir, actualee)
 ##   -> one home instead of copies; Protocols are typing-only (pyright), zero runtime cost
 ## EXT: put here only what 2+ plugins need. Anything single-use stays in its plugin.
 """
+
+# rnvimr imports user plugins as top-level modules with this directory on sys.path.
+# Normal Ranger imports them through the `plugins` package.
 
 from __future__ import annotations
 

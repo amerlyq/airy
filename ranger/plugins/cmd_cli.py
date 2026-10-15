@@ -12,7 +12,10 @@ from typing import cast
 
 from ranger.api.commands import Command
 
-from plugins.rutil import CompletionResult
+try:
+    from plugins.base_util import CompletionResult
+except ModuleNotFoundError:
+    from base_util import CompletionResult
 
 
 class console(Command):

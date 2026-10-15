@@ -1,6 +1,6 @@
 """cmd_actualee: `:actualee [-FLAG]` -- run ~/.local/bin/actualee on cursor file + rotated dir listing.
 
-## ARCH: dir listing is written (rotated to start at cursor) to rutil.tmpfile("buffer") and passed via `-l`
+## ARCH: dir listing is written (rotated to start at cursor) to base_util.tmpfile("buffer") and passed via `-l`
 ## DEBUG: cat $XDG_RUNTIME_DIR/ranger/buffer
 ## MAPS: <CR>
 """
@@ -10,7 +10,10 @@ from typing import ClassVar, cast
 
 from ranger.api.commands import Command
 
-from plugins.rutil import CompletionResult, tmpfile
+try:
+    from plugins.base_util import CompletionResult, tmpfile
+except ModuleNotFoundError:
+    from base_util import CompletionResult, tmpfile
 
 
 class actualee(Command):

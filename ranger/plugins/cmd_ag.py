@@ -9,6 +9,7 @@
 ##   -> ALT: drop `-r` (+ _catch, _filter) once tfilter_rg is trusted. Kept for now.
 ## CONFLICT: `filter_stack clear` / `;c` do NOT touch `ag -r` (it sets temporary_filter, not the stack)
 """
+
 from __future__ import annotations
 
 import os
@@ -20,7 +21,10 @@ from typing import ClassVar, TypeAlias, cast
 from ranger.api.commands import Command
 from ranger.ext.shell_escape import shell_quote
 
-from plugins.rutil import FilterableDirectory
+try:
+    from plugins.base_util import FilterableDirectory
+except ModuleNotFoundError:
+    from base_util import FilterableDirectory
 
 CommandLine: TypeAlias = str | list[str]
 CommandSpec: TypeAlias = tuple[CommandLine, str]
