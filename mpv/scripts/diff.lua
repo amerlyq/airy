@@ -133,7 +133,7 @@ mp.add_forced_key_binding("N", "hstack-enable", function() apply_smart_hstack(tr
 
 local function switch()
   local cur = mp.get_property("lavfi-complex") or ""
-  local to2 = not cur:find("%[vid2%] copy", 1, false)   -- hstack or slot 1 -> slot 2
+  local to2 = not cur:find("%[vid2%] copy", 1, false) -- hstack or slot 1 -> slot 2
   local t2 = second_video_track()
 
   set_graph(to2 and G2 or G1)
@@ -147,3 +147,4 @@ end
 
 mp.add_key_binding("v", "switch-v", switch)
 mp.add_key_binding("n", "switch-n", switch)
+mp.add_key_binding("M", "switch-M", switch)
