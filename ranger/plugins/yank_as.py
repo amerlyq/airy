@@ -52,7 +52,7 @@ class yank_as(Command):
         arg = self.rest(1).strip()
         arg = ALIAS.get(arg, arg)
         fm = self.fm
-        name = fm.thisfile.relative_path
+        name = (fm.thisfile or fm.thisdir).relative_path
         kind, _, pat = arg.partition("=")
         if kind == "split":
             text = _split(pat, name)
