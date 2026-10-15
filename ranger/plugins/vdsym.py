@@ -54,6 +54,7 @@ _LOG = logging.getLogger("ranger.vdsym")
 # --------------------------------------------------------------------------- #
 
 HOOKS = rhooks.shared("vdsym.hooks", lambda: {"preflight": {}, "cd": {}, "warm": {}})
+_ROTATIONS = rhooks.shared("vdsym.rotations", dict)
 
 
 def hook(kind: str, key: str, fn) -> None:
@@ -1032,36 +1033,57 @@ class vdsym(Command):
     def _yank(self, matches: list[str]) -> None:
         subprocess.run(["xci"], input="\n".join(matches), text=True, check=False)
 
-    def _jump(self, matches: list[str]) -> None:
+    def _jump(self, matches: list[str], position: int | None = None) -> None:
+        if not matches:
+            return
         current = self.fm.thisfile.path
         rotate = "r" in self._args()[0]
-        if rotate and current in matches:
-            target = matches[(matches.index(current) + 1) % len(matches)]
+        current_norm = _norm(current)
+        members = {_norm(path) for path in [current, *matches]}
+        state = _ROTATIONS.get(id(self.fm))
+        if state is None or state["members"] != members or current_norm not in state["index"]:
+            locations = [current]
+            seen = {current_norm}
+            for match in matches:
+                normalized = _norm(match)
+                if normalized not in seen:
+                    seen.add(normalized)
+                    locations.append(match)
+            state = {
+                "members": members,
+                "locations": locations,
+                "index": {_norm(path): index for index, path in enumerate(locations)},
+            }
+            _ROTATIONS[id(self.fm)] = state
+        locations = state["locations"]
+        alternatives = len(locations) - 1
+        if position is not None:
+            target_index = min(max(1, position), alternatives)
+            target = locations[target_index]
+        elif rotate:
+            target_index = (state["index"][current_norm] + 1) % len(locations)
+            target = locations[target_index]
         else:
-            current_real = fs.realpath(current)
-            dashboard_match = next(
-                (
-                    fs.join(self.fm.thisdir.path, entry.basename)
-                    for entry in self.fm.thisdir.files or ()
-                    if entry.is_link and fs.realpath(entry.path) == current_real
-                ),
-                None,
-            )
-            target = dashboard_match or matches[0]
+            target = self._jump_fallback(matches, current, fs.realpath(current))
+            target_index = state["index"].get(_norm(target), 0)
         self.fm.select_file(target)
         if "o" in self._args()[0]:
             self.fm.move(right=1)
-        if len(matches) > 1:
-            target_real = fs.realpath(target)
-            position = next(
-                (
-                    index
-                    for index, match in enumerate(matches)
-                    if match == target or fs.realpath(match) == target_real
-                ),
-                0,
-            )
-            self.fm.notify(f"MULTI ({position + 1}/{len(matches)})")
+        if alternatives > 1:
+            self.fm.notify(f"MULTI ({target_index}/{alternatives})")
+
+    def _jump_fallback(
+        self, matches: list[str], current: str, current_real: str
+    ) -> str:
+        dashboard_match = next(
+            (
+                fs.join(self.fm.thisdir.path, entry.basename)
+                for entry in self.fm.thisdir.files or ()
+                if entry.is_link and fs.realpath(entry.path) == current_real
+            ),
+            None,
+        )
+        return dashboard_match or matches[0]
 
     def _print(self, matches: list[str], flags: set[str]) -> None:
         needles = [self._normalize(name, flags) for name in self._names()]
@@ -1222,7 +1244,7 @@ class vdsym(Command):
                     f"No matches for '{self._name()}'.", duration=1, bad=True
                 )
             elif len(matches) == 1:
-                self._jump(matches)
+                self._jump(matches, self.quantifier)
             else:
                 self._dashboard(matches)
         elif "x" in flags:
@@ -1238,7 +1260,7 @@ class vdsym(Command):
                     matches = [matches[0]]
             self._print(matches, flags)
         elif "j" in flags:
-            self._jump(matches)
+            self._jump(matches, self.quantifier)
         else:
             self.fm.select_file(matches[0])
             if "o" in flags:
