@@ -142,6 +142,7 @@ for i in {1..9}; do
   alias -g C/$i="|awk -F/ '{print\$$i}'"
   alias -g C\$$i="|awk '{print\$(NF-$i)}'"
   alias -g C/-$i="|awk -F/ '{print\$(NF-$i)}'"
+  alias -g C/$i-="|cut -d/ -f$i-"
 
   # Strips the file name from column $i and prints just the directory path
   alias -g C${i}//="|awk '{sub(/\/[^\/]*$/, \"\", \$$i); print \$$i}'"
