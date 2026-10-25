@@ -37,7 +37,8 @@ from ranger.ext.shell_escape import shell_quote
 try:  # ranger imports plugins as `plugins.<name>` with the confdir on sys.path
     from plugins import rhooks
     from plugins import vdconf as C
-    from plugins.vdutil import _gone, _hops, _norm, _safe_readlink, replace_link
+    from plugins.vdutil import (_gone, _hops, _norm, _safe_readlink,
+                                replace_link)
 except ImportError:  # fallback: the plugin files somewhere on PYTHONPATH
     import rhooks
     import vdconf as C
@@ -484,7 +485,7 @@ class _Cache:
         try:
             with ThreadPoolExecutor(min(len(jobs), 6)) as pool:
                 out = list(pool.map(run, jobs))
-        except OSError, subprocess.SubprocessError:
+        except (OSError, subprocess.SubprocessError):
             return None
         return {
             root: (out[3 * i], out[3 * i + 1], out[3 * i + 2])
@@ -544,7 +545,7 @@ def _shared_cache() -> _Cache:
     try:
         with open(__file__, "rb") as handle:
             stamp = hashlib.sha1(handle.read()).hexdigest()
-    except NameError, OSError:
+    except (NameError, OSError):
         stamp = "unknown"
     holder = sys.modules.setdefault("_vdsym_shared", types.ModuleType("_vdsym_shared"))
     ## MOVED: the (owner, name) -> unpatched ranger method registry lives in rhooks.patch
@@ -710,8 +711,8 @@ class vdsym(Command):
     Search VD files and their symlink dashboards.
     """
 
-    data_roots = ("/media/pro/vd", "/cache/vd", "/media/hpx/vd_ssdt5")
-    view_root = "/d/irome/view"
+    data_roots = ("/media/pro/vd", "/media/pro/cache_vd", "/media/hpx/vd_ssdt5")
+    view_root = "/media/lexar/irome"
 
     _parsed: tuple[set[str], list[str], str | None] | None = None
     _names_cache: list[str] | None = None
@@ -1041,7 +1042,11 @@ class vdsym(Command):
         current_norm = _norm(current)
         members = {_norm(path) for path in [current, *matches]}
         state = _ROTATIONS.get(id(self.fm))
-        if state is None or state["members"] != members or current_norm not in state["index"]:
+        if (
+            state is None
+            or state["members"] != members
+            or current_norm not in state["index"]
+        ):
             locations = [current]
             seen = {current_norm}
             for match in matches:

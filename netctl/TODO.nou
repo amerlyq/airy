@@ -125,3 +125,17 @@ TODO
       ⁘ no sense, doesn't interfere
     [≈] CHECK: how to eth errors in long cable bw dir620 and mediaconverter for optics
       [>] WAIT: накопить статистику в web-ui dir620 и посмотреть пару дней спустя
+
+
+1h 2026-10-24-Sat-W42
+  [,] 08:35 ⁂ 1h <env> CFG #fra WTF: enp68s0 no ip-addr ⌇⡪⣜⢧⡮
+    [,] 08:35 10m .
+    [;] 09:00 20m .
+      $ sudo systemctl stop netctl-ifplugd@enp68s0 netctl-auto@wlo2
+      $ ip a
+      $ sudo systemctl daemon-reload
+      $ sudo systemctl start netctl-ifplugd@enp68s0 netctl-auto@wlo2
+    [✓] 09:55 30m .
+      $ systemctl | grep netctl-ifplug
+      $ sudo bash -x /etc/ifplugd/netctl.action enp68s0 up
+      ⁘ FIXED: needed explicit "ExcludeAuto=no"
