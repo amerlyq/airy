@@ -20,8 +20,9 @@ local options = {
   -- ALT:DFL:(for some videos): framesnum_offset_beg = -2, framesnum_offset_end = -3,
   framesnum_offset_beg = 0,
   framesnum_offset_end = 0,
-  -- Beg row decoded from the source at exact frame times; false = converter sample (see source_args).
-  beg_source = true
+  -- false: rows are consecutive source frames + the real export boundary from the converter
+  -- plan (see probe_job). true = old stitched rows: converter sample + source context.
+  rows_from_sample = false
 }
 require('mp.options').read_options(options, 'clip')
 
@@ -508,17 +509,20 @@ end
 
 local function execute_plan(job, commands, index)
   if index > #commands then
-    decode_job(job); return
+    (job.finish or decode_job)(job); return
   end
   local command = commands[index]
   local seek
-  if outer_count(job.edge) > 0 and index == 1 then
+  if (job.probe or outer_count(job.edge) > 0) and index == 1 then
     -- muxer timestamps precede container timestamp normalization. Track the
     -- boundary emitted video packet (end: last, beg: first), including
     -- reordered frames beyond the mark.
     for i, value in ipairs(command) do if value == "-ss" then seek = tonumber(command[i + 1]) end end
     if not seek and job.edge.id == 1 then seek = 0 end -- Unseeked beg starts at the source start.
     if not seek then
+      if job.degrade then
+        job.degrade("preview plan lacks source seek timestamp"); return
+      end
       fail(job.edge, "preview plan lacks source seek timestamp"); return
     end
     command = { (table.unpack or unpack)(command) }
@@ -582,6 +586,8 @@ local function execute_plan(job, commands, index)
         " delta=" .. tostring(distance) .. " source=" .. tostring(job.anchor))
     end
     execute_plan(job, commands, index + 1)
+  end, job.degrade and function(err)
+    job.degrade(err); return true
   end)
 end
 
@@ -640,8 +646,16 @@ local function source_args(job)
   end
   -- Without -copyts, t restarts at the -ss point; -t keeps the read short.
   local seek = math.max(0, lo - 1)
-  local filter = string.format("select='between(t,%.6f,%.6f)',scale=%d:%d,%s,%s", lo - seek, hi - seek,
-    job.w, job.h, box_filter(job, n0), text_filter(job, edge_label(job), n0))
+  local filter = string.format("select='between(t,%.6f,%.6f)',scale=%d:%d", lo - seek, hi - seek, job.w, job.h)
+  -- Frames the converter's real output does not contain (before its first / after its last
+  -- frame, `anchor` = that frame's source time) are dimmed: rows stay continuous in time
+  -- while the real boundary may jump in GOP/dts-sized steps.
+  if job.anchor then
+    local cut = job.anchor - seek
+    filter = filter .. string.format(",drawbox=x=0:y=0:w=iw:h=ih:color=black@0.65:t=fill:enable='%s'",
+      job.edge.id == 1 and string.format("lt(t,%.6f)", cut - 0.0004) or string.format("gt(t,%.6f)", cut + 0.0004))
+  end
+  filter = filter .. "," .. box_filter(job, n0) .. "," .. text_filter(job, edge_label(job), n0)
   if job.offset ~= 0 then filter = filter .. "," .. text_filter(job, string.format("%+d", job.offset), n0, true) end
   for k = 0, total - 1 do
     if k ~= n0 then filter = filter .. "," .. text_filter(job, string.format("%+d", k - n0), k) end
@@ -665,6 +679,34 @@ local function source_job(job)
       job.frames[#job.frames + 1] = { index = k - n0, file = job.raw, offset = k * bytes }
     end
     publish(job)
+  end)
+end
+
+-- Real export boundary: run the converter plan only to learn the first/last emitted frame
+-- (job.anchor), skip decoding its sample, then show the continuous source row around the mark.
+local function probe_job(job)
+  job.probe = true
+  job.finish = source_job
+  job.degrade = function(why) -- no boundary info: still show the plain row
+    mp.msg.warn("preview[" .. job.edge.name .. "]: no export boundary (" .. tostring(why) .. ")")
+    job.anchor = nil
+    source_job(job)
+  end
+  remove_samples(job)
+  run_job(job, { options.converter, "--preview-plan", job.edge.name, job.path,
+    tostring(job.a), tostring(job.b), job.mode, job.clip, tostring(job.window),
+  }, function(result)
+    local commands = parse_plan(result.stdout)
+    if not commands then
+      job.degrade("invalid converter preview plan"); return
+    end
+    -- Never retain a known-stale image while the new boundary is computed.
+    remove_overlay(job.edge)
+    dispose(job.edge.cache)
+    job.edge.cache = nil
+    execute_plan(job, commands, 1)
+  end, function(err)
+    job.degrade(err); return true
   end)
 end
 
@@ -703,8 +745,10 @@ local function start_preview(edge)
   }
   edge.job, jobs[job] = job, true
   -- Zero/negative length (red border): the converter can't cut it, so decode from the source.
-  if (edge.id == 1 and options.beg_source) or job.red then
+  if job.red then
     job.source = true; source_job(job)
+  elseif not options.rows_from_sample then
+    job.source = true; probe_job(job)
   else
     sample_job(job)
   end
@@ -723,8 +767,8 @@ local function unchanged_sample(edge)
   if not job or job.path ~= source_path() then return false end
   local a, b = etime(edges[1]), etime(edges[2])
   local unchanged
-  if job.source then
-    -- Source rows ignore the mode and the other edge; only the border color follows validity.
+  if job.red then
+    -- Red rows ignore the mode and the other edge; only the border color follows validity.
     unchanged = (edge.id == 1 and job.a == a or edge.id == 2 and job.b == b) and job.red == not valid_range()
   elseif job.mode ~= state.mode then
     return false
@@ -795,16 +839,24 @@ end
 local load_pts_map -- defined near the callbacks
 -- Looping is a switch over the markers: toggling never touches edge times.
 -- Raw marker times (wysiwyg in mpv); offsets only compensate the ffmpeg cut discrepancy.
-local function apply_loop()
+-- Parked = ab-loop-b suspended (state.loop stays on): while paused (frame-stepping to find
+-- boundaries must never jump end->beg) and after resuming at/after the end mark. It is
+-- decided only on user actions/pause changes, never mid-playback (or the loop would break
+-- half a frame before b); playback before b un-parks it again.
+local function loop_parked_now()
+  if mp.get_property_bool("pause") then return true end
+  local pos = mp.get_property_number("time-pos")
+  return finite(pos) and pos >= edges[2].time - (frame_duration() or 0.02) * 0.5
+end
+local function apply_loop(parked)
+  if parked ~= nil then state.parked = parked end
   mp.set_property("ab-loop-a", state.loop and edges[1].time or "no")
-  -- Parked (seek to end): stepping/playing forward would cross b and jump to a; b is
-  -- suspended only until time-pos goes back before it, state.loop stays on.
   mp.set_property("ab-loop-b", state.loop and not state.parked and edges[2].time or "no")
 end
 
 local function toggle_loop()
-  state.loop, state.parked = not state.loop, false
-  apply_loop()
+  state.loop = not state.loop
+  apply_loop(loop_parked_now())
   status("info", "loop " .. (state.loop and "on" or "off"))
 end
 
@@ -825,11 +877,11 @@ local function mark(edge)
   end
   local other = edges[3 - edge.id]
   other.time = edge.id == 1 and math.max(t, other.time) or math.min(t, other.time)
-  state.loop, state.parked = true, false
+  state.loop = true
   if not state.map_requested then
     state.map_requested = true; load_pts_map(source_path())
   end
-  apply_loop()
+  apply_loop(loop_parked_now())
   refresh_previews(edge)
   show_duration()
 end
@@ -852,9 +904,6 @@ local function seek(edge, mode)
   mp.set_property("pause", "yes")
   mp.commandv("seek", edge.time, "absolute", mode)
   status("info", string.format("seek %s %s (%s)", edge.name, timestamp(edge.time), mode))
-  if edge.id == 2 and state.loop then
-    state.parked = true; apply_loop()
-  end
 end
 
 local function export(mode)
@@ -949,10 +998,13 @@ end)
 mp.observe_property("eof-reached", "bool", function(_, eof)
   if eof then mp.set_property("pause", "yes") end
 end)
+mp.observe_property("pause", "bool", function()
+  if state.loop then apply_loop(loop_parked_now()) end
+end)
 mp.observe_property("time-pos", "number", function(_, pos)
-  if state.parked and finite(pos) and pos < edges[2].time - (frame_duration() or 0.02) * 0.5 then
-    state.parked = false
-    apply_loop()
+  if state.loop and state.parked and finite(pos) and not mp.get_property_bool("pause")
+      and pos < edges[2].time - (frame_duration() or 0.02) * 0.5 then
+    apply_loop(false)
   end
 end)
 mp.observe_property("osd-dimensions", "native", show_previews)
