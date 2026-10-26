@@ -29,17 +29,21 @@ try:  # ranger imports plugins as `plugins.<name>` with the confdir on sys.path
     from plugins import vdconf as C
     from plugins import vddangling as _dang
     from plugins import vdsym as _core
-    from plugins.vdutil import (_brief, _dangling, _link_text, _norm,
-                                _recovery, _safe_readlink, _swap_link,
-                                replace_link)
+    from plugins.vdutil import (_dangling, _link_text, _norm, _recovery,
+                                _safe_readlink, _swap_link, replace_link)
 except ImportError:  # fallback: the plugin files somewhere on PYTHONPATH
     import pasteflow
     import rhooks
     import vdconf as C
     import vddangling as _dang
     import vdsym as _core
-    from vdutil import (_brief, _dangling, _link_text, _norm, _recovery,
+    from vdutil import (_dangling, _link_text, _norm, _recovery,
                         _safe_readlink, _swap_link, replace_link)
+
+try:
+    from plugins.vdutil import fit_text, run_async
+except ImportError:
+    from vdutil import fit_text, run_async
 
 _LOG = logging.getLogger("ranger.vdsym")
 
@@ -449,6 +453,11 @@ def _print_links(fm, op: str, hits: list[_core._Hit]) -> None:
     fm.execute_command("printf '%s\\n' " + shell_quote("\n".join(lines)), flags="-w")
 
 
+# One question per set of files: the same paths asked twice (a double :cut, a paste before the
+# cut prompt was answered, ...) share the first prompt; every caller gets its answer.
+_PENDING: dict[tuple[str, ...], list] = rhooks.shared("vdguard.pending", dict)
+
+
 def _guard_move(
     fm,
     paths: Sequence[str],
@@ -460,57 +469,167 @@ def _guard_move(
 
     done(policy) with policy "" (nothing found), "y" (go, leave links), "U" (update) or
     "R" (replace); cancel() otherwise. Enter and Esc both answer "cancel".
+    The scan runs in a background thread (C.ASYNC_SCAN): "scanning ..." shows at once and the
+    prompt follows; prompts name a single link (cut to the screen width), else only count.
     """
+    key = tuple(paths)
+    waiting = _PENDING.get(key)
+    if waiting is not None:  # same files are being asked about right now
+        waiting.append((done, cancel))
+        return
+    waiting = _PENDING[key] = [(done, cancel)]
+
+    def done_all(policy: str) -> None:
+        _PENDING.pop(key, None)
+        for callback, _ in waiting:
+            callback(policy)
+
+    def cancel_all() -> None:
+        _PENDING.pop(key, None)
+        for _, callback in waiting:
+            callback()
+
     ask = fm.ui.console.ask
     _dang._arm()
-    clips = find_clips(paths)
     subjects = [path for path in paths if _core._under_roots(path)]
-    hits = _core.find_hits(subjects, C.LOCK_WAIT) if subjects else []
-    if hits is None:
-        ask(
-            f"link scan unavailable (cache is warming) -- {op} anyway? (y / C=cancel)",
-            lambda ans: done("y") if ans in ("y", "Y") else cancel(),
-            ("c", "C", "y", "Y"),
-        )
-        return
-    hits = _core._drop_moving(hits, paths)
-    if not hits and not clips:
-        return done("")
-    _recovery(
-        op,
-        [f"path {p}" for p in paths]
-        + [f"link {h.link} -> {_safe_readlink(h.link)}" for h in hits]
-        + [f"clip {c}" for c in clips],
-    )
-    _print_links(fm, op, hits)
-    parts = []
-    if hits:
-        parts.append(f"{len(hits)} symlink(s): {_brief(h.link for h in hits)}")
-    if clips:
-        parts.append(f"{len(clips)} clip(s)")
-    if hits:
-        text = (
-            " + ".join(parts)
-            + f" -- {op}? (y=leave / U=update / R=replace / n=dashboard / C=cancel)"
-        )
-        choices: tuple[str, ...] = ("c", "C", "y", "Y", "n", "N", "U", "R")
-    else:
-        text = parts[0] + f" -- {op} anyway? (y / C=cancel)"
-        choices = ("c", "C", "y", "Y")
 
-    def answer(ans: str) -> None:
-        if ans in ("U", "R"):
-            done(ans)
-        elif ans in ("y", "Y"):
-            _dang._acknowledge(hit.link for hit in hits)
-            done("y")
+    def scan():
+        return find_clips(paths), (
+            _core.find_hits(subjects, C.LOCK_WAIT) if subjects else []
+        )
+
+    def decide(result) -> None:
+        if result is None:  # the scan itself failed (traceback in :display_log)
+            ask(
+                f"link scan failed -- {op} anyway? (y / C=cancel)",
+                lambda ans: done_all("y") if ans in ("y", "Y") else cancel_all(),
+                ("c", "C", "y", "Y"),
+            )
+            return
+        clips, hits = result
+        if hits is None:
+            ask(
+                f"link scan unavailable (cache is warming) -- {op} anyway? (y / C=cancel)",
+                lambda ans: done_all("y") if ans in ("y", "Y") else cancel_all(),
+                ("c", "C", "y", "Y"),
+            )
+            return
+        hits = _core._drop_moving(hits, paths)
+        if not hits and not clips:
+            return done_all("")
+        _recovery(
+            op,
+            [f"path {p}" for p in paths]
+            + [f"link {h.link} -> {_safe_readlink(h.link)}" for h in hits]
+            + [f"clip {c}" for c in clips],
+        )
+        _print_links(fm, op, hits)
+        if len(hits) + len(clips) == 1:  # one item: name it, cut to the screen width
+            what, name = ("symlink", hits[0].link) if hits else ("clip", clips[0])
+            prefix, name = f"{what} ", fs.basename(name)
+        else:  # several: counts only, a list would not fit
+            parts = [f"{len(hits)} symlinks"] * bool(hits) + [
+                f"{len(clips)} clips"
+            ] * bool(clips)
+            prefix, name = " + ".join(parts), ""
+        if hits:
+            tail = (
+                f" -- {op}? (y=leave / U=update / R=replace / n=dashboard / C=cancel)"
+            )
+            choices: tuple[str, ...] = ("c", "C", "y", "Y", "n", "N", "U", "R")
         else:
-            if ans in ("n", "N"):
-                dest = fs.join(C.DASHBOARD_ROOT, fs.basename(paths[0]))
-                _core.make_dashboard(fm, [hit.link for hit in hits], dest)
-            cancel()
+            tail = f" -- {op} anyway? (y / C=cancel)"
+            choices = ("c", "C", "y", "Y")
+        short = f" -- {op}? (y/U/R/n/C)" if hits else f" -- {op}? (y/C)"
+        text = fit_text(fm, prefix, name, tail, short)
 
-    ask(text, answer, choices)
+        def answer(ans: str) -> None:
+            if ans in ("U", "R"):
+                done_all(ans)
+            elif ans in ("y", "Y"):
+                _dang._acknowledge(hit.link for hit in hits)
+                done_all("y")
+            else:
+                if ans in ("n", "N"):
+                    dest = fs.join(C.DASHBOARD_ROOT, fs.basename(paths[0]))
+                    _core.make_dashboard(fm, [hit.link for hit in hits], dest)
+                cancel_all()
+
+        ask(text, answer, choices)
+
+    if C.ASYNC_SCAN:
+        fm.notify(f"{op}: scanning links ...")
+        run_async(fm, scan, decide, "vdguard-scan")
+    else:
+        decide(scan())
+
+
+## ALT: synchronous scan on the main thread, prompt lists up to 3 link paths
+##      benefit: no thread, prompt appears exactly when the scan ends, names visible;
+##      cost: the whole UI froze during the scan (NFS roots) and a long list overflowed the
+##      screen; a second prompt for the same files could be queued (no dedup)
+# def _guard_move(
+#     fm,
+#     paths: Sequence[str],
+#     op: str,
+#     done: Callable[[str], None],
+#     cancel: Callable[[], None],
+# ) -> None:
+#     """Ask about clips / symlinks before `op` (cut, move, rename) touches `paths`.
+#
+#     done(policy) with policy "" (nothing found), "y" (go, leave links), "U" (update) or
+#     "R" (replace); cancel() otherwise. Enter and Esc both answer "cancel".
+#     """
+#     ask = fm.ui.console.ask
+#     _dang._arm()
+#     clips = find_clips(paths)
+#     subjects = [path for path in paths if _core._under_roots(path)]
+#     hits = _core.find_hits(subjects, C.LOCK_WAIT) if subjects else []
+#     if hits is None:
+#         ask(
+#             f"link scan unavailable (cache is warming) -- {op} anyway? (y / C=cancel)",
+#             lambda ans: done("y") if ans in ("y", "Y") else cancel(),
+#             ("c", "C", "y", "Y"),
+#         )
+#         return
+#     hits = _core._drop_moving(hits, paths)
+#     if not hits and not clips:
+#         return done("")
+#     _recovery(
+#         op,
+#         [f"path {p}" for p in paths]
+#         + [f"link {h.link} -> {_safe_readlink(h.link)}" for h in hits]
+#         + [f"clip {c}" for c in clips],
+#     )
+#     _print_links(fm, op, hits)
+#     parts = []
+#     if hits:
+#         parts.append(f"{len(hits)} symlink(s): {_brief(h.link for h in hits)}")
+#     if clips:
+#         parts.append(f"{len(clips)} clip(s)")
+#     if hits:
+#         text = (
+#             " + ".join(parts)
+#             + f" -- {op}? (y=leave / U=update / R=replace / n=dashboard / C=cancel)"
+#         )
+#         choices: tuple[str, ...] = ("c", "C", "y", "Y", "n", "N", "U", "R")
+#     else:
+#         text = parts[0] + f" -- {op} anyway? (y / C=cancel)"
+#         choices = ("c", "C", "y", "Y")
+#
+#     def answer(ans: str) -> None:
+#         if ans in ("U", "R"):
+#             done(ans)
+#         elif ans in ("y", "Y"):
+#             _dang._acknowledge(hit.link for hit in hits)
+#             done("y")
+#         else:
+#             if ans in ("n", "N"):
+#                 dest = fs.join(C.DASHBOARD_ROOT, fs.basename(paths[0]))
+#                 _core.make_dashboard(fm, [hit.link for hit in hits], dest)
+#             cancel()
+#
+#     ask(text, answer, choices)
 
 
 def _same_link_target(source: str, dest: str) -> bool:
@@ -613,9 +732,7 @@ class _GuardedRemoval:
         prompt = " + ".join(details) + suffix
         compact_prompt = " + ".join(compact_details) + suffix
         items = [f"clip {path}" for path in clips]
-        items += [
-            f"symlink {link} -> {_safe_readlink(link) or '?'}" for link in links
-        ]
+        items += [f"symlink {link} -> {_safe_readlink(link) or '?'}" for link in links]
 
         def answer(ans: str) -> None:
             if ans in ("y", "Y"):
@@ -627,7 +744,11 @@ class _GuardedRemoval:
                 )
 
         self._ask_remove(
-            fm, prompt, compact_prompt, ("c", "C", "y", "Y", "n", "N"), items,
+            fm,
+            prompt,
+            compact_prompt,
+            ("c", "C", "y", "Y", "n", "N"),
+            items,
             answer,
         )
 
@@ -640,7 +761,11 @@ class _GuardedRemoval:
     @staticmethod
     def _ask_remove(fm, full_text, compact_text, choices, items, callback) -> None:
         console = fm.ui.console
-        text = full_text if len(full_text) <= max(20, getattr(console, "wid", 80)) else compact_text
+        text = (
+            full_text
+            if len(full_text) <= max(20, getattr(console, "wid", 80))
+            else compact_text
+        )
         choices = tuple(choices)
         if items and "l" not in choices:
             choices += ("l", "L")
@@ -754,25 +879,61 @@ class rename(_default_rename):
 
 # path -> "" | y | U | R : the answer given at :cut time (what to do with the links on paste)
 _POLICY: dict[str, str] = rhooks.shared("vdguard.policy", dict)
+# the same answers, kept when the buffer is reset (anything that calls :copy between dd and pp)
+# so pp does not ask again about files already answered at dd; consumed by the paste
+_ANSWERED: dict[str, tuple[float, str]] = rhooks.shared("vdguard.answered", dict)
+ANSWER_TTL = 600.0  # s
 
 
 def _on_reset(fm) -> None:
+    now = time.monotonic()
+    for path, policy in _POLICY.items():
+        _ANSWERED[path] = (now, policy)
+    for path in [p for p, (at, _) in _ANSWERED.items() if now - at > ANSWER_TTL]:
+        del _ANSWERED[path]
     _POLICY.clear()  # :copy (set) / :uncut / :cut (calls :copy) start a fresh buffer
 
 
+## ALT: reset simply forgot the answers
+##      benefit: nothing stale can ever be reused; cost: an unrelated reset between dd and pp
+##      asked the same question again
+# def _on_reset(fm) -> None:
+#     _POLICY.clear()  # :copy (set) / :uncut / :cut (calls :copy) start a fresh buffer
+
+
 def _on_cut(fm, paths) -> None:
+    if not C.PROMPT_ON_CUT:  # answers come at paste time only
+        return
     fresh = [path for path in paths if path not in _POLICY]
     if not fresh:
         return
 
     def done(policy: str) -> None:
+        now = time.monotonic()
         for path in fresh:
             _POLICY[path] = policy
+            _ANSWERED[path] = (now, policy)
 
     def cancel() -> None:
         pasteflow.unmark(fm, fresh)
 
     _guard_move(fm, fresh, "cut", done, cancel)
+
+
+## ALT: asked unconditionally at :cut
+# def _on_cut(fm, paths) -> None:
+#     fresh = [path for path in paths if path not in _POLICY]
+#     if not fresh:
+#         return
+#
+#     def done(policy: str) -> None:
+#         for path in fresh:
+#             _POLICY[path] = policy
+#
+#     def cancel() -> None:
+#         pasteflow.unmark(fm, fresh)
+#
+#     _guard_move(fm, fresh, "cut", done, cancel)
 
 
 def _guard_links(p, proceed) -> None:
@@ -831,6 +992,8 @@ def _guard_moves(p, proceed) -> None:
 
     def go() -> None:
         wanted = {path: _POLICY.pop(path, "") for path in paths}
+        for path in paths:
+            _ANSWERED.pop(path, None)  # consumed
         active = {path: pol for path, pol in wanted.items() if pol in ("U", "R")}
         job = leave_job = None
         moves: dict[str, str] = {}
@@ -857,6 +1020,11 @@ def _guard_moves(p, proceed) -> None:
             p.after(lambda _p: leave_job.finish())
         proceed()
 
+    now = time.monotonic()
+    for path in paths:  # answered at dd, but the buffer was reset since
+        recent = _ANSWERED.get(path)
+        if path not in _POLICY and recent and now - recent[0] <= ANSWER_TTL:
+            _POLICY[path] = recent[1]
     fresh = [path for path in paths if path not in _POLICY]
     if not fresh:
         return go()

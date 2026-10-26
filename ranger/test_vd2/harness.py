@@ -1,6 +1,11 @@
+import os
+import shutil
 import sys
+import tempfile
+import time
 import types
 
+sys.path.insert(0, "/tmp/newplug")
 sys.path.insert(0, "/home/claude/plugins")
 import ranger
 from ranger.container.settings import Settings
@@ -43,6 +48,7 @@ class UI:
 
 
 def make_fm(cwd):
+    from ranger.ext.signals import SignalDispatcher
 
     ui = UI()
     fm = FM(ui=ui, paths=[cwd])

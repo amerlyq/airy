@@ -93,6 +93,7 @@ os.symlink("../data/gone.mp4", os.path.join(view, "gone.mp4"))
 c2 = vd.vdsym("vdsym -q x.mp4")
 c2.fm = fm
 con.answers[:] = ["c"]
+dang._mon.validated = None
 c2.execute()
 ok(
     con.asked and "newly dangling" in con.asked[-1],
@@ -107,8 +108,9 @@ d = goto(data)
 point(d, "x.mp4")
 con.answers[:] = ["U"]
 fm.cut()
+pump(fm)
 ok(
-    any("symlink(s)" in a and "cut?" in a for a in con.asked),
+    any("2 symlinks" in a and "cut?" in a for a in con.asked),
     "cut prompts about 2 symlinks",
 )
 ok(guard._POLICY.get(f1) == "U", "policy U remembered")
@@ -137,6 +139,7 @@ d = goto(sub)
 point(d, "x.mp4")
 con.answers[:] = ["c"]
 fm.cut()
+pump(fm)
 ok(not fm.copy_buffer and not fm.do_cut, "cancel at cut empties buffer")
 
 # ---- guard: cut WITHOUT hook prompt (buffer set directly) -> prompt at paste, R = replace ---- #

@@ -675,8 +675,12 @@ def _print_dismiss() -> tuple[str, str]:
     )
 
 
-def make_dashboard(fm, matches: Sequence[str], dest: str) -> str:
-    """Populate `dest` with one symlink per match (dropping stale symlinks) and cd there."""
+def make_dashboard(
+    fm, matches: Sequence[str], dest: str, go: bool = True, track: bool = True
+) -> str:
+    """Populate `dest` with one symlink per match (dropping stale symlinks) and cd there
+    (go=False: do not cd; track=False: do not remember the sources as visited, which costs a
+    realpath per match)."""
     os.makedirs(dest, exist_ok=True)
     wanted: dict[str, str] = {}
     for source in matches:
@@ -693,10 +697,11 @@ def make_dashboard(fm, matches: Sequence[str], dest: str) -> str:
         link = fs.join(dest, name)
         if not fs.lexists(link):
             os.symlink(source, link)
-    for source in matches:
+    for source in matches if track else ():
         _cache.visited.add(fs.dirname(source))
         _cache.visited.add(fs.dirname(fs.realpath(source)))
-    fm.cd(dest)
+    if go:
+        fm.cd(dest)
     return dest
 
 

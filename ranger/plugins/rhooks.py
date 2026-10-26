@@ -73,7 +73,14 @@ def patch(owner, name: str, make) -> None:
     original = originals.setdefault((owner, name), getattr(owner, name))
     wrapper = make(original)
     setattr(owner, name, wrapper)
-    if name in {"paste", "paste_symlink", "paste_hardlink", "paste_hardlinked_subtree", "__init__", "generate"}:
+    if name in {
+        "paste",
+        "paste_symlink",
+        "paste_hardlink",
+        "paste_hardlinked_subtree",
+        "__init__",
+        "generate",
+    }:
         trace(
             f"rhooks.patch owner={owner.__module__}.{owner.__name__} name={name} "
             f"original={original.__module__}.{original.__qualname__} "
@@ -102,7 +109,7 @@ def _dispatch_cd(signal) -> None:
     for key, fn in list(_S.cd.items()):
         try:
             fn(new.path)
-        except Exception:
+        except Exception:  # noqa: BLE001 - one plugin must not break the others / ranger
             _LOG.exception("rhooks: cd handler %s failed", key)
 
 
@@ -132,7 +139,7 @@ def on_cd(key: str, fn) -> None:
                 return previous(fm_)
 
             ranger.api.hook_init = hook_init
-    except Exception:
+    except Exception:  # noqa: BLE001 - a different ranger must not break plugin loading
         _LOG.exception("rhooks: cd signal not installed")
 
 
@@ -147,7 +154,7 @@ def _make_work(orig):
         for key, fn in list(_S.tick.items()):
             try:
                 fn()
-            except Exception:
+            except Exception:  # noqa: BLE001 - never break ranger's main loop
                 _LOG.exception("rhooks: tick handler %s failed", key)
         return result
 
@@ -160,5 +167,5 @@ def on_tick(key: str, fn) -> None:
         from ranger.core.loader import Loader
 
         patch(Loader, "work", _make_work)
-    except Exception:
+    except Exception:  # noqa: BLE001
         _LOG.exception("rhooks: tick not installed")

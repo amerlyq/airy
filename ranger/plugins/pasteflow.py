@@ -388,15 +388,17 @@ def _jump(p: Paste) -> None:
         if (cur is None or cur.path != d.path) and follow:
             fm.cd(d.path)
             cur = fm.thisdir
-        if cur is None or cur.path != d.path:
+        if cur is None or cur.path != d.path:  # NOTE user may have cd'd away meanwhile
             _dbg(
                 "jump: cursor dir %s != dest %s; updating destination directory cursor",
                 getattr(cur, "path", None),
                 d.path,
             )
+            return  # keep this new addition?
         for f in d.files or ():  # d.files = visible, sorted => "first" is what you see
             if f.basename in new:
                 d.move_to_obj(f.path)
+                # comment-out 5 lines?
                 index = d.files.index(f)
                 for tab in fm.tabs.values():
                     if getattr(getattr(tab, "thisdir", None), "path", None) == d.path:

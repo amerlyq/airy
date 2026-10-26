@@ -27,8 +27,7 @@ LINEMODES
 ════════════════════════════════════════════════════════════════════════════════
 SORTING
 ────────────────────────────────────────────────────────────────────────────────
-  sort keys dc{file,all,video}: largest first regardless of sort_reverse; uncomputed
-  entries sort to end (size 0).
+  sort keys dc{file,all,video}: largest first; uncomputed entries sort to end (size 0).
   Activated by the sort argument; setlocal sort is applied to current dir.
   Restored by dcu.
   Restore order: setlocal (if original sort was local) → fallback to set.
@@ -123,6 +122,7 @@ KNOWN LIMITATIONS
 import os
 import re
 import stat
+import sys
 import time
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from threading import Event
@@ -236,7 +236,9 @@ class _DcsizeLoader(Loadable):
 
 
 def _pause_vdsym_monitor(mode):
-    """Pause the whole-tree dangling-link scan while dcsize walks the tree."""
+    """vddangling's check is switched off through vdconf (it reads C.DANGLING_MONITOR live)."""
+    if mode != "video":
+        return None
     try:
         try:
             from plugins import vdconf
@@ -265,6 +267,39 @@ def _restore_vdsym_monitor(state):
             vddangling._arm(30.0)
         except Exception:
             pass
+
+
+## ALT: toggled vdsym.DANGLING_MONITOR / vdsym._arm directly
+##      benefit: no vdconf/vddangling dependency; cost: BUG - ranger imports plugins as
+##      `plugins.vdsym`, so sys.modules.get("vdsym") / "ranger.plugins.vdsym" never matched and
+##      the monitor was never paused; moved out of vdsym by the split anyway
+# def _pause_vdsym_monitor(mode):
+#     if mode != "video":
+#         return None
+#     try:
+#         vdsym = sys.modules.get("vdsym")
+#         if vdsym is None:
+#             vdsym = sys.modules.get("ranger.plugins.vdsym")
+#         if vdsym is None:
+#             return None
+#
+#         old = vdsym.DANGLING_MONITOR
+#         vdsym.DANGLING_MONITOR = False
+#         return vdsym, old
+#     except Exception:
+#         return None
+#
+#
+# def _restore_vdsym_monitor(state):
+#     if state is None:
+#         return
+#     vdsym, old = state
+#     vdsym.DANGLING_MONITOR = old
+#     if old:
+#         try:
+#             vdsym._arm(30.0)
+#         except Exception:
+#             pass
 
 
 def _vfmt(p, st):
@@ -355,7 +390,7 @@ def _dir(path, st, mode, cancelled):
     ino, mt = st.st_ino, st.st_mtime_ns
     prev = None
     if not _FRESH:
-        e = vdprobe.dir_get_stat(st)
+        e = vdprobe.dir_get(ino)
         if e is not None and e[0] == mt:
             prev = e[1]
     need_f = mode != "video"
@@ -368,7 +403,9 @@ def _dir(path, st, mode, cancelled):
         return prev
     _DIR_SCANS += 1
     o = _readdir(path, need_f, prev, cancelled)
-    vdprobe.dir_put(ino, mt, o, st)  # mt predates listing; racing changes force a rescan
+    vdprobe.dir_put(
+        ino, mt, o
+    )  # mt was read BEFORE the listing: a racing change just forces a rescan
     return o
 
 
@@ -577,17 +614,22 @@ def _restore_sort(fm, d, sn):
     sort = sn["sort"]
     rev = str(sn["rev"]).lower()  # 'true' / 'false'
     if sn.get("sort_is_local"):
-        _set_local_sort(fm, d.path, sort, rev == "true")
-        return
+        try:
+            # OR: _set_local_sort(fm, d.path, sort, rev == "true")
+            fm.execute_console(f"setlocal path={d.path} sort={sort}")
+            fm.execute_console(f"setlocal path={d.path} sort_reverse={rev}")
+            return
+        except Exception:
+            pass
     fm.execute_console(f"set sort={sort}")
     fm.execute_console(f"set sort_reverse={rev}")
 
 
-def _set_local_sort(fm, path, sort, reverse=False):
-    """Write cwd-local sort settings without signaling every loaded directory."""
-    pattern = re.escape(path) + "$"
-    fm.settings._raw_set("sort", sort, path=pattern)
-    fm.settings._raw_set("sort_reverse", reverse, path=pattern)
+def _set_local_sort(fm, path, sort):
+    # """Write cwd-local sort settings without signaling every loaded directory."""
+    # pattern = re.escape(path) + "$"
+    fm.execute_console(f"setlocal path={path} sort={sort}")
+    fm.execute_console(f"setlocal path={path} sort_reverse=False")
 
 
 def _restore_local_sorts(fm, sn):
@@ -697,13 +739,14 @@ class dcsize(Command):
         for f in dirs:
             f.linemode = name
         if "sort" in opts:
-            _set_local_sort(self.fm, d.path, name, reverse=False)
+            # _set_local_sort(self.fm, d.path, name, reverse=False)
+            _set_local_sort(self.fm, d.path, name)
 
         def on_result(f, result):
             SIZES[mode][f.path] = result
-            f.display_data.clear()
-            if f.is_directory:
-                f.set_linemode(name)
+            # f.display_data.clear()
+            # if f.is_directory:
+            #     f.set_linemode(name)
             ## DISABLED: sort-signal-storm
             ##   8 _set_local_sort calls -> 37,111 Directory.sort calls —> 37,111 signal callbacks
             # if f.is_directory:
@@ -741,10 +784,10 @@ class dcsize(Command):
                 d.refilter()
             if refresh:
                 d.sort()
-            for f in d.files_all or []:
-                if f.is_directory and f.path in SIZES[mode]:
-                    f.set_linemode(name)
-                    f.display_data.clear()
+            # for f in d.files_all or []:
+            #     if f.is_directory and f.path in SIZES[mode]:
+            #         f.set_linemode(name)
+            #         f.display_data.clear()
             self.fm.ui.redraw_main_column()
 
         self.fm.loader.add(_DcsizeLoader(self.fm, todo, mode, on_result, on_finish))

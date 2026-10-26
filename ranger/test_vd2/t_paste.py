@@ -1,3 +1,4 @@
+import pasteflow
 from harness import *
 
 root = tempfile.mkdtemp()

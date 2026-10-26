@@ -91,3 +91,40 @@ RACY_NS = 2_000_000_000  # dirs modified < 2s before their scan are re-read next
 # vdsym, a ranger timer repeats the comparison once after DANGLING_QUIET s without VD activity.
 DANGLING_MONITOR = True
 DANGLING_QUIET = 30.0
+
+
+# --------------------------------------------------------------------------- #
+# prompts at cut / paste (vdguard)
+# --------------------------------------------------------------------------- #
+
+# Ask about symlinks / clips right at :cut (dd) so the answer is known before you move on.
+# False: ask only at paste (pp).
+PROMPT_ON_CUT = True
+
+# Scan for links in a background thread: "scanning..." shows at once, the prompt follows when
+# the scan is done (a slow / remote root no longer freezes ranger at dd or pp).
+ASYNC_SCAN = True
+
+# --------------------------------------------------------------------------- #
+# dangling monitor (vddangling): cost control
+# --------------------------------------------------------------------------- #
+
+# Directory (under DASHBOARD_ROOT) holding one symlink per dangling link; the notification
+# shows its path, :dangling opens it.
+DANGLING_DASHBOARD = "dangling"
+
+# s the background / pre-flight check may spend statting links; links not answered in time are
+# skipped (their mount is left alone for DANGLING_SLOW_SKIP s) instead of freezing ranger.
+DANGLING_BUDGET = 6.0
+DANGLING_PREFLIGHT_BUDGET = 3.0  # same, but when :vdsym waits for it on the main thread
+DANGLING_WORKERS = 8  # parallel stats (hung NFS stats park in daemon threads)
+DANGLING_SLOW_SKIP = 600.0
+
+# Links whose TARGET lives on one of these filesystems are checked at most every
+# DANGLING_REMOTE_EVERY s (an NFS stat can take seconds). :dangling always checks everything.
+DANGLING_REMOTE_FS = ("nfs", "nfs4", "cifs", "smb3", "fuse.sshfs", "fuse.rclone")
+DANGLING_REMOTE_EVERY = 900.0
+
+# Periodic checks trust the cached link index; every DANGLING_REVALIDATE s one also stat-walks
+# the cached directories (finds links created / removed behind ranger's back).
+DANGLING_REVALIDATE = 1800.0

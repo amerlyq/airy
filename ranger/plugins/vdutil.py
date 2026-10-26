@@ -151,3 +151,59 @@ def _recovery(op: str, lines: Iterable[str]) -> None:
                 handle.write(f"  {line}\n")
     except OSError:
         _LOG.warning("cannot write %s", C.RECOVERY_LOG)
+
+
+# --------------------------------------------------------------------------- #
+# prompts / background work (shared by vdguard and vddangling)
+# --------------------------------------------------------------------------- #
+
+
+def fit_text(
+    fm, prefix: str, name: str, tail: str, short_tail: str | None = None
+) -> str:
+    """`prefix + name + tail` cut to the terminal width: only `name` is shortened (middle
+    ellipsis). When even a 12-char name does not fit next to `tail`, `short_tail` (a compact
+    legend) is used instead; when it still does not fit, the name is dropped."""
+    try:
+        width = int(fm.ui.termsize[1])
+    except Exception:  # noqa: BLE001 - no UI (tests): do not cut
+        width = 10_000
+    if (
+        short_tail is not None
+        and len(prefix) + min(len(name), 12) + len(tail) > width - 1
+    ):
+        tail = short_tail
+    room = width - 1 - len(prefix) - len(tail)
+    if len(name) <= room:
+        return prefix + name + tail
+    if room < 6:
+        return (prefix + tail)[: max(width - 1, 1)]
+    head = room // 2
+    return prefix + name[:head] + "\u2026" + name[-(room - head - 1) :] + tail
+
+
+def run_async(fm, work, then, name: str = "vd") -> None:
+    """work() in a daemon thread; then(result) back on ranger's main thread (polled by the
+    loader, so no locking in `then`). result is None when work() raised (traceback logged)."""
+    import threading
+
+    from ranger.core.loader import Loadable
+
+    box: list = []
+
+    def target() -> None:
+        try:
+            box.append(work())
+        except Exception:  # noqa: BLE001
+            _LOG.exception("vdsym: background %s failed", name)
+            box.append(None)
+
+    threading.Thread(target=target, name=name, daemon=True).start()
+
+    def poll():
+        while not box:
+            time.sleep(0.01)  # the loader calls us in a loop: do not spin
+            yield
+        then(box[0])
+
+    fm.loader.add(Loadable(poll(), name), append=True)
