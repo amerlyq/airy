@@ -196,6 +196,9 @@ rargs=(\
   --mount=type=bind,src=/usr/lib/terminfo/t/tmux-256color,dst=/usr/share/terminfo/t/tmux-256color
   --env=TERM=tmux-256color
 )
+
+[[ -f AGENTS.md ]] || rargs+=( --mount=type=bind,"src=$here/AGENTS.md,dst=$pjdir/AGENTS.md,ro=false,bind-propagation=rslave" )
+
 exec docker run "${rargs[@]}" -- "$ltag" "$@"
 
 # DEBUG:
