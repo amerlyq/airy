@@ -52,8 +52,11 @@ if [ -n "$lim" ]; then
     NR < lim { buf[NR] = $0 }
     END {
       if (NR < lim) for (i = 1; i <= NR; i++) print buf[i]
-      else printf "%d / %d bytes differ (%.2f%%), list suppressed (>= %d lines)\n",
-                  NR, size, size > 0 ? 100 * NR / size : 0, lim
+      else {
+        pct = size > 0 ? 100 * NR / size : 0
+        printf "%d / %d bytes differ (%.2f%%), list suppressed (>= %d lines)\n",
+               NR, size, pct, lim
+      }
     }'
   rc=${PIPESTATUS[0]}
 else

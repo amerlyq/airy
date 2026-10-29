@@ -98,6 +98,7 @@ _GROUPS = {
         "print": "p",
         "replace": "R",
         "rotate": "r",
+        "rotate-back": "B",
         "xclip": "x",
         "refresh": "q",
         "rescan": "Q",
@@ -1043,7 +1044,9 @@ class vdsym(Command):
         if not matches:
             return
         current = self.fm.thisfile.path
-        rotate = "r" in self._args()[0]
+        flags = self._args()[0]
+        rotate = bool(flags & {"r", "B"})
+        reverse = "B" in flags or (rotate and self.quantifier == 9)
         current_norm = _norm(current)
         members = {_norm(path) for path in [current, *matches]}
         state = _ROTATIONS.get(id(self.fm))
@@ -1063,6 +1066,7 @@ class vdsym(Command):
                 "members": members,
                 "locations": locations,
                 "index": {_norm(path): index for index, path in enumerate(locations)},
+                "origin": current_norm,
             }
             _ROTATIONS[id(self.fm)] = state
         locations = state["locations"]
@@ -1071,8 +1075,18 @@ class vdsym(Command):
             target_index = min(max(1, position), alternatives)
             target = locations[target_index]
         elif rotate:
-            target_index = (state["index"][current_norm] + 1) % len(locations)
+            if state.get("complete"):
+                state["origin"] = current_norm
+                state["complete"] = False
+            current_index = state["index"][current_norm]
+            direction = -1 if reverse else 1
+            target_index = current_index + direction
+            if not 0 <= target_index < len(locations):
+                target_index %= len(locations)
             target = locations[target_index]
+            if _norm(target) == state["origin"]:
+                # One full pass is done; stop here until the next keypress.
+                state["complete"] = True
         else:
             target = self._jump_fallback(matches, current, fs.realpath(current))
             target_index = state["index"].get(_norm(target), 0)
