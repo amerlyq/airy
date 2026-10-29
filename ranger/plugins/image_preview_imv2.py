@@ -7,7 +7,7 @@ No compositor or tmux focus notifications are needed.
 
 Track the newest imv socket created after ranger startup. This is discovery,
 not process ownership: another application's newly launched imv is also eligible.
-While tracking: i = tag_toggle, m = sync_imv_position, M = stop_imv_tracking.
+While tracking: i = tag_toggle, m = delay toggle, M = stop or burst control.
 M ignores existing sockets until another imv appears; original maps are restored.
 
 Requires imv with shell-quoted `open` arguments (verified against imv 5.0.1).
@@ -38,7 +38,7 @@ IMV_POLL_MS = 300
 IMV_DELAY_PRESETS_MS = [50, 100, 150, 200, 360, 420, 640, 800]
 IMV_FORWARD_DELAYS_MS = [120, 400]
 IMV_UP_DELAY_OVERRIDE_MS = 80
-IMV_BURST_SIZE = 3  # <CASE: <=1 uses normal delay behavior.
+IMV_BURST_SIZE = 1  # <CASE: <=1 uses normal delay behavior.
 IMV_BURST_BETWEEN_DELAY_MS = 700
 IMV_HOLD_THRESHOLD_MS = 120
 IPC_TIMEOUT = 0.15
@@ -60,7 +60,9 @@ IMV_HIDE_PREVIEW = True
 #   are probed (cached by path+mtime). TRADEOFF: smaller animated webp are NOT detected
 #   (-> use IMV_SYNC_MODE="name"). Set IMV_SKIP_ANIM=False to remove all probing cost.
 IMV_SKIP_ANIM = True
-IMV_ANIM_MIN_SIZE = 500_000  # bytes; sanity threshold, adjust to your animated/still split
+IMV_ANIM_MIN_SIZE = (
+    500_000  # bytes; sanity threshold, adjust to your animated/still split
+)
 # OPTION: how ranger selection is mapped to imv position
 #   "index": goto <ranger index>; requires imv list == playlist (see _imv_can_show). 1 IPC.
 #   "name":  goto <guess>, verify landed path via snapshot, shift guess, repeat. Tolerates
@@ -232,7 +234,9 @@ class ImvSync:
         self.hunt_until = 0.0
         self.playlist = ()
         self.imv_index = {}  # realpath -> imv index as last observed ("name" mode hint)
-        self.saved_preview = None  # preview_files value to restore; None = not hidden by us
+        self.saved_preview = (
+            None  # preview_files value to restore; None = not hidden by us
+        )
         self._positions_src = None
         self._positions_map = {}
         self.directory = ""
@@ -243,6 +247,7 @@ class ImvSync:
         self.forward_delay_index = 0
         self.forward_delays = list(IMV_FORWARD_DELAYS_MS)
         self.burst_size = IMV_BURST_SIZE
+        self.burst_between_delay = IMV_BURST_BETWEEN_DELAY_MS
         self.burst_progress = 0
         self.last_forward_index = None
         self.last_forward_time = None
@@ -378,8 +383,11 @@ class ImvSync:
             if 1 <= count <= 9:
                 self.burst_size = count
                 self.fm.notify(f"imv burst size: {count}")
+            elif count >= 100:
+                self.burst_between_delay = count
+                self.fm.notify(f"imv burst delay: {count} ms")
             else:
-                self.fm.notify("imv burst size must be 1..9", bad=True)
+                self.fm.notify("imv count must be 1..9 or >=100", bad=True)
             return
         self.ignored.update(_sockets())
         self.set_socket(None)
@@ -484,7 +492,7 @@ class ImvSync:
                 delay = 0
             elif self.burst_size > 1:
                 delay = (
-                    IMV_BURST_BETWEEN_DELAY_MS
+                    self.burst_between_delay
                     if self.burst_progress == self.burst_size
                     else self.forward_delays[self.forward_delay_index]
                 )
@@ -525,7 +533,9 @@ class ImvSync:
                 if landed is None:
                     self.playlist = ()
                     return
-                observed = landed  # may be a neighbour; keeps back-sync from fighting ranger
+                observed = (
+                    landed  # may be a neighbour; keeps back-sync from fighting ranger
+                )
             elif not _send_command(self.socket.path, f"goto {index}"):
                 self.playlist = ()
                 return
@@ -545,7 +555,9 @@ class ImvSync:
         """realpath -> 1-based ranger playlist position; rebuilt only when the playlist changes."""
         if self._positions_src is not paths:
             self._positions_src = paths
-            self._positions_map = {os.path.realpath(p): i for i, p in enumerate(paths, 1)}
+            self._positions_map = {
+                os.path.realpath(p): i for i, p in enumerate(paths, 1)
+            }
         return self._positions_map
 
     def _goto_by_name(self, selected, index, paths):
@@ -609,7 +621,11 @@ class ImvSync:
             snapshot = future.result()
         except (OSError, ValueError):
             return  # Temporary-file/IPC failures are retried on the next poll.
-        if requested_context != context or snapshot is None:
+        if requested_context != context:
+            return
+        if snapshot is None:
+            if not _send_command(self.socket.path, "exec true"):
+                self.set_socket(None)
             return
         # imv can add images or reorder its own playlist while ranger's list
         # stays frozen. Invalidate only when the shown path leaves that list.
@@ -667,6 +683,7 @@ class ImvSync:
         finally:
             if capped_wait and not self.fm.ui.load_mode:
                 curses.halfdelay(min(255, max(1, self.fm.settings.idle_delay // 100)))
+        self.discover()
         if self.fm.thistab is not self.last_tab:
             self.last_tab = self.fm.thistab
             self.generation += 1
