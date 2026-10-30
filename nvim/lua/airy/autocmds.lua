@@ -1,5 +1,19 @@
 local autocmd = vim.api.nvim_create_autocmd
 
+-- In diff windows, fold unchanged context and leave changed hunks visible.
+-- `diff` foldmethod is window-local, so this applies independently to each
+-- side of `nvim -d` and to windows where :diffthis is enabled later.
+autocmd({ 'OptionSet', 'WinEnter' }, {
+  desc = "(Diff) fold unchanged context around changed hunks",
+  callback = function()
+    if vim.wo.diff then
+      vim.wo.foldmethod = 'diff'
+      vim.wo.foldlevel = 0
+      vim.wo.foldenable = true
+    end
+  end,
+})
+
 
 autocmd('FileType', {
   desc = "(Aux) .lua filetype settings",

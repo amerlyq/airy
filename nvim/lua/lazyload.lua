@@ -205,8 +205,12 @@ local function load_ondemand()
     -- MOVE? into plug/treesitter.lua
     if enable then
       if pcall(vim.treesitter.start) then -- vim.treesitter.start()
-        vim.o.foldmethod = "expr"         -- <RQ
-        vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+        -- Diff windows use Vim's diff folds so unchanged context collapses
+        -- around the changed hunks. Keep Tree-sitter folds for normal windows.
+        if not vim.wo.diff then
+          vim.wo.foldmethod = "expr"
+          vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+        end
         -- FIXED: wrong indend for comments in 'ft=sh' ※⡨⣭⡰⢺
         if not vim.tbl_contains({ 'sh' }, vim.bo.filetype) then
           vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
