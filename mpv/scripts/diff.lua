@@ -5,6 +5,38 @@ local user_configs = { stitch = false }
 -- Read variables passed from the command line (--script-opts)
 options.read_options(user_configs, "hstack")
 
+-- ============================================================ DEBUG CONFIG
+-- Set to true to enable verbose logging to console
+-- Run mpv with --log-file=mpv.log to capture output
+local DEBUG = true
+
+local function log_debug(msg)
+  if DEBUG then
+    mp.msg.info("[diff.lua] " .. msg)
+  end
+end
+
+-- ============================================================ DIMENSION CACHE
+-- Store original video dimensions before any filter is applied
+-- This prevents reading post-filter dimensions when in hstack mode
+local orig_h1, orig_w1, orig_h2, orig_w2
+
+local function cache_dimensions()
+  orig_h1 = mp.get_property_number("video-params/h")
+  orig_w1 = mp.get_property_number("video-params/w")
+  local t2 = second_video_track()
+  orig_h2 = t2 and (t2["demux-h"] or t2["height"])
+  orig_w2 = t2 and (t2["demux-w"] or t2["width"])
+  log_debug(string.format("cache_dimensions: h1=%s w1=%s h2=%s w2=%s",
+    tostring(orig_h1), tostring(orig_w1), tostring(orig_h2), tostring(orig_w2)))
+end
+
+local function get_cached_dims()
+  return orig_h1, orig_w1, orig_h2, orig_w2
+end
+
+-- ============================================================
+
 local G1               = "[vid1] copy [vo]; [aid1] anull [ao]"
 local G2               = "[vid2] copy [vo]; [aid2] anull [ao]"
 
@@ -18,7 +50,7 @@ local WAVE_COLOR1      = "0x00FF88@0.75" -- green  (vid1)
 local WAVE_COLOR2      = "0x00CCFF@0.75" -- cyan   (vid2)
 local WAVE_BG          = 0.35            -- opacity of the dark backdrop strip
 
----------------------------------------------------------------- helpers
+---------------------------------------------------------------- helpers (MUST come before cache_dimensions)
 
 local function second_video_track()
   local n = 0
@@ -38,6 +70,8 @@ local function has_vf(label)
 end
 
 local function set_graph(graph)
+  log_debug("Setting lavfi-complex graph:")
+  log_debug(graph)
   mp.set_property("lavfi-complex", graph)
 end
 
@@ -45,6 +79,24 @@ end
 local function refresh()
   local pos = mp.get_property_number("time-pos")
   if pos then mp.commandv("seek", tostring(pos), "absolute+exact") end
+end
+
+---------------------------------------------------------------- DIMENSION CACHE (now safe to call second_video_track)
+
+local orig_h1, orig_w1, orig_h2, orig_w2
+
+local function cache_dimensions()
+  orig_h1 = mp.get_property_number("video-params/h")
+  orig_w1 = mp.get_property_number("video-params/w")
+  local t2 = second_video_track()
+  orig_h2 = t2 and (t2["demux-h"] or t2["height"])
+  orig_w2 = t2 and (t2["demux-w"] or t2["width"])
+  log_debug(string.format("cache_dimensions: h1=%s w1=%s h2=%s w2=%s",
+    tostring(orig_h1), tostring(orig_w1), tostring(orig_h2), tostring(orig_w2)))
+end
+
+local function get_cached_dims()
+  return orig_h1, orig_w1, orig_h2, orig_w2
 end
 
 ---------------------------------------------------------------- video dimensions
@@ -89,6 +141,8 @@ local function build_single_wave(slot)
   local h   = get_video_h(slot) or 1080
   local y   = h - WAVE_H
 
+  log_debug(string.format("build_single_wave(slot=%d): w=%d h=%d y=%d", slot, w, h, y))
+
   return string.format(
     "%s asplit=2 [ao][a_vis]; "
     .. "[a_vis] %s [wave]; "
@@ -107,46 +161,82 @@ end
 --   [aid2] ─── showwaves(cyan)   ─► overlay on vid2
 --   vid1_final + vid2_final ─► hstack ─► [vo]
 --
-local function build_hstack_wave(h1, h2)
-  local w1 = get_video_w(1) or 1920
-  local w2 = get_video_w(2) or 1920
+-- KEY FIX: Pad BOTH videos to same size FIRST, then apply waveforms, then hstack
+-- Uses CACHED original dimensions, not current video-params
+local function build_hstack_wave(h1, h2, w1, w2)
+  log_debug(string.format("build_hstack_wave: h1=%d h2=%d w1=%d w2=%d", h1, h2, w1, w2))
+
+  local pad_section, v1_src, v2_src
+
+  if h1 == h2 then
+    pad_section = ""
+    v1_src = "[vid1]"
+    v2_src = "[vid2]"
+    log_debug("  -> heights equal, no padding needed")
+  elseif h1 > h2 then
+    pad_section = string.format("[vid2] pad=eval=init:w=iw:h=%d:x=0:y=0 [v2_p]; ", h1)
+    v1_src = "[vid1]"
+    v2_src = "[v2_p]"
+    log_debug(string.format("  -> h1 > h2, padding vid2 to %d", h1))
+  else
+    pad_section = string.format("[vid1] pad=eval=init:w=iw:h=%d:x=0:y=0 [v1_p]; ", h2)
+    v1_src = "[v1_p]"
+    v2_src = "[vid2]"
+    log_debug(string.format("  -> h2 > h1, padding vid1 to %d", h2))
+  end
+
   local y1 = h1 - WAVE_H
   local y2 = h2 - WAVE_H
 
-  local v1_src, v2_src = "[vid1]", "[vid2]"
-  local pad_line = ""
-  if h1 > h2 then
-    pad_line = string.format(
-      "[vid2] pad=eval=init:w=iw:h=%d:x=0:y=0 [v2_p]; ", h1)
-    v2_src = "[v2_p]"
-  elseif h2 > h1 then
-    pad_line = string.format(
-      "[vid1] pad=eval=init:w=iw:h=%d:x=0:y=0 [v1_p]; ", h2)
-    v1_src = "[v1_p]"
-  end
-
-  return string.format(
-  -- audio routing
-    "[aid1] asplit=2 [ao][a1_vis]; "
+  -- Build the graph:
+  -- 1. Pad videos to same height (if needed)
+  -- 2. Split audio for playback + visualization
+  -- 3. Apply waveforms to each padded video
+  -- 4. hstack the waveform-overlaid videos
+  local graph = string.format(
+  -- padding (if needed)
+    "%s"
+    -- audio routing
+    .. "[aid1] asplit=2 [ao][a1_vis]; "
     .. "[a1_vis] %s [w1]; "
     .. "[aid2] %s [w2]; "
-    -- optional height-padding
-    .. "%s"
-    -- vid1 + waveform
+    -- waveform for vid1
     .. "color=c=black@%.2f:s=%dx%d:r=%d [bg1]; "
     .. "%s[bg1] overlay=x=0:y=%d:format=auto:shortest=1 [v1bg]; "
     .. "[v1bg][w1] overlay=x=0:y=%d:format=auto:shortest=1 [v1f]; "
-    -- vid2 + waveform
+    -- waveform for vid2
     .. "color=c=black@%.2f:s=%dx%d:r=%d [bg2]; "
     .. "%s[bg2] overlay=x=0:y=%d:format=auto:shortest=1 [v2bg]; "
     .. "[v2bg][w2] overlay=x=0:y=%d:format=auto:shortest=1 [v2f]; "
     -- combine
     .. "[v1f][v2f] hstack [vo]",
+    pad_section,
     sw_filter(w1, WAVE_COLOR1),
     sw_filter(w2, WAVE_COLOR2),
-    pad_line,
     WAVE_BG, w1, WAVE_H, WAVE_RATE, v1_src, y1, y1,
     WAVE_BG, w2, WAVE_H, WAVE_RATE, v2_src, y2, y2)
+
+  return graph
+end
+
+-- hstack WITHOUT waveforms (original logic, but with proper padding)
+local function build_hstack_plain(h1, h2, w1, w2)
+  log_debug(string.format("build_hstack_plain: h1=%d h2=%d w1=%d w2=%d", h1, h2, w1, w2))
+
+  if h1 == h2 then
+    log_debug("  -> heights equal, no padding")
+    return "[vid1][vid2]hstack[vo]; [aid1] anull [ao]"
+  elseif h1 > h2 then
+    log_debug(string.format("  -> h1 > h2, padding vid2 to %d", h1))
+    return string.format(
+      "[vid2]pad=eval=init:w=iw:h=%d:x=0:y=0[v2_p]; "
+      .. "[vid1][v2_p]hstack[vo]; [aid1] anull [ao]", h1)
+  else
+    log_debug(string.format("  -> h2 > h1, padding vid1 to %d", h2))
+    return string.format(
+      "[vid1]pad=eval=init:w=iw:h=%d:x=0:y=0[v1_p]; "
+      .. "[v1_p][vid2]hstack[vo]; [aid1] anull [ao]", h2)
+  end
 end
 
 ---------------------------------------------------------------- state helpers
@@ -186,34 +276,44 @@ end
 local apply_smart_hstack
 
 apply_smart_hstack = function(force_enable)
-  local h1 = mp.get_property_number("video-params/h")
-  local t2 = second_video_track()
-  local h2 = t2 and (t2["demux-h"] or t2["height"])
+  -- When in hstack mode, use CACHED dimensions, not current video-params
+  -- (because video-params reflect the hstack output, not the original inputs)
+  local h1, w1, h2, w2
 
-  if not (h1 and h2) then
+  if is_hstack() then
+    h1, w1, h2, w2 = get_cached_dims()
+    log_debug(string.format("apply_smart_hstack: using CACHED dims h1=%s w1=%s h2=%s w2=%s",
+      tostring(h1), tostring(w1), tostring(h2), tostring(w2)))
+  else
+    h1 = mp.get_property_number("video-params/h")
+    w1 = mp.get_property_number("video-params/w")
+    local t2 = second_video_track()
+    h2 = t2 and (t2["demux-h"] or t2["height"])
+    w2 = t2 and (t2["demux-w"] or t2["width"])
+    log_debug(string.format("apply_smart_hstack: using CURRENT dims h1=%s w1=%s h2=%s w2=%s",
+      tostring(h1), tostring(w1), tostring(h2), tostring(w2)))
+  end
+
+  if not (h1 and h2 and w1 and w2) then
     if not force_enable then
       mp.osd_message("Error: No external video track found")
     end
+    log_debug("  -> missing dimensions, returning")
     return
   end
 
   if not force_enable and is_hstack() then
+    log_debug("  -> disabling hstack, showing single video 1")
     set_graph(waveform_enabled and build_single_wave(1) or G1)
     current_slot = 1
     mp.osd_message("Stitch Disabled (Showing Video 1)")
   else
     if waveform_enabled then
-      set_graph(build_hstack_wave(h1, h2))
-    elseif h1 == h2 then
-      set_graph("[vid1][vid2]hstack[vo]; [aid1] anull [ao]")
-    elseif h1 > h2 then
-      set_graph(string.format(
-        "[vid2]pad=eval=init:w=iw:h=%d:x=0:y=0[v2_p]; "
-        .. "[vid1][v2_p]hstack[vo]; [aid1] anull [ao]", h1))
+      log_debug("  -> enabling hstack with waveforms")
+      set_graph(build_hstack_wave(h1, h2, w1, w2))
     else
-      set_graph(string.format(
-        "[vid1]pad=eval=init:w=iw:h=%d:x=0:y=0[v1_p]; "
-        .. "[v1_p][vid2]hstack[vo]; [aid1] anull [ao]", h2))
+      log_debug("  -> enabling hstack without waveforms")
+      set_graph(build_hstack_plain(h1, h2, w1, w2))
     end
   end
   refresh()
@@ -222,6 +322,7 @@ end
 
 mp.register_event("file-loaded", function()
   current_slot = 1
+  cache_dimensions()
   if user_configs.stitch then
     mp.add_timeout(0.2, function() apply_smart_hstack(true) end)
   end
@@ -234,6 +335,7 @@ mp.add_forced_key_binding("N", "hstack-enable", function() apply_smart_hstack(tr
 
 local function toggle_waveform()
   waveform_enabled = not waveform_enabled
+  log_debug("toggle_waveform: " .. (waveform_enabled and "ON" or "OFF"))
   mp.osd_message("Waveform: " .. (waveform_enabled and "ON" or "OFF"))
 
   if is_hstack() then
@@ -265,10 +367,15 @@ end
 -- end
 
 local function switch()
-  if is_hstack() then return end
+  if is_hstack() then
+    log_debug("switch: in hstack mode, ignoring")
+    return
+  end
 
   local t2 = second_video_track()
   local going_to_2 = (current_slot ~= 2)
+
+  log_debug(string.format("switch: current_slot=%d going_to_2=%s", current_slot, tostring(going_to_2)))
 
   if going_to_2 then
     set_graph(waveform_enabled and build_single_wave(2) or G2)
