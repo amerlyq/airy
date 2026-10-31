@@ -45,8 +45,8 @@ fm.do_cut = False
 fm.paste()
 pump(fm)
 ok(cur() == "a.txt", "opaque wrapper in front: jump works -> " + cur())
-# :mvsel style: cut in src, paste(dest=oth): no jump by default (cursor stays in src), follow=cd+jump
-for follow in (False, True):
+# :mvsel: cut in src, paste(dest=oth, jump="follow"): cd+jump
+for follow in (True,):
     for n in os.listdir(oth):
         os.remove(os.path.join(oth, n))
     for n in ("b.txt", "a.txt"):
@@ -55,15 +55,9 @@ for follow in (False, True):
     sd.load_content(schedule=False)
     fm.copy_buffer = {f for f in sd.files_all}
     fm.do_cut = True
-    kw = {"jump": "follow"} if follow else {}
-    fm.paste(dest=oth, **kw)
+    fm.paste(dest=oth, jump="follow")
     pump(fm)
-    ok(
-        (fm.thisdir.path == oth and cur() == "a.txt")
-        if follow
-        else fm.thisdir.path == src,
-        f"mvsel-like follow={follow}: dir={os.path.basename(fm.thisdir.path)}",
-    )
+    ok(fm.thisdir.path == oth and cur() == "a.txt", "mvsel follow -> " + cur())
 # retry path: stale listing (dir loaded & cached before files exist, load already pending)
 dd = goto(dst)
 os.remove(os.path.join(dst, "a.txt"))

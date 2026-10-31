@@ -25,6 +25,34 @@ except ModuleNotFoundError:
     from base_util import CompletionResult, tmpfile, today_date
 
 
+class cd_realdir(Command):
+    """:cd_realdir <directory>
+
+    Enter a directory through its real path and keep the selected basename.
+    """
+
+    def execute(self) -> None:
+        fm = self.fm
+        destination = fs.realpath(self.rest(1) or fm.thisdir.path)
+        selected = getattr(fm.thisfile, "basename", None)
+        directory = fm.get_directory(destination)
+
+        def restore(_signal=None) -> None:
+            if getattr(fm.thisdir, "path", None) != directory.path:
+                return
+            fm.signal_unbind(restore_handler[0])
+            for entry in directory.files or ():
+                if entry.basename == selected:
+                    directory.move_to_obj(entry.path)
+                    break
+
+        restore_handler = [None]
+        restore_handler[0] = fm.signal_bind("finished_loading_dir", restore)
+        fm.cd(destination)
+        if directory.files_all is not None and not directory.loading:
+            restore()
+
+
 # NOTE:NEED: in ~/.bashrc or ~/.zshrc save $PWD (not pwd) on trap EXIT
 class cd_shelldir(Command):
     lastdir: ClassVar[str] = tmpfile("cwd")
