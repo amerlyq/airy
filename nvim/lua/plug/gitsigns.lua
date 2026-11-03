@@ -21,7 +21,7 @@ M.setup {
   -- DONE: show gitsign as a color/bkgr of cur lineno (for narrow windows) ※⡢⢹⢓⠓※⡢⢹⢐⣓
   --   MAYBE:BET: chg numhl bg= inof fg=
   signcolumn = false, -- Toggle with `:Gitsigns toggle_signs`
-  numhl      = true, -- Toggle with `:Gitsigns toggle_numhl`
+  numhl      = true,  -- Toggle with `:Gitsigns toggle_numhl`
   -- linehl     = false, -- Toggle with `:Gitsigns toggle_linehl`
   -- word_diff  = false, -- Toggle with `:Gitsigns toggle_word_diff`
   -- current_line_blame = false, -- Toggle with `:Gitsigns toggle_current_line_blame`
@@ -32,23 +32,33 @@ M.setup {
     topdelete = { text = '‾' },
     changedelete = { text = '~' },
   },
-  on_attach = function(bufnr)
+  on_attach  = function(bufnr)
     -- if vim.api.nvim_buf_get_name(bufnr):match(<PATTERN>) then
     --   -- Don't attach to specific buffers whose name matches a pattern
     --   return false
     -- end
 
-    vim.keymap.set('n', ']c', function()
+    -- Helper: preserve existing mappings in the target scope.
+    local map_unless_defined = function(mode, lhs, callback, opts)
+      local buffer = opts and opts.buffer
+      local maps = buffer and vim.api.nvim_buf_get_keymap(buffer, mode) or vim.api.nvim_get_keymap(mode)
+      for _, map in ipairs(maps) do
+        if map.lhs == lhs then return end
+      end
+      vim.keymap.set(mode, lhs, callback, opts)
+    end
+
+    map_unless_defined('n', ']c', function()
       if vim.wo.diff then
         vim.cmd.normal({ ']c', bang = true })
       else
         -- BAD: doesn't work for arbitrary unified ft=diff from stdin
         -- OR:(M): local M = package.loaded.gitsigns
-        M.nav_hunk('next')  -- , { wrap = false, preview = true }
+        M.nav_hunk('next') -- , { wrap = false, preview = true }
       end
     end, { buffer = bufnr, desc = "hunk↓ (gitsigns → :vimdiff)" })
 
-    vim.keymap.set('n', '[c', function()
+    map_unless_defined('n', '[c', function()
       if vim.wo.diff then
         vim.cmd.normal({ '[c', bang = true })
       else
@@ -56,7 +66,7 @@ M.setup {
       end
     end, { buffer = bufnr, desc = "hunk↑ (gitsigns → :vimdiff)" })
 
-    vim.keymap.set('n', '[C', function()
+    map_unless_defined('n', '[C', function()
       if vim.wo.diff then
         vim.cmd.normal({ '9999[c', bang = true })
       else
@@ -64,7 +74,7 @@ M.setup {
       end
     end, { buffer = bufnr, desc = "hunk1 (gitsigns → :vimdiff)" })
 
-    vim.keymap.set('n', ']C', function()
+    map_unless_defined('n', ']C', function()
       if vim.wo.diff then
         vim.cmd.normal({ '9999]c', bang = true })
       else
@@ -72,26 +82,18 @@ M.setup {
       end
     end, { buffer = bufnr, desc = "hunk$ (gitsigns → :vimdiff)" })
 
-    -- Helper: only map if lhs is not already mapped in normal mode
-    local map_unless_defined = function(lhs, callback, opts)
-      if vim.fn.mapcheck(lhs, 'n') == '' then
-        vim.keymap.set('n', lhs, callback, opts)
-      end
-    end
-
-    map_unless_defined('n', ']g', function()
-        M.nav_hunk('next', { target = "staged" })  -- "unstaged"|"all"
+    map_unless_defined('n', ']v', function()
+      M.nav_hunk('next', { target = "staged" })   -- "unstaged"|"all"
     end, { buffer = bufnr, desc = "ihunk↓ (gitsigns/staged-index)" })
-    map_unless_defined('n', '[g', function()
-        M.nav_hunk('prev', { target = "staged" })  -- "unstaged"|"all"
+    map_unless_defined('n', '[v', function()
+      M.nav_hunk('prev', { target = "staged" })   -- "unstaged"|"all"
     end, { buffer = bufnr, desc = "ihunk↑ (gitsigns/staged-index)" })
-    map_unless_defined('n', '[G', function()
-        M.nav_hunk('first', { target = "staged" })  -- "unstaged"|"all"
+    map_unless_defined('n', '[V', function()
+      M.nav_hunk('first', { target = "staged" })   -- "unstaged"|"all"
     end, { buffer = bufnr, desc = "ihunk1 (gitsigns/staged-index)" })
-    map_unless_defined('n', ']G', function()
-        M.nav_hunk('last', { target = "staged" })  -- "unstaged"|"all"
+    map_unless_defined('n', ']V', function()
+      M.nav_hunk('last', { target = "staged" })   -- "unstaged"|"all"
     end, { buffer = bufnr, desc = "ihunk$ (gitsigns/staged-index)" })
-
   end,
 }
 
