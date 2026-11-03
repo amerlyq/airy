@@ -92,7 +92,7 @@ fi
 
 
 stmp=${here%/*}/.git/_stamp/${here##*/}
-if [[ ${update:+x} ]] || [[ $stmp -ot $here/opencode.jsonc ]] || [[ $stmp -ot $here/codex.toml ]]; then
+if [[ ${update:+x} ]] || [[ $stmp -ot $here/opencode.jsonc ]] || [[ $stmp -ot $here/codex.toml ]] || [[ $stmp -ot $here/AGENTS.md ]]; then
   # DockerActive "$cnm" && DockerStopKill "$cnm"
   if ! docker volume inspect -f '{{.Name}}' "$vnm" &>/dev/null; then
     docker volume create "$vnm"
@@ -100,12 +100,14 @@ if [[ ${update:+x} ]] || [[ $stmp -ot $here/opencode.jsonc ]] || [[ $stmp -ot $h
   docker run -ti --rm \
     --mount=type=bind,"src=$here/opencode.jsonc,dst=/boot/opencode.jsonc,ro=true" \
     --mount=type=bind,"src=$here/codex.toml,dst=/boot/codex.toml,ro=true" \
+    --mount=type=bind,"src=$here/AGENTS.md,dst=/boot/AGENTS.md,ro=true" \
     --mount=type=volume,"src=$vnm,dst=/home/user,ro=false" \
     -- "$ltag" bash -xc '
       [[ "$(stat -c "%U:%G" ~)" = "${USER:?}:$USER" ]] || sudo chown -R --no-dereference -- $USER:$USER ~
       # FIXED: copy file to avoid dangling bind-mount
       install -Dm644 -t ~/.config/opencode -- /boot/opencode.jsonc
       install -Dm644 -t ~/.codex -- /boot/codex.toml
+      install -Dm644 -T -- /boot/AGENTS.md ~/.codex/AGENTS.md
     '
   mkdir -p "${stmp%/*}"
   touch "$stmp"
@@ -197,7 +199,8 @@ rargs=(\
   --env=TERM=tmux-256color
 )
 
-[[ -f AGENTS.md ]] || rargs+=( --mount=type=bind,"src=$here/AGENTS.md,dst=$pjdir/AGENTS.md,ro=false,bind-propagation=rslave" )
+## DISABLED:BAD: leaves empty AGENTS.md files everywhere -- better use ~/.codex/AGENTS.md
+# [[ -f AGENTS.md ]] || rargs+=( --mount=type=bind,"src=$here/AGENTS.md,dst=$pjdir/AGENTS.md,ro=false,bind-propagation=rslave" )
 
 exec docker run "${rargs[@]}" -- "$ltag" "$@"
 
