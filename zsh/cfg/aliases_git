@@ -78,8 +78,8 @@ alias gdf.d='gdf | delta'  # DEP=git-delta
 alias gdf.s='GIT_EXTERNAL_DIFF=difft git diff'  # DEP=difftastic
 alias gdf.t='nvim -c "au User LazyPluginsLoaded ++once Difft|only"'  # DEP=difft.nvim
 # alias gdf.t='nvim -c "au User LazyPluginsLoaded ++once call timer_start(50,{->execute(\"Difft|only\")})"'  # DEP=difft.nvim
-# OR: alias gdv=...
-alias gdf.f='nvim -c "au User LazyPluginsLoaded ++once call timer_start(50,{->execute(\"G|only\")})"'  # DEP=fugitive.vim
+# OR: alias gdf.t=...
+alias gdv='nvim -c "au User LazyPluginsLoaded ++once call timer_start(50,{->execute(\"G diff|only\")})"'  # DEP=fugitive.vim
 
 # IDEA: "base .cmp. others(local)" and "merged .cmp. myown(remote)"
 alias gdm='git -c mergetool.vimdiff.cmd='\''nvim -d "$BASE" "$LOCAL" "$MERGED" "$REMOTE"'\'' mergetool --tool=vimdiff'
@@ -147,6 +147,7 @@ alias gSd='git stash show -p'
 alias gSX='git stash drop'
 
 alias gs='git status -sb --show-stash'
+alias gsv='nvim -c "au User LazyPluginsLoaded ++once call timer_start(50,{->execute(\"G|only\")})"'  # DEP=fugitive.vim
 # alias gss='git submodule foreach git status -sb --show-stash'
 alias gss='git status -sb --show-stash && git -c status.submodulesummary=1 status --ignore-submodules=none --porcelain=v1 |
   awk "/^ M /{print\$2}" | while read -r sm; do printf "\\n\e[1;4;34m%s\e[m\\n" "$sm"; git -C "$sm" status -sb --show-stash; done'
@@ -165,8 +166,9 @@ alias gWm='git worktree move'  # FAIL: for submodules
 alias gWr='git worktree repair'
 alias gWx='git worktree remove'
 
+alias gxi='git clean -i'
 
-for i in {1..5}; do
+for i in {1..7}; do
   alias gcs$i="gcs @~$i"
   alias gcss$i="gcss @~$i"
   alias gdf$i="gdf @~$i"
