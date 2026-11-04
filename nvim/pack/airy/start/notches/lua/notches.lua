@@ -18,7 +18,7 @@ function M.register()
   -- local rpfx = '\\v%(^|.*!|\\A@1<=)'
   -- local rsfx = '%(!.*|[:?*.=~]+|\\A@=|$)'
   local rpfx = '\\v%(<|[<]{1,2}|\\s@1<=[-=<:.]{1,2})%('
-  local rsfx = ')%(!\\..+|[-.:=?!>~]{1,2}|>|\\ze\\s|$)'
+  local rsfx = ')%(!\\..+|[-.:=?!>~]{1,2}|>|s?\\ze\\s|s?$)'
 
   -- DEBUG: :echo getmatches()
   vim.fn.clearmatches()
@@ -36,7 +36,7 @@ function M.iabbrev()
   local bufnr = vim.api.nvim_get_current_buf()
 
   for _, vrgx in pairs(spec.patterns) do
-    vrgx = vrgx:gsub('[\\]', '')  -- ALSO: strip wb='<%()>'
+    vrgx = vrgx:gsub('[\\]', '') -- ALSO: strip wb='<%()>'
     for notch in string.gmatch(vrgx, '([^|]+)') do
       -- EXPL: both lower() and UPPER() case should translate to same UPPER iabbr
       local norm = notch:gsub('[-.:;]', '')
