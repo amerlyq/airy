@@ -14,14 +14,18 @@ RUN --mount=type=cache,id=pacman-cache,target=/var/cache/pacman/pkg,sharing=lock
   locale-gen
   ln -svfT /usr/share/zoneinfo/UTC /etc/localtime
   ln -svfT bash /usr/bin/sh
+  sed -i 's/#Color/Color/;s/#TotalDownload/TotalDownload/' /etc/pacman.conf
+
+  pacman -Syu --noconfirm --needed -- util-linux
 
   # pacman-key --init
   # pacman-key --populate archlinux
-  pacman -Syu --noconfirm --needed -- \
-    base-devel sudo zsh git ripgrep fd # base  man neovim tzdata ca-certificates curl
 
-  pacman -S --noconfirm --needed -- \
-    docker docker-buildx
+  # base  man neovim tzdata ca-certificates curl
+  script -q -c "pacman -S --noconfirm --needed -- base-devel sudo zsh git ripgrep fd python python-pytest" /dev/null
+
+  # for feed/monica-dev (android)
+  # script -q -c "pacman -S --noconfirm --needed -- docker docker-buildx" /dev/null
 
   # # mymirror="http://localhost:8080"
   # myarchive="https://archive.archlinux.org/repos"
@@ -34,7 +38,6 @@ RUN --mount=type=cache,id=pacman-cache,target=/var/cache/pacman/pkg,sharing=lock
   # pacman --noconfirm --remove --recursive --unneeded -- reflector
 EOF
 
-
 # MAYBE: directly use USER,HOME ?
 ARG myuser=user
 ARG myhome=/home/${myuser:?}
@@ -42,8 +45,9 @@ ARG myuid=1000
 ARG mygid=1000
 RUN --network=none <<"EOF"
   groupadd --gid "${mygid:?}" "${myuser:?}"
+  # feed/monica-dev : "...,docker"
   useradd --create-home --home-dir "${myhome:?}" --shell "/usr/bin/zsh" --no-log-init \
-    --uid "${myuid:?}" --gid "$myuser" --groups "users,wheel,docker" --comment "$myuser@host" -- "$myuser"
+    --uid "${myuid:?}" --gid "$myuser" --groups "users,wheel" --comment "$myuser@host" -- "$myuser"
 
   printf "%s\n" "$myuser:$myuser" | chpasswd
   install --directory --mode=750 -- /etc/sudoers.d
@@ -78,6 +82,10 @@ EOF
 # EOF
 
 
+RUN mkdir -p /opt/uv-tools/bin /opt/uv-tools/lib && \
+    chown -R "${myuser:?}:${myuser:?}" /opt/uv-tools
+
+
 USER "${myuser:?}"
 
 ENV USER="${myuser:?}" \
@@ -87,8 +95,13 @@ ENV USER="${myuser:?}" \
   PAGER="less" \
   LESS="-A -i -j.5 -M -R -S -W -z-2 -x8"
   # OR: LESS="-a -i -j6 -M -N -R -S -w -z-4 -x4"
-  # PATH="/usr/local/bin:/usr/bin:/usr/sbin"
   # LD_LIBRARY_PATH="/opt/my/lib"
+
+ENV UV_LINK_MODE=copy
+ENV UV_TOOL_BIN_DIR=/opt/uv-tools/bin
+ENV UV_TOOL_DIR=/opt/uv-tools/lib
+ENV PATH="/opt/uv-tools/bin:$PATH"
+  # PATH="/usr/local/bin:/usr/bin:/usr/sbin"
 
 
 # TRY: !paru (Rust) inof !pikaur
@@ -110,13 +123,6 @@ RUN --mount=type=cache,id=pacman-cache,target=/var/cache/pacman/pkg,sharing=lock
   cd pikaur
   makepkg --syncdeps --clean --install --noconfirm --force  # PKGBUILD --rmdeps --skippgpcheck
   # ALT: sudo pacman -U --noconfirm paru*.pkg.tar.zst
-EOF
-
-
-RUN --mount=type=cache,id=pacman-cache,target=/var/cache/pacman/pkg,sharing=locked \
-    --mount=type=cache,id=cargo-cache,target=${myhome:?}/.cargo,uid=${myuid:?},gid=${mygid:?},sharing=locked \
-<<"EOF"
-  sudo pacman -S --noconfirm --needed -- python python-pytest
 EOF
 
 
@@ -283,23 +289,29 @@ COPY --link --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 #
 #
 
+
+# HACK: precreate config file to be copied into VOLUME during its creation
+#   FIXED: prevents dangling-on-exit bind-mount over VOLUME
+# ALT: COPY --link --chmod=0644 --chown=${USER:?}:${USER:?} \
+#   opencode.jsonc  ${HOME:?}/.config/opencode/opencode.jsonc
+# install -Dm644 -t ~/.config/opencode -- opencode.jsonc
+# sudo pacman -S --noconfirm --needed -- bun
+# pikaur --noconfirm -S opencode-bin
+
+# ERR: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces.
+#  On e.g. debian this can be enabled with 'sysctl kernel.unprivileged_userns_clone=1'.
+# --mount=type=bind,"src=opencode.jsonc,dst=opencode.jsonc,ro=true"
 RUN --mount=type=cache,id=pacman-cache,target=/var/cache/pacman/pkg,sharing=locked \
     --mount=type=cache,id=cargo-cache,target=${myhome:?}/.cargo,sharing=locked \
-    --mount=type=bind,"src=opencode.jsonc,dst=opencode.jsonc,ro=true" \
 <<"EOF"
-  # HACK: precreate config file to be copied into VOLUME during its creation
-  #   FIXED: prevents dangling-on-exit bind-mount over VOLUME
-  # ALT: COPY --link --chmod=0644 --chown=${USER:?}:${USER:?} \
-  #   opencode.jsonc  ${HOME:?}/.config/opencode/opencode.jsonc
-
-  # install -Dm644 -t ~/.config/opencode -- opencode.jsonc
-  # sudo pacman -S --noconfirm --needed -- bun
-  # pikaur --noconfirm -S opencode-bin
-
-  # ERR: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces.
-  #  On e.g. debian this can be enabled with 'sysctl kernel.unprivileged_userns_clone=1'.
   sudo pacman -S --noconfirm --needed -- bubblewrap
-  pikaur --noconfirm -S openai-codex-bin
+  script -q -c "pikaur --noconfirm -S openai-codex-bin" /dev/null
+EOF
+
+# uv tool install --force --python python3.12 --with pip aider-chat@latest
+RUN --mount=type=cache,id=uv-cache,target=${myhome:?}/.cache/uv,uid=${myuid:?},gid=${mygid:?} \
+<<"EOF"
+  script -q -c "uv tool install --force --python 3.13 aider-chat@latest" /dev/null
 EOF
 
 ## BET: install from AUR

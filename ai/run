@@ -92,35 +92,35 @@ fi
 
 
 stmp=${here%/*}/.git/_stamp/${here##*/}
-if [[ ${update:+x} ]] || [[ $stmp -ot $here/opencode.jsonc ]] || [[ $stmp -ot $here/codex.toml ]] || [[ $stmp -ot $here/AGENTS.md ]]; then
+if [[ ${update:+x} ]] || [[ $stmp -ot $here/aider.conf.yml ]] || [[ $stmp -ot $here/codex.toml ]] || [[ $stmp -ot $here/AGENTS.md ]]; then
   # DockerActive "$cnm" && DockerStopKill "$cnm"
   if ! docker volume inspect -f '{{.Name}}' "$vnm" &>/dev/null; then
     docker volume create "$vnm"
   fi
+  # --mount=type=bind,"src=$here/opencode.jsonc,dst=/boot/opencode.jsonc,ro=true" \
   docker run -ti --rm \
-    --mount=type=bind,"src=$here/opencode.jsonc,dst=/boot/opencode.jsonc,ro=true" \
-    --mount=type=bind,"src=$here/codex.toml,dst=/boot/codex.toml,ro=true" \
-    --mount=type=bind,"src=$here/AGENTS.md,dst=/boot/AGENTS.md,ro=true" \
+    --mount=type=bind,"src=$here,dst=/boot,ro=true" \
     --mount=type=volume,"src=$vnm,dst=/home/user,ro=false" \
     -- "$ltag" bash -xc '
       [[ "$(stat -c "%U:%G" ~)" = "${USER:?}:$USER" ]] || sudo chown -R --no-dereference -- $USER:$USER ~
       # FIXED: copy file to avoid dangling bind-mount
-      install -Dm644 -t ~/.config/opencode -- /boot/opencode.jsonc
+      # install -Dm644 -t ~/.config/opencode -- /boot/opencode.jsonc
       install -Dm644 -t ~/.codex -- /boot/codex.toml
       install -Dm644 -T -- /boot/AGENTS.md ~/.codex/AGENTS.md
+      install -Dm644 -T -- /boot/aider.conf.yml ~/.aider.conf.yml
     '
   mkdir -p "${stmp%/*}"
   touch "$stmp"
 fi
 
 
-
-cd "${1:-$PWD}"
+[[ -d ${1-} ]] && cd "$1"
 # pjdir="/d/${PWD##*/}"
 pjdir="$PWD"
 (($#)) && shift
 # (($#)) || set -- opencode  # bash -l
-(($#)) || set -- bash -c 'sudo chmod 666 /var/run/docker.sock && exec codex'
+# (($#)) || set -- bash -c 'sudo chmod 666 /var/run/docker.sock && exec codex'
+# (($#)) || set -- uv tool aider --model gemini/gemini-2.5-pro
 # codex --sandbox danger-full-access
 # codex --dangerously-bypass-approvals-and-sandbox
 
@@ -129,6 +129,8 @@ pjdir="$PWD"
 # sudo sysctl -w kernel.unprivileged_userns_clone=1
 # sudo sysctl -w user.max_user_namespaces=28633
 
+export GOOGLE_API_KEY=$(pass ai/gemini)
+
 rargs=(\
   --name="$cnm"
   --hostname="$cnm"
@@ -136,6 +138,8 @@ rargs=(\
   # OR: -v /etc/localtime:/etc/localtime:ro -v /etc/timezone:/etc/timezone:ro
   # OR: --env=TZ="EET-2EEST,M3.5.0/3,M10.5.0/4"
   --env=TZ="$(realpath /etc/localtime | sed 's@.*zoneinfo/@@')"
+
+  --env=GOOGLE_API_KEY
 
   --rm
   --read-only=true
@@ -173,13 +177,20 @@ rargs=(\
   ## DEV: with android container inside of ai container
   # --privileged
   # --device=/dev/kvm --group-add="$(stat -c '%g' /dev/kvm)"
-  --mount=type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock,ro=false
+  --mount=type=bind,"src=/var/run/docker.sock,dst=/var/run/docker.sock",ro=false
 
   # --mount=type=bind,src=$out/bash_history,dst=/home/user/.bash_history,ro=false
   # --mount=type=bind,src=$HOME/.netrc,dst=/home/user/.netrc,ro=true
   # --mount=type=bind,src=$HOME/.docker/config.json,dst=/home/user/.docker/config.json,ro=true
 
   --mount=type=bind,"src=/usr/lib/python3.14/site-packages/ranger,dst=/usr/lib/python3.14/site-packages/ranger,ro=true"
+
+  # -v "$HOME/.aider.conf.yml":/root/.aider.conf.yml \
+  # -v "$HOME/.aider.input.history":/root/.aider.input.history \
+  # -v "$HOME/.aider.chat.history.md":/root/.aider.chat.history.md \
+  # -v "$HOME/.config/aider":/root/.config/aider \
+  # -e OPENAI_API_BASE="http://127.0.0" \
+
 
   # BAD: left as dangling mount
   #   $ sudo umount /var/lib/docker/volumes/airydev-data/_data/.config/opencode/opencode.jsonc
