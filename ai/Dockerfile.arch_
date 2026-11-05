@@ -1,0 +1,71 @@
+FROM archlinux:latest
+SHELL ["/usr/bin/bash", "-euo", "pipefail", "-xc"]
+WORKDIR /boot
+ENV LANG="C.UTF-8"
+RUN --mount=type=cache,id=pacman-cache,target=/var/cache/pacman/pkg,sharing=locked \
+<<"EOF"
+  echo "${LANG:?} UTF-8" >> /etc/locale.gen
+  echo "LANG=${LANG}" > /etc/locale.conf
+  locale-gen
+  ln -svfT /usr/share/zoneinfo/UTC /etc/localtime
+  ln -svfT bash /usr/bin/sh
+  sed -i 's/#Color/Color/;s/#TotalDownload/TotalDownload/' /etc/pacman.conf
+  pacman -Syu --noconfirm --needed -- util-linux
+  script -q -c "pacman -S --noconfirm --needed -- base-devel sudo zsh git ripgrep fd python python-pytest" /dev/null
+EOF
+ARG myuser=user
+ARG myhome=/home/${myuser:?}
+ARG myuid=1000
+ARG mygid=1000
+RUN --network=none <<"EOF"
+  groupadd --gid "${mygid:?}" "${myuser:?}"
+  useradd --create-home --home-dir "${myhome:?}" --shell "/usr/bin/zsh" --no-log-init \
+    --uid "${myuid:?}" --gid "$myuser" --groups "users,wheel" --comment "$myuser@host" -- "$myuser"
+  printf "%s\n" "$myuser:$myuser" | chpasswd
+  install --directory --mode=750 -- /etc/sudoers.d
+  echo "$myuser ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/user
+  install --directory --owner="${myuser:?}" --group="$myuser" --mode=0755 -- \
+    /d  # "${myhome:?}/".{config,config/opencode}  # /opt /opt/venv /opt/airydev
+EOF
+RUN mkdir -p /opt/uv-tools/bin /opt/uv-tools/lib && \
+    chown -R "${myuser:?}:${myuser:?}" /opt/uv-tools
+USER "${myuser:?}"
+ENV USER="${myuser:?}" \
+  HOME="${myhome:?}" \
+  SHELL="/usr/bin/zsh" \
+  EDITOR="nvim" \
+  PAGER="less" \
+  LESS="-A -i -j.5 -M -R -S -W -z-2 -x8"
+
+RUN --mount=type=cache,id=pacman-cache,target=/var/cache/pacman/pkg,sharing=locked \
+    --mount=type=cache,id=cargo-cache,target=${myhome:?}/.cargo,uid=${myuid:?},gid=${mygid:?},sharing=locked \
+    --mount=type=tmpfs,target=/tmp \
+<<"EOF"
+  touch "${myhome:?}/.hushlogin"
+  cd /tmp
+  git clone --depth=1 https://aur.archlinux.org/pikaur.git
+  cd pikaur
+  makepkg --syncdeps --clean --install --noconfirm --force  # PKGBUILD --rmdeps --skippgpcheck
+EOF
+COPY --link --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
+RUN --mount=type=cache,id=pacman-cache,target=/var/cache/pacman/pkg,sharing=locked \
+    --mount=type=cache,id=cargo-cache,target=${myhome:?}/.cargo,sharing=locked \
+<<"EOF"
+  sudo pacman -S --noconfirm --needed -- bubblewrap
+  script -q -c "pikaur --noconfirm -S openai-codex-bin" /dev/null
+EOF
+ENV UV_LINK_MODE=copy \
+  UV_TOOL_BIN_DIR=/opt/uv-tools/bin \
+  UV_TOOL_DIR=/opt/uv-tools/lib \
+  UV_PYTHON_INSTALL_DIR=/opt/uv-tools/python \
+  PATH="/opt/uv-tools/bin:$PATH"
+RUN --mount=type=cache,id=uv-cache,target=${myhome:?}/.cache/uv,uid=${myuid:?},gid=${mygid:?} \
+<<"EOF"
+  # export UV_PYTHON_INSTALL_DIR=/opt/uv-tools/python
+  # sudo chmod o+w /opt
+  # uv venv /opt/uv-tools --python 3.13 --clear --force --copy
+  # sudo chmod o-w /opt
+  # VIRTUAL_ENV=/opt/uv-tools uv pip install aider-chat@latest
+  script -q -c "uv tool install --force --python 3.13 aider-chat@latest" /dev/null
+EOF
+WORKDIR /d

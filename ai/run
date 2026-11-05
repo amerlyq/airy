@@ -142,7 +142,7 @@ rargs=(\
   --env=GOOGLE_API_KEY
 
   --rm
-  --read-only=true
+  # --read-only=true
   --interactive=true
   --tty=true
   --pull=never
@@ -213,6 +213,7 @@ rargs=(\
 ## DISABLED:BAD: leaves empty AGENTS.md files everywhere -- better use ~/.codex/AGENTS.md
 # [[ -f AGENTS.md ]] || rargs+=( --mount=type=bind,"src=$here/AGENTS.md,dst=$pjdir/AGENTS.md,ro=false,bind-propagation=rslave" )
 
+# ALT: ltag= paulgauthier/aider
 exec docker run "${rargs[@]}" -- "$ltag" "$@"
 
 # DEBUG:

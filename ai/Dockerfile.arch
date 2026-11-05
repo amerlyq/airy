@@ -57,7 +57,7 @@ RUN --network=none <<"EOF"
   # echo "$myuser ALL=(ALL) ALL" > /etc/sudoers.d/user
 
   install --directory --owner="${myuser:?}" --group="$myuser" --mode=0755 -- \
-    /d  # "${myhome:?}/".{config,config/opencode}  # /opt /opt/venv /opt/airydev
+    /d  /opt/uv-tools  # "${myhome:?}/".{config,config/opencode}  # /opt /opt/venv /opt/airydev
   # ln -sT -- /opt /d
 
   # find /home -exec ls -lad {} +
@@ -82,10 +82,6 @@ EOF
 # EOF
 
 
-RUN mkdir -p /opt/uv-tools/bin /opt/uv-tools/lib && \
-    chown -R "${myuser:?}:${myuser:?}" /opt/uv-tools
-
-
 USER "${myuser:?}"
 
 ENV USER="${myuser:?}" \
@@ -96,12 +92,6 @@ ENV USER="${myuser:?}" \
   LESS="-A -i -j.5 -M -R -S -W -z-2 -x8"
   # OR: LESS="-a -i -j6 -M -N -R -S -w -z-4 -x4"
   # LD_LIBRARY_PATH="/opt/my/lib"
-
-ENV UV_LINK_MODE=copy
-ENV UV_TOOL_BIN_DIR=/opt/uv-tools/bin
-ENV UV_TOOL_DIR=/opt/uv-tools/lib
-ENV PATH="/opt/uv-tools/bin:$PATH"
-  # PATH="/usr/local/bin:/usr/bin:/usr/sbin"
 
 
 # TRY: !paru (Rust) inof !pikaur
@@ -308,10 +298,27 @@ RUN --mount=type=cache,id=pacman-cache,target=/var/cache/pacman/pkg,sharing=lock
   script -q -c "pikaur --noconfirm -S openai-codex-bin" /dev/null
 EOF
 
+ENV UV_LINK_MODE=copy \
+  UV_TOOL_BIN_DIR=/opt/uv-tools/bin \
+  UV_TOOL_DIR=/opt/uv-tools/lib \
+  UV_PYTHON_INSTALL_DIR=/opt/uv-tools/python \
+  PATH="/opt/uv-tools/bin:$PATH"
+  # PATH="/usr/local/bin:/usr/bin:/usr/sbin"
+
+
 # uv tool install --force --python python3.12 --with pip aider-chat@latest
 RUN --mount=type=cache,id=uv-cache,target=${myhome:?}/.cache/uv,uid=${myuid:?},gid=${mygid:?} \
 <<"EOF"
-  script -q -c "uv tool install --force --python 3.13 aider-chat@latest" /dev/null
+  export UV_PYTHON_INSTALL_DIR=/opt/uv-tools/python
+  sudo chmod o+w /opt
+  uv venv /opt/uv-tools --python 3.13 --clear --force --copy
+  sudo chmod o-w /opt
+  VIRTUAL_ENV=/opt/uv-tools uv pip install aider-chat@latest
+  # uv pip install --python /opt/uv-tools/bin/python aider-chat@latest
+  # script -q -c "uv tool install --no-cache --force --python 3.13 aider-chat@latest" /dev/null
+  # uv tool install --force --python 3.13  aider-chat@latest
+  # Fix shebangs to use system python instead of venv-relative paths
+  # sed -i "1s|.*|#!/usr/bin/env python3|" /opt/uv-tools/bin/aider
 EOF
 
 ## BET: install from AUR
