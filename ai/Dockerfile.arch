@@ -298,10 +298,13 @@ RUN --mount=type=cache,id=pacman-cache,target=/var/cache/pacman/pkg,sharing=lock
   script -q -c "pikaur --noconfirm -S openai-codex-bin" /dev/null
 EOF
 
+# LAYOUT: BuildKit caches downloads; Python + tool environments stay in image under /opt.
+# WHY: /home/user is replaced by runtime volume; never create/clear a venv above Python's install dir.
 ENV UV_LINK_MODE=copy \
   UV_TOOL_BIN_DIR=/opt/uv-tools/bin \
   UV_TOOL_DIR=/opt/uv-tools/lib \
   UV_PYTHON_INSTALL_DIR=/opt/uv-tools/python \
+  UV_PYTHON_CACHE_DIR=${myhome:?}/.cache/uv/python \
   PATH="/opt/uv-tools/bin:$PATH"
   # PATH="/usr/local/bin:/usr/bin:/usr/sbin"
 
@@ -309,16 +312,27 @@ ENV UV_LINK_MODE=copy \
 # uv tool install --force --python python3.12 --with pip aider-chat@latest
 RUN --mount=type=cache,id=uv-cache,target=${myhome:?}/.cache/uv,uid=${myuid:?},gid=${mygid:?} \
 <<"EOF"
-  export UV_PYTHON_INSTALL_DIR=/opt/uv-tools/python
-  sudo chmod o+w /opt
-  uv venv /opt/uv-tools --python 3.13 --clear --force --copy
-  sudo chmod o-w /opt
-  VIRTUAL_ENV=/opt/uv-tools uv pip install aider-chat@latest
+  ## ALT: explicit venv allowed pip installs, but --clear deleted its nested managed Python.
+  # export UV_PYTHON_INSTALL_DIR=/opt/uv-tools/python
+  # sudo chmod o+w /opt
+  # uv venv /opt/uv-tools --python 3.13 --clear --force --copy
+  # sudo chmod o-w /opt
+  # VIRTUAL_ENV=/opt/uv-tools uv pip install aider-chat@latest
+  ## ALT: script provided terminal output, but without --return it hid installer failures.
+  # script -q -c "uv tool install --force --python 3.13 aider-chat@latest" /dev/null
+  # COMPAT: published aider pins NumPy 1.26.4; use Python 3.12 wheels and fail instead of compiling.
+  uv tool install --managed-python --python 3.12 --no-build aider-chat@latest
   # uv pip install --python /opt/uv-tools/bin/python aider-chat@latest
   # script -q -c "uv tool install --no-cache --force --python 3.13 aider-chat@latest" /dev/null
   # uv tool install --force --python 3.13  aider-chat@latest
   # Fix shebangs to use system python instead of venv-relative paths
   # sed -i "1s|.*|#!/usr/bin/env python3|" /opt/uv-tools/bin/aider
+EOF
+
+# CHECK: run without cache mount; reject Python hidden by the runtime home volume.
+RUN --network=none <<"EOF"
+  /opt/uv-tools/lib/aider-chat/bin/python -c 'import os, sys, numpy, scipy; assert sys.version_info[:2] == (3, 12), sys.version; assert sys.base_prefix.startswith(os.environ["UV_PYTHON_INSTALL_DIR"] + "/"), sys.base_prefix'
+  aider --version
 EOF
 
 ## BET: install from AUR

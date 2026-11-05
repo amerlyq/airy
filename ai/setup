@@ -1,4 +1,9 @@
 #!/bin/bash -eu
 
-/d/airy/airy/bin/linkcp -t ~/.config/opencode -- opencode.jsonc
-/d/airy/airy/bin/linkcp -t ~/.codex -- codex.toml
+/d/airy/airy/bin/linkcp run /b/ai
+sed -rn '/^(in|;;) ai(.)\).*/s//\2/p' run | while IFS= read -r c; do
+  /d/airy/airy/bin/linkcp run "/b/ai$c"
+done
+
+# /d/airy/airy/bin/linkcp -t ~/.config/opencode -- opencode.jsonc
+# /d/airy/airy/bin/linkcp -t ~/.codex -- codex.toml

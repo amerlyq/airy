@@ -115,34 +115,27 @@ fi
 
 
 [[ -d ${1-} ]] && cd "$1"
-# pjdir="/d/${PWD##*/}"
-pjdir="$PWD"
-(($#)) && shift
-# (($#)) || set -- opencode  # bash -l
-# (($#)) || set -- bash -c 'sudo chmod 666 /var/run/docker.sock && exec codex'
-# (($#)) || set -- uv tool aider --model gemini/gemini-2.5-pro
-# codex --sandbox danger-full-access
-# codex --dangerously-bypass-approvals-and-sandbox
+# repodir="/d/${PWD##*/}"
+wkdir=$PWD
+repodir=$(git rev-parse --show-toplevel 2>/dev/null || echo "$wkdir")
+# subdir=$(git rev-parse --show-prefix)
 
 # cat /proc/sys/kernel/unprivileged_userns_clone 2>/dev/null || true
 # cat /proc/sys/user/max_user_namespaces
 # sudo sysctl -w kernel.unprivileged_userns_clone=1
 # sudo sysctl -w user.max_user_namespaces=28633
 
-export GOOGLE_API_KEY=$(pass ai/gemini)
 
 rargs=(\
   --name="$cnm"
   --hostname="$cnm"
-  --workdir="$pjdir"
+  --workdir="$wkdir"
   # OR: -v /etc/localtime:/etc/localtime:ro -v /etc/timezone:/etc/timezone:ro
   # OR: --env=TZ="EET-2EEST,M3.5.0/3,M10.5.0/4"
   --env=TZ="$(realpath /etc/localtime | sed 's@.*zoneinfo/@@')"
 
-  --env=GOOGLE_API_KEY
-
   --rm
-  # --read-only=true
+  --read-only=true
   --interactive=true
   --tty=true
   --pull=never
@@ -168,7 +161,7 @@ rargs=(\
   --log-opt=mode=non-blocking
   --log-opt=max-buffer-size=16MiB
 
-  --mount=type=bind,"src=.,dst=$pjdir,ro=false,bind-propagation=rslave"
+  --mount=type=bind,"src=$repodir,dst=$repodir,ro=false,bind-propagation=rslave"
   --mount=type=volume,"src=$vnm,dst=/home/user,ro=false"
   # --mount=type=tmpfs,"dst=/tmp,tmpfs-mode=1777,tmpfs-noexec=false"
   --tmpfs=/tmp:exec,mode=1777
@@ -210,8 +203,29 @@ rargs=(\
   --env=TERM=tmux-256color
 )
 
+
+case ${0##*/}
+in aic)
+  # codex --sandbox danger-full-access
+  # codex --dangerously-bypass-approvals-and-sandbox
+  set -- codex "$@"
+;; aid)
+  set -- bash -c 'sudo chmod 666 /var/run/docker.sock && exec codex "$@' '' "$@"
+;; aia)
+  export GOOGLE_API_KEY=$(pass ai/gemini)
+  rargs+=( --env=GOOGLE_API_KEY )
+  # set -- aider --model gemini/gemini-3.1-pro-preview --weak-model gemini/gemini-3.8-flash
+  set -- aider --model gemini/gemini-3.8-flash --subtree-only "$@"
+;; ail)
+  # VIZ:REF: https://aistudio.google.com/docs/models
+  # VIZ: $ ai aider --list-models gemini/
+  set -- aider --list-models "$@"
+;; ais) (($#)) || set -- bash -l
+esac
+
+
 ## DISABLED:BAD: leaves empty AGENTS.md files everywhere -- better use ~/.codex/AGENTS.md
-# [[ -f AGENTS.md ]] || rargs+=( --mount=type=bind,"src=$here/AGENTS.md,dst=$pjdir/AGENTS.md,ro=false,bind-propagation=rslave" )
+# [[ -f AGENTS.md ]] || rargs+=( --mount=type=bind,"src=$here/AGENTS.md,dst=$repodir/AGENTS.md,ro=false,bind-propagation=rslave" )
 
 # ALT: ltag= paulgauthier/aider
 exec docker run "${rargs[@]}" -- "$ltag" "$@"

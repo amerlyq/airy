@@ -477,3 +477,84 @@
   [X] 04:00 2h #gpt CFG make new short system prompt (1.36kB ~350tk)
     I benchmarked 13 models at 65K-128K context to find out what actually matters for agentic workloads : r/LocalLLaMA ⌇⡪⣊⣻⣶
       https://www.reddit.com/r/LocalLLaMA/comments/1unrse9/i_benchmarked_13_models_at_65k128k_context_to/
+
+
+3h45m 2026-11-04-Wed-W44
+  [X] 21:45 1h15m #gpt Qs OV:XLR free tiers and ALTs ⌇⡪⣬⢰⣩
+    ¦ I need: archlinux terminal or nvim workflow on git projects (mostly
+    ¦ python, some projects/configs are lua/c++/js). Required: use free tokens
+    ¦ from as many models available. Desirable: also support claude/codex paid
+    ¦ tiers to work with both free models from same interface. Nice: support
+    ¦ local ollama and auto-route requests to several models based on
+    ¦ complexity, repeated failures and cross-review.
+    ¦ Include claude/google-ai-studio/codex/etc. with community proxy to free models in comparison
+    Free Claude Code: Run AI Coding Agents Without Paying for Tokens | MindStudio ⌇⡪⣫⢆⠐
+      https://www.mindstudio.ai/blog/free-claude-code-local-proxy
+      * a local proxy, not a fork of any official product,
+        that intercepts coding agent requests and redirects them to a model you choose.
+    OpenCode & OpenCode Go alternatives (2026): 29 best, compared and scored ⌇⡪⣫⢇⡌
+      https://todofor.ai/alternatives/opencode
+    8 best OpenCode alternatives for engineering teams in 2026 ⌇⡪⣫⢇⡬
+      https://replicas.dev/resources/opencode-alternatives
+    Provider	Free Allowance	Best Used For
+      * Google AI Studio	Generative rate limits (varies by model)	Gemini 1.5 Pro & Flash (huge context window for codebases)
+        gemini/gemini-2.5-pro	Deep reasoning, complex logic, refactoring	Primary coding, debugging architecture, writing tests.
+        gemini/gemini-3.8-flash / gemini-4-argon	Ultra-fast response times, high rate limits	Fast autocomplete, boilerplate generation, simple scripts.
+      * Groq	Generative rate limits (high speed, no dollar cost)	Ultra-fast code completions (Llama 3.1, Mixtral)
+      * OpenRouter	Daily/Monthly rotation of 15+ completely free models	Swapping between different open-source coding models
+      * Cohere	Generative rate limits (trial keys)	Command R+ (excellent for retrieval-augmented generation & search)
+      * Mistral AI	Generative rate limits (La Plateforme tier)	Codestral (a specialized, highly capable model for code)
+  [✗] 23:00 2h30m #gpt CFG:TRY: !aider ⌇⡪⣬⢱⠢
+    USAGE
+      $ uvx install aider-chat
+      # $ python -m pip install uv  # If you need to install uv
+      $ uv tool install aider-chat@latest
+      $ uv tool run aider --list-models gemini/
+      $ aider --list-models gemini/
+      $ export GEMINI_API_KEY="your_free_google_api_key_here"
+      # For core development and multi-file architecture (Highly Recommended)
+      $ aider --model gemini/gemini-2.5-pro
+      # For quick, single-file scripts if you run into rate limits
+      $ aider --model gemini/gemini-3.8-flash
+      $ export OPENROUTER_API_KEY="your_free_openrouter_api_key_here"
+      $ aider --model openrouter/openrouter/free
+
+
+0m 2026-11-05-Thu-W44
+  [/] 18:50 10m #gpt guideline to pick
+    1. You hit Free Tier Rate Limits (429 Errors)
+      • The Circumstance: You are mid-session, making rapid, back-to-back
+      edits, and Google AI Studio throttles your requests.
+      • The Model to Use: gemini/gemini-3.8-flash or gemini/gemini-4-argon
+      • Why: Flash and Argon models have significantly higher
+      Requests-Per-Minute (RPM) and Daily Quotas on the free tier. They allow
+      you to keep coding without waiting out a cooldown timer.
+    2. You are generating simple, self-sufficient boilerplate
+      • The Circumstance: You are starting a brand new Ranger or MPV plugin and
+      just need a standard single-file template (e.g., a basic keybind listener).
+      • The Model to Use: gemini/gemini-3.8-flash
+      • Why: Flash models are incredibly fast. For simple code generation that
+      doesn't require deep reasoning across 3 different files, Flash will give
+      you the answer in a third of the time.
+    3. You need the absolute sharpest coding reasoning available
+      • The Circumstance: You are hitting a wall where gemini-2.5-pro keeps
+      introducing bugs, failing to understand the MPV Lua event loop, or
+      messing up aider's SEARCH/REPLACE blocks.
+      • The Model to Use: gemini/gemini-2.5-pro-exp-03-25 or gemini/gemini-exp-1206
+      • Why: Google's Experimental (-exp) models are un-neutered, bleeding-edge
+      checkpoints. They are often significantly smarter at coding than the
+      stable releases, though they can be unstable or have stricter temporary rate limits.
+    4. You want the plugin to interact with what is on your screen
+      • The Circumstance: You are writing an MPV UI plugin (like a custom OSD
+      menu) or a Ranger preview script, and you want the AI to "see" your
+      terminal layout or video player artifact to debug it.
+      • The Model to Use: gemini/gemini-2.5-computer-use-preview-10-2025
+      • Why: This model is specifically tuned to understand screen coordinates,
+        visual user interfaces, and execution environments. While aider is
+        primarily text-based, this model is useful if you are feeding visual logs
+        or screenshots into the prompt to fix layout bugs.
+   :: The "Per Project" Catch: The limits are tied to your Google AI Studio
+     project API key. If you open two different terminal windows running aider
+     at the same time using the same API key and the same model, they will share
+     and exhaust that model's limits twice as fast.
+    $ aider --model gemini/gemini-3.1-pro-preview --weak-model gemini/gemini-3.8-flash
