@@ -75,7 +75,7 @@ alias gdc='gdf --cached'
 alias gds='gdf --submodule=diff'
 
 alias gdf.d='gdf | delta'  # DEP=git-delta
-alias gdf.s='GIT_EXTERNAL_DIFF=difft git diff'  # DEP=difftastic
+alias gdf.s='DFT_BACKGROUND=light GIT_EXTERNAL_DIFF=difft git diff -wb'  # DEP=difftastic
 alias gdf.t='nvim -c "au User LazyPluginsLoaded ++once Difft|only"'  # DEP=difft.nvim
 # alias gdf.t='nvim -c "au User LazyPluginsLoaded ++once call timer_start(50,{->execute(\"Difft|only\")})"'  # DEP=difft.nvim
 # OR: alias gdf.t=...

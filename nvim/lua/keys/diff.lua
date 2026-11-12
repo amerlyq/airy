@@ -109,6 +109,9 @@ local function jump_commit_boundary(direction)
   end
 end
 
+-- local conflict_pattern = [[^\v(@@ .* @@|[<=>|]{7}($| ))]]
+local conflict_pattern = [[^\v([<=>|]{7}($| ))]]
+
 
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "diff",
@@ -122,6 +125,12 @@ vim.api.nvim_create_autocmd("FileType", {
     map("n", "[f", function() jump_file(-1) end, { buffer = true, desc = "file↓ (diff)" })
     map("n", "]]", function() jump_commit_boundary(1) end, { buffer = true, desc = "commit↑ (diff)" })
     map("n", "[[", function() jump_commit_boundary(-1) end, { buffer = true, desc = "commit↓ (diff)" })
+    map({ "n", "x", "o" }, "]n", function()
+      vim.fn.search(conflict_pattern, "W")
+    end, { buffer = true, desc = "conflict↑ (diff)" })
+    map({ "n", "x", "o" }, "[n", function()
+      vim.fn.search(conflict_pattern, "bW")
+    end, { buffer = true, desc = "conflict↓ (diff)" })
   end,
 })
 

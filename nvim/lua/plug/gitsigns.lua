@@ -39,13 +39,16 @@ M.setup {
     -- end
 
     -- Helper: preserve existing mappings in the target scope.
-    local map_unless_defined = function(mode, lhs, callback, opts)
-      local buffer = opts and opts.buffer
-      local maps = buffer and vim.api.nvim_buf_get_keymap(buffer, mode) or vim.api.nvim_get_keymap(mode)
-      for _, map in ipairs(maps) do
-        if map.lhs == lhs then return end
+    local map_unless_defined = function(modes, lhs, callback, opts)
+      modes = type(modes) == 'string' and { modes } or modes
+      for _, m in ipairs(modes) do
+        local buffer = opts and opts.buffer
+        local maps = buffer and vim.api.nvim_buf_get_keymap(buffer, m) or vim.api.nvim_get_keymap(m)
+        for _, map in ipairs(maps) do
+          if map.lhs == lhs then return end
+        end
+        vim.keymap.set(m, lhs, callback, opts)
       end
-      vim.keymap.set(mode, lhs, callback, opts)
     end
 
     map_unless_defined('n', ']c', function()
@@ -83,17 +86,24 @@ M.setup {
     end, { buffer = bufnr, desc = "hunk$ (gitsigns → :vimdiff)" })
 
     map_unless_defined('n', ']v', function()
-      M.nav_hunk('next', { target = "staged" })   -- "unstaged"|"all"
+      M.nav_hunk('next', { target = "staged" }) -- "unstaged"|"all"
     end, { buffer = bufnr, desc = "ihunk↓ (gitsigns/staged-index)" })
     map_unless_defined('n', '[v', function()
-      M.nav_hunk('prev', { target = "staged" })   -- "unstaged"|"all"
+      M.nav_hunk('prev', { target = "staged" }) -- "unstaged"|"all"
     end, { buffer = bufnr, desc = "ihunk↑ (gitsigns/staged-index)" })
     map_unless_defined('n', '[V', function()
-      M.nav_hunk('first', { target = "staged" })   -- "unstaged"|"all"
+      M.nav_hunk('first', { target = "staged" }) -- "unstaged"|"all"
     end, { buffer = bufnr, desc = "ihunk1 (gitsigns/staged-index)" })
     map_unless_defined('n', ']V', function()
-      M.nav_hunk('last', { target = "staged" })   -- "unstaged"|"all"
+      M.nav_hunk('last', { target = "staged" }) -- "unstaged"|"all"
     end, { buffer = bufnr, desc = "ihunk$ (gitsigns/staged-index)" })
+
+    map_unless_defined({ "n", "x", "o" }, "]n", function()
+      vim.fn.search(conflict_pattern, "W")
+    end, { buffer = bufnr, desc = "conflict↑ (gitsigns)" })
+    map_unless_defined({ "n", "x", "o" }, "[n", function()
+      vim.fn.search(conflict_pattern, "bW")
+    end, { buffer = bufnr, desc = "conflict↓ (gitsigns)" })
   end,
 }
 

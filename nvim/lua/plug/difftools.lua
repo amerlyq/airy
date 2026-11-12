@@ -20,24 +20,24 @@ if status_ok then
   end
 
   difft.setup({
-      -- Explicitly tell it to ignore all whitespace in the underlying git call
-      command = "GIT_EXTERNAL_DIFF='difft --color=always --width=180' git diff -w",
-      -- layout = "float", -- Centered floating window is best for quick checks
-      window = {
-          width = 0.9,
-          height = 0.8,
-          border = "rounded",
-      },
-      keymaps = {
-          next = "]", -- Navigate between file changes
-          prev = "[",
-          close = "q",
-      }
+    -- Explicitly tell it to ignore all whitespace in the underlying git call
+    command = "GIT_EXTERNAL_DIFF='difft --color=always --background=light --width=180' git diff -wb",
+    -- layout = "float", -- Centered floating window is best for quick checks
+    window = {
+      width = 0.9,
+      height = 0.8,
+      border = "rounded",
+    },
+    keymaps = {
+      next = "]", -- Navigate between file changes
+      prev = "[",
+      close = "q",
+    }
   })
   -- "<leader>d", function() if Difft.is_visible() then Difft.hide() else Difft.diff() end end, desc = "Toggle Difft",
 
   vim.api.nvim_create_user_command('Difft', function()
-      Difft.diff()
+    Difft.diff()
   end, { bar = true, desc = "Open Difftastic structural diff" })
 end
 
@@ -48,7 +48,7 @@ end
 -- Note: As of early 2026, diffmantic is lean on options.
 -- It relies heavily on your existing Tree-sitter parsers.
 require('diffmantic').setup({
-    -- Internal defaults are usually best, but ensure it's initialized
+  -- Internal defaults are usually best, but ensure it's initialized
 })
 
 -- vim.api.nvim_create_autocmd("BufReadPost", {
@@ -69,31 +69,31 @@ require('diffmantic').setup({
 -- })
 
 local function diffmantic_git_head()
-    local current_file = vim.api.nvim_buf_get_name(0)
-    if current_file == "" then return end
+  local current_file = vim.api.nvim_buf_get_name(0)
+  if current_file == "" then return end
 
-    -- 1. Create a temp file path (e.g., /tmp/filename.py.HEAD)
-    local extension = vim.fn.expand("%:e")
-    local temp_file = vim.fn.tempname() .. "." .. extension
+  -- 1. Create a temp file path (e.g., /tmp/filename.py.HEAD)
+  local extension = vim.fn.expand("%:e")
+  local temp_file = vim.fn.tempname() .. "." .. extension
 
-    -- 2. Use git show to dump the HEAD version into the temp file
-    -- We use 'git ls-files --full-name' to ensure we get the correct repo path
-    local relative_path = vim.fn.systemlist("git ls-files --full-name " .. current_file)[1]
-    if not relative_path or relative_path == "" then
-        print("File not tracked by git")
-        return
-    end
+  -- 2. Use git show to dump the HEAD version into the temp file
+  -- We use 'git ls-files --full-name' to ensure we get the correct repo path
+  local relative_path = vim.fn.systemlist("git ls-files --full-name " .. current_file)[1]
+  if not relative_path or relative_path == "" then
+    print("File not tracked by git")
+    return
+  end
 
-    os.execute("git show HEAD:" .. relative_path .. " > " .. temp_file)
+  os.execute("git show HEAD:" .. relative_path .. " > " .. temp_file)
 
-    -- 3. Run Diffmantic on the two files
-    -- Format: Diffmantic <file1> <file2>
-    vim.cmd("Diffmantic " .. temp_file .. " " .. current_file)
+  -- 3. Run Diffmantic on the two files
+  -- Format: Diffmantic <file1> <file2>
+  vim.cmd("Diffmantic " .. temp_file .. " " .. current_file)
 
-    -- Optional: Clean up the temp file when Neovim exits
-    vim.api.nvim_create_autocmd("VimLeave", {
-        callback = function() os.remove(temp_file) end
-    })
+  -- Optional: Clean up the temp file when Neovim exits
+  vim.api.nvim_create_autocmd("VimLeave", {
+    callback = function() os.remove(temp_file) end
+  })
 end
 
 -- Map it to something quick
@@ -105,14 +105,14 @@ vim.keymap.set('n', '\\gh', diffmantic_git_head, { desc = "Semantic Diff vs HEAD
 -------------------------------------------------------------------------------
 -- This adds 'gs' (Git Structural) and 'gm' (Git mantic) to your Fugitive window
 vim.api.nvim_create_autocmd("FileType", {
-    pattern = "fugitive",
-    callback = function()
-        local opts = { buffer = true, remap = false }
-        -- gt: Structural diff (Great for checking if a refactor changed logic)
-        vim.keymap.set("n", "gt", "<cmd>Difft<CR>", opts)
-        -- gm: Semantic diff (Great for staying in the buffer)
-        vim.keymap.set("n", "gm", "<cmd>Diffmantic<CR>", opts)
-    end,
+  pattern = "fugitive",
+  callback = function()
+    local opts = { buffer = true, remap = false }
+    -- gt: Structural diff (Great for checking if a refactor changed logic)
+    vim.keymap.set("n", "gt", "<cmd>Difft<CR>", opts)
+    -- gm: Semantic diff (Great for staying in the buffer)
+    vim.keymap.set("n", "gm", "<cmd>Diffmantic<CR>", opts)
+  end,
 })
 
 -- Global shortcuts for when you aren't in Fugitive
