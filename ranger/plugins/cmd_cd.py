@@ -11,6 +11,7 @@
 
 from __future__ import annotations
 
+import glob
 import os
 import re
 import stat
@@ -193,10 +194,11 @@ class cda(Command):
 class cd_samedur_ji(Command):
     """:cd_samedur
 
-    Select first /t/samedur0/**/*／<basename of cursor file>  (U+FF0F in the name = flattened path separator).
+    Select first matching file across directories matching /t/dups/same-dur80*
+    with pattern *／<basename of cursor file> (U+FF0F = flattened path separator).
     """
 
-    root: ClassVar[str] = "/t/samedur0"
+    root_glob: ClassVar[str] = "/t/dups/same-dur*"
 
     def execute(self) -> None:
         from subprocess import CalledProcessError, check_output
@@ -204,17 +206,27 @@ class cd_samedur_ji(Command):
         f = self.fm.thisfile
         if f is None:
             return
-        # find(1) -name glob: escape *?[\ in the name. FIXED: original interpolated the name into a shell string
+
+        roots = glob.glob(self.root_glob)
+        if not roots:
+            return self.fm.notify(
+                f"cd_samedur: No directories match {self.root_glob}", bad=True
+            )
+
+        # Escape special characters *?[\ for find(1) -name glob
         pat = "*／" + re.sub(r"([*?\[\\])", r"\\\1", f.basename)
+
         try:
-            out = check_output(["find", self.root, "-name", pat, "-print"], text=True)
+            # Pass all resolved roots directly to find
+            out = check_output(["find"] + roots + ["-name", pat, "-print"], text=True)
         except CalledProcessError as e:
             return self.fm.notify(f"cd_samedur: {e}", bad=True)
+
         lines = out.splitlines()
         if lines:
             self.fm.select_file(lines[0])
         else:
-            self.fm.notify("No /t/samedur0/ name found.")
+            self.fm.notify(f"cd_samedur: No matching file found for '{f.basename}'.")
 
 
 class cd_samedur(Command):
