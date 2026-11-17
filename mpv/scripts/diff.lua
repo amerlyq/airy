@@ -101,8 +101,15 @@ end
 
 ---------------------------------------------------------------- video dimensions
 
+-- is_hstack() is defined further below (state helpers); same test, needed earlier.
+local function is_hstack_graph()
+  return (mp.get_property("lavfi-complex") or ""):find("hstack") ~= nil
+end
+
 local function get_video_w(slot)
   if slot == 1 then
+    -- WTF: video-params/* describe the hstack output while split is on => use the cache
+    if is_hstack_graph() and orig_w1 then return orig_w1 end
     return mp.get_property_number("video-params/w")
   end
   local t2 = second_video_track()
@@ -111,6 +118,7 @@ end
 
 local function get_video_h(slot)
   if slot == 1 then
+    if is_hstack_graph() and orig_h1 then return orig_h1 end
     return mp.get_property_number("video-params/h")
   end
   local t2 = second_video_track()
@@ -367,13 +375,13 @@ end
 -- end
 
 local function switch()
-  if is_hstack() then
-    log_debug("switch: in hstack mode, ignoring")
-    return
-  end
-
+  -- ## ALT: ignore in hstack (previous behavior, postponed decision):
+  -- ##   if is_hstack() then log_debug("switch: in hstack mode, ignoring"); return end
+  -- INVARIANT: leaving split always lands on video 1 (not a cycle step); the next
+  --   press cycles normally. v/n/M share this handler => all three leave split.
+  local was_hstack = is_hstack()
   local t2 = second_video_track()
-  local going_to_2 = (current_slot ~= 2)
+  local going_to_2 = (current_slot ~= 2) and not was_hstack
 
   log_debug(string.format("switch: current_slot=%d going_to_2=%s", current_slot, tostring(going_to_2)))
 
@@ -388,10 +396,13 @@ local function switch()
       "(1) " .. (mp.get_property("filename") or ""))
     current_slot = 1
   end
+  -- slow: re-decode from keyframe (dav1d OBU errors after graph change), same as stitch toggle
+  if was_hstack then refresh() end
   apply_offset()
-  mp.osd_message(string.format("slot %d, offset %+d ms%s",
+  mp.osd_message(string.format("slot %d, offset %+d ms%s%s",
     current_slot, offsets[current_slot] or 0,
-    waveform_enabled and " [wave]" or ""))
+    waveform_enabled and " [wave]" or "",
+    was_hstack and " (split off)" or ""))
 end
 
 mp.add_key_binding("v", "switch-v", switch)
