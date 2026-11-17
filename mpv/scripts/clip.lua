@@ -20,7 +20,7 @@
 local utils = require 'mp.utils'
 -- Inclusive frame ranges around each boundary's "0" frame.
 BEG_FRAME_RANGE = { -3, 2 }
-END_FRAME_RANGE = { -3, 6 } -- ## ALT: { -3, 2 } (tail frames kept by the copy-mode -to were invisible)
+END_FRAME_RANGE = { -3, 2 } -- ## ALT: { -3, 6 } showed the whole tail but 10 columns were too small
 local options = {
   converter = "r.ffmpeg",
   preview_mode = "copy",
@@ -47,6 +47,7 @@ local state = {
   revision = 0,
   loop = false,
   parked = false,
+  map_failed = false,    -- ffprobe map unavailable: rows use the constant-fps fallback
   map_requested = false, -- parked: loop-b suspended while at/after the end mark
 }
 -- Each boundary owns its mark, pending work, cached frame and display state.
@@ -712,10 +713,21 @@ local function source_args(job)
     local frames = (anchor_mpv - t_mpv) / fd
     mp.msg.debug(string.format("preview[%s] row: mark=%.6f anchor=%.6f (mpv) anchor-mark=%+.2f frames n0=%d total=%d shift=%s",
       job.edge.name, t_mpv, anchor_mpv, frames, n0, total, m and string.format("%.6f", m.shift) or "nil"))
-    -- WARN: the converter's output reaches beyond the frames this row can show.
-    local beyond = job.edge.id == 1 and (-frames - (-first)) or (frames - last)
-    if beyond > 0.5 then
-      status("warn", string.format("export %s includes %.0f frame(s) beyond the preview row",
+    -- Frames the export holds OUTSIDE the marks (beg: preroll before a, end: tail after b).
+    -- Printed on the "0" frame so it is known even when the row (n0-3..n0+2) cannot show them all.
+    local outside = math.floor((job.edge.id == 1 and -frames or frames) + 0.5)
+    if m and i then -- exact with the frame map (VFR safe)
+      local ai = lower_bound(m.pts, job.anchor + m.start - 0.0004)
+      outside = job.edge.id == 1 and (i - ai) or (ai - i)
+    end
+    if outside > 0 then
+      filter = filter .. string.format(
+        ",drawtext=text='in file\\: %s%d':x=10:y=10:fontsize=%d:fontcolor=0xFF8000:borderw=2:bordercolor=black:enable='eq(n,%d)'",
+        job.edge.id == 1 and "-" or "+", outside, math.max(12, math.floor(job.h * 0.14)), n0)
+    end
+    local beyond = outside - (job.edge.id == 1 and -first or last)
+    if beyond > 0 then
+      status("warn", string.format("export %s includes %d frame(s) beyond the preview row",
         job.edge.id == 1 and "beg" or "end", beyond))
     end
   end
@@ -776,6 +788,8 @@ end
 
 local function start_preview(edge)
   if state.hidden or not edge.marked or edge.job or edge.timer or edge.error then return end
+  -- Rows need the frame map (exact frames, mpv<->pts shift); load_pts_map re-runs previews.
+  if state.map_requested and not pts_map and not state.map_failed then return end
   local _, _, w, h = geometry(edge)
   if not w then return end -- Layout observers retry later.
   local path = source_path()
@@ -1017,13 +1031,16 @@ end
 
 -- Async, on the first "[" or "]" per file: ffprobe reads every video packet time (slow for big files).
 function load_pts_map(path)
-  if not path or path:match("^%a[%w+.-]*://") then return end
+  if not path or path:match("^%a[%w+.-]*://") then state.map_failed = true; return end
   subprocess({ "ffprobe", "-v", "error", "-select_streams", "v:0",
       "-show_entries", "packet=pts_time,dts_time:format=start_time", "-of", "compact", path },
     false, function(result, err)
       if path ~= source_path() then return end
       if not result then
-        mp.msg.warn("frame map unavailable: " .. tostring(err)); return
+        mp.msg.warn("frame map unavailable: " .. tostring(err))
+        state.map_failed = true
+        if edges[1].marked or edges[2].marked then refresh_previews() end
+        return
       end
       local pts, start, delay = {}, 0, 0
       for line in (result.stdout or ""):gmatch("[^\r\n]+") do
@@ -1037,7 +1054,11 @@ function load_pts_map(path)
           start = tonumber(line:match("^format|start_time=([%d.eE+%-]+)")) or start
         end
       end
-      if #pts == 0 then return end
+      if #pts == 0 then
+        state.map_failed = true
+        if edges[1].marked or edges[2].marked then refresh_previews() end
+        return
+      end
       table.sort(pts)
       pts_map = { pts = pts, start = start, shift = start, reorder = delay }
       mp.msg.debug("frame map: " .. #pts .. " frames, start " .. start)
@@ -1057,7 +1078,7 @@ mp.register_event("file-loaded", function()
   local b = loop_b or mp.get_property_number("duration/full") or mp.get_property_number("duration")
   state.loop = finite(a) or finite(loop_b)
   framesnum_offset_beg, framesnum_offset_end = default_offset_beg, default_offset_end
-  pts_map, state.map_requested, state.parked = nil, false, false -- map: lazily on first mark
+  pts_map, state.map_requested, state.map_failed, state.parked = nil, false, false, false -- map: lazily on first mark
   edges[1].time = finite(a) and math.max(0, a) or 0
   edges[2].time = finite(b) and math.max(edges[1].time, b) or edges[1].time
   local duration = mp.get_property_number("duration")
