@@ -3,6 +3,19 @@
 -- Preview commands come from ffmpeg/run; only short boundary samples are made.
 -- Lossy samples match frame selection, not full-encode compression.
 -- Debug: mpv --msg-level=clip=debug FILE
+--
+-- COPY-MODE FACTS (observed; mechanisms are probably, see r.ffmpeg copy branch):
+--   end: ffmpeg `-to` compares packet DTS, mpv shows PTS => with B-frame reorder the clip
+--        probably keeps `reorder delay` extra frames (1-3, rarely 5, constant per video)
+--        => frames of the NEXT scene. Cure = framesnum_offset_end (see "reorder" log line).
+--   beg: -copypriorss defaults to 1 => the clip starts at the keyframe BEFORE the mark;
+--        these preroll frames are hidden by edit list/negative pts in players but become
+--        visible after re-converting. So beg may need 0..-2 (rarely -4) frames less.
+-- PREVIEW BORDER LEGEND (rows are real SOURCE frames; borders say what the export contains):
+--   green  "0" frame (requested boundary)      red: zero/negative length range
+--   orange frame IN the converter output but OUTSIDE the marked range (beg: hidden preroll,
+--          end: unrelated trailing frames)  <- what you cut off with the offsets
+--   blue   frame NOT in the converter output (just source context, brightness is untouched)
 
 local utils = require 'mp.utils'
 -- Inclusive frame ranges around each boundary's "0" frame.
@@ -390,6 +403,7 @@ local function text_filter(job, text, n, corner)
     corner and "0xD0C000" or "white", n)
 end
 local BORDER_OK, BORDER_BAD = "0x008000", "0x800000" -- BAD: zero/negative length clip
+local BORDER_EXTRA, BORDER_SIM = "0xFF8000", "0x4080FF" -- in output beyond the mark / not in output
 local function box_filter(job, n)
   return string.format("drawbox=x=0:y=0:w=iw:h=ih:color=%s:t=%d:enable='eq(n,%d)'",
     job.red and BORDER_BAD or BORDER_OK, math.max(2, math.floor(job.h * 0.025)), n)
@@ -647,13 +661,29 @@ local function source_args(job)
   -- Without -copyts, t restarts at the -ss point; -t keeps the read short.
   local seek = math.max(0, lo - 1)
   local filter = string.format("select='between(t,%.6f,%.6f)',scale=%d:%d", lo - seek, hi - seek, job.w, job.h)
-  -- Frames the converter's real output does not contain (before its first / after its last
-  -- frame, `anchor` = that frame's source time) are dimmed: rows stay continuous in time
-  -- while the real boundary may jump in GOP/dts-sized steps.
+  -- Frames are never dimmed (brightness must stay real). `anchor` = the converter's first
+  -- (beg) / last (end) emitted frame, in source time. Borders only:
+  --   blue   = not in the converter output (outside anchor)
+  --   orange = in the converter output but outside the marked range (n0 = marked frame)
+  -- ## ALT: dim frames outside the output (removed 2026-11-17: hides the true brightness):
+  -- ##   drawbox=x=0:y=0:w=iw:h=ih:color=black@0.65:t=fill:enable='lt(t,<cut>)' (beg) / 'gt(t,<cut>)' (end)
   if job.anchor then
     local cut = job.anchor - seek
-    filter = filter .. string.format(",drawbox=x=0:y=0:w=iw:h=ih:color=black@0.65:t=fill:enable='%s'",
-      job.edge.id == 1 and string.format("lt(t,%.6f)", cut - 0.0004) or string.format("gt(t,%.6f)", cut + 0.0004))
+    local bw = math.max(1, math.floor(job.h * 0.012))
+    local sim, extra
+    if job.edge.id == 1 then
+      sim = string.format("lt(t,%.6f)", cut - 0.0004)
+      extra = string.format("lt(n,%d)*gte(t,%.6f)", n0, cut - 0.0004)
+    else
+      sim = string.format("gt(t,%.6f)", cut + 0.0004)
+      extra = string.format("gt(n,%d)*lte(t,%.6f)", n0, cut + 0.0004)
+    end
+    for _, b in ipairs({ { BORDER_SIM, sim }, { BORDER_EXTRA, extra } }) do
+      filter = filter .. string.format(",drawbox=x=0:y=0:w=iw:h=ih:color=%s:t=%d:enable='%s'", b[1], bw, b[2])
+    end
+    -- DEBUG: compare with `r.ffmpeg --preview-plan` when a row looks off by a frame
+    mp.msg.debug(string.format("preview[%s] row: mark=%.6f seek=%.6f anchor=%.6f anchor-mark=%+.1f frames n0=%d total=%d map=%s",
+      job.edge.name, t, seek, job.anchor, (job.anchor - t) / fd, n0, total, tostring(pts_map ~= nil)))
   end
   filter = filter .. "," .. box_filter(job, n0) .. "," .. text_filter(job, edge_label(job), n0)
   if job.offset ~= 0 then filter = filter .. "," .. text_filter(job, string.format("%+d", job.offset), n0, true) end
@@ -955,21 +985,34 @@ end
 function load_pts_map(path)
   if not path or path:match("^%a[%w+.-]*://") then return end
   subprocess({ "ffprobe", "-v", "error", "-select_streams", "v:0",
-      "-show_entries", "packet=pts_time:format=start_time", "-of", "compact", path },
+      "-show_entries", "packet=pts_time,dts_time:format=start_time", "-of", "compact", path },
     false, function(result, err)
       if path ~= source_path() then return end
       if not result then
         mp.msg.warn("frame map unavailable: " .. tostring(err)); return
       end
-      local pts, start = {}, 0
+      local pts, start, delay = {}, 0, 0
       for line in (result.stdout or ""):gmatch("[^\r\n]+") do
         local p = tonumber(line:match("^packet|pts_time=([%d.eE+%-]+)"))
-        if p then pts[#pts + 1] = p else start = tonumber(line:match("^format|start_time=([%d.eE+%-]+)")) or start end
+        if p then
+          pts[#pts + 1] = p
+          -- reorder delay = max(pts - dts): ffmpeg's copy-mode `-to` cuts on DTS (probably)
+          local d = tonumber(line:match("|dts_time=([%d.eE+%-]+)"))
+          if d and p - d > delay then delay = p - d end
+        else
+          start = tonumber(line:match("^format|start_time=([%d.eE+%-]+)")) or start
+        end
       end
       if #pts == 0 then return end
       table.sort(pts)
-      pts_map = { pts = pts, start = start }
+      pts_map = { pts = pts, start = start, reorder = delay }
       mp.msg.debug("frame map: " .. #pts .. " frames, start " .. start)
+      local fd = frame_duration()
+      if fd then
+        -- INFO: hint only, never applied automatically (mkv has no dts => 0 here)
+        mp.msg.info(string.format("reorder delay %.0f frames (copy-mode end probably needs framesnum_offset_end ~ %d)",
+          delay / fd, -math.floor(delay / fd + 0.5)))
+      end
       if edges[1].marked or edges[2].marked then refresh_previews() end
     end)
 end
