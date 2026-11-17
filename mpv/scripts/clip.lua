@@ -20,7 +20,7 @@
 local utils = require 'mp.utils'
 -- Inclusive frame ranges around each boundary's "0" frame.
 BEG_FRAME_RANGE = { -3, 2 }
-END_FRAME_RANGE = { -3, 2 }
+END_FRAME_RANGE = { -3, 6 } -- ## ALT: { -3, 2 } (tail frames kept by the copy-mode -to were invisible)
 local options = {
   converter = "r.ffmpeg",
   preview_mode = "copy",
@@ -121,7 +121,12 @@ end
 -- Per-file video frame times (absolute pts, ascending) from ffprobe: mpv exposes no frame
 -- time list, and this makes frame-in-second and whole-frame offsets exact for VFR too.
 -- Until loaded (or without ffprobe/local file) everything falls back to constant fps.
-local pts_map                       -- { pts = {...}, start = container start_time }
+-- DOMAINS (observed in a real log: format start_time 0.062, mpv marks on the 1/24 grid):
+--   ffmpeg/select/anchor time = pts - start      (start = container start_time)
+--   mpv time (marks, time-pos) = pts - shift     (shift is `start` OR 0 depending on file => calibrated)
+-- Mixing them shifted every row/border by (start - shift) = 1.5 frames, and made map_index
+-- fail silently (=> constant-fps fallback) because its tolerance is < half a frame.
+local pts_map                       -- { pts = {...}, start = container start_time, shift = mpv domain }
 local function lower_bound(list, x) -- first index with list[i] >= x (#list + 1 if none)
   local lo, hi = 1, #list + 1
   while lo < hi do
@@ -130,28 +135,46 @@ local function lower_bound(list, x) -- first index with list[i] >= x (#list + 1 
   end
   return lo
 end
--- Index of the frame displayed at mpv time t (nearest, within ~half a frame).
+-- Calibrate the mpv<->pts shift once: marks sit on frame boundaries, so choose the candidate
+-- (start | 0) with the smaller residual to the pts grid; keep `start` until a mark proves otherwise.
+local function calibrate_shift(m, t)
+  local fd = frame_duration()
+  if m.calibrated or not fd then return end
+  local best, residual
+  for _, c in ipairs({ m.start, 0 }) do
+    local x = t + c
+    local i = lower_bound(m.pts, x)
+    local d = math.huge
+    for _, k in ipairs({ i - 1, i }) do
+      if m.pts[k] then d = math.min(d, math.abs(m.pts[k] - x)) end
+    end
+    if not residual or d < residual - 1e-6 then best, residual = c, d end
+  end
+  if residual and residual <= fd * 0.2 then
+    m.shift, m.calibrated = best, true
+    mp.msg.debug(string.format("frame map: mpv shift=%.6f (container start=%.6f) residual=%.6f", best, m.start, residual))
+  end
+end
+-- Index of the frame displayed at mpv time t: the frame covering t (floor), so a seek target
+-- between two frames (e.g. after a failed frame-back-step) resolves like the screen does.
 local function map_index(t)
   local m = pts_map
   if not m or not finite(t) then return end
-  local x, i = t + m.start, nil
-  local best, dist = nil, (frame_duration() or 0.02) * 0.45
-  i = lower_bound(m.pts, x)
-  for _, k in ipairs({ i - 1, i }) do
-    local p = m.pts[k]
-    if p and math.abs(p - x) <= dist then best, dist = k, math.abs(p - x) end
-  end
-  return best
+  calibrate_shift(m, t)
+  -- ## ALT: nearest frame within 0.45 frame (ties/half-frame marks picked the wrong frame or nil)
+  local x = t + m.shift
+  local i = lower_bound(m.pts, x + 0.0005) - 1 -- last pts <= x (+eps)
+  local p = m.pts[i]
+  if p and x - p < (frame_duration() or 0.05) * 1.01 then return i end
 end
 
 -- Actual clipping time: used by previews and export (the loop uses raw marks).
 local function etime(edge)
   local t, off = edge.time, frames_offset(edge)
-  if off ~= 0 then
-    local i = map_index(t)
-    local p = i and pts_map.pts[math.max(1, math.min(#pts_map.pts, i + off))]
-    t = p and (p - pts_map.start) or (t + off * (frame_duration() or 0))
-  end
+  -- Snapped to the frame pts even for off == 0: a raw mark may be a seek target between frames.
+  local i = map_index(t)
+  local p = i and pts_map.pts[math.max(1, math.min(#pts_map.pts, i + off))]
+  if p then t = p - pts_map.shift elseif off ~= 0 then t = t + off * (frame_duration() or 0) end
   local duration = mp.get_property_number("duration")
   if finite(duration) then t = math.min(t, duration) end
   return math.max(0, t)
@@ -173,8 +196,8 @@ local function timestamp(t)
   local i = map_index(t)
   if i then
     local m = pts_map
-    local sec = math.floor(m.pts[i] - m.start + 1e-5)
-    return frame_text(sec, i - lower_bound(m.pts, m.start + sec - 1e-5))
+    local sec = math.floor(m.pts[i] - m.shift + 1e-5)
+    return frame_text(sec, i - lower_bound(m.pts, m.shift + sec - 1e-5))
   end
   local f = fps()
   if not f then return ms_text(t) end
@@ -647,6 +670,7 @@ end
 local function source_args(job)
   local first, last = ranges[job.edge.id].first, ranges[job.edge.id].last
   local t = job.edge.id == 1 and job.a or job.b
+  local t_mpv = t
   local fd = frame_duration() or 0.04
   local m, i = pts_map, map_index(t)
   local lo, hi, n0, total
@@ -654,7 +678,8 @@ local function source_args(job)
     local lo_i, hi_i = math.max(1, i + first), math.min(#m.pts, i + last)
     lo, hi = m.pts[lo_i] - m.start - 0.0004, m.pts[hi_i] - m.start + 0.0004
     n0, total = i - lo_i, hi_i - lo_i + 1
-  else -- no frame map (yet): constant frame rate guess
+  else -- no frame map (yet): constant frame rate guess, mpv domain -> ffmpeg domain
+    if m then t = t + m.shift - m.start end
     n0 = math.min(-first, math.max(0, math.floor(t / fd + 0.5)))
     lo, hi, total = t - (n0 + 0.5) * fd, t + (last + 0.5) * fd, n0 + 1 + last
   end
@@ -681,9 +706,18 @@ local function source_args(job)
     for _, b in ipairs({ { BORDER_SIM, sim }, { BORDER_EXTRA, extra } }) do
       filter = filter .. string.format(",drawbox=x=0:y=0:w=iw:h=ih:color=%s:t=%d:enable='%s'", b[1], bw, b[2])
     end
-    -- DEBUG: compare with `r.ffmpeg --preview-plan` when a row looks off by a frame
-    mp.msg.debug(string.format("preview[%s] row: mark=%.6f seek=%.6f anchor=%.6f anchor-mark=%+.1f frames n0=%d total=%d map=%s",
-      job.edge.name, t, seek, job.anchor, (job.anchor - t) / fd, n0, total, tostring(pts_map ~= nil)))
+    -- DEBUG: anchor in the mpv domain; the frame distance to the mark must be an INTEGER
+    -- (a .5 means the domains are still mixed). beyond = export frames outside this row.
+    local anchor_mpv = job.anchor + (m and (m.start - m.shift) or 0)
+    local frames = (anchor_mpv - t_mpv) / fd
+    mp.msg.debug(string.format("preview[%s] row: mark=%.6f anchor=%.6f (mpv) anchor-mark=%+.2f frames n0=%d total=%d shift=%s",
+      job.edge.name, t_mpv, anchor_mpv, frames, n0, total, m and string.format("%.6f", m.shift) or "nil"))
+    -- WARN: the converter's output reaches beyond the frames this row can show.
+    local beyond = job.edge.id == 1 and (-frames - (-first)) or (frames - last)
+    if beyond > 0.5 then
+      status("warn", string.format("export %s includes %.0f frame(s) beyond the preview row",
+        job.edge.id == 1 and "beg" or "end", beyond))
+    end
   end
   filter = filter .. "," .. box_filter(job, n0) .. "," .. text_filter(job, edge_label(job), n0)
   if job.offset ~= 0 then filter = filter .. "," .. text_filter(job, string.format("%+d", job.offset), n0, true) end
@@ -1005,7 +1039,7 @@ function load_pts_map(path)
       end
       if #pts == 0 then return end
       table.sort(pts)
-      pts_map = { pts = pts, start = start, reorder = delay }
+      pts_map = { pts = pts, start = start, shift = start, reorder = delay }
       mp.msg.debug("frame map: " .. #pts .. " frames, start " .. start)
       local fd = frame_duration()
       if fd then
