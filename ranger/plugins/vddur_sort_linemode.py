@@ -74,13 +74,20 @@ else:
             fm = self.fm
             mode = self.arg(1) or "toggle"
             grayout = len(self.args) > 2 and self.arg(2) == "grayout"
+            extras = self.args[3:]
+            clip_sorting = bool(extras)
             restore_filter = False
             if (
                 mode not in ("on", "off", "toggle")
-                or len(self.args) > 3
+                or (clip_sorting and (extras[0] != "clip_sorting" or any(
+                    item not in ("group", "decorate") for item in extras[1:]
+                )))
                 or (len(self.args) > 2 and not grayout)
             ):
-                return fm.notify("Usage: view_duration [on|off|toggle] [grayout]", bad=True)
+                return fm.notify(
+                    "Usage: view_duration [on|off|toggle] [grayout] [clip_sorting [group] [decorate]]",
+                    bad=True,
+                )
             if mode == "toggle":
                 duration_filter = next(
                     (item for item in fm.thisdir.filter_stack if isinstance(item, DurationFilter)),
@@ -90,6 +97,7 @@ else:
                     # Keep the active filter mode while restoring its required sort.
                     mode = "on"
                     grayout = duration_filter.grayout
+                    restore_filter = True
                 elif duration_filter is not None:
                     mode = "off"
                 else:
@@ -133,6 +141,8 @@ else:
                 fm.thisdir.filter_stack.append(DurationFilter("", grayout=grayout))
             fm.thisdir.refilter()
             fm.thisdir.sort()
+            if clip_sorting and not restore_filter:
+                fm.execute_console("clip_sorting " + mode + " " + " ".join(extras[1:]))
             fm.ui.redraw_main_column()
 
     @register_linemode
@@ -140,6 +150,11 @@ else:
         name = "duration"
 
         def filetitle(self, f: FileSystemObject, metadata: object) -> str:
+            # Keep the configured devicon title in duration view; clip_grouping replaces its
+            # icon with the tree marker only for names recognized as clips.
+            devicons = f.linemode_dict.get("devicons")
+            if devicons is not None and devicons is not self:
+                return devicons.filetitle(f, metadata)
             return f.relative_path
 
         def infostring(self, f: FileSystemObject, metadata: object) -> str:

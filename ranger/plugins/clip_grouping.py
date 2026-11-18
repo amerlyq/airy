@@ -11,10 +11,12 @@ import os
 import re
 
 from ranger.container.directory import Directory
+from ranger.gui.widgets.browsercolumn import BrowserColumn
 
 _TOKEN = r"(?:\d+m\d+s\d+|v\d+|prev\d+)"
 _CLIP_SUFFIX = re.compile(_TOKEN + r"(?:_" + _TOKEN + r")*$")
-_GROUPED_DIRS: set[str] = set()
+GROUP_CLIPS_ENABLED = True  # Grouping plus clip decoration is the default Ranger mode.
+DECORATE_CLIP_NAMES = True  # `oV` can override decoration independently.
 
 
 def _clip_key(file):
@@ -26,8 +28,8 @@ def _clip_key(file):
     return stem.casefold(), 0, stem.casefold()
 
 
-def grouping_enabled(path: str) -> bool:
-    return path in _GROUPED_DIRS
+def grouping_enabled(_path: str) -> bool:
+    return GROUP_CLIPS_ENABLED
 
 
 def clip_source(file):
@@ -38,13 +40,21 @@ def clip_source(file):
 def _make_sort(original):
     def sort(self):
         original(self)
-        if self.path not in _GROUPED_DIRS or not self.files_all:
+        if not self.files_all:
+            return
+
+        if not GROUP_CLIPS_ENABLED:
+            if DECORATE_CLIP_NAMES:
+                for file in self.files_all:
+                    file.display_data.clear()
             return
 
         # Keep Ranger's order for group anchors and within each original/clip subgroup.
         ordered = list(enumerate(self.files_all))
         source_groups = {}
         for index, file in ordered:
+            if file.is_directory:
+                continue
             source, is_clip, _ = _clip_key(file)
             source_groups.setdefault(source, []).append((index, file, is_clip))
         anchors = {
@@ -56,17 +66,69 @@ def _make_sort(original):
         }
         self.files_all[:] = [
             file
-            for _, file, _ in sorted(
+            for _, file in sorted(
                 ordered,
                 key=lambda row: (
-                    anchors[_clip_key(row[1])[0]],
-                    _clip_key(row[1])[1],
+                    row[0] if row[1].is_directory else anchors[_clip_key(row[1])[0]],
+                    0 if row[1].is_directory else _clip_key(row[1])[1],
                     row[0],
                 ),
             )
         ]
+        for file in self.files_all:
+            file.display_data.clear()
+        # Ranger refilters before this wrapper reorders files_all; refilter again so visible
+        # files follow the grouped order after every sort setting change.
+        self.refilter()
 
     return sort
+
+
+def _make_text_display(original):
+    def draw_text(self, text, space):
+        # BrowserColumn formats every linemode title through this method, so decoration stays
+        # visual only: file paths, macros, and the active linemode retain the real filename.
+        if DECORATE_CLIP_NAMES:
+            icon, separator, title = text.partition(" ")
+            codepoint = ord(icon[0]) if len(icon) == 1 else 0
+            has_devicon = separator and len(icon) == 1 and (
+                0xE000 <= codepoint <= 0xF8FF
+                or 0xF0000 <= codepoint <= 0xFFFFD
+                or 0x100000 <= codepoint <= 0x10FFFD
+            )
+            candidate = title if has_devicon else text
+            name = os.path.basename(candidate)
+            stem = os.path.splitext(name)[0]
+            match = _CLIP_SUFFIX.search(stem)
+            if match:
+                source = stem[: match.start()].rstrip("_").casefold()
+                prefix = "├ "
+                if self.target is not None:
+                    clips = [
+                        file.basename
+                        for file in (self.target.files or [])
+                        if clip_source(file) == source
+                    ]
+                    originals = [
+                        file for file in (self.target.files_all or [])
+                        if not file.is_directory
+                        and clip_source(file) is None
+                        and os.path.splitext(file.basename)[0].casefold() == source
+                    ]
+                    if not originals:
+                        if len(clips) == 1:
+                            prefix = "· "
+                        elif clips and clips[0] == name:
+                            prefix = "┌ "
+                        elif clips and clips[-1] == name:
+                            prefix = "└ "
+                    elif clips and clips[-1] == name:
+                        prefix = "└ "
+                # Replace an existing devicon when present; two-column prefix aligns the title.
+                text = prefix + title if separator and candidate == title else prefix + text
+        return original(self, text, space)
+
+    return draw_text
 
 
 try:
@@ -74,6 +136,15 @@ try:
 except ImportError:
     from plugins import rhooks
 rhooks.patch(Directory, "sort", _make_sort)
+rhooks.patch(BrowserColumn, "_draw_text_display", _make_text_display)
+
+try:
+    import ranger
+
+    if ranger.fm is not None and ranger.fm.thisdir is not None:
+        ranger.fm.thisdir.sort()
+except Exception:  # startup may not have selected a directory yet
+    pass
 
 
 try:
@@ -85,15 +156,70 @@ else:
         """:group_clips toggles grouping clips after their source, preserving active sort."""
 
         def execute(self):
-            path = self.fm.thisdir.path
-            if path in _GROUPED_DIRS:
-                _GROUPED_DIRS.remove(path)
-                enabled = False
-            else:
-                _GROUPED_DIRS.add(path)
-                enabled = True
+            global GROUP_CLIPS_ENABLED
+            GROUP_CLIPS_ENABLED = not GROUP_CLIPS_ENABLED
+            enabled = GROUP_CLIPS_ENABLED
             self.fm.thisdir.sort()
             self.fm.thisdir.refilter()
+            for file in self.fm.thisdir.files_all or []:
+                file.display_data.clear()
             self.fm.ui.redraw_main_column()
             self.fm.notify(f"Clip grouping {'on' if enabled else 'off'}")
+
+
+    class clip_sorting(Command):
+        """:clip_sorting [on|off|toggle] [group] [decorate] [group+decorate] [sort=<name>]
+
+        Grouping and decoration are global mode flags; an optional active sort stays independent.
+        """
+
+        def execute(self):
+            global DECORATE_CLIP_NAMES
+
+            args = list(self.args[1:])
+            operation = args.pop(0) if args and args[0] in ("on", "off", "toggle") else "toggle"
+            features = set(args)
+            allowed = {"group", "decorate", "group+decorate"}
+            sort_args = [arg for arg in features if arg.startswith("sort=")]
+            unknown = features - allowed - set(sort_args)
+            if unknown or len(sort_args) > 1:
+                return self.fm.notify(
+                    "Usage: clip_sorting [on|off|toggle] [group] [decorate] [group+decorate] [sort=<name>]",
+                    bad=True,
+                )
+            for arg in sort_args:
+                sort = arg.partition("=")[2]
+                if sort not in Directory.sort_dict:
+                    return self.fm.notify(f"Unknown sort: {sort}", bad=True)
+
+            fm = self.fm
+            global GROUP_CLIPS_ENABLED
+            if "group+decorate" in features:
+                enabled = (
+                    operation == "on"
+                    or (operation == "toggle" and not (
+                        GROUP_CLIPS_ENABLED and DECORATE_CLIP_NAMES
+                    ))
+                )
+                GROUP_CLIPS_ENABLED = enabled
+                DECORATE_CLIP_NAMES = enabled
+            if "group" in features:
+                GROUP_CLIPS_ENABLED = (
+                    operation == "on"
+                    or (operation == "toggle" and not GROUP_CLIPS_ENABLED)
+                )
+            if "decorate" in features:
+                DECORATE_CLIP_NAMES = (
+                    operation == "on"
+                    or (operation == "toggle" and not DECORATE_CLIP_NAMES)
+                )
+            for arg in sort_args:
+                sort = arg.partition("=")[2]
+                fm.execute_console(f"setlocal sort={sort}")
+            fm.thisdir.sort()
+            fm.thisdir.refilter()
+            if features & {"group", "decorate", "group+decorate"}:
+                for file in fm.thisdir.files_all or []:
+                    file.display_data.clear()
+            fm.ui.redraw_main_column()
 
