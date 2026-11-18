@@ -17,6 +17,7 @@ end=$3
 fmt=$4
 ddst=${5-}
 window=${6:-2}
+audio_end=${7-} # exact end for audio when `end` is a DTS-aware copy cut (clip.lua copy_end_dts)
 if [[ -n $preview ]]; then
   [[ $fmt == copy || $fmt == fast || $fmt == smart ]] || exit 2
   awk -vb="$beg" -ve="$end" -vw="$window" 'BEGIN{exit !(b>=0 && e>b && w>0)}' || exit 2
@@ -103,11 +104,25 @@ elif [[ $fmt == copy ]]; then
   # -loglevel info
   # -avoid_negative_ts make_zero \
   bound_preview
-  execute_or_plan ffmpeg -hide_banner -nostats -nostdin -n \
-    -ss "${beg:-00:00}" -to "${end:--00:00}" \
-    -i "$fname" \
-    -codec:v copy -codec:a copy -codec:d copy \
-    "$path"
+  # clip.lua passes the 7th argument audio_end (the exact marked end) when its video `end` was moved to a
+  # DTS-based cut (copy-mode -to compares packet DTS, so B-frame reorder keeps frames of the next
+  # clip). A second input keeps audio up to the real end; video/audio share the same -ss origin.
+  # LIMIT: only first video + first audio stream, no subtitles/data (were default-mapped before).
+  if [[ -z $preview && -n $audio_end ]]; then
+    execute_or_plan ffmpeg -hide_banner -nostats -nostdin -n \
+      -ss "${beg:-00:00}" -to "${end:--00:00}" -i "$fname" \
+      -ss "${beg:-00:00}" -to "$audio_end" -i "$fname" \
+      -map 0:v:0 -map '1:a:0?' -codec:v copy -codec:a copy \
+      "$path"
+  else:
+    ## ALT: single input, `-to` cuts audio and video at the same DTS-based point (used when
+    ##   audio_end is empty, i.e. copy_end_dts=no):
+    execute_or_plan ffmpeg -hide_banner -nostats -nostdin -n \
+      -ss "${beg:-00:00}" -to "${end:--00:00}" \
+      -i "$fname" \
+      -codec:v copy -codec:a copy -codec:d copy \
+      "$path"
+  fi
 
 elif [[ $fmt == fast ]]; then
 

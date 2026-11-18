@@ -199,3 +199,34 @@ Status: the sandbox has ffmpeg, so I'm checking whether the 2-second preview sam
 - **Speed:** unchanged. The converter plan only runs on the 2-second window, and the preview is 6 decoded frames.
 
 **One thing worth checking.** In log2 your final end mark 123.229333 still has `+1` extra frame, 123.271, which is the first frame of the next clip. Step the end one frame left and watch whether the label drops to `in file: +0`.
+
+
+==============
+
+Status: I'm wiring the DTS-aware `-to` into `clip.lua`. The `r.ffmpeg` side is already patched, and a sandbox test shows audio still ending at your marked end while the video tail shrinks.
+
+Status: my validation script clobbered its own `src` variable. I'm rewriting it cleanly to check the DTS-aware end on both test files, then presenting the files.
+
+The preview in log3 was correct; it was the export that kept next-clip frames. I changed both so the copy cut stops where the frame actually ends, and `clip.lua` and `r.ffmpeg` are updated. I tested the cut on synthetic files with ffmpeg 6.1, but not in mpv and not on your file.
+
+**What the log shows**
+- Your steps match the log: end mark 123.1460 gave +2, 123.1877 gave +1, 123.2293 gave +1, and 123.2710 (the first frame of the next clip) gave +4.
+- At the first two marks the last packet in the file is the same one (123.2293). So stepping left cannot reach `+0` just by moving the mark.
+- Last time I said stepping one frame left should drop the label to `+0`. That was wrong.
+
+**Why**
+- Copy-mode `-to` keeps every packet whose DTS is before the end time. I checked this on 40 cuts and the prediction matched ffmpeg every time.
+- The old code passed the mark itself as `-to`. Since DTS runs behind PTS by the B-frame reorder delay, that kept extra frames after the frame you picked.
+- Some end frames cannot be cut cleanly at all, because their B-frame references live in the next clip.
+
+**What changed**
+- **`copy_end_dts`:** this new option is on by default. `clip.lua` now passes the converter an end time just after the last packet needed for your end frame. The preview plans and the export use the same value, so the preview still describes the real file. In my 40 tests the average tail dropped from 2.38 to 1.38 frames, and 12 of 40 cuts ended with no extra frames.
+- **`clean -K` hint:** when the tail can't be avoided, the label shows `in file: +N clean -K`. K is how many frames to step left to reach an end frame with no extra frames. This held in 25 of 25 test cases.
+- **Audio:** a cut at the DTS-aware end would clip about 0.1 s of audio. `r.ffmpeg` now takes a 7th argument and opens a second input for audio, so audio still ends at your real mark. In my test it ended at the mark, and `copy_end_dts=no` restores the old single-input command, kept as `## ALT`.
+- **Time domains:** all times passed to ffmpeg now go through one conversion, correct whatever the mpv-to-pts shift is. This changes nothing for your file.
+
+**Caveats**
+- With `copy_end_dts` active, the copy export maps only the first video and first audio stream. Subtitles and data streams are dropped, and so is any second audio track.
+- Fast and smart modes are unchanged.
+- Your "+6, 3 frames from the next clip" case isn't in log3. It matches the unavoidable-tail case above, but I haven't seen the log for it.
+- The hidden preroll at the beg is unchanged: copy mode still starts at the keyframe before your mark.

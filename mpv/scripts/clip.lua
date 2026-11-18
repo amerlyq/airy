@@ -35,7 +35,10 @@ local options = {
   framesnum_offset_end = 0,
   -- false: rows are consecutive source frames + the real export boundary from the converter
   -- plan (see probe_job). true = old stitched rows: converter sample + source context.
-  rows_from_sample = false
+  rows_from_sample = false,
+  -- copy mode: `-to` compares packet DTS, so with B-frame reorder frames of the NEXT clip stay in
+  -- the file. true = pass a DTS-aware end to the converter (+ CLIP_AUDIO_END keeps audio to the real end).
+  copy_end_dts = true
 }
 require('mp.options').read_options(options, 'clip')
 
@@ -167,6 +170,27 @@ local function map_index(t)
   local i = lower_bound(m.pts, x + 0.0005) - 1 -- last pts <= x (+eps)
   local p = m.pts[i]
   if p and x - p < (frame_duration() or 0.05) * 1.01 then return i end
+end
+
+-- ffmpeg-domain start time for a mpv-domain time (they differ by shift - start).
+local function ff_time(t)
+  local m = pts_map
+  return t + (m and (m.shift - m.start) or 0)
+end
+-- ffmpeg-domain `-to` for the end frame at mpv time t. copy mode cuts on packet DTS, so the exact
+-- frame time keeps every packet decoded before the next DTS: up to `reorder delay` frames of the
+-- next clip. Cut right after the packet that completes frame t instead (midway to the next DTS).
+-- Returns to, and the exact end for audio (nil when no DTS-aware cut applies).
+local function ff_end(t, mode)
+  local m = pts_map
+  local exact = ff_time(t)
+  local i = map_index(t)
+  if mode ~= "copy" or not options.copy_end_dts or not (m and i and m.has_dts) then return exact end
+  local j = lower_bound(m.pre, m.pts[i] - 1e-6) -- first packet whose prefix-max pts reaches frame i
+  if j > #m.pre then return exact end
+  local d0, d1 = m.odts[j], m.odts[j + 1]
+  local to = (d1 and (d0 + d1) / 2 or d0 + (frame_duration() or 0.04)) - m.start
+  return to, exact
 end
 
 -- Actual clipping time: used by previews and export (the loop uses raw marks).
@@ -632,7 +656,7 @@ end
 sample_job = function(job)
   remove_samples(job)
   run_job(job, { options.converter, "--preview-plan", job.edge.name, job.path,
-    tostring(job.a), tostring(job.b), job.mode, job.clip, tostring(job.window),
+    tostring(ff_time(job.a)), tostring((ff_end(job.b, job.mode))), job.mode, job.clip, tostring(job.window),
   }, function(result)
     local commands = parse_plan(result.stdout)
     if not commands then
@@ -720,10 +744,20 @@ local function source_args(job)
       local ai = lower_bound(m.pts, job.anchor + m.start - 0.0004)
       outside = job.edge.id == 1 and (i - ai) or (ai - i)
     end
+    -- Copy-mode end frames that can only be reached with extra tail frames (B-frame refs of the
+    -- next clip must precede them): hint the nearest end frame to the left that has none.
+    local hint = ""
+    if outside > 0 and job.edge.id == 2 and m and i and m.clean and #m.clean > 0 then
+      local c = lower_bound(m.clean, m.pts[i] + 1e-6) - 1
+      if c >= 1 then
+        local k = i - lower_bound(m.pts, m.clean[c] - 1e-6)
+        if k > 0 then hint = string.format(" clean -%d", k) end
+      end
+    end
     if outside > 0 then
       filter = filter .. string.format(
-        ",drawtext=text='in file\\: %s%d':x=10:y=10:fontsize=%d:fontcolor=0xFF8000:borderw=2:bordercolor=black:enable='eq(n,%d)'",
-        job.edge.id == 1 and "-" or "+", outside, math.max(12, math.floor(job.h * 0.14)), n0)
+        ",drawtext=text='in file\\: %s%d%s':x=10:y=10:fontsize=%d:fontcolor=0xFF8000:borderw=2:bordercolor=black:enable='eq(n,%d)'",
+        job.edge.id == 1 and "-" or "+", outside, hint, math.max(12, math.floor(job.h * 0.14)), n0)
     end
     local beyond = outside - (job.edge.id == 1 and -first or last)
     if beyond > 0 then
@@ -770,7 +804,7 @@ local function probe_job(job)
   end
   remove_samples(job)
   run_job(job, { options.converter, "--preview-plan", job.edge.name, job.path,
-    tostring(job.a), tostring(job.b), job.mode, job.clip, tostring(job.window),
+    tostring(ff_time(job.a)), tostring((ff_end(job.b, job.mode))), job.mode, job.clip, tostring(job.window),
   }, function(result)
     local commands = parse_plan(result.stdout)
     if not commands then
@@ -999,7 +1033,11 @@ local function export(mode)
   state.writing = true
   local a, b = etime(edges[1]), etime(edges[2])
   status("info", string.format("ENCODING %s dt=%s", mode, duration_text(b - a)))
-  subprocess({ options.converter, path, tostring(a), tostring(b), mode },
+  local to, audio_to = ff_end(b, mode)
+  mp.msg.debug(string.format("export %s: ss=%.6f to=%.6f audio_to=%s", mode, ff_time(a), to, tostring(audio_to)))
+  -- 7th converter arg = exact end for audio (empty => single input, `to` applies to everything)
+  subprocess({ options.converter, path, tostring(ff_time(a)), tostring(to), mode, "", "",
+      audio_to and tostring(audio_to) or "" },
     false, function(result, err)
       state.writing = false
       if not result then
@@ -1043,6 +1081,7 @@ function load_pts_map(path)
         return
       end
       local pts, start, delay = {}, 0, 0
+      local order, odts, has_dts = {}, {}, true -- decode (file) order: for the DTS-aware copy end
       for line in (result.stdout or ""):gmatch("[^\r\n]+") do
         local p = tonumber(line:match("^packet|pts_time=([%d.eE+%-]+)"))
         if p then
@@ -1050,6 +1089,8 @@ function load_pts_map(path)
           -- reorder delay = max(pts - dts): ffmpeg's copy-mode `-to` cuts on DTS (probably)
           local d = tonumber(line:match("|dts_time=([%d.eE+%-]+)"))
           if d and p - d > delay then delay = p - d end
+          order[#order + 1], odts[#odts + 1] = p, d
+          if not d then has_dts = false end
         else
           start = tonumber(line:match("^format|start_time=([%d.eE+%-]+)")) or start
         end
@@ -1060,7 +1101,18 @@ function load_pts_map(path)
         return
       end
       table.sort(pts)
-      pts_map = { pts = pts, start = start, shift = start, reorder = delay }
+      -- pre[j] = highest pts among the first j packets: the last frame a DTS cut after j contains.
+      -- clean[] = such pts values where nothing earlier-in-time is still missing (no forced extras).
+      local pre, sufmin, clean = {}, {}, {}
+      local hi = -math.huge
+      for j = 1, #order do hi = math.max(hi, order[j]); pre[j] = hi end
+      local lo = math.huge
+      for j = #order, 1, -1 do sufmin[j] = lo; lo = math.min(lo, order[j]) end
+      for j = 1, #order do
+        if sufmin[j] > pre[j] and pre[j] ~= clean[#clean] then clean[#clean + 1] = pre[j] end
+      end
+      pts_map = { pts = pts, start = start, shift = start, reorder = delay,
+                  pre = pre, odts = odts, has_dts = has_dts and #odts == #order, clean = clean }
       mp.msg.debug("frame map: " .. #pts .. " frames, start " .. start)
       local fd = frame_duration()
       if fd then
