@@ -74,6 +74,7 @@ else:
             fm = self.fm
             mode = self.arg(1) or "toggle"
             grayout = len(self.args) > 2 and self.arg(2) == "grayout"
+            restore_filter = False
             if (
                 mode not in ("on", "off", "toggle")
                 or len(self.args) > 3
@@ -81,10 +82,31 @@ else:
             ):
                 return fm.notify("Usage: view_duration [on|off|toggle] [grayout]", bad=True)
             if mode == "toggle":
-                active = fm.thisdir.settings.sort == "duration" or any(
-                    isinstance(item, DurationFilter) for item in fm.thisdir.filter_stack
+                duration_filter = next(
+                    (item for item in fm.thisdir.filter_stack if isinstance(item, DurationFilter)),
+                    None,
                 )
-                mode = "off" if active else "on"
+                if duration_filter is not None and fm.thisdir.settings.sort != "duration":
+                    # Keep the active filter mode while restoring its required sort.
+                    mode = "on"
+                    grayout = duration_filter.grayout
+                elif duration_filter is not None:
+                    mode = "off"
+                else:
+                    mode = "on"
+            elif mode == "on":
+                duration_filter = next(
+                    (item for item in fm.thisdir.filter_stack if isinstance(item, DurationFilter)),
+                    None,
+                )
+                if duration_filter is not None and fm.thisdir.settings.sort != "duration":
+                    # First explicit activation after external sort change restores sort only.
+                    grayout = duration_filter.grayout
+                    restore_filter = True
+                else:
+                    restore_filter = False
+            else:
+                restore_filter = False
             path = fm.thisdir.path
             if mode == "off":
                 commands = (
@@ -103,7 +125,7 @@ else:
                 )
             for command in commands:
                 fm.execute_console(command)
-            if mode == "on":
+            if mode == "on" and not restore_filter:
                 fm.thisdir.filter_stack[:] = [
                     item for item in fm.thisdir.filter_stack
                     if not isinstance(item, DurationFilter)

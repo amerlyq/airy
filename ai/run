@@ -209,6 +209,11 @@ in aic)
   # codex --sandbox danger-full-access
   # codex --dangerously-bypass-approvals-and-sandbox
   set -- codex "$@"
+  rargs+=(
+    --mount=type=bind,"src=/cache/irome_db,dst=/cache/irome_db,ro=true,bind-propagation=rslave"
+    --mount=type=bind,"src=/media/pro/vd,dst=/media/pro/vd,ro=true,bind-propagation=rslave"
+  )
+
 ;; aid)
   set -- bash -c 'sudo chmod 666 /var/run/docker.sock && exec codex "$@' '' "$@"
 ;; aia)
