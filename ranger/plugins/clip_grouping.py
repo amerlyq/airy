@@ -15,8 +15,27 @@ from ranger.gui.widgets.browsercolumn import BrowserColumn
 
 _TOKEN = r"(?:\d+m\d+s\d+|v\d+|prev\d+)"
 _CLIP_SUFFIX = re.compile(_TOKEN + r"(?:_" + _TOKEN + r")*$")
-GROUP_CLIPS_ENABLED = True  # Grouping plus clip decoration is the default Ranger mode.
+GROUP_DECOR_MODE = True  # Master toggle used by `ov`; enabled by default.
+GROUP_CLIPS_ENABLED = True
 DECORATE_CLIP_NAMES = True  # `oV` can override decoration independently.
+_DURATION_SAVED_MODES: dict[str, tuple[bool, bool, bool]] = {}
+
+
+def enter_duration_view(path: str) -> None:
+    """Save the pre-duration clip mode once, then disable grouping and decoration."""
+    global GROUP_DECOR_MODE, GROUP_CLIPS_ENABLED, DECORATE_CLIP_NAMES
+    _DURATION_SAVED_MODES.setdefault(
+        path, (GROUP_DECOR_MODE, GROUP_CLIPS_ENABLED, DECORATE_CLIP_NAMES)
+    )
+    GROUP_DECOR_MODE = GROUP_CLIPS_ENABLED = DECORATE_CLIP_NAMES = False
+
+
+def leave_duration_view(path: str) -> None:
+    """Restore exact clip flags saved when this directory entered duration view."""
+    global GROUP_DECOR_MODE, GROUP_CLIPS_ENABLED, DECORATE_CLIP_NAMES
+    saved = _DURATION_SAVED_MODES.pop(path, None)
+    if saved is not None:
+        GROUP_DECOR_MODE, GROUP_CLIPS_ENABLED, DECORATE_CLIP_NAMES = saved
 
 
 def _clip_key(file):
@@ -193,16 +212,14 @@ else:
                     return self.fm.notify(f"Unknown sort: {sort}", bad=True)
 
             fm = self.fm
-            global GROUP_CLIPS_ENABLED
+            global GROUP_CLIPS_ENABLED, GROUP_DECOR_MODE
             if "group+decorate" in features:
-                enabled = (
+                GROUP_DECOR_MODE = (
                     operation == "on"
-                    or (operation == "toggle" and not (
-                        GROUP_CLIPS_ENABLED and DECORATE_CLIP_NAMES
-                    ))
+                    or (operation == "toggle" and not GROUP_DECOR_MODE)
                 )
-                GROUP_CLIPS_ENABLED = enabled
-                DECORATE_CLIP_NAMES = enabled
+                GROUP_CLIPS_ENABLED = GROUP_DECOR_MODE
+                DECORATE_CLIP_NAMES = GROUP_DECOR_MODE
             if "group" in features:
                 GROUP_CLIPS_ENABLED = (
                     operation == "on"

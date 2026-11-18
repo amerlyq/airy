@@ -80,19 +80,19 @@ else:
             if (
                 mode not in ("on", "off", "toggle")
                 or (clip_sorting and (extras[0] != "clip_sorting" or any(
-                    item not in ("group", "decorate") for item in extras[1:]
+                    item not in ("group", "decorate", "group+decorate") for item in extras[1:]
                 )))
                 or (len(self.args) > 2 and not grayout)
             ):
                 return fm.notify(
-                    "Usage: view_duration [on|off|toggle] [grayout] [clip_sorting [group] [decorate]]",
+                    "Usage: view_duration [on|off|toggle] [grayout] [clip_sorting [group] [decorate] [group+decorate]]",
                     bad=True,
                 )
+            duration_filter = next(
+                (item for item in fm.thisdir.filter_stack if isinstance(item, DurationFilter)),
+                None,
+            )
             if mode == "toggle":
-                duration_filter = next(
-                    (item for item in fm.thisdir.filter_stack if isinstance(item, DurationFilter)),
-                    None,
-                )
                 if duration_filter is not None and fm.thisdir.settings.sort != "duration":
                     # Keep the active filter mode while restoring its required sort.
                     mode = "on"
@@ -103,10 +103,6 @@ else:
                 else:
                     mode = "on"
             elif mode == "on":
-                duration_filter = next(
-                    (item for item in fm.thisdir.filter_stack if isinstance(item, DurationFilter)),
-                    None,
-                )
                 if duration_filter is not None and fm.thisdir.settings.sort != "duration":
                     # First explicit activation after external sort change restores sort only.
                     grayout = duration_filter.grayout
@@ -116,6 +112,17 @@ else:
             else:
                 restore_filter = False
             path = fm.thisdir.path
+            entering_duration = mode == "on" and duration_filter is None
+            leaving_duration = mode == "off" and duration_filter is not None
+            if entering_duration or leaving_duration:
+                try:
+                    from plugins.clip_grouping import enter_duration_view, leave_duration_view
+                except ImportError:
+                    from clip_grouping import enter_duration_view, leave_duration_view
+                if entering_duration:
+                    enter_duration_view(path)
+                else:
+                    leave_duration_view(path)
             if mode == "off":
                 commands = (
                     "filter_stack clear",
@@ -141,8 +148,11 @@ else:
                 fm.thisdir.filter_stack.append(DurationFilter("", grayout=grayout))
             fm.thisdir.refilter()
             fm.thisdir.sort()
-            if clip_sorting and not restore_filter:
+            if clip_sorting and not restore_filter and not (entering_duration or leaving_duration):
                 fm.execute_console("clip_sorting " + mode + " " + " ".join(extras[1:]))
+            if entering_duration or leaving_duration:
+                for file in fm.thisdir.files_all or []:
+                    file.display_data.clear()
             fm.ui.redraw_main_column()
 
     @register_linemode
@@ -194,6 +204,16 @@ else:
 
             return ""
 
+    def _duration_clip_source(file):
+        try:
+            from plugins.clip_grouping import clip_source
+        except ImportError:
+            try:
+                from clip_grouping import clip_source
+            except ImportError:
+                return None
+        return clip_source(file)
+
     @stack_filter("duration")
     class DurationFilter(FileManagerAware):
         def __init__(self, arg, grayout=False):
@@ -217,6 +237,20 @@ else:
                 hit = self._cache[d] = (len(files), self._scan(files))
             return f.path in hit[1]
 
+        def attached_to_paired_origin(self, directory, f):
+            source = _duration_clip_source(f)
+            if source is None:
+                return False
+            for candidate in directory.files_all or []:
+                if (
+                    not candidate.is_directory
+                    and _duration_clip_source(candidate) is None
+                    and os.path.splitext(candidate.basename)[0].casefold() == source
+                    and self.paired(directory, candidate)
+                ):
+                    return True
+            return False
+
         def __call__(self, f):
             if f.is_directory:
                 return True
@@ -224,24 +258,15 @@ else:
             if self.paired(directory, f) or self.grayout:
                 return True
             try:
-                from plugins.clip_grouping import clip_source, grouping_enabled
+                from plugins.clip_grouping import grouping_enabled
             except ImportError:
                 try:
-                    from clip_grouping import clip_source, grouping_enabled
+                    from clip_grouping import grouping_enabled
                 except ImportError:
                     return False
-            source = clip_source(f)
-            if source is None or not grouping_enabled(directory.path):
-                return False
-            for candidate in directory.files_all or []:
-                if (
-                    not candidate.is_directory
-                    and clip_source(candidate) is None
-                    and os.path.splitext(candidate.basename)[0].casefold() == source
-                    and self.paired(directory, candidate)
-                ):
-                    return True
-            return False
+            return grouping_enabled(directory.path) and self.attached_to_paired_origin(
+                directory, f
+            )
 
         def __str__(self):
             suffix = "; unpaired dim" if self.grayout else ""
@@ -262,11 +287,13 @@ else:
             directory = FileManagerAware.fm.thisdir
             if os.path.dirname(fsobj.path) == directory.path:
                 for item in directory.filter_stack:
-                    if (
-                        isinstance(item, DurationFilter)
-                        and item.grayout
-                        and not item.paired(directory, fsobj)
-                    ):
+                    is_unpaired = isinstance(item, DurationFilter) and not item.paired(
+                        directory, fsobj
+                    )
+                    dim_clip = isinstance(item, DurationFilter) and item.attached_to_paired_origin(
+                        directory, fsobj
+                    )
+                    if is_unpaired and (item.grayout or dim_clip):
                         colors.append("duration_unpaired")
                         break
         return fsobj, colors
