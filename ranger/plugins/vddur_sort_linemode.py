@@ -206,7 +206,27 @@ else:
             if f.is_directory:
                 return True
             directory = self.fm.get_directory(os.path.dirname(f.path))
-            return self.paired(directory, f) or self.grayout
+            if self.paired(directory, f) or self.grayout:
+                return True
+            try:
+                from plugins.clip_grouping import clip_source, grouping_enabled
+            except ImportError:
+                try:
+                    from clip_grouping import clip_source, grouping_enabled
+                except ImportError:
+                    return False
+            source = clip_source(f)
+            if source is None or not grouping_enabled(directory.path):
+                return False
+            for candidate in directory.files_all or []:
+                if (
+                    not candidate.is_directory
+                    and clip_source(candidate) is None
+                    and os.path.splitext(candidate.basename)[0].casefold() == source
+                    and self.paired(directory, candidate)
+                ):
+                    return True
+            return False
 
         def __str__(self):
             suffix = "; unpaired dim" if self.grayout else ""
