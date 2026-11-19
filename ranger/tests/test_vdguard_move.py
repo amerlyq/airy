@@ -533,16 +533,14 @@ def _run_isolated_case():
     fm = newfm(d1)
     fm.select(tree)
     fm.cut()
+    fm.run_loader()
+    assert fm.console.q
+    text = fm.console.q[0][0]
+    assert "2 symlink" in text, text
+    fm.console.answer("U")
     fm.thistab.path = d2
     fm.thisdir.path = d2
     fm.paste()
-    deadline = time.monotonic() + 2
-    while not fm.console.q and time.monotonic() < deadline:
-        time.sleep(0.01)
-    text = fm.console.q[0][0]
-    print(text)
-    assert "2 symlink(s)" in text
-    fm.console.answer("U")
     fm.run_loader()
     assert os.readlink(fs.join(view, "into_tree")) == fs.join(
         d2, "tree/in/f.mp4"
@@ -561,8 +559,9 @@ def _run_isolated_case():
         fm = newfm(fs.join(d1, "a"))
         fm.select(fs.join(d1, "a/" + fs.basename(src_cur[0])))
         M.Command.fm = fm
-        r = M.rename("rename " + name)
+        r = G.rename("rename " + name)
         r.execute()
+        fm.run_loader()
         for a in answers:
             fm.console.answer(a)
         return fm
@@ -586,21 +585,23 @@ def _run_isolated_case():
     fm = newfm(fs.join(d1, "a"))
     fm.select(src_cur[0])
     M.Command.fm = fm
-    r = M.rename("rename nope.mp4")
+    r = G.rename("rename nope.mp4")
     r.execute()
+    fm.run_loader()
     fm.console.esc()
     assert fs.exists(src_cur[0]) and not fs.exists(fs.join(d1, "a/nope.mp4"))
     w(fs.join(d1, "a/free.mp4"))
     fm = newfm(fs.join(d1, "a"))
     fm.select(fs.join(d1, "a/free.mp4"))
     M.Command.fm = fm
-    r = M.rename("rename free2.mp4")
+    r = G.rename("rename free2.mp4")
     r.execute()
+    fm.run_loader()
     assert not fm.console.q and fs.exists(fs.join(d1, "a/free2.mp4"))
     print("rename ok")
 
     # ---------- guards don't hang when the cache lock is busy (warm-up running)
-    M.LOCK_WAIT = 0.05
+    G.C.LOCK_WAIT = 0.05
     hold = threading.Event()
     release = threading.Event()
 
@@ -620,13 +621,16 @@ def _run_isolated_case():
     fm.thisfile = fm.sel[0]
     G.delete("delete").execute()
     fm.console.answer("y")
+    fm.run_loader()
     text = fm.console.q[0][0]
     print(text)
     assert "unavailable" in text
     fm.console.esc()
     assert fm.deleted == []
+    G._POLICY.pop(src_cur[0], None)
     fm.cut()
-    assert "unavailable" in fm.console.q[0][0]
+    fm.run_loader()
+    assert "unavailable" in fm.console.q[0][0], fm.console.q
     fm.console.enter()
     assert not fm.copy_buffer
     release.set()

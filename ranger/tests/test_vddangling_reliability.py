@@ -459,6 +459,7 @@ def _run_isolated_case():
     os.symlink(fs.join(d1, "m/c.mp4"), fs.join(view, "mc9"))
     os.unlink(fs.join(d1, "m/c.mp4"))
     w(fs.join(d2, "moved/c.mp4"))
+    M._cache.ensure(M.vdsym.roots(), "rescan")
     fm.cmds.clear()
     M.Command.fm = fm
     def run_loadable(loadable, append=False):
@@ -466,7 +467,7 @@ def _run_isolated_case():
             pass
 
     fm.loader = types.SimpleNamespace(add=run_loadable)
-    vddangling.dangling("dangling").execute()
+    vddangling.dangling("dangling list").execute()
     out = fm.cmds[-1]
     assert "candidate: " + fs.join(d2, "moved/c.mp4") in out and fs.join(view, "mc9") in out
     vddangling.dangling("dangling update").execute()

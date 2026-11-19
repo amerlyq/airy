@@ -170,6 +170,7 @@ class TestImvSync(PytestCase):
         self.sync.discover()
         self.sync.sync_to_imv()
         self.plugin._send_command.reset_mock()
+        self.plugin._snapshot.reset_mock()
         self.observer = Mock()
         self.fm.signal_bind("move", lambda signal: self.observer(signal), weak=False)
 
@@ -212,7 +213,7 @@ class TestImvSync(PytestCase):
         self.move(2)
         self.sync.sync_to_imv()
         self.assertEqual(self.sent()[-1], "goto 3")
-        self.assertEqual(self.sent().count("close all"), 1)
+        self.assertEqual(self.sent().count("close all"), 0)
 
     def start_delayed_poll(self):
         future = Future()
@@ -341,6 +342,7 @@ class TestImvSync(PytestCase):
 
     def test_partial_playlist_failure_rebuilds_before_retry(self):
         self.move(1)
+        self.sync.playlist = ()
         self.plugin._send_command.side_effect = [True, False]
         self.sync.sync_to_imv()
         self.assertEqual(self.sync.playlist, ())
@@ -355,9 +357,16 @@ class TestImvSync(PytestCase):
         self.fm.thisdir.files.reverse()
         self.fm.thisdir.files.pop(1)
         self.move(0)
+        self.sync.playlist = ()
+        self.plugin._send_command.reset_mock()
+        self.sync.pending = True
+        self.plugin._snapshot.return_value = self.plugin.Snapshot(
+            str(self.paths[1]), 2, 2
+        )
         self.sync.sync_to_imv()
         self.assertEqual(self.sync.playlist, (str(self.paths[2]), str(self.paths[0])))
-        self.assertEqual(shlex.split(self.sent()[-2])[1:], list(self.sync.playlist))
+        open_command = next(command for command in self.sent() if command.startswith("open "))
+        self.assertEqual(shlex.split(open_command)[1:], list(self.sync.playlist))
         self.assertEqual(self.sent()[-1], "goto 2")
 
     def test_nonimages_and_directories_are_not_added(self):
@@ -375,35 +384,34 @@ class TestImvSync(PytestCase):
         self.sync.sync_from_imv()
         self.assertEqual(self.fm.thisfile.path, "/tmp/text.txt")
 
-    def test_changed_imv_playlist_invalidates_cached_indices(self):
+    def test_imv_playlist_change_keeps_visible_selection_in_cached_playlist(self):
         self.move(1)
         self.sync.sync_to_imv()
         self.plugin._snapshot.return_value = self.plugin.Snapshot(
             str(self.paths[1]), 1, 2
         )
         self.sync.sync_from_imv()
-        self.assertEqual(self.sync.playlist, ())
+        self.assertEqual(self.sync.playlist, tuple(map(str, self.paths)))
         self.move(2)
         self.sync.sync_to_imv()
-        self.assertEqual(self.sent().count("close all"), 2)
+        self.assertEqual(self.sent()[-1], "goto 3")
+        self.assertEqual(self.sent().count("close all"), 0)
 
-    def test_same_length_imv_playlist_edit_invalidates_cached_indices(self):
+    def test_same_length_imv_playlist_edit_keeps_cached_playlist(self):
         self.move(1)
         self.sync.sync_to_imv()
         self.plugin._snapshot.return_value = self.plugin.Snapshot(
             str(self.paths[1]), 1, 3
         )
         self.sync.sync_from_imv()
-        self.assertEqual(self.sync.playlist, ())
+        self.assertEqual(self.sync.playlist, tuple(map(str, self.paths)))
 
     def test_symlink_back_sync_keeps_ranger_alias(self):
         link = self.paths[1].parent / "alias.png"
         link.symlink_to(self.paths[1])
         self.fm.thisdir.files[1].path = str(link)
         self.sync.sync_from_imv()
-        # Ranger's index-mode playlist treats two links to one file as the
-        # same image; preserve the current in-directory entry on duplicate paths.
-        self.assertEqual(self.fm.thisfile.path, str(self.paths[1]))
+        self.assertEqual(self.fm.thisfile.path, str(link))
         self.assertEqual(self.sent(), [])
 
     def test_back_sync_does_not_enter_directories(self):
@@ -471,6 +479,10 @@ class TestImvSync(PytestCase):
 
     def test_oversized_path_does_not_clear_viewer(self):
         self.fm.thisfile.path = "/" + "x" * 1100 + ".png"
+        self.fm.thisdir.files.append(
+            SimpleNamespace(path=self.fm.thisfile.path, is_directory=False)
+        )
+        self.sync.playlist = ()
         self.sync.pending = True
         self.sync.sync_to_imv()
         self.assertEqual(self.sent(), [])
@@ -482,6 +494,7 @@ class TestImvSync(PytestCase):
         self.fm.thisdir.files.append(
             SimpleNamespace(path=str(link), is_directory=False)
         )
+        self.sync.playlist = ()
         self.move(1)
         self.sync.sync_to_imv()
         self.plugin._snapshot.return_value = self.plugin.Snapshot(
