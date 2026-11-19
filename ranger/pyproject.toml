@@ -1,0 +1,15 @@
+[project]
+name = "ranger-plugin-tests"
+version = "0.0.0"
+requires-python = ">=3.14,<3.15"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+pythonpath = ["plugins"]
+addopts = "-ra -m 'not benchmark'"
+markers = [
+    "integration: exercises a plugin together with Ranger or other plugins",
+    "benchmark: filesystem performance test, excluded from the default run",
+    "slow: test that takes substantially longer than the regular suite",
+]

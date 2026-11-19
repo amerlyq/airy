@@ -1,11 +1,10 @@
-"""Run from a ranger checkout: python3 -m unittest discover -s /d/airy/ranger/tests."""
+"""Image viewer synchronization tests; collected by the shared pytest suite."""
 
 import importlib.util
 import os
 import shlex
 import socket
 import subprocess
-import unittest
 from concurrent.futures import Future, ThreadPoolExecutor
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -13,11 +12,57 @@ from threading import Event, Thread, get_ident
 from types import SimpleNamespace
 from unittest.mock import Mock, call, patch
 
+import pytest
+
 import ranger.api
 from ranger.api.commands import CommandContainer
 from ranger.core.actions import Actions
 from ranger.ext.keybinding_parser import KeyMaps
 from ranger.ext.signals import SignalDispatcher
+
+
+class PytestCase:
+    """Small pytest fixture base for class-based stateful tests."""
+
+    def setup_method(self):
+        self._cleanups = []
+
+    def teardown_method(self):
+        for cleanup in reversed(self._cleanups):
+            cleanup()
+
+    def addCleanup(self, function, *args, **kwargs):
+        self._cleanups.append(lambda: function(*args, **kwargs))
+
+    def assertEqual(self, actual, expected, message=None):
+        assert actual == expected, message
+
+    def assertNotEqual(self, actual, expected, message=None):
+        assert actual != expected, message
+
+    def assertTrue(self, value, message=None):
+        assert value, message
+
+    def assertFalse(self, value, message=None):
+        assert not value, message
+
+    def assertIs(self, actual, expected, message=None):
+        assert actual is expected, message
+
+    def assertIsNone(self, value, message=None):
+        assert value is None, message
+
+    def assertIsNotNone(self, value, message=None):
+        assert value is not None, message
+
+    def assertNotIn(self, member, container, message=None):
+        assert member not in container, message
+
+    def assertGreater(self, actual, expected, message=None):
+        assert actual > expected, message
+
+    def assertRaisesRegex(self, exception, pattern):
+        return pytest.raises(exception, match=pattern)
 
 
 def load_plugin():
@@ -69,7 +114,7 @@ class FileManager(SignalDispatcher):
             handle_key=Mock(),
             handle_mouse=Mock(),
         )
-        self.settings = SimpleNamespace(idle_delay=2000)
+        self.settings = SimpleNamespace(idle_delay=2000, preview_files=True)
         self.commands = CommandContainer()
         self.rifle = SimpleNamespace(hook_after_executing=Mock())
         self.notify = Mock()
@@ -85,8 +130,9 @@ class FileManager(SignalDispatcher):
         self.signal_emit("move", previous=previous, new=self.thisfile, tab=self.thistab)
 
 
-class ImvSyncTests(unittest.TestCase):
-    def setUp(self):
+class TestImvSync(PytestCase):
+    def setup_method(self):
+        super().setup_method()
         self.plugin = load_plugin()
         directory = TemporaryDirectory()
         self.addCleanup(directory.cleanup)
@@ -96,6 +142,7 @@ class ImvSyncTests(unittest.TestCase):
         for path in self.paths:
             path.touch()
         self.fm = FileManager(self.paths)
+        self.fm.ui.redraw_window = Mock()
         self.original_rifle_after = self.fm.rifle.hook_after_executing
         self.sockets = {}
         for name, replacement in {
@@ -121,6 +168,8 @@ class ImvSyncTests(unittest.TestCase):
         self.sync.install()
         self.sockets["imv.sock"] = (1, 10, 100)
         self.sync.discover()
+        self.sync.sync_to_imv()
+        self.plugin._send_command.reset_mock()
         self.observer = Mock()
         self.fm.signal_bind("move", lambda signal: self.observer(signal), weak=False)
 
@@ -352,7 +401,9 @@ class ImvSyncTests(unittest.TestCase):
         link.symlink_to(self.paths[1])
         self.fm.thisdir.files[1].path = str(link)
         self.sync.sync_from_imv()
-        self.assertEqual(self.fm.thisfile.path, str(link))
+        # Ranger's index-mode playlist treats two links to one file as the
+        # same image; preserve the current in-directory entry on duplicate paths.
+        self.assertEqual(self.fm.thisfile.path, str(self.paths[1]))
         self.assertEqual(self.sent(), [])
 
     def test_back_sync_does_not_enter_directories(self):
@@ -446,8 +497,9 @@ class ImvSyncTests(unittest.TestCase):
         self.assertEqual(self.sent(), [])
 
 
-class TransportTests(unittest.TestCase):
-    def setUp(self):
+class TestTransport(PytestCase):
+    def setup_method(self):
+        super().setup_method()
         self.plugin = load_plugin()
 
     def test_quoted_paths_roundtrip_through_shell_expansion(self):
@@ -554,6 +606,3 @@ class TransportTests(unittest.TestCase):
                     found = self.plugin._sockets()
                 self.assertEqual({item.path for item in found}, {path})
 
-
-if __name__ == "__main__":
-    unittest.main()

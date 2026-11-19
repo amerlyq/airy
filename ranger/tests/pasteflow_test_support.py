@@ -2,11 +2,11 @@ import os
 import shutil
 import sys
 import tempfile
+from pathlib import Path
 import time
 import types
 
-sys.path.insert(0, "/tmp/newplug")
-sys.path.insert(0, "/home/claude/plugins")
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import ranger
 from ranger.container.settings import Settings
 from ranger.core.fm import FM
@@ -56,7 +56,10 @@ def make_fm(cwd):
     FileManagerAware.fm = fm
     SettingsAware.settings = Settings()
     ranger.args = types.SimpleNamespace(
-        clean=True, confdir="/tmp/t/conf", cachedir="/tmp/t/cache", debug=False
+        clean=True,
+        confdir=os.path.join(tempfile.gettempdir(), "ranger-test-conf"),
+        cachedir=os.path.join(tempfile.gettempdir(), "ranger-test-cache"),
+        debug=False,
     )
     fm.tabs = {}
     tab = Tab(cwd)

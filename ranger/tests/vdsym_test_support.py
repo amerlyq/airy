@@ -8,12 +8,18 @@ import types
 from os import path as fs
 
 import ranger
-import vdsym as M
+from plugins import vdsym as M
+from plugins import pasteflow
+from plugins import vdguard
+from plugins import vddangling
+from plugins import vdconf
+from plugins import vdutil
+from plugins import rhooks
 from ranger.core.actions import Actions
 from ranger.core.shared import FileManagerAware, SettingsAware
 from ranger.core.tab import Tab
 
-import paths  # noqa: F401  (plugin dir on sys.path, isolated state)
+import plugin_test_paths as paths  # noqa: F401
 
 
 class Entry:
@@ -116,7 +122,20 @@ class FM(Actions):
         pass
 
     def get_directory(s, p):
-        return types.SimpleNamespace(load_content=lambda: None)
+        return types.SimpleNamespace(
+            path=p,
+            files=[],
+            loading=False,
+            load_generator=None,
+            settings=types.SimpleNamespace(freeze_files=False),
+            load_content=lambda: None,
+        )
+
+    def signal_bind(s, name, callback):
+        return (name, callback)
+
+    def signal_unbind(s, handler):
+        pass
 
     def run_loader(s):
         for l in s.queue:
@@ -129,7 +148,11 @@ def newfm(cwd):
     fm = FM(cwd)
     FileManagerAware.fm_set(fm)
     SettingsAware.settings_set(
-        types.SimpleNamespace(size_in_bytes=False, confirm_on_delete="always")
+        types.SimpleNamespace(
+            size_in_bytes=False,
+            binary_size_prefix=False,
+            confirm_on_delete="always",
+        )
     )
     M.Command.fm = fm
     return fm
