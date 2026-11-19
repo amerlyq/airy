@@ -1,4 +1,3 @@
-
 # ~/.config/ranger/plugins/move_dedup.py
 #
 # Move current tab's directory content into the *next* tab's directory
@@ -62,9 +61,7 @@ class move_dedup(ranger.api.commands.Command):
         dst_dir = Path(dst_dir)
 
         if src_dir.resolve() == dst_dir.resolve():
-            self.fm.notify(
-                "Source and destination are the same directory.", bad=True
-            )
+            self.fm.notify("Source and destination are the same directory.", bad=True)
             return
 
         self.fm.notify(f"move_dedup: {src_dir}  →  {dst_dir}")
@@ -157,9 +154,7 @@ class move_dedup(ranger.api.commands.Command):
         sorted_keys = sorted(tabs.keys())
 
         if len(sorted_keys) < 2:
-            self.fm.notify(
-                "No other tab open — open a second tab first.", bad=True
-            )
+            self.fm.notify("No other tab open — open a second tab first.", bad=True)
             return None
 
         idx = sorted_keys.index(current_tab)
@@ -191,4 +186,3 @@ class move_dedup(ranger.api.commands.Command):
                 continue
             if not os.listdir(dirpath):
                 os.rmdir(dirpath)
-

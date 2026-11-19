@@ -21,6 +21,7 @@ Treefilters nest: each new one narrows the previous.
                (see its other files, go up, enter the next match dir);
         -a     drop every layer that covers the current dir.
 """
+
 import os
 import re
 import shlex
@@ -39,23 +40,56 @@ ARG_BYTES = 128 * 1024  # max total size of path arguments handed to fd/rg
 _stack = []  # active _Session layers, oldest first
 
 _RULES = {
-    'fd': dict(
-        deny={'-x', '--exec', '-X', '--exec-batch', '-l', '--list-details',
-              '-q', '--quiet', '-h', '--help', '-V', '--version', '-c',
-              '--color', '--gen-completions', '--search-path',
-              '--base-directory', '--format', '--path-separator',
-              '--strip-cwd-prefix', '-0', '--print0'},
-        short_deny='xXlqhVc0', short_val='dteESjoc',
-        depth=re.compile(r'^--(max|min|exact)-?depth')),
-    'rg': dict(
-        deny={'-h', '--help', '-V', '--version', '--type-list',
-              '--pcre2-version', '--generate', '--files', '--json'},
-        short_deny='hV', short_val='ABCEMTefgjmrtd',
-        depth=re.compile(r'^--max-?depth')),
+    "fd": dict(
+        deny={
+            "-x",
+            "--exec",
+            "-X",
+            "--exec-batch",
+            "-l",
+            "--list-details",
+            "-q",
+            "--quiet",
+            "-h",
+            "--help",
+            "-V",
+            "--version",
+            "-c",
+            "--color",
+            "--gen-completions",
+            "--search-path",
+            "--base-directory",
+            "--format",
+            "--path-separator",
+            "--strip-cwd-prefix",
+            "-0",
+            "--print0",
+        },
+        short_deny="xXlqhVc0",
+        short_val="dteESjoc",
+        depth=re.compile(r"^--(max|min|exact)-?depth"),
+    ),
+    "rg": dict(
+        deny={
+            "-h",
+            "--help",
+            "-V",
+            "--version",
+            "--type-list",
+            "--pcre2-version",
+            "--generate",
+            "--files",
+            "--json",
+        },
+        short_deny="hV",
+        short_val="ABCEMTefgjmrtd",
+        depth=re.compile(r"^--max-?depth"),
+    ),
 }
 
 
 # --- layers -----------------------------------------------------------------
+
 
 class _Session:
     """One treefilter layer; also the callable put into Directory.filter_stack."""
@@ -68,7 +102,7 @@ class _Session:
         return fobj.path in self.allowed
 
     def __str__(self):
-        return 'tfilter: ' + self.label
+        return "tfilter: " + self.label
 
 
 def _within(path, root):
@@ -91,7 +125,7 @@ def _applicable(path):
     return [s for s in _stack if _live(s, path)]
 
 
-_orig = getattr(Directory.refilter, '_orig', Directory.refilter)
+_orig = getattr(Directory.refilter, "_orig", Directory.refilter)
 
 
 def _refilter(self):
@@ -117,23 +151,24 @@ def _refresh(fm):
 
 # --- flags and planning -----------------------------------------------------
 
+
 def _scan(tool, tokens):
     """Reject unusable flags; return True if depth flags are present."""
     R, depth = _RULES[tool], False
     for tok in tokens:
-        if tok == '--':
+        if tok == "--":
             break
-        if tok.startswith('--'):
-            name = tok.split('=', 1)[0]
-            if name in R['deny']:
-                raise ValueError('flag %s not supported' % name)
-            depth = depth or bool(R['depth'].match(name))
-        elif tok.startswith('-') and len(tok) > 1:
+        if tok.startswith("--"):
+            name = tok.split("=", 1)[0]
+            if name in R["deny"]:
+                raise ValueError("flag %s not supported" % name)
+            depth = depth or bool(R["depth"].match(name))
+        elif tok.startswith("-") and len(tok) > 1:
             for ch in tok[1:]:
-                if ch in R['short_deny']:
-                    raise ValueError('flag -%s not supported' % ch)
-                depth = depth or ch == 'd'
-                if ch in R['short_val']:
+                if ch in R["short_deny"]:
+                    raise ValueError("flag -%s not supported" % ch)
+                depth = depth or ch == "d"
+                if ch in R["short_val"]:
                     break  # rest of the token is this flag's value
     return depth
 
@@ -146,41 +181,47 @@ def _plan(fm, tool, tokens):
     marked = list(d.marked_items)
     chosen = marked or list(d.files)
     if not chosen:
-        raise ValueError('nothing visible to search')
+        raise ValueError("nothing visible to search")
     paths = [f.path for f in chosen]
     unrestricted = not marked and len(chosen) == len(d.files_all or chosen)
     names = None if unrestricted else {f.basename for f in chosen}
     # Depth is relative to each search path, so with depth flags only a
     # whole-cwd search keeps the meaning.
-    use_args = (not unrestricted and not depth
-                and sum(len(p) + 1 for p in paths) <= ARG_BYTES)
+    use_args = (
+        not unrestricted and not depth and sum(len(p) + 1 for p in paths) <= ARG_BYTES
+    )
     exe = shutil.which(tool)
     if exe is None:
-        raise RuntimeError('%s not found in PATH' % tool)
+        raise RuntimeError("%s not found in PATH" % tool)
 
-    if tool == 'rg':
-        tail = ['--null', '--no-messages', '--color=never']
-        if '--files-without-match' not in tokens:
-            tail.append('--files-with-matches')
-        cmd = [exe, *tokens, *tail, '--', *(paths if use_args else ['.'])]
+    if tool == "rg":
+        tail = ["--null", "--no-messages", "--color=never"]
+        if "--files-without-match" not in tokens:
+            tail.append("--files-with-matches")
+        cmd = [exe, *tokens, *tail, "--", *(paths if use_args else ["."])]
         return [(cmd, None)], (None if use_args else names)
 
-    tail = ['--print0', '--color=never']
+    tail = ["--print0", "--color=never"]
     if not use_args:
         return [([exe, *tokens, *tail], None)], names
     # fd cannot search plain files, and never tests a search path's own name:
     # one depth-1 pass in cwd covers the chosen entries themselves ...
-    jobs = [([exe, *tokens, '--max-depth', '1', *tail],
-             {os.path.normpath(p) for p in paths})]
+    jobs = [
+        (
+            [exe, *tokens, "--max-depth", "1", *tail],
+            {os.path.normpath(p) for p in paths},
+        )
+    ]
     # ... and one pass over the chosen dirs covers their contents.
     dirs = [f.path for f in chosen if f.is_directory]
     if dirs:
-        sp = [a for p in dirs for a in ('--search-path', p)]
+        sp = [a for p in dirs for a in ("--search-path", p)]
         jobs.append(([exe, *tokens, *tail, *sp], None))
     return jobs, None
 
 
 # --- async search -----------------------------------------------------------
+
 
 class _Job:
     """One fd/rg process; stdout drained by a thread, stderr to a tempfile."""
@@ -188,8 +229,13 @@ class _Job:
     def __init__(self, cmd, root, only):
         self.only, self.buf, self.n = only, bytearray(), 0
         self.err = tempfile.TemporaryFile()
-        self.proc = subprocess.Popen(cmd, cwd=root, stdin=subprocess.DEVNULL,
-                                     stdout=subprocess.PIPE, stderr=self.err)
+        self.proc = subprocess.Popen(
+            cmd,
+            cwd=root,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=self.err,
+        )
         self.thread = threading.Thread(target=self._drain, daemon=True)
         self.thread.start()
 
@@ -199,7 +245,7 @@ class _Job:
             if not chunk:
                 return
             self.buf += chunk
-            self.n += chunk.count(b'\0')
+            self.n += chunk.count(b"\0")
 
     @property
     def done(self):
@@ -207,7 +253,7 @@ class _Job:
 
     def stderr(self):
         self.err.seek(0)
-        return self.err.read().decode(errors='replace').strip()
+        return self.err.read().decode(errors="replace").strip()
 
     def kill(self):
         if self.proc.poll() is None:
@@ -216,10 +262,11 @@ class _Job:
 
 class _Search(Loadable):
     """Loader item: waits for the jobs, then builds and applies the layer."""
+
     progressbar_supported = True  # indeterminate: fd/rg report no totals
 
     def __init__(self, fm, tool, root, jobs, names, label):
-        Loadable.__init__(self, self._run(), 'tfilter_%s: %s' % (tool, label))
+        Loadable.__init__(self, self._run(), "tfilter_%s: %s" % (tool, label))
         self.fm, self.tool, self.root = fm, tool, root
         self.jobs, self.names, self.label = jobs, names, label
         self.t0 = time.monotonic()
@@ -242,22 +289,26 @@ class _Search(Loadable):
         return True
 
     def _run(self):
-        ok_codes = (0, 1) if self.tool == 'rg' else (0,)  # rg: 1 = no match
+        ok_codes = (0, 1) if self.tool == "rg" else (0,)  # rg: 1 = no match
         while not all(j.done for j in self.jobs):
             t = time.monotonic() - self.t0
             self.percent = 100 * abs(t % 2 - 1)  # bouncing bar
-            self.description = 'tfilter_%s: %d found, %.1fs' % (
-                self.tool, sum(j.n for j in self.jobs), t)
+            self.description = "tfilter_%s: %d found, %.1fs" % (
+                self.tool,
+                sum(j.n for j in self.jobs),
+                t,
+            )
             time.sleep(0.005)
             yield
         for j in self.jobs:
             if j.proc.returncode not in ok_codes and not j.buf:
-                self.fm.notify('tfilter_%s: %s' % (
-                    self.tool, j.stderr() or 'failed'), bad=True)
+                self.fm.notify(
+                    "tfilter_%s: %s" % (self.tool, j.stderr() or "failed"), bad=True
+                )
                 return
         matches, full, n = [], set(), 0
         for j in self.jobs:
-            for raw in bytes(j.buf).split(b'\0'):
+            for raw in bytes(j.buf).split(b"\0"):
                 n += 1
                 if n % 2048 == 0:
                     yield
@@ -266,10 +317,10 @@ class _Search(Loadable):
                 p = os.path.normpath(os.path.join(self.root, os.fsdecode(raw)))
                 if (j.only is None or p in j.only) and self._ok(p):
                     matches.append(p)
-                    if self.tool == 'fd' and os.path.isdir(p):
+                    if self.tool == "fd" and os.path.isdir(p):
                         full.add(p)  # matched dir: show it whole
         if not matches:
-            self.fm.notify('tfilter_%s: no matches' % self.tool, bad=True)
+            self.fm.notify("tfilter_%s: no matches" % self.tool, bad=True)
             return
         allowed = set()
         for p in matches:
@@ -280,8 +331,10 @@ class _Search(Loadable):
                 p = os.path.dirname(p)
         _stack.append(_Session(self.root, allowed, full, self.label))
         _refresh(self.fm)
-        self.fm.notify('tfilter_%s: %d matches in %.1fs' % (
-            self.tool, len(matches), time.monotonic() - self.t0))
+        self.fm.notify(
+            "tfilter_%s: %d matches in %.1fs"
+            % (self.tool, len(matches), time.monotonic() - self.t0)
+        )
 
 
 def _start(cmd, tool):
@@ -290,7 +343,7 @@ def _start(cmd, tool):
     try:
         tokens = shlex.split(cmd.rest(1))
         if not tokens:
-            raise ValueError('usage: tfilter_%s [%s flags] PATTERN' % (tool, tool))
+            raise ValueError("usage: tfilter_%s [%s flags] PATTERN" % (tool, tool))
         specs, names = _plan(fm, tool, tokens)
         root = fm.thisdir.path
         for c, only in specs:
@@ -298,9 +351,9 @@ def _start(cmd, tool):
     except (ValueError, RuntimeError, OSError) as e:
         for j in jobs:
             j.kill()
-        return fm.notify('tfilter_%s: %s' % (tool, e), bad=True)
+        return fm.notify("tfilter_%s: %s" % (tool, e), bad=True)
     fm.loader.add(_Search(fm, tool, root, jobs, names, shlex.join(tokens)))
-    fm.notify('tfilter_%s: searching (^C aborts)' % tool)
+    fm.notify("tfilter_%s: searching (^C aborts)" % tool)
 
 
 class tfilter_fd(Command):
@@ -312,7 +365,7 @@ class tfilter_fd(Command):
     """
 
     def execute(self):
-        _start(self, 'fd')
+        _start(self, "fd")
 
 
 class tfilter_rg(Command):
@@ -323,7 +376,7 @@ class tfilter_rg(Command):
     """
 
     def execute(self):
-        _start(self, 'rg')
+        _start(self, "rg")
 
 
 class tfilter_undo(Command):
@@ -338,8 +391,8 @@ class tfilter_undo(Command):
         within = [s for s in _stack if _within(path, s.root)]
         here = [s for s in within if s.root == path]
         if not within:
-            return fm.notify('tfilter: nothing to undo', bad=True)
-        if '-a' in self.args[1:]:
+            return fm.notify("tfilter: nothing to undo", bad=True)
+        if "-a" in self.args[1:]:
             for s in within:
                 _stack.remove(s)
         elif here:

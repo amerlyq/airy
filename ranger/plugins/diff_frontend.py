@@ -99,7 +99,9 @@ def _duration_next(cur, tgt, cross, current, target):
             ),
             (),
         )
-        index = next((i for i, file in enumerate(group) if file.path == origin.path), -1)
+        index = next(
+            (i for i, file in enumerate(group) if file.path == origin.path), -1
+        )
         if index < 0 or len(group) < 2:
             return None
         return group[index - 1] if index else group[1]
@@ -116,7 +118,9 @@ def _duration_next(cur, tgt, cross, current, target):
 FALLBACKS["duration"] = _duration_next
 
 
-def _pick(cur, tgt, cross: bool, policy: str | None = None, fallback: str | None = None):
+def _pick(
+    cur, tgt, cross: bool, policy: str | None = None, fallback: str | None = None
+):
     """-> two files to compare, else ValueError(msg)"""
     if policy == "same" and cross:
         raise ValueError("comparison requires current tab")
@@ -135,7 +139,9 @@ def _pick(cur, tgt, cross: bool, policy: str | None = None, fallback: str | None
         resolver = FALLBACKS.get(fallback)
         if resolver is None:
             raise ValueError(f"unknown fallback {fallback}")
-        picked = resolver(cur, tgt, cross, cur.thisfile, tgt.thisfile if cross else None)
+        picked = resolver(
+            cur, tgt, cross, cur.thisfile, tgt.thisfile if cross else None
+        )
     if picked is not None:
         return picked
     if picked is None and fallback and no_selection:
@@ -169,7 +175,11 @@ class df(Command):
         fallback = None
         if self.arg(1).startswith("-"):
             raw = self.arg(1).lstrip("-")
-            flags = "".join(ch for ch in raw if ch not in FRONTEND_FLAGS and ch not in FALLBACK_FLAGS)
+            flags = "".join(
+                ch
+                for ch in raw
+                if ch not in FRONTEND_FLAGS and ch not in FALLBACK_FLAGS
+            )
             policies = {FRONTEND_FLAGS[ch] for ch in raw if ch in FRONTEND_FLAGS}
             fallbacks = {FALLBACK_FLAGS[ch] for ch in raw if ch in FALLBACK_FLAGS}
             if len(policies) > 1 or len(fallbacks) > 1:
@@ -198,8 +208,11 @@ class df(Command):
 
         try:
             fls = _pick(
-                fm.tabs[cur], fm.tabs[tgt], cross=cur != tgt,
-                policy=policy, fallback=fallback,
+                fm.tabs[cur],
+                fm.tabs[tgt],
+                cross=cur != tgt,
+                policy=policy,
+                fallback=fallback,
             )
         except ValueError as e:
             return self._err(str(e))

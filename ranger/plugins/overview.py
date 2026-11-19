@@ -8,8 +8,10 @@ _enabled = False
 def _step(fm, direction):
     directory = fm.thisdir
     files = directory.files or []
-    if not files or (direction > 0 and directory.pointer != len(files) - 1) or (
-        direction < 0 and directory.pointer != 0
+    if (
+        not files
+        or (direction > 0 and directory.pointer != len(files) - 1)
+        or (direction < 0 and directory.pointer != 0)
     ):
         fm.move(down=direction)
         return
@@ -19,7 +21,9 @@ def _step(fm, direction):
     if not siblings:
         fm.move(down=direction)
         return
-    index = next((i for i, item in enumerate(siblings) if item.path == directory.path), None)
+    index = next(
+        (i for i, item in enumerate(siblings) if item.path == directory.path), None
+    )
     if index is None:
         fm.move(down=direction)
         return

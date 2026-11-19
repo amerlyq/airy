@@ -18,11 +18,11 @@ GET_MACROS_OLD = ranger.core.actions.Actions.get_macros
 # Define a new macro function
 def get_macros_with_date(self: Actions) -> dict[str, object]:
     macros = GET_MACROS_OLD(self)
-    macros['dt'] = time.strftime('%Y%m%d')
-    macros['dT'] = time.strftime('%Y-%m-%d')
-    macros['dw'] = time.strftime('%Y-%m-%d-%a')
-    macros['dW'] = time.strftime('%Y-%m-%d-%a-W%W')
-    macros['date'] = time.strftime('%Y/%m/%d')
+    macros["dt"] = time.strftime("%Y%m%d")
+    macros["dT"] = time.strftime("%Y-%m-%d")
+    macros["dw"] = time.strftime("%Y-%m-%d-%a")
+    macros["dW"] = time.strftime("%Y-%m-%d-%a-W%W")
+    macros["date"] = time.strftime("%Y/%m/%d")
     return macros
 
 

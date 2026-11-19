@@ -141,7 +141,9 @@ class Store:
                         columns += ", blob BLOB"
                         c.execute(f"CREATE TABLE {self.table}({columns})")
                         if self.range_index:
-                            c.execute(f"CREATE INDEX {self.table}_idx ON {self.table}(idx)")
+                            c.execute(
+                                f"CREATE INDEX {self.table}_idx ON {self.table}(idx)"
+                            )
                         c.execute(f"PRAGMA user_version={want}")
                     c.execute("COMMIT")
             self._tl.c = c
@@ -159,9 +161,8 @@ class Store:
         if row is None:
             try:
                 r = (
-                    self._db().execute(
-                        f"SELECT mt,sz,blob FROM {self.table} WHERE k=?", (key,)
-                    )
+                    self._db()
+                    .execute(f"SELECT mt,sz,blob FROM {self.table} WHERE k=?", (key,))
                     .fetchone()
                 )
             except sqlite3.Error:
@@ -190,14 +191,17 @@ class Store:
     def get_many_records(self, sts) -> dict:
         """-> {key: (stored_mtime, stored_size, value)} for valid requested keys."""
         sts = list(sts)
-        need = list(dict.fromkeys(self._key(s) for s in sts if self._key(s) not in self._mem))
+        need = list(
+            dict.fromkeys(self._key(s) for s in sts if self._key(s) not in self._mem)
+        )
         if need:
             try:
                 c = self._db()
                 for i in range(0, len(need), 900):
                     part = need[i : i + 900]
-                    q = f"SELECT k,mt,sz,blob FROM {self.table} WHERE k IN (%s)" % ",".join(
-                        "?" * len(part)
+                    q = (
+                        f"SELECT k,mt,sz,blob FROM {self.table} WHERE k IN (%s)"
+                        % ",".join("?" * len(part))
                     )
                     for k, mt, sz, blob in c.execute(q, part):
                         self._mem[k] = (mt, sz, marshal.loads(blob))
@@ -253,7 +257,9 @@ class Store:
                     for k, r in self._new.items()
                 ]
             else:
-                rows = [(k, r[0], r[1], marshal.dumps(r[2])) for k, r in self._new.items()]
+                rows = [
+                    (k, r[0], r[1], marshal.dumps(r[2])) for k, r in self._new.items()
+                ]
             self._new.clear()
         try:
             with self._wlock:
@@ -262,7 +268,8 @@ class Store:
                 try:
                     placeholders = "?,?,?,?,?" if self.range_index else "?,?,?,?"
                     c.executemany(
-                        f"INSERT OR REPLACE INTO {self.table} VALUES ({placeholders})", rows
+                        f"INSERT OR REPLACE INTO {self.table} VALUES ({placeholders})",
+                        rows,
                     )
                     c.execute("COMMIT")
                 except BaseException:

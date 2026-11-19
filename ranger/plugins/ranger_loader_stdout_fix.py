@@ -25,8 +25,10 @@ _LATE_READ = "read_stdout += read"
 def _make_generate(original):
     try:
         source = textwrap.dedent(inspect.getsource(original))
-    except (OSError, TypeError):
-        _LOG.warning("could not inspect Ranger CommandLoader.generate; leaving unchanged")
+    except OSError, TypeError:
+        _LOG.warning(
+            "could not inspect Ranger CommandLoader.generate; leaving unchanged"
+        )
         return original
 
     if source.count(_LATE_READ) != 1:
@@ -40,8 +42,10 @@ def _make_generate(original):
     )
     try:
         exec(compile(patched_source, original.__code__.co_filename, "exec"), namespace)
-    except (SyntaxError, TypeError):
-        _LOG.exception("could not patch Ranger CommandLoader.generate; leaving unchanged")
+    except SyntaxError, TypeError:
+        _LOG.exception(
+            "could not patch Ranger CommandLoader.generate; leaving unchanged"
+        )
         return original
     return namespace[original.__name__]
 

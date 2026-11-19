@@ -79,9 +79,16 @@ else:
             restore_filter = False
             if (
                 mode not in ("on", "off", "toggle")
-                or (clip_sorting and (extras[0] != "clip_sorting" or any(
-                    item not in ("group", "decorate", "group+decorate") for item in extras[1:]
-                )))
+                or (
+                    clip_sorting
+                    and (
+                        extras[0] != "clip_sorting"
+                        or any(
+                            item not in ("group", "decorate", "group+decorate")
+                            for item in extras[1:]
+                        )
+                    )
+                )
                 or (len(self.args) > 2 and not grayout)
             ):
                 return fm.notify(
@@ -89,11 +96,18 @@ else:
                     bad=True,
                 )
             duration_filter = next(
-                (item for item in fm.thisdir.filter_stack if isinstance(item, DurationFilter)),
+                (
+                    item
+                    for item in fm.thisdir.filter_stack
+                    if isinstance(item, DurationFilter)
+                ),
                 None,
             )
             if mode == "toggle":
-                if duration_filter is not None and fm.thisdir.settings.sort != "duration":
+                if (
+                    duration_filter is not None
+                    and fm.thisdir.settings.sort != "duration"
+                ):
                     # Keep the active filter mode while restoring its required sort.
                     mode = "on"
                     grayout = duration_filter.grayout
@@ -103,7 +117,10 @@ else:
                 else:
                     mode = "on"
             elif mode == "on":
-                if duration_filter is not None and fm.thisdir.settings.sort != "duration":
+                if (
+                    duration_filter is not None
+                    and fm.thisdir.settings.sort != "duration"
+                ):
                     # First explicit activation after external sort change restores sort only.
                     grayout = duration_filter.grayout
                     restore_filter = True
@@ -116,7 +133,10 @@ else:
             leaving_duration = mode == "off" and duration_filter is not None
             if entering_duration or leaving_duration:
                 try:
-                    from plugins.clip_grouping import enter_duration_view, leave_duration_view
+                    from plugins.clip_grouping import (
+                        enter_duration_view,
+                        leave_duration_view,
+                    )
                 except ImportError:
                     from clip_grouping import enter_duration_view, leave_duration_view
                 if entering_duration:
@@ -142,13 +162,18 @@ else:
                 fm.execute_console(command)
             if mode == "on" and not restore_filter:
                 fm.thisdir.filter_stack[:] = [
-                    item for item in fm.thisdir.filter_stack
+                    item
+                    for item in fm.thisdir.filter_stack
                     if not isinstance(item, DurationFilter)
                 ]
                 fm.thisdir.filter_stack.append(DurationFilter("", grayout=grayout))
             fm.thisdir.refilter()
             fm.thisdir.sort()
-            if clip_sorting and not restore_filter and not (entering_duration or leaving_duration):
+            if (
+                clip_sorting
+                and not restore_filter
+                and not (entering_duration or leaving_duration)
+            ):
                 fm.execute_console("clip_sorting " + mode + " " + " ".join(extras[1:]))
             if entering_duration or leaving_duration:
                 for file in fm.thisdir.files_all or []:
@@ -290,9 +315,9 @@ else:
                     is_unpaired = isinstance(item, DurationFilter) and not item.paired(
                         directory, fsobj
                     )
-                    dim_clip = isinstance(item, DurationFilter) and item.attached_to_paired_origin(
-                        directory, fsobj
-                    )
+                    dim_clip = isinstance(
+                        item, DurationFilter
+                    ) and item.attached_to_paired_origin(directory, fsobj)
                     if is_unpaired and (item.grayout or dim_clip):
                         colors.append("duration_unpaired")
                         break

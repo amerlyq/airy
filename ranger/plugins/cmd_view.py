@@ -37,7 +37,9 @@ class _InodeTypeFilter:
 
 
 _flat_context = threading.local()
-_walklevel = getattr(ranger_directory.walklevel, "_flat_inode_original", ranger_directory.walklevel)
+_walklevel = getattr(
+    ranger_directory.walklevel, "_flat_inode_original", ranger_directory.walklevel
+)
 _load_bit_by_bit = getattr(
     ranger_directory.Directory.load_bit_by_bit,
     "_flat_inode_original",
@@ -57,18 +59,15 @@ def _filtered_walklevel(path, level):
             directory, visible_entries, hidden, _ = context
             if root == directory.path and visible_entries is not None:
                 dirs[:] = [
-                    name for name in dirs
-                    if os.path.join(root, name) in visible_entries
+                    name for name in dirs if os.path.join(root, name) in visible_entries
                 ]
                 files[:] = [
-                    name for name in files
+                    name
+                    for name in files
                     if os.path.join(root, name) in visible_entries
                 ]
             if hidden is not None:
-                dirs[:] = [
-                    name for name in dirs
-                    if not hidden.search(name)
-                ]
+                dirs[:] = [name for name in dirs if not hidden.search(name)]
         yield root, dirs, files
 
 
@@ -147,7 +146,7 @@ class flat_inode(Command):
 
         try:
             q = int(q)
-        except (TypeError, ValueError):
+        except TypeError, ValueError:
             return self.fm.notify("flat_inode: level must be an integer", bad=True)
         if "u" in t:
             t, q = "", 0
@@ -163,16 +162,22 @@ class flat_inode(Command):
             finally:
                 directory.flat = previous_flat
             if directory.files_all is None or directory.files is None:
-                return self.fm.notify("flat_inode: directory contents unavailable", bad=True)
+                return self.fm.notify(
+                    "flat_inode: directory contents unavailable", bad=True
+                )
         directory.refilter()
         prefiltered_entries = getattr(directory, "_flat_inode_entries", None)
         if prefiltered_entries is None:
             prefiltered_entries = {item.path for item in directory.files}
-        current = next((f for f in directory.filter_stack if isinstance(f, _InodeTypeFilter)), None)
+        current = next(
+            (f for f in directory.filter_stack if isinstance(f, _InodeTypeFilter)), None
+        )
         if toggle and q == directory.flat and current:
             t, q = "", 0
 
-        directory.filter_stack[:] = [f for f in directory.filter_stack if not isinstance(f, _InodeTypeFilter)]
+        directory.filter_stack[:] = [
+            f for f in directory.filter_stack if not isinstance(f, _InodeTypeFilter)
+        ]
         if t:
             directory.filter_stack.append(_InodeTypeFilter(t))
         directory.inode_type_filter = None

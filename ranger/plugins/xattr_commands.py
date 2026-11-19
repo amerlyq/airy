@@ -19,18 +19,19 @@ class xattr(Command):
         if not isinstance(f, list):
             f = [f]
         # XXX: chattr != os.setxattr
-        self.fm.execute_command(['chattr', mode] + f)
+        self.fm.execute_command(["chattr", mode] + f)
 
     def xattr_toggle(self, value: str, files: str | Sequence[str]) -> None:
         from ranger.container.fsobject import FileSystemObject
-        xattr_get = FileSystemObject.linemode_dict['xattr'].xattr_get
-        for f in (files if isinstance(files, list) else [files]):
+
+        xattr_get = FileSystemObject.linemode_dict["xattr"].xattr_get
+        for f in files if isinstance(files, list) else [files]:
             try:
                 cv = xattr_get(f)
             except NotImplementedError as e:
                 return self.fm.notify(e, bad=True)
             for c in value:
-                t = '-' if c in cv else '+'
+                t = "-" if c in cv else "+"
                 self.xattr_set(t + c, f)
 
     def execute(self) -> None:
@@ -40,10 +41,11 @@ class xattr(Command):
         mod = self.arg(1)[0]
         value = self.arg(1)[1:]
         import shlex
+
         files = shlex.split(self.rest(2))
 
         for c in value:
-            if c not in 'aAcCdDeijsStTu':
+            if c not in "aAcCdDeijsStTu":
                 return self.fm.notify("Wrong xattr value", bad=True)
 
         if files:
@@ -55,9 +57,9 @@ class xattr(Command):
             else:
                 files = [cdir.thisfile]
 
-        if mod in '+-=':
+        if mod in "+-=":
             self.xattr_set(mod + value, files)
-        elif mod == '!':
+        elif mod == "!":
             self.xattr_toggle(value, files)
         else:
             return self.fm.notify("Wrong xattr modifier", bad=True)
@@ -66,5 +68,6 @@ class xattr(Command):
 def hook_init(fm: FM) -> None:
     old_hook_init(fm)
     fm.commands.load_commands_from_module(sys.modules[__name__])
+
 
 ranger.api.hook_init = hook_init

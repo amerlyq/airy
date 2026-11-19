@@ -24,14 +24,26 @@ try:  # ranger imports plugins as `plugins.<name>` with the confdir on sys.path
     from plugins import rhooks
     from plugins import vdconf as C
     from plugins import vdsym as _core
-    from plugins.vdutil import (_dangling, _gone, _link_text, _recovery,
-                                _safe_readlink, _swap_link)
+    from plugins.vdutil import (
+        _dangling,
+        _gone,
+        _link_text,
+        _recovery,
+        _safe_readlink,
+        _swap_link,
+    )
 except ImportError:  # fallback: the plugin files somewhere on PYTHONPATH
     import rhooks
     import vdconf as C
     import vdsym as _core
-    from vdutil import (_dangling, _gone, _link_text, _recovery,
-                        _safe_readlink, _swap_link)
+    from vdutil import (
+        _dangling,
+        _gone,
+        _link_text,
+        _recovery,
+        _safe_readlink,
+        _swap_link,
+    )
 
 try:
     from plugins.vdutil import fit_text, run_async

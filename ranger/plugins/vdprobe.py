@@ -21,7 +21,6 @@ import marshal
 import subprocess
 import sys
 import time
-import threading
 from struct import Struct
 
 try:
@@ -593,7 +592,6 @@ def _parallel(paths, n):
         if os.waitpid(pid, 0)[1] or not data:
             sys.exit("vdprobe: worker failed (traceback above); nothing written")
         out, new, dfr = marshal.loads(data)
-        offset = len(res)
         res.extend(out)
         chunk = paths[worker_index * step : (worker_index + 1) * step]
         stats_by_key = {}

@@ -122,7 +122,6 @@ KNOWN LIMITATIONS
 import os
 import re
 import stat
-import sys
 import time
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from threading import Event
@@ -507,7 +506,7 @@ def _tree(path, mode, parallel=False, cancelled=None):
         if mode == "video" and not path.lower().endswith(EXTS):
             return 0, 0
         return _leaf(path, mode, st)
-    except (OSError, _Cancel):
+    except OSError, _Cancel:
         return 0, 0
 
 
@@ -578,7 +577,7 @@ def _snap_sort(fm, d):
                 local.get("sort_reverse", fm.settings.sort_reverse),
                 True,
             )
-    except (AttributeError, KeyError):
+    except AttributeError, KeyError:
         pass
     return fm.settings.sort, fm.settings.sort_reverse, False
 

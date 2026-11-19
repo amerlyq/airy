@@ -6,14 +6,16 @@ from ranger.core.linemode import LinemodeBase
 @ranger.api.register_linemode
 class XAttrLinemode(LinemodeBase):
     """list file attributes on a Linux second extended file system"""
+
     name = "xattr"
 
     def xattr_get(self, f: str) -> str:
         # XXX: lsattr != os.listxattr  (BAD: empty list)
         from subprocess import CalledProcessError, check_output
+
         try:
-            xattr = check_output(['lsattr', '-d', f]).strip().split()[0]
-        except (CalledProcessError, IndexError):
+            xattr = check_output(["lsattr", "-d", f]).strip().split()[0]
+        except CalledProcessError, IndexError:
             raise NotImplementedError
         if not isinstance(xattr, str):
             xattr = xattr.decode("utf-8")
@@ -29,16 +31,17 @@ class XAttrLinemode(LinemodeBase):
 # SEE:
 @ranger.api.register_linemode
 class BTimeXrefLinemode(LinemodeBase):
-    name = 'bxref'
+    name = "bxref"
 
     # FIXME: replace by "r.vim-xtref"
     def to_z85(self, ts: float) -> str:
         from subprocess import CalledProcessError, run
+
         try:
-            bts = int(ts).to_bytes(4, byteorder='big')
-            z85ts = run(['basenc', '--z85'], input=bts, check=True, capture_output=True)
-            z85ts = z85ts.stdout.strip().decode('utf-8')[::-1]
-        except (CalledProcessError, IndexError):
+            bts = int(ts).to_bytes(4, byteorder="big")
+            z85ts = run(["basenc", "--z85"], input=bts, check=True, capture_output=True)
+            z85ts = z85ts.stdout.strip().decode("utf-8")[::-1]
+        except CalledProcessError, IndexError:
             raise NotImplementedError
         return z85ts
 
@@ -51,4 +54,4 @@ class BTimeXrefLinemode(LinemodeBase):
         # FAIL: on ext4 birth ~=~ change time, and "modify" is much older
         #   !! because vim always creates new files on write !!
         # return '⌇' + self.to_z85(f.stat.st_birthtime)
-        return '⌇' + self.to_z85(f.stat.st_mtime)
+        return "⌇" + self.to_z85(f.stat.st_mtime)

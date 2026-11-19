@@ -110,10 +110,14 @@ def _make_text_display(original):
         if DECORATE_CLIP_NAMES:
             icon, separator, title = text.partition(" ")
             codepoint = ord(icon[0]) if len(icon) == 1 else 0
-            has_devicon = separator and len(icon) == 1 and (
-                0xE000 <= codepoint <= 0xF8FF
-                or 0xF0000 <= codepoint <= 0xFFFFD
-                or 0x100000 <= codepoint <= 0x10FFFD
+            has_devicon = (
+                separator
+                and len(icon) == 1
+                and (
+                    0xE000 <= codepoint <= 0xF8FF
+                    or 0xF0000 <= codepoint <= 0xFFFFD
+                    or 0x100000 <= codepoint <= 0x10FFFD
+                )
             )
             candidate = title if has_devicon else text
             name = os.path.basename(candidate)
@@ -129,7 +133,8 @@ def _make_text_display(original):
                         if clip_source(file) == source
                     ]
                     originals = [
-                        file for file in (self.target.files_all or [])
+                        file
+                        for file in (self.target.files_all or [])
                         if not file.is_directory
                         and clip_source(file) is None
                         and os.path.splitext(file.basename)[0].casefold() == source
@@ -144,7 +149,11 @@ def _make_text_display(original):
                     elif clips and clips[-1] == name:
                         prefix = "└ "
                 # Replace an existing devicon when present; two-column prefix aligns the title.
-                text = prefix + title if separator and candidate == title else prefix + text
+                text = (
+                    prefix + title
+                    if separator and candidate == title
+                    else prefix + text
+                )
         return original(self, text, space)
 
     return draw_text
@@ -171,6 +180,7 @@ try:
 except ImportError:
     pass
 else:
+
     class group_clips(Command):
         """:group_clips toggles grouping clips after their source, preserving active sort."""
 
@@ -185,7 +195,6 @@ else:
             self.fm.ui.redraw_main_column()
             self.fm.notify(f"Clip grouping {'on' if enabled else 'off'}")
 
-
     class clip_sorting(Command):
         """:clip_sorting [on|off|toggle] [group] [decorate] [group+decorate] [sort=<name>]
 
@@ -196,7 +205,9 @@ else:
             global DECORATE_CLIP_NAMES
 
             args = list(self.args[1:])
-            operation = args.pop(0) if args and args[0] in ("on", "off", "toggle") else "toggle"
+            operation = (
+                args.pop(0) if args and args[0] in ("on", "off", "toggle") else "toggle"
+            )
             features = set(args)
             allowed = {"group", "decorate", "group+decorate"}
             sort_args = [arg for arg in features if arg.startswith("sort=")]
@@ -214,21 +225,18 @@ else:
             fm = self.fm
             global GROUP_CLIPS_ENABLED, GROUP_DECOR_MODE
             if "group+decorate" in features:
-                GROUP_DECOR_MODE = (
-                    operation == "on"
-                    or (operation == "toggle" and not GROUP_DECOR_MODE)
+                GROUP_DECOR_MODE = operation == "on" or (
+                    operation == "toggle" and not GROUP_DECOR_MODE
                 )
                 GROUP_CLIPS_ENABLED = GROUP_DECOR_MODE
                 DECORATE_CLIP_NAMES = GROUP_DECOR_MODE
             if "group" in features:
-                GROUP_CLIPS_ENABLED = (
-                    operation == "on"
-                    or (operation == "toggle" and not GROUP_CLIPS_ENABLED)
+                GROUP_CLIPS_ENABLED = operation == "on" or (
+                    operation == "toggle" and not GROUP_CLIPS_ENABLED
                 )
             if "decorate" in features:
-                DECORATE_CLIP_NAMES = (
-                    operation == "on"
-                    or (operation == "toggle" and not DECORATE_CLIP_NAMES)
+                DECORATE_CLIP_NAMES = operation == "on" or (
+                    operation == "toggle" and not DECORATE_CLIP_NAMES
                 )
             for arg in sort_args:
                 sort = arg.partition("=")[2]
@@ -239,4 +247,3 @@ else:
                 for file in fm.thisdir.files_all or []:
                     file.display_data.clear()
             fm.ui.redraw_main_column()
-

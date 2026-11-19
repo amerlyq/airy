@@ -37,8 +37,7 @@ from ranger.ext.shell_escape import shell_quote
 try:  # ranger imports plugins as `plugins.<name>` with the confdir on sys.path
     from plugins import rhooks
     from plugins import vdconf as C
-    from plugins.vdutil import (_gone, _hops, _norm, _safe_readlink,
-                                replace_link)
+    from plugins.vdutil import _gone, _hops, _norm, _safe_readlink, replace_link
 except ImportError:  # fallback: the plugin files somewhere on PYTHONPATH
     import rhooks
     import vdconf as C
@@ -486,7 +485,7 @@ class _Cache:
         try:
             with ThreadPoolExecutor(min(len(jobs), 6)) as pool:
                 out = list(pool.map(run, jobs))
-        except (OSError, subprocess.SubprocessError):
+        except OSError, subprocess.SubprocessError:
             return None
         return {
             root: (out[3 * i], out[3 * i + 1], out[3 * i + 2])
@@ -546,7 +545,7 @@ def _shared_cache() -> _Cache:
     try:
         with open(__file__, "rb") as handle:
             stamp = hashlib.sha1(handle.read()).hexdigest()
-    except (NameError, OSError):
+    except NameError, OSError:
         stamp = "unknown"
     holder = sys.modules.setdefault("_vdsym_shared", types.ModuleType("_vdsym_shared"))
     ## MOVED: the (owner, name) -> unpatched ranger method registry lives in rhooks.patch

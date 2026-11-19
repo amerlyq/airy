@@ -4,6 +4,7 @@
 ## DEBUG: cat $XDG_RUNTIME_DIR/ranger/buffer
 ## MAPS: <CR>
 """
+
 from __future__ import annotations
 
 from typing import ClassVar, cast

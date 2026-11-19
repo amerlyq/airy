@@ -97,7 +97,7 @@ def _blend_color(orig):
                         for i in range(3)
                     ),
                 )
-            except (curses.error, ValueError):
+            except curses.error, ValueError:
                 blended_bg = base_bg
             _BLENDED[cache_key] = blended_bg
         return fg, blended_bg, attr
