@@ -17,14 +17,20 @@ def _run_isolated_case():
 
     from ranger.core.actions import Actions
 
-    globals().update({key: value for key, value in vars(importlib.import_module("pasteflow_test_support")).items() if not key.startswith("__")})
+    globals().update(
+        {
+            key: value
+            for key, value in vars(
+                importlib.import_module("pasteflow_test_support")
+            ).items()
+            if not key.startswith("__")
+        }
+    )
 
     _o = Actions.paste
 
-
     def paste(self, *a, **k):
         return _o(self, *a, **k)  # a clipboard-style wrapper, no functools.wraps
-
 
     Actions.paste = paste
     from plugins import pasteflow
@@ -41,7 +47,6 @@ def _run_isolated_case():
         open(os.path.join(dst, n), "w").write("o")
     fm = make_fm(src)
 
-
     def goto(p):
         d = fm.get_directory(p)
         d.load_content(schedule=False)
@@ -50,11 +55,12 @@ def _run_isolated_case():
         fm.thistab.path = p
         return d
 
-
     sd = goto(src)
+
     def ok(condition, message):
         assert condition, message
         print("PASS " + message)
+
     cur = lambda: fm.thisdir.files[fm.thisdir.pointer].basename
     # opaque wrapper: still jumps
     dd = goto(dst)
@@ -92,13 +98,13 @@ def _run_isolated_case():
     orig_load = dd.load_content
     calls = []
 
-
-    def stale_once(schedule=None):  # first reload after the paste returns the OLD listing
+    def stale_once(
+        schedule=None,
+    ):  # first reload after the paste returns the OLD listing
         calls.append(1)
         if len(calls) == 1:
             dd.files_all = [f for f in dd.files_all if f.basename != "n.txt"]
         return orig_load(schedule)
-
 
     fm.paste()
     pump(fm)

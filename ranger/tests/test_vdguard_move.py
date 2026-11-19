@@ -36,7 +36,6 @@ def _run_isolated_case():
 
     import plugin_test_paths as paths  # noqa: F401
 
-
     class Entry:
         def __init__(s, p):
             s.path = p
@@ -50,7 +49,6 @@ def _run_isolated_case():
 
         def __eq__(s, o):
             return getattr(o, "path", None) == s.path
-
 
     class Console:
         def __init__(s):
@@ -74,7 +72,6 @@ def _run_isolated_case():
             assert a in ch, (a, ch)
             cb(a)
 
-
     class FM(Actions):
         def __init__(s, cwd):
             s.notes = []
@@ -95,10 +92,16 @@ def _run_isolated_case():
             )
             s.settings = types.SimpleNamespace(confirm_on_delete="always")
             s.thisdir = types.SimpleNamespace(
-                path=cwd, files=[], marked_items=[], pointer=0, correct_pointer=lambda: None
+                path=cwd,
+                files=[],
+                marked_items=[],
+                pointer=0,
+                correct_pointer=lambda: None,
             )
             s.thistab = types.SimpleNamespace(path=cwd, get_selection=lambda: s.sel)
-            s.loader = types.SimpleNamespace(add=lambda l, append=False: s.queue.append(l))
+            s.loader = types.SimpleNamespace(
+                add=lambda l, append=False: s.queue.append(l)
+            )
             s.tags = types.SimpleNamespace(
                 tags={},
                 remove=lambda p: None,
@@ -144,7 +147,6 @@ def _run_isolated_case():
                     pass
             s.queue.clear()
 
-
     def newfm(cwd):
         fm = FM(cwd)
         FileManagerAware.fm_set(fm)
@@ -158,9 +160,10 @@ def _run_isolated_case():
         M.Command.fm = fm
         return fm
 
-
     base = tempfile.mkdtemp(prefix="vdt3")
-    view, d1, d2, outside = [fs.join(base, x) for x in ("view", "vd1", "vd2", "outside")]
+    view, d1, d2, outside = [
+        fs.join(base, x) for x in ("view", "vd1", "vd2", "outside")
+    ]
     for d in (view, d1, d2, outside):
         os.makedirs(d)
     M.vdsym.view_root = view
@@ -169,15 +172,12 @@ def _run_isolated_case():
     M.C.RECOVERY_LOG = fs.join(base, "state/moves.log")
     M._cache.warmed = True
 
-
     def w(p):
         os.makedirs(fs.dirname(p), exist_ok=True)
         open(p, "w").close()
 
-
     def rel(ps):
         return sorted(fs.relpath(p, base) for p in ps)
-
 
     # ---------- hooks: not a Tab.enter_dir wrapper, patched exactly once, survive re-exec
     assert Tab.enter_dir.__code__.co_filename.endswith("core/tab.py"), (
@@ -188,18 +188,18 @@ def _run_isolated_case():
     assert (Actions, "cut") in orig and orig[(Actions, "cut")] is not wrapped_cut
     importlib.reload(M)  # reloading vdsym must preserve its shared cache
     assert M._cache is sys.modules["_vdsym_shared"].cache
-    assert Actions.cut is wrapped_cut  # loading/reloading vdsym never stacks pasteflow hooks
+    assert (
+        Actions.cut is wrapped_cut
+    )  # loading/reloading vdsym never stacks pasteflow hooks
     M.vdsym.view_root = view
     M.vdsym.data_roots = (d1, d2)
     M.C.DASHBOARD_ROOT = fs.join(base, "bnm")
     M.C.RECOVERY_LOG = fs.join(base, "state/moves.log")
     bound = []
 
-
     class SigFM:
         def signal_bind(s, name, fn):
             bound.append((name, fn))
-
 
     f = SigFM()
     RH._bind(f)
@@ -219,13 +219,11 @@ def _run_isolated_case():
     w(fs.join(d1, "2024-05-pics/readme.txt"))
     w(fs.join(d1, "2024-05-pics/misc/123-45.webp"))
 
-
     def mk(line, fm, thisfile=None):
         M.Command.fm = fm
         c = M.vdsym(line)
         fm.thisfile = Entry(thisfile) if thisfile else None
         return c
-
 
     fm = newfm(base)
     c = mk("vdsym --modifiers=numeric -- 123-45.html", fm)
@@ -262,7 +260,9 @@ def _run_isolated_case():
     assert M._cache.rootver[view] == v0, "same content must not bump the version"
     st = os.stat(fs.join(view, "racy"))
     w(fs.join(view, "racy/b"))
-    os.utime(fs.join(view, "racy"), ns=(st.st_atime_ns, st.st_mtime_ns))  # restore mtime
+    os.utime(
+        fs.join(view, "racy"), ns=(st.st_atime_ns, st.st_mtime_ns)
+    )  # restore mtime
     v = M._cache.ensure(M.vdsym.roots(), "validate")
     assert "b" in v.index.names, "racy dir must be re-read"
     print("racy ok")
@@ -272,16 +272,18 @@ def _run_isolated_case():
     w(real)
     w(fs.join(d1, "a/movie_00m33s6.mp4"))
 
-
     def links():
-        for p in [fs.join(view, "abs"), fs.join(view, "sub/rel"), fs.join(view, "chain")]:
+        for p in [
+            fs.join(view, "abs"),
+            fs.join(view, "sub/rel"),
+            fs.join(view, "chain"),
+        ]:
             if fs.lexists(p):
                 os.unlink(p)
         os.makedirs(fs.join(view, "sub"), exist_ok=True)
         os.symlink(real, fs.join(view, "abs"))
         os.symlink("../../vd1/a/movie.mp4", fs.join(view, "sub/rel"))
         os.symlink(fs.join(view, "abs"), fs.join(view, "chain"))
-
 
     links()
 
@@ -306,7 +308,6 @@ def _run_isolated_case():
     assert not any(".vdsym-old-" in name for name in os.listdir(view))
     os.unlink(txn_link)
 
-
     def full_cycle(choice, dest, cancel=None, key=None):
         fm = newfm(fs.join(d1, "a"))
         fm.select(real)
@@ -324,7 +325,6 @@ def _run_isolated_case():
         fm.paste()
         fm.run_loader()
         return fm, text
-
 
     # print list + recovery log happen before the prompt
     fm, text = full_cycle("U", d2)
@@ -406,7 +406,9 @@ def _run_isolated_case():
     assert fm.cds and fm.cds[-1].endswith("bnm/movie.mp4") and not fm.copy_buffer
     # y -> moves, leaves links dangling
     fm, text = full_cycle("y", d2)
-    assert os.readlink(fs.join(view, "abs")) == real and not fs.exists(fs.join(view, "abs"))
+    assert os.readlink(fs.join(view, "abs")) == real and not fs.exists(
+        fs.join(view, "abs")
+    )
     os.rename(new, real)
     links()
 
@@ -554,7 +556,6 @@ def _run_isolated_case():
     os.symlink("../vd1/a/clipme.mp4", fs.join(view, "cl_rel"))
     os.chdir(fs.join(d1, "a"))
 
-
     def do_rename(name, answers):
         fm = newfm(fs.join(d1, "a"))
         fm.select(fs.join(d1, "a/" + fs.basename(src_cur[0])))
@@ -565,7 +566,6 @@ def _run_isolated_case():
         for a in answers:
             fm.console.answer(a)
         return fm
-
 
     src_cur = [src]
     fm = do_rename("renamed.mp4", ["U"])
@@ -605,12 +605,10 @@ def _run_isolated_case():
     hold = threading.Event()
     release = threading.Event()
 
-
     def holder():
         with M._cache.lock:
             hold.set()
             release.wait(5)
-
 
     t = threading.Thread(target=holder)
     t.start()

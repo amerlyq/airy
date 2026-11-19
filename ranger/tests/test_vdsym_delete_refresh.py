@@ -32,14 +32,12 @@ def _run_isolated_case():
         False  # covered by test4; these fixtures leave dangling links on purpose
     )
 
-
     class Entry:
         def __init__(s, path):
             s.path = path
             s.basename = fs.basename(path)
             s.relative_path = s.basename
             s.is_link = fs.islink(path)
-
 
     class Console:
         def __init__(s):
@@ -62,7 +60,6 @@ def _run_isolated_case():
             text, cb, ch = s.q.pop(0)
             assert a in ch
             cb(a)
-
 
     class FM:
         def __init__(s, cwd):
@@ -97,36 +94,32 @@ def _run_isolated_case():
         def move(s, **k):
             pass
 
-
     base = tempfile.mkdtemp(prefix="vdt2")
-    view, d1, d2, outside = [fs.join(base, x) for x in ("view", "vd1", "vd2", "outside")]
+    view, d1, d2, outside = [
+        fs.join(base, x) for x in ("view", "vd1", "vd2", "outside")
+    ]
     for d in (view, d1, d2, outside):
         os.makedirs(d)
     M.vdsym.view_root = view
     M.vdsym.data_roots = (d1, d2)
     C.DASHBOARD_ROOT = fs.join(base, "bnm")
 
-
     def w(p):
         os.makedirs(fs.dirname(p), exist_ok=True)
         open(p, "w").close()
-
 
     def mk(line, fm, thisfile=None):
         M.Command.fm = fm
         fm.thisfile = Entry(thisfile) if thisfile else None
         return M.vdsym(line)
 
-
     G.delete._copy_names = lambda self, names: True
-
 
     def start_delete(fm):
         M.Command.fm = fm
         fm.thisfile = fm.sel[0] if fm.sel else None
         d = G.delete("delete")
         d.execute()
-
 
     M._cache.warmed = True  # keep the warm thread out of tests
 
@@ -161,12 +154,16 @@ def _run_isolated_case():
     # replace prompt: Enter and Esc quit, don't replace
     w(fs.join(d1, "a/new.mp4"))
     fm = FM(fs.join(d1, "a"))
-    c = mk("vdsym --action=replace --source=basename --target=yanked", fm, thisfile=real)
+    c = mk(
+        "vdsym --action=replace --source=basename --target=yanked", fm, thisfile=real
+    )
     fm.copy_buffer = {Entry(fs.join(d1, "a/new.mp4"))}
     c.execute()
     fm.ui.console.esc()
     assert fs.realpath(fs.join(view, "v1")) == real
-    c = mk("vdsym --action=replace --source=basename --target=yanked", fm, thisfile=real)
+    c = mk(
+        "vdsym --action=replace --source=basename --target=yanked", fm, thisfile=real
+    )
     c.execute()
     fm.ui.console.enter()
     assert fs.realpath(fs.join(view, "v1")) == real
@@ -255,7 +252,9 @@ def _run_isolated_case():
     )
     fm.selected = None
     c.execute()
-    assert fm.selected is None  # :vdsym matches link names; target backlinks use find_backlinks.
+    assert (
+        fm.selected is None
+    )  # :vdsym matches link names; target backlinks use find_backlinks.
     assert fs.join(view, "into_dir") in M.find_backlinks(
         [fs.join(d2, "dir/inner/f.mp4")]
     )
@@ -315,14 +314,12 @@ def _run_isolated_case():
 
     real_thread = threading.Thread
 
-
     class T:
         def __init__(s, target, **k):
             s.t = target
 
         def start(s):
             started.append(1)
-
 
     M.threading.Thread = T
     M._on_cd(outside)

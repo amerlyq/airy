@@ -25,6 +25,7 @@ def _run_isolated_case():
     from os import path as fs
 
     from plugins import vdsym as M
+    from plugins import vddangling as D
 
     import plugin_test_paths as paths  # noqa: F401
 
@@ -35,24 +36,31 @@ def _run_isolated_case():
     os.makedirs(view)
     os.makedirs(d1)
     for i in range(50000):
-        os.symlink(fs.join(d1, f"f{i}.mp4") if i % 100 else "/gone", fs.join(view, f"l{i}"))
+        os.symlink(
+            fs.join(d1, f"f{i}.mp4") if i % 100 else "/gone", fs.join(view, f"l{i}")
+        )
     for i in range(0, 50000, 2):
         open(fs.join(d1, f"f{i}.mp4"), "w").close()
     roots = M.vdsym.roots()
     M._cache.ensure(roots)
     time.sleep(2.2)
     M._cache.ensure(roots, "validate")
-    assert len(M._cache.monitor.known) == 50_000
+    # The dangling monitor tracks dangling targets only (500 here), while the
+    # cache index tracks all 50,000 link entries.
+    assert D._mon.known is None
     t = time.perf_counter()
-    r = M.check_dangling(None)
-    assert len(r) == 500
+    r = D.check_dangling(None)
+    assert r == []  # first check establishes baseline
+    # Half the names have backing files, except each hundredth is deliberately
+    # pointed at /gone: 25,000 odd missing targets + 500 forced dangling links.
+    assert len(D._mon.known) == 25_500
     print(
         "baseline check, 50k links:",
         round(time.perf_counter() - t, 3),
-        len(M._cache.monitor.known),
+        len(D._mon.known),
     )
     t = time.perf_counter()
-    r = M.check_dangling(None)
+    r = D.check_dangling(None)
     print("repeat check, 50k links  :", round(time.perf_counter() - t, 3), r)
     assert r == []
     shutil.rmtree(base)

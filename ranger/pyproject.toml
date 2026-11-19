@@ -6,8 +6,8 @@ requires-python = ">=3.14,<3.15"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
-pythonpath = ["plugins"]
-addopts = "-ra -m 'not benchmark'"
+pythonpath = [".", "plugins"]
+addopts = "-ra -m 'not benchmark' --ignore=plugins/ranger-archives/tests"
 markers = [
     "integration: exercises a plugin together with Ranger or other plugins",
     "benchmark: filesystem performance test, excluded from the default run",

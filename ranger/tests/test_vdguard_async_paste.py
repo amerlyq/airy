@@ -17,11 +17,20 @@ def _run_isolated_case():
 
     import sys
     from pathlib import Path
+
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
     import importlib
     import threading
 
-    globals().update({key: value for key, value in vars(importlib.import_module("pasteflow_test_support")).items() if not key.startswith("__")})
+    globals().update(
+        {
+            key: value
+            for key, value in vars(
+                importlib.import_module("pasteflow_test_support")
+            ).items()
+            if not key.startswith("__")
+        }
+    )
 
     root = tempfile.mkdtemp()
     data = os.path.join(root, "data")
@@ -36,7 +45,15 @@ def _run_isolated_case():
     mods = {
         n: importlib.import_module("plugins." + n)
         for n in sorted(
-            ["pasteflow", "rhooks", "vdconf", "vddangling", "vdguard", "vdsym", "vdutil"]
+            [
+                "pasteflow",
+                "rhooks",
+                "vdconf",
+                "vddangling",
+                "vdguard",
+                "vdsym",
+                "vdutil",
+            ]
         )
     }
     vd, guard, dang, C, util = (
@@ -48,16 +65,15 @@ def _run_isolated_case():
     C.RECOVERY_LOG = os.path.join(root, "rec.log")
     C.WARM_ON_CD = False
     con = fm.ui.console
+
     def ok(condition, message):
         assert condition, message
         print("PASS " + message)
-
 
     def mk(p):
         os.makedirs(os.path.dirname(p), exist_ok=True)
         open(p, "w").write("x")
         return p
-
 
     def goto(d):
         dd = fm.get_directory(d)
@@ -67,13 +83,11 @@ def _run_isolated_case():
         fm.thistab.path = d
         return dd
 
-
     def pump2(n=3000):
         for _ in range(n):
             if not fm.loader.has_work():
                 break
             fm.loader.work()
-
 
     # ---- dd: immediate notice, async scan, one compact prompt -------------------------------- #
     f = mk(os.path.join(data, "a_very_long_name_" + "x" * 90 + ".mp4"))
@@ -229,12 +243,10 @@ def _run_isolated_case():
     # ---- bounded: one link hangs ------------------------------------------------------------------------------ #
     orig = dang._dangling
 
-
     def slow(link):
         if link.endswith("d2"):
             time.sleep(8)
         return orig(link)
-
 
     dang._dangling = slow
     dang._mon.known = set()
@@ -253,11 +265,9 @@ def _run_isolated_case():
     # ---- remote targets are throttled -------------------------------------------------------------------------- #
     calls = []
 
-
     def counting(link):
         calls.append(link)
         return orig(link)
-
 
     dang._dangling = counting
     dang._mon.slow.clear()
@@ -271,7 +281,8 @@ def _run_isolated_case():
     n2 = len(calls)
     ok(
         n1 > 0 and n2 == n1,
-        "remote links probed once per DANGLING_REMOTE_EVERY (%d then +%d)" % (n1, n2 - n1),
+        "remote links probed once per DANGLING_REMOTE_EVERY (%d then +%d)"
+        % (n1, n2 - n1),
     )
     dang._compare(5, 2, force=True)
     ok(len(calls) > n2, "force (:dangling) ignores the throttle")

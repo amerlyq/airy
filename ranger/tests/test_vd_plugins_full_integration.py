@@ -17,10 +17,19 @@ def _run_isolated_case():
 
     import sys
     from pathlib import Path
+
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
     import importlib
 
-    globals().update({key: value for key, value in vars(importlib.import_module("pasteflow_test_support")).items() if not key.startswith("__")})
+    globals().update(
+        {
+            key: value
+            for key, value in vars(
+                importlib.import_module("pasteflow_test_support")
+            ).items()
+            if not key.startswith("__")
+        }
+    )
 
     # load like ranger: alphabetical, as plugins.<name>
     fm = None
@@ -54,18 +63,15 @@ def _run_isolated_case():
     ui = fm.ui
     con = ui.console
 
-
     def mk(path, text="x"):
         os.makedirs(os.path.dirname(path), exist_ok=True)
         open(path, "w").write(text)
         return path
 
-
     def load(d):
         dd = fm.get_directory(d)
         dd.load_content(schedule=False)
         return dd
-
 
     def goto(d):
         dd = load(d)
@@ -74,14 +80,11 @@ def _run_isolated_case():
         fm.thistab.path = dd.path
         return dd
 
-
     def point(dd, name):
         dd.move_to_obj(os.path.join(dd.path, name))
 
-
     def cur():
         return fm.thisdir.files[fm.thisdir.pointer].basename
-
 
     def ok(condition, message):
         assert condition, message

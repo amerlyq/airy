@@ -26,6 +26,7 @@ TARGET_PATH2 = os.path.expanduser("~/.local/share/ranger/scaffolds2")
 
 
 def set_scaffold_paths():
+    os.makedirs(os.path.dirname(TARGET_PATH), exist_ok=True)
     if not os.path.exists(TARGET_PATH):
         open(TARGET_PATH, "w").close()
     if not os.path.exists(TARGET_PATH2):

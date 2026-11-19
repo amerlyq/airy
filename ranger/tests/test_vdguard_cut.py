@@ -17,10 +17,19 @@ def _run_isolated_case():
 
     import sys
     from pathlib import Path
+
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
     import importlib
 
-    globals().update({key: value for key, value in vars(importlib.import_module("pasteflow_test_support")).items() if not key.startswith("__")})
+    globals().update(
+        {
+            key: value
+            for key, value in vars(
+                importlib.import_module("pasteflow_test_support")
+            ).items()
+            if not key.startswith("__")
+        }
+    )
 
     root = tempfile.mkdtemp()
     data = os.path.join(root, "data")
@@ -33,7 +42,15 @@ def _run_isolated_case():
     mods = {
         n: importlib.import_module("plugins." + n)
         for n in sorted(
-            ["pasteflow", "rhooks", "vdconf", "vddangling", "vdguard", "vdsym", "vdutil"]
+            [
+                "pasteflow",
+                "rhooks",
+                "vdconf",
+                "vddangling",
+                "vdguard",
+                "vdsym",
+                "vdutil",
+            ]
         )
     }
     vd, guard, C = mods["vdsym"], mods["vdguard"], mods["vdconf"]
@@ -44,12 +61,10 @@ def _run_isolated_case():
     C.WARM_ON_CD = False
     con = fm.ui.console
 
-
     def mk(p):
         os.makedirs(os.path.dirname(p), exist_ok=True)
         open(p, "w").write("x")
         return p
-
 
     def goto(d):
         dd = fm.get_directory(d)
@@ -58,7 +73,6 @@ def _run_isolated_case():
         fm.thistab.pathway = (dd,)
         fm.thistab.path = d
         return dd
-
 
     f = mk(os.path.join(data, "a.mp4"))
     os.symlink(f, os.path.join(view, "a.mp4"))  # the link we move

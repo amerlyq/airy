@@ -16,8 +16,16 @@ def _run_isolated_case():
     """Process-isolated pasteflow options, guards, overwrite, and re-execution scenario."""
 
     from plugins import pasteflow
-    globals().update({key: value for key, value in vars(importlib.import_module("pasteflow_test_support")).items() if not key.startswith("__")})
 
+    globals().update(
+        {
+            key: value
+            for key, value in vars(
+                importlib.import_module("pasteflow_test_support")
+            ).items()
+            if not key.startswith("__")
+        }
+    )
 
     def setup():
         root = tempfile.mkdtemp()
@@ -38,10 +46,8 @@ def _run_isolated_case():
         sd.load_content(schedule=False)
         return fm, d, sd, src, dst
 
-
     def cur(fm):
         return fm.thisdir.files[fm.thisdir.pointer].basename
-
 
     # 1 symlink: sync kind, jump to first new link in sort order
     fm, d, sd, src, dst = setup()
@@ -94,11 +100,9 @@ def _run_isolated_case():
     fm, d, sd, src, dst = setup()
     held = []
 
-
     def g(p, proceed):
         p.drop([x for x in p.paths if x.endswith("a.txt")])
         held.append(proceed)
-
 
     pasteflow.guard("t", g)
     fm.copy_buffer = {f for f in sd.files_all if f.basename in ("a.txt", "b.txt")}
@@ -119,11 +123,9 @@ def _run_isolated_case():
     assert sorted(os.listdir(dst)) == ["a0", "b.txt", "m1", "zz"]
     assert cur(fm) == "b.txt"
 
-
     # 6 crashing guard aborts
     def bad(p, proceed):
         raise RuntimeError("boom")
-
 
     pasteflow.guard("t", bad)
     fm.paste()

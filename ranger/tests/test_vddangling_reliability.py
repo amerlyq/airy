@@ -27,7 +27,16 @@ def _run_isolated_case():
     from os import path as fs
 
     import plugin_test_paths as paths  # noqa: F401
-    globals().update({key: value for key, value in vars(importlib.import_module("vdsym_test_support")).items() if not key.startswith("__")})
+
+    globals().update(
+        {
+            key: value
+            for key, value in vars(
+                importlib.import_module("vdsym_test_support")
+            ).items()
+            if not key.startswith("__")
+        }
+    )
 
     base = tempfile.mkdtemp(prefix="vdt4")
     view, d1, d2, d3 = [fs.join(base, x) for x in ("view", "vd1", "vd2", "vd3")]
@@ -40,22 +49,18 @@ def _run_isolated_case():
     M._cache.warmed = True
     vdconf.WARM_ON_CD = False
 
-
     def dangling_now():
         view = M._cache.ensure(M.vdsym.link_roots(), "validate")
         return {link for link in view.index.links if vdutil._dangling(link)}
-
 
     def w(p):
         os.makedirs(fs.dirname(p), exist_ok=True)
         open(p, "w").close()
 
-
     def mk(line, fm, thisfile=None):
         M.Command.fm = fm
         fm.thisfile = Entry(thisfile) if thisfile else None
         return M.vdsym(line)
-
 
     def move(fm, srcs, dest, answer):
         fm.select(*srcs)
@@ -67,7 +72,6 @@ def _run_isolated_case():
         fm.thisdir.path = dest
         fm.paste()
         fm.run_loader()
-
 
     # ---- R: old links are always gone / never dangling; link already named like the file goes first
     real = fs.join(d1, "a/movie.mp4")
@@ -82,7 +86,9 @@ def _run_isolated_case():
     new = fs.join(d2, "movie.mp4")
     left = sorted(os.listdir(view))
     print(left)
-    assert left == ["g", "movie.mp4"], left  # zz_other + zz_chain collapsed into movie.mp4
+    assert left == ["g", "movie.mp4"], (
+        left
+    )  # zz_other + zz_chain collapsed into movie.mp4
     assert os.readlink(fs.join(view, "movie.mp4")) == new and os.listdir(
         fs.join(view, "g")
     ) == ["movie.mp4"]
@@ -153,7 +159,9 @@ def _run_isolated_case():
     fm.thisdir.path = d2
     orig_paste_target = d2
     fm.paste()  # job created with prediction d2/race.mp4
-    w(fs.join(d2, "race.mp4"))  # ... but somebody creates that name before the mover runs
+    w(
+        fs.join(d2, "race.mp4")
+    )  # ... but somebody creates that name before the mover runs
     fm.run_loader()
     tgt = os.readlink(fs.join(view, "lr"))
     print(tgt)
@@ -185,12 +193,10 @@ def _run_isolated_case():
     )
     orig = os.lstat
 
-
     def deny(p, *a, **k):
         if p.endswith("m1.txt"):
             raise PermissionError(13, "denied")
         return orig(p, *a, **k)
-
 
     M.os.lstat = deny
     assert not M._gone(fs.join(d2, "many", "m1.txt"))
@@ -204,12 +210,10 @@ def _run_isolated_case():
     assert not rec.racy or time.time_ns() - 10**18 < M.RACY_NS
     old_scandir = os.scandir
 
-
     def boom(p):
         if str(p).endswith("/vd2/locked"):
             raise PermissionError(13, "denied", p)
         return old_scandir(p)
-
 
     os.makedirs(fs.join(d2, "locked"))
     w(
@@ -243,11 +247,9 @@ def _run_isolated_case():
 
     records = []
 
-
     class Cap(logging.Handler):
         def emit(self, r):
             records.append(r.getMessage())
-
 
     logging.getLogger("ranger.vdsym").addHandler(Cap())
     logging.getLogger("ranger.vdsym").setLevel(logging.INFO)
@@ -287,12 +289,10 @@ def _run_isolated_case():
     M.LOCK_WAIT = 0.05
     hold, rel = threading.Event(), threading.Event()
 
-
     def holder():
         with M._cache.lock:
             hold.set()
             rel.wait(5)
-
 
     t = threading.Thread(target=holder)
     t.start()
@@ -315,7 +315,9 @@ def _run_isolated_case():
     fm.console.answer("y")
     fm.console.answer("y")
     assert fm.deleted == [["d.mp4"]] and not fs.exists(tD)
-    assert vddangling.check_dangling(fm) == [] and not any("newly" in x for x in fm.notes), fm.notes
+    assert vddangling.check_dangling(fm) == [] and not any(
+        "newly" in x for x in fm.notes
+    ), fm.notes
     # healed and dangling again => news again
     w(tD)
     assert vddangling.check_dangling(fm) == []
@@ -323,14 +325,12 @@ def _run_isolated_case():
     assert vddangling.check_dangling(fm) == [fs.join(view, "md")]
     print("check ok")
 
-
     # ---- the ranger timer: one-shot, after DANGLING_QUIET without VD activity, via Loader.work
     class FakeLoader:
         calls = 0
 
         def work(self):
             FakeLoader.calls += 1
-
 
     FakeLoader.work = rhooks._make_work(FakeLoader.work)
     ld = FakeLoader()
@@ -362,7 +362,10 @@ def _run_isolated_case():
         time.sleep(0.01)
         ld.work()
     assert (
-        any(note.startswith("4 symlink(s) newly dangling (4 in total) -> ") for note in fm.notes)
+        any(
+            note.startswith("4 symlink(s) newly dangling (4 in total) -> ")
+            for note in fm.notes
+        )
         and mon.deadline is None
     ), fm.notes
     n = len(fm.notes)
@@ -441,7 +444,9 @@ def _run_isolated_case():
     fm.console.answer("l")
     out = fm.cmds[-1]
     print(out)
-    assert "candidate: " + fs.join(d2, "moved/a.mp4") in out and fm.selected.endswith("mbb")
+    assert "candidate: " + fs.join(d2, "moved/a.mp4") in out and fm.selected.endswith(
+        "mbb"
+    )
     # U re-points the unique-candidate links and continues
     fm.selected = None
     vddangling._mon.known = dangling_now() - {fs.join(view, "ma2")}
@@ -462,6 +467,7 @@ def _run_isolated_case():
     M._cache.ensure(M.vdsym.roots(), "rescan")
     fm.cmds.clear()
     M.Command.fm = fm
+
     def run_loadable(loadable, append=False):
         for _ in loadable.load_generator:
             pass
@@ -469,15 +475,18 @@ def _run_isolated_case():
     fm.loader = types.SimpleNamespace(add=run_loadable)
     vddangling.dangling("dangling list").execute()
     out = fm.cmds[-1]
-    assert "candidate: " + fs.join(d2, "moved/c.mp4") in out and fs.join(view, "mc9") in out
+    assert (
+        "candidate: " + fs.join(d2, "moved/c.mp4") in out
+        and fs.join(view, "mc9") in out
+    )
     vddangling.dangling("dangling update").execute()
     fm.console.esc()
     assert not fs.exists(fs.join(view, "mc9"))  # Esc cancels
     vddangling.dangling("dangling update").execute()
     fm.console.answer("y")
-    assert fs.exists(fs.join(view, "mc9")) and fs.realpath(fs.join(view, "mc9")) == fs.join(
-        d2, "moved/c.mp4"
-    )
+    assert fs.exists(fs.join(view, "mc9")) and fs.realpath(
+        fs.join(view, "mc9")
+    ) == fs.join(d2, "moved/c.mp4")
     vddangling.dangling("dangling bogus").execute()
     assert "Syntax" in fm.notes[-1]
     print("dangling cmd ok")

@@ -11,6 +11,7 @@
 from __future__ import annotations
 
 import os
+import shlex
 from os import path as fs
 
 from ranger.api.commands import Command
@@ -63,7 +64,9 @@ class link_orig(Command):
                 duplicate += 1
                 continue
             self.fm.execute_command(
-                f'ln -svt "{d}" --backup=numbered -- "{optrelpath(src)}"'
+                shlex.join(
+                    ["ln", "-svt", d, "--backup=numbered", "--", optrelpath(src)]
+                )
             )
             # MAYBE: notify user if some links had failed (e.g. wrong relative path)
             if not fs.exists(target):

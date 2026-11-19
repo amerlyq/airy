@@ -25,7 +25,6 @@ def _run_isolated_case():
 
     import plugin_test_paths as paths  # noqa: F401
 
-
     class D:  # Directory stand-in: one object per path, like fm.get_directory()
         _c = {}
 
@@ -41,7 +40,6 @@ def _run_isolated_case():
         def move_to_obj(s, obj):
             s.pointed = obj
 
-
     def mk(n):
         h = History(2000, unique=False)
         for i in range(n):
@@ -49,15 +47,12 @@ def _run_isolated_case():
         h.index = n - 1
         return h
 
-
     def jump(h, old, new):  # what enter_dir() records for a non-step jump
         H._visit(h, D(old))
         H._visit(h, D(new))
 
-
     def state(h):
         return f"[{h.index + 1}/{len(h)}]"
-
 
     # --- <cl> <H> <cl> <H> ... never grows (it grew by 2 per cycle before)
     h = mk(3)
@@ -129,17 +124,16 @@ def _run_isolated_case():
         pns,
     )
 
-
     def chain(name, wrapped, **kw):
         inner = lambda: (lambda: H._is_step(sys._getframe(1)))()  # noqa: E731
         call = (lambda: pns["wrapper"](inner)) if wrapped else inner
         return ns[name](call, **kw)
 
-
     assert chain("move", False) is True
     assert chain("move", True) is True  # a foreign wrapper in between: still a step
     assert (
-        chain("move_parent", True, n=1) is True and chain("move_parent", True, n=2) is False
+        chain("move_parent", True, n=1) is True
+        and chain("move_parent", True, n=2) is False
     )
     assert chain("cd", True) is False  # another ranger caller: a real jump
     assert H._is_step(sys._getframe(0)) is False  # no ranger frame within reach
@@ -149,7 +143,9 @@ def _run_isolated_case():
     tab = type("Tab", (), {})()
     tab.thisdir = child
     tab.pathway = (parent, child)
-    tab.assign_cursor_positions_for_subdirs = lambda: Tab.assign_cursor_positions_for_subdirs(tab)
+    tab.assign_cursor_positions_for_subdirs = lambda: (
+        Tab.assign_cursor_positions_for_subdirs(tab)
+    )
     H._sync_parent_cursor(tab)
     assert parent.pointed is child
     print("OK5")

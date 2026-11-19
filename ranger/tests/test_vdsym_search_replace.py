@@ -32,14 +32,12 @@ def _run_isolated_case():
     C.DANGLING_MONITOR = False  # covered by the vddangling integration test.
     from ranger.api.commands import Command
 
-
     class Entry:
         def __init__(s, path):
             s.path = path
             s.basename = fs.basename(path)
             s.relative_path = s.basename
             s.is_link = fs.islink(path)
-
 
     class Console:
         def __init__(s):
@@ -52,7 +50,6 @@ def _run_isolated_case():
             text, cb, ch = s.q.pop(0)
             assert ch is None or a in ch, (a, ch)
             cb(a)
-
 
     class FM:
         def __init__(s, cwd):
@@ -90,7 +87,6 @@ def _run_isolated_case():
         def move(s, **k):
             pass
 
-
     base = tempfile.mkdtemp(prefix="vdt")
     view, d1, d2 = [fs.join(base, x) for x in ("view", "vd1", "vd2")]
     for d in (view, d1, d2):
@@ -100,11 +96,9 @@ def _run_isolated_case():
     bnm = fs.join(base, "bnm")
     C.DASHBOARD_ROOT = bnm
 
-
     def w(p, data=""):
         os.makedirs(fs.dirname(p), exist_ok=True)
         open(p, "w").write(data)
-
 
     w(fs.join(d1, "a/some video.mp4"))
     w(fs.join(d1, "a/some video_00m33s6.mp4"))
@@ -126,16 +120,13 @@ def _run_isolated_case():
     )  # same name, different target
     os.symlink(fs.join(d1, "gone.mp4"), fs.join(view, "dangling"))
 
-
     def mk(line, fm, thisfile=None):
         M.Command.fm = fm
         fm.thisfile = Entry(thisfile) if thisfile else None
         return M.vdsym(line)
 
-
     def rel(ps):
         return sorted(fs.relpath(p, base) for p in ps)
-
 
     fm = FM(fs.join(d1, "a"))
     # --- cold build, both fd and scandir
@@ -187,7 +178,9 @@ def _run_isolated_case():
     real = fs.join(d1, "a/some video.mp4")
     bl = M.find_backlinks([real])
     print("backlinks", rel(bl))
-    assert rel(bl) == sorted(["view/abs_link", "view/sub/rel_link", "view/chain"]), rel(bl)
+    assert rel(bl) == sorted(["view/abs_link", "view/sub/rel_link", "view/chain"]), rel(
+        bl
+    )
     # new link created after cache build is seen (validate)
     os.symlink(real, fs.join(view, "fresh"))
     assert "view/fresh" in rel(M.find_backlinks([real]))
@@ -240,7 +233,6 @@ def _run_isolated_case():
         paths + [fs.join(d1, "a/some video_00m33s6.mp4")]
     ) != G.find_clips(paths)  # selected clip excluded, but its _prev stays
 
-
     # --- delete flow
     def run_delete(fm, answers):
         M.Command.fm = fm
@@ -252,7 +244,6 @@ def _run_isolated_case():
             out.append(fm.ui.console.q[0][0])
             fm.ui.console.answer(answers.pop(0))
         return out
-
 
     G.delete._copy_names = lambda self, names: True
     fm = FM(fs.join(d1, "a"))
@@ -306,7 +297,9 @@ def _run_isolated_case():
     os.symlink(real, replace_me)
     M._cache.ensure(M.vdsym.roots(), "rescan")
     fm = FM(fs.join(d1, "a"))
-    c = mk("vdsym --action=replace --source=basename --target=yanked", fm, thisfile=real)
+    c = mk(
+        "vdsym --action=replace --source=basename --target=yanked", fm, thisfile=real
+    )
     fm.copy_buffer = {Entry(fs.join(d1, "a/new.mp4"))}
     fm.thisfile = Entry(real)
     c.execute()
@@ -322,8 +315,7 @@ def _run_isolated_case():
     # cache reflects replace
     M._cache.ensure(M.vdsym.roots(), "rescan")
     assert any(
-        p.endswith("view/new.mp4")
-        for p in M.vdsym("vdsym -- new.mp4")._matches()
+        p.endswith("view/new.mp4") for p in M.vdsym("vdsym -- new.mp4")._matches()
     )
 
     # --- print action escapes

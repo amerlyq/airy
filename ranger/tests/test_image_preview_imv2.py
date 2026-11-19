@@ -365,7 +365,9 @@ class TestImvSync(PytestCase):
         )
         self.sync.sync_to_imv()
         self.assertEqual(self.sync.playlist, (str(self.paths[2]), str(self.paths[0])))
-        open_command = next(command for command in self.sent() if command.startswith("open "))
+        open_command = next(
+            command for command in self.sent() if command.startswith("open ")
+        )
         self.assertEqual(shlex.split(open_command)[1:], list(self.sync.playlist))
         self.assertEqual(self.sent()[-1], "goto 2")
 
@@ -618,4 +620,3 @@ class TestTransport(PytestCase):
                 with patch.dict(os.environ, XDG_RUNTIME_DIR=directory):
                     found = self.plugin._sockets()
                 self.assertEqual({item.path for item in found}, {path})
-

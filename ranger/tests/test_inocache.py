@@ -48,16 +48,16 @@ def test_store_validation_modes_and_independent_versions(tmp_path):
     assert inocache.Store("tags", 1, "none", str(cache)).get(file_path.stat()) == {
         "labels": ["keep"]
     }
-    assert inocache.Store("visited", 1, "path", str(cache)).get(
-        "/some/directory"
-    ) is True
+    assert (
+        inocache.Store("visited", 1, "path", str(cache)).get("/some/directory") is True
+    )
     assert inocache.Store("visited", 1, "path", str(cache)).get("/other") is None
 
     newer_version = inocache.Store("tags", 2, "none", str(cache))
     assert newer_version.get(stat) is None
-    assert inocache.Store("visited", 1, "path", str(cache)).get(
-        "/some/directory"
-    ) is True
+    assert (
+        inocache.Store("visited", 1, "path", str(cache)).get("/some/directory") is True
+    )
 
 
 def test_directory_store_invalidates_when_directory_changes(tmp_path):

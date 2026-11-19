@@ -16,7 +16,16 @@ def _run_isolated_case():
     """Process-isolated basic pasteflow copy and cursor-selection scenario."""
 
     from plugins import pasteflow
-    globals().update({key: value for key, value in vars(importlib.import_module("pasteflow_test_support")).items() if not key.startswith("__")})
+
+    globals().update(
+        {
+            key: value
+            for key, value in vars(
+                importlib.import_module("pasteflow_test_support")
+            ).items()
+            if not key.startswith("__")
+        }
+    )
 
     root = tempfile.mkdtemp()
     src = os.path.join(root, "src")

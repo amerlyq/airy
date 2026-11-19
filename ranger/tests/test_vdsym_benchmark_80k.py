@@ -87,11 +87,12 @@ def _run_isolated_case():
     print("cold build (scandir fallback)", round(time.perf_counter() - t, 3))
     # glob + ignore-case lookup
     M.Command.fm = types.SimpleNamespace(thisfile=None)
-    c = M.vdsym("vdsym --modifiers=glob,ignore-case -- CLIP 7-1")
+    c = M.vdsym("vdsym --modifiers=glob,ignore-case -- CLIP")
     t = time.perf_counter()
     m = c._matches()
     print("glob lookup", round(time.perf_counter() - t, 3), len(m))
-    assert len(m) == n
+    # One indexed link aliases a clip basename; newlink adds a second alias.
+    assert len(m) == n + 2
     c = M.vdsym("vdsym -- 'clip 7-1.mp4'")
     t = time.perf_counter()
     m = c._matches()

@@ -16,8 +16,16 @@ def _run_isolated_case():
     """Process-isolated pasteflow UI refresh scenario for copy and cut operations."""
 
     from plugins import pasteflow
-    globals().update({key: value for key, value in vars(importlib.import_module("pasteflow_test_support")).items() if not key.startswith("__")})
 
+    globals().update(
+        {
+            key: value
+            for key, value in vars(
+                importlib.import_module("pasteflow_test_support")
+            ).items()
+            if not key.startswith("__")
+        }
+    )
 
     def setup(big=True):
         root = tempfile.mkdtemp()
@@ -40,7 +48,6 @@ def _run_isolated_case():
         sd.load_content(schedule=False)
         return fm, d, sd, src, dst
 
-
     def ui_pump(fm, d, n=100000):
         for _ in range(n):
             d.load_content_if_outdated()  # UI draw does this every frame
@@ -51,7 +58,6 @@ def _run_isolated_case():
                 d.load_content_if_outdated()
                 if not fm.loader.has_work():
                     break
-
 
     for cut in (False, True):
         fm, d, sd, src, dst = setup()

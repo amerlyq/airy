@@ -1,6 +1,7 @@
 import os
 
 from ranger.container.directory import Directory
+from ranger.container.fsobject import FileSystemObject
 
 Directory.sort_dict["from_end"] = lambda x: x.relative_path[::-1]
 Directory.sort_dict["name_len"] = lambda x: (len(x.relative_path), x.relative_path)
