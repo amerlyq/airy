@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+cd -- "$repo_root"
+
+for tool in ruff pytest; do
+  if ! command -v "$tool" >/dev/null 2>&1; then
+    printf 'qa: required tool not found on PATH: %s\n' "$tool" >&2
+    exit 127
+  fi
+done
+
+mapfile -d '' python_files < <(find plugins tests -type f -name '*.py' -print0)
+mapfile -d '' plugin_files < <(find plugins -maxdepth 2 -type f -name '*.py' -print0)
+qa_log_dir="$(mktemp -d)"
+trap 'rm -rf "$qa_log_dir"' EXIT
+failed=0
+
+run_check() {
+  local label=$1
+  local logfile="$qa_log_dir/$label.log"
+  shift
+  printf '%-12s' "$label"
+  if "$@" >"$logfile" 2>&1; then
+    printf 'ok\n'
+    if [[ $label == tests ]]; then
+      grep -E '^[0-9]+ .* in [0-9.]+s$' "$logfile" | tail -1
+    fi
+    return 0
+  fi
+
+  failed=1
+  printf 'failed\n'
+  sed -n '1,24p' "$logfile"
+  if [[ $(wc -l <"$logfile") -gt 24 ]]; then
+    printf '... output shortened; final summary follows ...\n'
+    tail -n 3 "$logfile"
+  fi
+  return 0
+}
+
+run_check format ruff format --isolated --check --quiet "${python_files[@]}"
+# E402 is used by Ranger patch hooks; E741/E722 cover established link and fallback idioms.
+run_check lint ruff check --isolated --select E4,E7,E9,F --ignore E402,E741,E722 --output-format concise "${plugin_files[@]}"
+run_check tests pytest -q --tb=short --maxfail=1 -W error --strict-markers "$@" tests
+exit "$failed"
