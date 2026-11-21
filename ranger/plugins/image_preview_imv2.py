@@ -619,7 +619,7 @@ class ImvSync:
         self.snapshot_job = None
         try:
             snapshot = future.result()
-        except OSError, ValueError:
+        except (OSError, ValueError):
             return  # Temporary-file/IPC failures are retried on the next poll.
         if requested_context != context:
             return

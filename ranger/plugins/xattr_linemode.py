@@ -15,7 +15,7 @@ class XAttrLinemode(LinemodeBase):
 
         try:
             xattr = check_output(["lsattr", "-d", f]).strip().split()[0]
-        except CalledProcessError, IndexError:
+        except (CalledProcessError, IndexError):
             raise NotImplementedError
         if not isinstance(xattr, str):
             xattr = xattr.decode("utf-8")

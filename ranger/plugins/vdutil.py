@@ -39,7 +39,7 @@ def _gone(path: str) -> bool:
     a result is only dropped when we are sure it no longer exists."""
     try:
         os.lstat(path)
-    except FileNotFoundError, NotADirectoryError:
+    except (FileNotFoundError, NotADirectoryError):
         return True
     except OSError:
         return False
@@ -51,7 +51,7 @@ def _dangling(link: str) -> bool:
     a hung mount) are not 'dangling'."""
     try:
         os.stat(link)
-    except FileNotFoundError, NotADirectoryError:
+    except (FileNotFoundError, NotADirectoryError):
         return True
     except OSError as error:
         return error.errno == errno.ELOOP

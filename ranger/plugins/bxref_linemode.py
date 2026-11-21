@@ -15,7 +15,7 @@ class XAttrLinemode(LinemodeBase):
 
         try:
             xattr = check_output(["lsattr", "-d", f]).strip().split()[0]
-        except CalledProcessError, IndexError:
+        except (CalledProcessError, IndexError):
             raise NotImplementedError
         if not isinstance(xattr, str):
             xattr = xattr.decode("utf-8")
@@ -41,7 +41,7 @@ class BTimeXrefLinemode(LinemodeBase):
             bts = int(ts).to_bytes(4, byteorder="big")
             z85ts = run(["basenc", "--z85"], input=bts, check=True, capture_output=True)
             z85ts = z85ts.stdout.strip().decode("utf-8")[::-1]
-        except CalledProcessError, IndexError:
+        except (CalledProcessError, IndexError):
             raise NotImplementedError
         return z85ts
 

@@ -146,7 +146,7 @@ class flat_inode(Command):
 
         try:
             q = int(q)
-        except TypeError, ValueError:
+        except (TypeError, ValueError):
             return self.fm.notify("flat_inode: level must be an integer", bad=True)
         if "u" in t:
             t, q = "", 0
